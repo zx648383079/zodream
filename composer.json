@@ -1,5 +1,5 @@
 {
-    "name": "ZoDream/app",
+    "name": "zodream/app",
     "type": "library",
     "description": "ZoDream PHP main program",
     "keywords": ["log","logging"],
