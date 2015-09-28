@@ -33,7 +33,7 @@ class Controller{
 				case '?':
 					if(!Auth::guest())
 					{
-						App::redirect('?c=home');
+						App::redirect('/');
 					}
 					break;
 				case '1':
@@ -41,6 +41,9 @@ class Controller{
 					{
 						App::redirect('?c=auth');
 					}
+					break;
+				case '!':
+					App::redirect('/' , 4 ,'您访问的页面暂未开放！','413');
 					break;
 				default:
 					if(!App::role($role))

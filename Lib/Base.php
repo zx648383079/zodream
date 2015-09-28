@@ -7,7 +7,6 @@ namespace App\Lib;
 *
 ********************************************************/
 use App\Lib\Object\OArray;
-use App\Lib\Helper\HUrl;
 use App\Lib\Web\WRequest;
 use App\Lib\Role\RComma;
 
@@ -28,7 +27,7 @@ class Base{
 		
 		self::$request = new WRequest();
 		
-		self::load();
+		Route::load();
 	}
 	/**
 	* 获取配置文件
@@ -343,38 +342,6 @@ class Base{
 		//extract(self::$data);
 		require($file.$ext);
 	}
-
-	/**
-	 * 加载控制器和视图
-	 *
-	 * @access globe
-	 * @param $c string 控制器的名称
-	 * @param $v string 视图所在的方法名
-	 */
-	private static function load()
-	{
-		$url = HUrl::get();
-		
-		$con = ucfirst(strtolower($url[0]));
-		$name = 'App\\Controller\\'.$con."Controller";
-		$view = strtolower($url[1]);
-		if( class_exists($name))
-		{
-			$controller = new $name();
-			
-			$controller -> before($view);
-			
-			if(method_exists($controller,$view))
-			{
-				$controller->$view();
-			}else{
-				self::error(0,$view,__FILE__,__LINE__);
-			}
-		}else{
-			self::error(0,$name.$view,__FILE__,__LINE__);
-		}
-	}
-
 
 
 	/**
