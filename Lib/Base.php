@@ -7,6 +7,7 @@ namespace App\Lib;
 *
 ********************************************************/
 use App\Lib\Object\OArray;
+use App\Lib\Helper\HUrl;
 use App\Lib\Web\WRequest;
 use App\Lib\Role\RComma;
 
@@ -87,16 +88,7 @@ class Base{
 	 */
 	public static function url($file = null,$echo = TRUE)
 	{
-		if($file === null)
-		{
-			$hurl = new HUrl();
-			$file = request_uri();
-		}
-		
-		$url = APP_URL.'/'.$file;
-		
-		$url = preg_replace('/([^:]\/)\/+/', '$1', $url);
-		//$url = str_replace( ':/', '://', $url);
+		$url = HUrl::to($file);
 		
 		if($echo)
 		{
