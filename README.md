@@ -61,7 +61,7 @@
 
 ```php
 
-function index()
+function indexAction()
 {
    $this->show();
 }
