@@ -12,8 +12,9 @@ use App\Lib\Web\WRequest;
 use App\Lib\Role\RComma;
 
 defined("DEBUG") or define("DEBUG", false);
-define('APP_URL', Base::config('app.host')); 
-define('APP_API' , isset($_GET['api'])?TRUE:FALSE);    //是否是API模式
+defined("APP_DIR") or define("APP_DIR", dirname( dirname( dirname( __FILE__ ) ) ) );
+defined("APP_URL") or define('APP_URL', Base::config('app.host'));
+defined("APP_API") or define('APP_API' , isset($_GET['api'])?TRUE:FALSE);    //是否是API模式
 
 class Base{
 	
@@ -39,7 +40,7 @@ class Base{
 	*/
 	public static function config( $key = null )
 	{
-		$configs=require(APP_DIR."/app/conf/config.php");
+		$configs=require(APP_DIR."/app/config/config.php");
 		if(!empty($key))
 		{
 			$arr = explode('.',$key);
