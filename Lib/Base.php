@@ -108,9 +108,7 @@ class Base{
 	*/
 	public static function jcs()
 	{
-		$list = new OArray();
-		
-		$files = $list->sort(func_get_args());
+		$files = OArray::sort(func_get_args());
 		
 		foreach ($files as $file) {
 			if(is_string($file) && !empty($file))
@@ -165,16 +163,15 @@ class Base{
 	* @param string $name 要显示的
 	* @param string|function $text 默认值.
 	*/
-	public static function ech($name,$text = '')
+	public static function ech($name, $text = '')
 	{
-		$result = isset(self::$data[$name])?self::$data[$name]:$text;
+		$result = OArray::getChild( $name , self::$data , $text );
 		if (is_object($text)) 
 		{
 			$text($result);
 		}else
 		{
-			$oarray = new OArray();
-			echo $oarray->tostring($result);
+			echo OArray::tostring($result);
 		}
 	}
 	
@@ -187,7 +184,7 @@ class Base{
 	*/
 	public static function ret($name , $text = '')
 	{
-		$result = isset(self::$data[$name])?self::$data[$name]:$text;
+		$result = OArray::getChild( $name, self::$data[$name] , $text );
 		if (is_object($text)) 
 		{
 			$text($result);
@@ -220,13 +217,7 @@ class Base{
 		
 		if(is_bool($value))
 		{
-			$result = $_SESSION;
-			$arr = explode('.',$keys);
-			foreach ($arr as $value) {
-				$result = isset($result[$value])?$result[$value]:'';
-			}
-			
-			return $result;
+			return OArray::getChild($keys, $_SESSION);
 		}else{
 			$arr = explode('.',$keys);
 			$str = '$_SESSION';
@@ -305,9 +296,7 @@ class Base{
 			$ext = '.'.$ext;
 		}
 		
-		$list =new OArray();
-		
-		foreach ($list->to($names,'.') as $value) {
+		foreach (OArray::to($names,'.') as $value) {
 			self::inc_file($view_dir,$value,$ext);
 		}
 	}

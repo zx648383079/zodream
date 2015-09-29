@@ -33,7 +33,7 @@ class Validation
 		{
 			$arr=explode('|',$val);
 			
-			if(isset($request[$key]) && !empty($request[$key]))
+			if(isset($request[$key]) && !$this->isNull( $request[$key] ) )
 			{
 				foreach($arr as $v)
 				{
@@ -120,6 +120,11 @@ class Validation
 		}
 		
 		return $result;
+	}
+	
+	public function isNull($value)
+	{
+		return ($value === null || $value === '');
 	}
 	
 	/**

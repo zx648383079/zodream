@@ -16,11 +16,12 @@ class OArray implements IBase
 	/**
 	自定义排序 根据关键词 before after
 	*/
-	public function sort($arr)
+	public static function sort($arr)
 	{
-		$this->arr_list($arr);
+		$oarray = new OArray();
+		$oarray->arr_list($arr);
 		
-		return array_merge($this->before, $this->content ,$this->after);
+		return array_merge($oarray->before, $oarray->content ,$oarray->after);
 	}
 	
 	private function arr_list($arr)
@@ -64,7 +65,7 @@ class OArray implements IBase
 	)) 
 	
 	**/
-	public function to( $arr , $link = null,$pre = null)
+	public static function to( $arr , $link = null,$pre = null)
 	{
 		$list = array();
 		if(is_array($arr))
@@ -74,14 +75,14 @@ class OArray implements IBase
 					{
 						if(is_array($value))
 						{
-							$list = array_merge($list, $this->to($value,$link,$pre));
+							$list = array_merge($list, self::to($value,$link,$pre));
 						}else{
-							$list[] =$pre.$value;
+							$list[] = $pre.$value;
 						}
 					}else{
 						if(is_array($value))
 						{
-							$list = array_merge($list, $this->to($value,$link,$key.$link));
+							$list = array_merge($list, self::to($value,$link,$key.$link));
 						}else{
 							$list[] = $pre.$key.$link.$value;
 						}
@@ -97,7 +98,7 @@ class OArray implements IBase
 	/****
 	把多维数组转换成字符串
 	*******/
-	public function tostring($arr ,$link  = '')
+	public static function tostring($arr ,$link  = '')
 	{
 		$str = '';
 		if(is_array($arr))
@@ -109,5 +110,58 @@ class OArray implements IBase
 			$str .= $arr.$link;
 		}
 		return $str;
+	}
+	
+	/****
+	根据字符串获取数组值
+	***/
+	public static function getVal($name, $values, $default = null, $link = ',')
+	{
+		$names = explode( $link, $name );
+		
+		$arr = array();
+		
+		foreach ($names as $name) 
+		{
+			//使用方法 post:key default
+			
+			$temp = explode(' ' , $name , 2 );
+			$def = ( count($temp) == 1) ? $default : $temp[1];
+			
+			$temp = explode(':',$temp[0],2);
+			$key = ( count($temp) == 1 ) ? $name : $temp[1];
+			
+			if(isset($values[$name]))
+			{
+				$arr[$key] = $values[$name];
+			} else
+			{
+				$arr[$key] = $def;
+			}
+		}
+		
+		if(count($arr) == 1)
+		{
+			foreach ($arr as $value) {
+				$arr = $value;
+			}
+		}
+		
+		return $arr;
+	}
+	
+	public static function getChild( $name , $values, $default = null, $link = '.')
+	{
+		$names = explode($link , $name , 2 );
+		if( count($names) === 1)
+		{
+			return isset($values[$name])?$values[$name]:$default;
+		}
+		else if( !isset($values[$names[0]]) ){
+			return $default;
+		}
+		else {
+			return self::getChild( $names[1] , $values[$names[0]] ,$default , $link);
+		}
 	}
 }
