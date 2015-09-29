@@ -26,12 +26,12 @@ abstract class Model extends DPdo{
 		}
 		$arr = array_combine($this->fillable,$param);
 		
-		if(empty($arr['user_id']))
+		if(isset($arr['user_id']) && empty($arr['user_id']))
 		{
 			$arr['user_id'] = Auth::user()->id;
 		}
 		
-		if(empty($arr['udate']))
+		if(isset($arr['udate']) && empty($arr['udate']))
 		{
 			$arr['udate'] = OTime::Now();
 		}
