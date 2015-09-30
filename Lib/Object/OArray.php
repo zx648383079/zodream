@@ -164,4 +164,9 @@ class OArray implements IBase
 			return self::getChild( $names[1] , $values[$names[0]] ,$default , $link);
 		}
 	}
+	
+	public static function setChild($name , $value , &$arr)
+	{
+		
+	}
 }

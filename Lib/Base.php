@@ -229,7 +229,17 @@ class Base{
 		}
 		
 	}
-
+	
+	public static function cookie( $key, $value = null , $time = 0)
+	{
+		if(empty($value))
+		{
+			return isset($_COOKIE[$key])?$_COOKIE[$key]:null;
+		}else {
+			setcookie($key, $value , $time);
+		}
+	}
+	
 	/**
 	* 跳转页面
 	*

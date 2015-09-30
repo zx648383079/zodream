@@ -129,7 +129,7 @@ class DPdo
 	 */
     public function findOne(Array $_param) {  
         $_where = '';  
-        foreach ($_param as $_key=>$_value) {  
+        foreach ($_param as $_key => $_value) {  
             $_where .=$_value.' AND ';  
         }  
         $_where = 'WHERE '.substr($_where, 0, -4);  

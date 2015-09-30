@@ -13,12 +13,12 @@ class Auth
 	
 	public static $userModel;
 	/*
-		* 判断是否登录
-		*
-		* @access public static
-		*
-		* @return 返回True|False,
-		*/
+	* 判断是否登录
+	*
+	* @access public static
+	*
+	* @return 返回True|False,
+	*/
 	public static function user()
 	{
 		$id = App::session('user');
@@ -27,8 +27,7 @@ class Auth
 			if(empty(self::$userModel))
 			{
 				$user = new UserModel();
-				$user ->id = $id;
-				$user ->assignRow('id',$id);
+				$user -> assignRow('id',$id);
 				self::$userModel = $user;
 			}
 			return self::$userModel;
@@ -38,13 +37,29 @@ class Auth
 	}
 
 	/**
-		* 判断是否是游客
-		*
-		* @return bool
-		*/
+	* 判断是否是游客
+	*
+	* @return bool
+	*/
 	public static function guest()
 	{
+		return empty(self::getId());
+	}
+	
+	private static function getId()
+	{
 		$id = App::session('user');
-		return empty($id);
+		if(!empty($id))
+		{
+			return $id;
+		}else if(!empty($token = App::cookie('token')))
+		{
+			$user = new UserModel();
+			$id = $user -> findByToken($token);
+			App::session('user' , $id);
+			$user -> assignRow('id',$id);
+			self::$userModel = $user;
+			return $id;
+		}
 	}
 }
