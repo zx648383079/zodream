@@ -165,7 +165,7 @@ class Base{
 	*/
 	public static function ech($name, $text = '')
 	{
-		$result = OArray::getChild( $name , self::$data , $text );
+		$result = OArray::getChild( $name, self::$data , $text );
 		if (is_object($text)) 
 		{
 			$text($result);
@@ -184,7 +184,7 @@ class Base{
 	*/
 	public static function ret($name , $text = '')
 	{
-		$result = OArray::getChild( $name, self::$data[$name] , $text );
+		$result = OArray::getChild( $name, self::$data , $text );
 		if (is_object($text)) 
 		{
 			$text($result);
@@ -257,6 +257,7 @@ class Base{
 			$str    = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
 			self::$data['meta'] = $str;
 		}
+		self::$data['title'] = "出错了！";
 		self::$data['code'] = $code;
 		self::$data['error'] = $msg;
 		self::extend('404');

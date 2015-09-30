@@ -35,10 +35,10 @@ class Route
 			{
 				$controller->$view();
 			}else{
-				self::error(0,$view,__FILE__,__LINE__);
+				App::error(0,$view,__FILE__,__LINE__);
 			}
 		}else{
-			self::error(0,$name.$view,__FILE__,__LINE__);
+			App::error(0,$name.$view,__FILE__,__LINE__);
 		}
 	}
 	
