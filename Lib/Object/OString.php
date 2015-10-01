@@ -7,6 +7,25 @@ namespace App\Lib\Object;
 
 class OString implements IBase
 {
+	public static function toArray($str, $link = ' ', $num = 1 ,$default = null)
+	{
+		$arr = explode($link, $str, $num);
+		for ($i = 0 ; $i < $num ; $i++) 
+		{
+			if(!isset($arr[i]) || $arr[i] === '')
+			{
+				if(is_array($default))
+				{
+					$arr[i] = $default[i];
+				}else {
+					$arr[i] = $default;
+				}
+			} 
+		}
+		
+		return $arr;
+	}
+	
 	public static function abslength($str)
 	{
 		if(empty($str)){

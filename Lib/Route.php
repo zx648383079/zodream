@@ -8,6 +8,7 @@ namespace App\Lib;
 ********************************************************/
 use App;
 use App\Lib\Helper\HUrl;
+use App\Lib\Object\OString;
 
 class Route
 {
@@ -31,7 +32,7 @@ class Route
 			
 			$controller -> before($view);
 			$view .= 'Action';
-			if(method_exists($controller,$view))
+			if(method_exists( $controller, $view ) )
 			{
 				$controller->$view();
 			}else{
@@ -78,73 +79,33 @@ class Route
 	private function c()
 	{
 		return array(
-			isset($_GET['c'])?$_GET['c']:'home',
-			isset($_GET['v'])?$_GET['v']:'index'
+			App::$request->get('c' , 'home'),
+			App::$request->get('v' , 'index')
 		);
 	}
 	
 	private function r()
 	{
-		$result = array(
-			'home','index'
-		);
+		$r = App::$request->get('r' , 'home/index');
 		
-		if(isset($_GET['r']))
-		{
-			$arr = explode('/',$_GET['r'],2);
-			$result = array(
-				empty($arr[0])?'home':$arr[0],	
-				empty($arr[1])?'index':$arr[1]
-			);
-		}
-		
-		return $result;
+		return OString::toArray($r, '/' ,2 , array( 'home', 'index' ));
 	}
 	
 	private function u()
 	{
-		$result = array();
 		$url = HUrl::request_uri();
-		$arr = explode('.php', $url);
-		if(count($arr) == 2)
-		{
-			$arra = explode('/', $arr[1]);
-			switch (count($arra)) {
-				case 1:
-					$result = array('home', 'index');
-					break;
-				case 2:
-					$result = array($arra[1], 'index');
-					break;
-				default:
-					$result = array_splice($arra,1);
-					break;
-			}
-		}else{
-			$result = array('home', 'index');
-		}
+		$arr = OString::toArray($url, '.php' ,2 , array( '','/home/index' ));
+		$arr = OString::toArray($arr[1], '/' ,4 , array( '' , 'home', 'index',''));
 		
-		return $result;
+		return array($arr[1],$arr[2]);
 	}
 	
 	private function y()
 	{
-		$result = array();
 		$url = HUrl::request_uri();
-		$arr = explode('/', $url);
-		switch (count($arr)) {
-			case 1:
-				$result = array('home', 'index');
-				break;
-			case 2:
-				$result = array($arra[1], 'index');
-				break;
-			default:
-				$result = array_splice($arra,1);
-				break;
-		}
+		$arr = OString::toArray($url , '/' , 4 , array( '' , 'home', 'index',''));
 		
-		return $result;
+		return array($arr[1],$arr[2]);
 	}
 	
 	private function p()
@@ -156,21 +117,19 @@ class Route
 	
 	private function s()
 	{
-		$key = '*';
-		if(isset($_GET['s']))
+		$key = App::$request->get('s');
+		if($key === null)
 		{
-			$key  = $_GET['s'];
-		}else{
 			$url = HUrl::request_uri();
 			$ar = explode('/',$url ,2);
 			$ar = explode('?',$ar[1],2);
 			$key = $arr[0];
+			$key = $key == ''?'*':$key;
 		}
 		if(strlen($key) < 4)
 		{
 			$short = App::config('short.'.$key);
-			$url = empty($short)?'home.index':$short;
-			$arr = explode('.', $url);
+			$arr = OString::toArray( $short , '.' ,2 , array( 'home', 'index' )); 
 		}else{
 			
 		}
