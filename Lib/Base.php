@@ -230,12 +230,16 @@ class Base{
 		
 	}
 	
-	public static function cookie( $key, $value = null , $time = 0)
+	public static function cookie( $key, $value = false , $time = 0)
 	{
-		if(empty($value))
+		if(is_bool($value))
 		{
 			return isset($_COOKIE[$key])?$_COOKIE[$key]:null;
-		}else {
+		}else if($value === null)
+		{
+			setcookie($key);
+		}else
+		{
 			setcookie($key, $value , $time);
 		}
 	}
