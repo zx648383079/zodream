@@ -123,7 +123,7 @@ class Route
 			$url = HUrl::request_uri();
 			$ar = explode('/',$url ,2);
 			$ar = explode('?',$ar[1],2);
-			$key = $arr[0];
+			$key = $ar[0];
 			$key = $key == ''?'*':$key;
 		}
 		if(strlen($key) < 4)

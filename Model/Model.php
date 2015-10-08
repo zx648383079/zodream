@@ -80,7 +80,7 @@ abstract class Model extends DPdo{
 	*/
 	public function updateOne( $filed , $where ,$num = 1)
 	{
-		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} + {$sum} WHERE ";
+		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} + {$num} WHERE ";
 		$sql .= $where;
 		return $this->execute($sql)->rowCount();
 	}

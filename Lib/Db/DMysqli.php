@@ -104,7 +104,7 @@ class DMysqli implements IBase
 	 * @param array $addData 需要添加的集合
 	 * @return int 返回影响的行数,
 	 */
-    public function add(Array $addData) 
+    public function add($addData)
     {  
         $addFields = array();  
         $addValues = array();  
@@ -130,7 +130,7 @@ class DMysqli implements IBase
      * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-    public function update(Array $param, Array $updateData) 
+    public function update($param, $updateData)
     {  
         $where = $setData = '';  
         foreach ($param as $key=>$value) 
@@ -185,7 +185,7 @@ class DMysqli implements IBase
 	 * @param array $param 条件
 	 * @return string|bool 返回id,
 	 */
-    public function findOne(Array $param) 
+    public function findOne($param)
     {  
         $where = '';  
         foreach ($param as $key=>$value) 
@@ -241,7 +241,7 @@ class DMysqli implements IBase
         $result = array();
         if(!empty($param))
         {
-            $sql = new HSql($prefix);
+            $sql = new HSql($this->prefix);
               
             $this->execute($sql->getSQL($param));            //获取SQL语句
             $result = $islist?$this->getList():$this->getObject();

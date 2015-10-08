@@ -80,16 +80,15 @@ class Base{
 	 *
 	 * @return string
 	 */
-	public static function url($file = null,$echo = TRUE)
+	public static function url($file = null, $echo = TRUE)
 	{
 		$url = HUrl::to($file);
-		
 		if($echo)
 		{
 			echo $url;
-		}else{
-			return $url;	
-		} 
+		}else {
+			return $url;
+		}
 	}	
 
 	/**
@@ -102,7 +101,7 @@ class Base{
 	*/
 	public static function jcs()
 	{
-		$files = OArray::sort(func_get_args());
+		$files = OArray::sort( func_get_args() );
 		
 		foreach ($files as $file) {
 			if(is_string($file) && !empty($file))

@@ -20,7 +20,7 @@ class Controller{
 	/**
 	* 在执行之前做规则验证
 	*
-	* @param string $request 方法名
+	* @param string $func 方法名
 	*/
 	function before($func)
 	{
@@ -59,18 +59,18 @@ class Controller{
 	/**
 	* 验证数据
 	*
-	* @param $request array 要验证的数据
-	* @param $param array  验证的规则
+	* @param array $request 要验证的数据
+	* @param array $param 验证的规则
 	* @return array
 	*/
-	function validata($request,$param)
+	function validata( $request, $param)
 	{
-		$_vali = new Validation();
-		$result = $_vali->make($request,$param);
+		$vali = new Validation();
+		$result = $vali->make($request , $param);
 		
 		if(!$result)
 		{
-			$result = $_vali->error;
+			$result = $vali->error;
 		}
 		
 		return $result;
@@ -142,10 +142,10 @@ class Controller{
 	/**
 	* 返回JSON数据
 	*
-	* @param $data 要传的值
+	* @param array|string $data 要传的值
 	* @param string $type 返回类型
 	*/
-	function ajaxJson($data,$type = 'JSON')
+	function ajaxJson( $data, $type = 'JSON')
 	{
 		switch (strtoupper($type)){
 			case 'JSON' :
@@ -178,7 +178,7 @@ class Controller{
 	* @param null $xml
 	* @return mixed
 	*/
-	function xml_encode($data, $rootNodeName = 'data', $xml=null)
+	function xml_encode($data, $rootNodeName = 'data', $xml = null)
 	{
 		// turn off compatibility mode as simple xml throws a wobbly if you don't.
 		if (ini_get('zend.ze1_compatibility_mode') == 1)

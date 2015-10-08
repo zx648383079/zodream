@@ -4,7 +4,7 @@ namespace App\Lib\Db;
 use App;
 use App\Lib\Helper\HSql;
     
-class DPdo
+class DPdo implements IBase
 {
 	//pdo对象  
     protected $pdo = null;  
@@ -78,7 +78,7 @@ class DPdo
 	 * @param array $addData 需要添加的集合
 	 * @return int 返回影响的行数,
 	 */
-    public function add(Array $addData) {  
+    public function add($addData) {
         $addFields = array();  
         $addValues = array();  
         foreach ($addData as $key => $value) {  
@@ -101,7 +101,7 @@ class DPdo
      * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-    public function update(Array $updateData , Array $param) {  
+    public function update($updateData , $param) {
         $where = $setData = '';  
         foreach ($param as $key => $value) {  
             $where .= $value.' AND ';  
@@ -127,7 +127,7 @@ class DPdo
 	 * @param array $param 条件
 	 * @return string|bool 返回id,
 	 */
-    public function findOne(Array $param) {  
+    public function findOne($param) {
         $where = '';  
         foreach ($param as $key => $value) {  
             $where .=$value.' AND ';  
@@ -175,7 +175,7 @@ class DPdo
      * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */  
-    public function find( Array $param = array(),Array $fileld=array()) {  
+    public function find( $param = array(),$fileld=array()) {
         $limit = $order =$group = $where = $like = '';  
         if (is_array($param) && !empty($param)) {  
             $limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';  
@@ -228,7 +228,7 @@ class DPdo
      * @param array|null $param 条件
 	 * @return int 返回总数,
 	 */ 
-    public function count( Array $param = array()) {  
+    public function count( $param = array()) {
         $where = '';  
         if (isset($param['where'])) {  
             foreach ($param['where'] as $key=>$value) {  
@@ -335,5 +335,23 @@ class DPdo
     public function getError()
     {
         return $this->error;
+    }
+
+    /**
+     * 查询返回array
+     *
+     */
+    function getList()
+    {
+        // TODO: Implement getList() method.
+    }
+
+    /**
+     * 查询返回object
+     *
+     */
+    function getObject()
+    {
+        // TODO: Implement getObject() method.
     }
 }

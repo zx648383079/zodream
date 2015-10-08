@@ -45,7 +45,10 @@ class Auth
 	{
 		return empty(self::getId());
 	}
-	
+
+	/**
+	 * @return bool|string
+     */
 	private static function getId()
 	{
 		$id = App::session('user');
@@ -61,5 +64,6 @@ class Auth
 			self::$userModel = $user;
 			return $id;
 		}
+		return null;
 	}
 }
