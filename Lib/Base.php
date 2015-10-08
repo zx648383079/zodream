@@ -248,7 +248,7 @@ class Base{
 	* @param string $msg 显示的消息.
 	* @param string $code 显示的代码标志.
 	*/
-	public static function redirect($url, $time=0, $msg='',$code = '') {
+	public static function redirect($url, $time = 0, $msg = '',$code = '') {
 		//多行URL地址支持
 		$url        = str_replace(array("\n", "\r"), '', $url);
 		if (empty($msg))

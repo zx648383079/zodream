@@ -108,7 +108,7 @@ class DPdo
         }  
         $where = 'WHERE '.substr($where, 0, -4);  
         foreach ($updateData as $key => $value) {  
-            if (isarray($value)) {  
+            if (is_array($value)) {  
                 $setData .= "`$key` = $value[0],";  
             } else {  
                 $setData .= "`$key` = '$value',";  

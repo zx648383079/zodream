@@ -28,7 +28,7 @@ class HUrl implements IBase
 	 *
 	 * @return string
 	 */
-	public static function to($file = null,$extra = null,$secret = FALSE)
+	public static function to( $file = null, $extra = null, $secret = FALSE)
 	{
 		if($file === null)
 		{
