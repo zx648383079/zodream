@@ -7,6 +7,7 @@ namespace App\Model;
 use App\Lib\Auth;
 use App\Lib\Db\DPdo;
 use App\Lib\Object\OTime;
+use App\Lib\Object\OArray;
 
 abstract class Model extends DPdo{
 	/*查询到的数据*/
@@ -22,20 +23,20 @@ abstract class Model extends DPdo{
 		
 		if(count($param) == 1)
 		{
-			$param=array_shift($param);
+			$param = array_shift($param);
 		}
-		$arr = array_combine($this->fillable,$param);
+		$arr = OArray::combine( $this->fillable, $param);
 		
-		if(isset($arr['user_id']) && empty($arr['user_id']))
+		if(array_key_exists('user_id', $arr) && empty($arr['user_id']))
 		{
-			$arr['user_id'] = Auth::user()->id;
+			$arr['user_id'] = Auth::user() === FALSE ? 0: Auth::user()->id;
 		}
 		
-		if(isset($arr['udate']) && empty($arr['udate']))
+		if(array_key_exists('udate', $arr) && empty($arr['udate']))
 		{
 			$arr['udate'] = OTime::Now();
 		}
-		if(!isset($arr['cdate']) || empty($arr['cdate']))
+		if(array_key_exists('cdate', $arr) && empty($arr['cdate']))
 		{
 			$arr['cdate'] = OTime::Now();
 		}
@@ -52,7 +53,7 @@ abstract class Model extends DPdo{
 	public function findById($id)
 	{
 		$sql = "SELECT * FROM {$this->table} WHERE id = {$id}";
-		return $this->execute($_sql)->fetchObject();
+		return $this->execute($sql)->fetchObject();
 	}
 	
 	/**
@@ -66,7 +67,7 @@ abstract class Model extends DPdo{
 	{
 		$sql = "UPDATE {$this->table} SET {$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END WHERE ";
 		$sql .= $where;
-		return $this->execute($_sql)->rowCount();
+		return $this->execute($sql)->rowCount();
 	}
 	
 	/**
@@ -81,7 +82,7 @@ abstract class Model extends DPdo{
 	{
 		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} + {$sum} WHERE ";
 		$sql .= $where;
-		return $this->execute($_sql)->rowCount();
+		return $this->execute($sql)->rowCount();
 	}
 	
 	/**
@@ -114,20 +115,19 @@ abstract class Model extends DPdo{
 	*/
 	public function findList($param = '' , $filed = '*')
 	{
-		$_stmt = $this->findObject($param , $filed);  
-
-		$_result = array(); 
-		foreach ($_stmt as $key => $value) {
-			foreach ($value as $_key => $_value) {
-				$_result[$key][$_key] = $_value;
+		$stmt = $this->findObject($param , $filed);
+		$result = array(); 
+		foreach ($stmt as $key => $value) {
+			foreach ($value as $k => $val) {
+				$result[$key][$k] = $val;
 			}
 		}
-		return $_result;  
+		return $result;  
 	}
 	
-	public function assignRow($_key , $_value ,$one = true )
+	public function assignRow($key , $value ,$one = true )
 	{
-		$arr = $this->findList("{$_key} = '{$_value}'");
+		$arr = $this->findList("{$key} = '{$value}'");
 			
 		if( $one && count($arr) > 0)
 		{

@@ -28,6 +28,8 @@ class Base{
 		
 		self::$request = new WRequest();
 		
+		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
+		
 		Route::load();
 	}
 	/**
@@ -157,7 +159,7 @@ class Base{
 	*/
 	public static function ech($name, $text = '')
 	{
-		$result = OArray::getChild( $name, self::$data , $text );
+		$result = OArray::getChild( $name, self::$data , is_object($text)?'':$text );
 		if (is_object($text)) 
 		{
 			$text($result);
@@ -176,7 +178,7 @@ class Base{
 	*/
 	public static function ret($name , $text = '')
 	{
-		$result = OArray::getChild( $name, self::$data , $text );
+		$result = OArray::getChild( $name, self::$data , is_object($text)?'':$text );
 		if (is_object($text)) 
 		{
 			$text($result);

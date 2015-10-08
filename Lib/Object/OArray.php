@@ -104,7 +104,7 @@ class OArray implements IBase
 		if(is_array($arr))
 		{
 			foreach ($arr as $value) {
-				$str .= $this->tostring($value , $link);
+				$str .= self::tostring($value , $link);
 			}
 		}else{
 			$str .= $arr.$link;
@@ -164,7 +164,7 @@ class OArray implements IBase
 			return $default;
 		}
 		else {
-			return self::getChild( $names[1] , $values[$names[0]] ,$default , $link);
+			return self::getChild( $names[1] , $values[ $names[0] ] ,$default , $link);
 		}
 	}
 	
@@ -172,4 +172,31 @@ class OArray implements IBase
 	{
 		
 	}
+	
+	/**
+	*   扩展 array_combine 能够用于不同数目
+	*/
+	public static function combine( $keys , $values )
+	{
+		$arr = array();
+		if( self::isAssoc($values) )
+		{
+			foreach ($keys as $key) {
+				$arr[$key] = isset($values[$key])?$values[$key]:null;
+			}
+		}else {
+			for ($i = 0; $i < count($keys) ; $i++) { 
+				$arr[$keys[$i]] = isset($values[$i])?$values[$i]:null;
+			}
+		}
+		
+		return $arr;
+	}
+	
+	/**
+	*   判断是否是关联数组
+	*/
+	public static function isAssoc($arr) {  
+		return array_keys($arr) !== range(0, count($arr) - 1);  
+	}  
 }

@@ -127,6 +127,8 @@ class Controller{
 				}else{
 					ob_start();
 				}
+			}else{
+				ob_start();
 			} 
 			header( 'Content-Type:text/html;charset=utf-8' );
 			ob_implicit_flush(FALSE);

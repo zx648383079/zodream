@@ -75,20 +75,20 @@ class DPdo
 	 *
 	 * @access public
 	 *
-	 * @param array $_addData 需要添加的集合
+	 * @param array $addData 需要添加的集合
 	 * @return int 返回影响的行数,
 	 */
-    public function add(Array $_addData) {  
-        $_addFields = array();  
-        $_addValues = array();  
-        foreach ($_addData as $_key=>$_value) {  
-            $_addFields[] = $_key;  
-            $_addValues[] = $_value;  
+    public function add(Array $addData) {  
+        $addFields = array();  
+        $addValues = array();  
+        foreach ($addData as $key => $value) {  
+            $addFields[] = $key;  
+            $addValues[] = $value;  
         }  
-        $_addFields = implode(',', $_addFields);  
-        $_addValues = implode("','", $_addValues);  
-        $_sql = "INSERT INTO {$this->table} ($_addFields) VALUES ('$_addValues')";  
-        $this->execute($_sql);
+        $addFields = implode('`,`', $addFields);  
+        $addValues = implode("','", $addValues);  
+        $sql = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";  
+        $this->execute($sql);
         return $this->pdo->lastInsertId();  
     }  
        
@@ -97,26 +97,26 @@ class DPdo
 	 *
 	 * @access public
 	 *
-	 * @param array $_param 条件
-     * @param array $_updateData 需要修改的内容
+	 * @param array $param 条件
+     * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-    public function update(Array $_updateData , Array $_param) {  
-        $_where = $_setData = '';  
-        foreach ($_param as $_key=>$_value) {  
-            $_where .= $_value.' AND ';  
+    public function update(Array $updateData , Array $param) {  
+        $where = $setData = '';  
+        foreach ($param as $key => $value) {  
+            $where .= $value.' AND ';  
         }  
-        $_where = 'WHERE '.substr($_where, 0, -4);  
-        foreach ($_updateData as $_key=>$_value) {  
-            if (is_array($_value)) {  
-                $_setData .= "$_key = $_value[0],";  
+        $where = 'WHERE '.substr($where, 0, -4);  
+        foreach ($updateData as $key => $value) {  
+            if (isarray($value)) {  
+                $setData .= "`$key` = $value[0],";  
             } else {  
-                $_setData .= "$_key = '$_value',";  
+                $setData .= "`$key` = '$value',";  
             }  
         }  
-        $_setData = substr($_setData, 0, -1);  
-        $_sql = "UPDATE {$this->table} SET $_setData $_where";  
-        return $this->execute($_sql)->rowCount();  
+        $setData = substr($setData, 0, -1);  
+        $sql = "UPDATE {$this->table} SET $setData $where";  
+        return $this->execute($sql)->rowCount();  
     }  
        
     /**
@@ -124,17 +124,17 @@ class DPdo
 	 *
 	 * @access public
 	 *
-	 * @param array $_param 条件
+	 * @param array $param 条件
 	 * @return string|bool 返回id,
 	 */
-    public function findOne(Array $_param) {  
-        $_where = '';  
-        foreach ($_param as $_key => $_value) {  
-            $_where .=$_value.' AND ';  
+    public function findOne(Array $param) {  
+        $where = '';  
+        foreach ($param as $key => $value) {  
+            $where .=$value.' AND ';  
         }  
-        $_where = 'WHERE '.substr($_where, 0, -4);  
-        $_sql = "SELECT * FROM {$this->table} $_where LIMIT 1";  
-        $result = $this->execute($_sql);
+        $where = 'WHERE '.substr($where, 0, -4);  
+        $sql = "SELECT * FROM {$this->table} $where LIMIT 1";  
+        $result = $this->execute($sql);
         if($result->rowCount() > 0)
         {
             return $result->fetchObject();
@@ -148,22 +148,22 @@ class DPdo
 	 *
 	 * @access public
 	 *
-	 * @param array|string $_param 条件
+	 * @param array|string $param 条件
 	 * @return int 返回影响的行数,
 	 */
-    public function delete($_param) {  
-        $_where = '';  
-        if(is_array($_param))
+    public function delete($param) {  
+        $where = '';  
+        if(is_array($param))
         {
-            foreach ($_param as $_key=>$_value) {  
-            $_where .= $_value.' AND ';  
+            foreach ($param as $key=>$value) {  
+            $where .= $value.' AND ';  
             }  
-            $_where = 'WHERE '.substr($_where, 0, -4);  
+            $where = 'WHERE '.substr($where, 0, -4);  
         }else{
-            $_where='WHERE '.$_param;
+            $where='WHERE '.$param;
         }
-        $_sql = "DELETE FROM {$this->table} $_where LIMIT 1";  
-        return $this->execute($_sql)->rowCount();  
+        $sql = "DELETE FROM {$this->table} $where LIMIT 1";  
+        return $this->execute($sql)->rowCount();  
     }  
        
     /**
@@ -171,53 +171,53 @@ class DPdo
 	 *
 	 * @access public
 	 *
-     * @param array $_fileld 要显示的字段
-     * @param array|null $_param 条件
+     * @param array $fileld 要显示的字段
+     * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */  
-    public function find( Array $_param = array(),Array $_fileld=array()) {  
-        $_limit = $_order =$_group = $_where = $_like = '';  
-        if (is_array($_param) && !empty($_param)) {  
-            $_limit = isset($_param['limit']) ? 'LIMIT '.$_param['limit'] : '';  
-            $_order = isset($_param['order']) ? 'ORDER BY '.$_param['order'] : '';  
-            $_group = isset($_param['group']) ? 'GROUP BY '.$_param['group'] : '';  
-            if (isset($_param['where'])) {  
-                foreach ($_param['where'] as $_key=>$_value) {  
-                    if(empty($_where))
+    public function find( Array $param = array(),Array $fileld=array()) {  
+        $limit = $order =$group = $where = $like = '';  
+        if (is_array($param) && !empty($param)) {  
+            $limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';  
+            $order = isset($param['order']) ? 'ORDER BY '.$param['order'] : '';  
+            $group = isset($param['group']) ? 'GROUP BY '.$param['group'] : '';  
+            if (isset($param['where'])) {  
+                foreach ($param['where'] as $key=>$value) {  
+                    if(empty($where))
                     {
-                        $_where='WHERE'.$_value;
+                        $where='WHERE'.$value;
                     }else{
-                        if(is_array($_value))
+                        if(is_array($value))
                         {
-                            switch($_value[1])
+                            switch($value[1])
                             {
                                 case "or":
-                                    $_where .= 'OR'.$_value;
+                                    $where .= 'OR'.$value;
                                 case "and":
-                                    $_where .= 'AND'.$_value;
+                                    $where .= 'AND'.$value;
                             }
                         }else{
-                            $_where .= 'AND'.$_value;
+                            $where .= 'AND'.$value;
                         }
                     }
                 }  
             }  
-            /*if (isset($_param['like'])) {  
-                foreach ($_param['like'] as $_key=>$_value) {  
-                    $_like = "WHERE $_key LIKE '%$_value%'";  
+            /*if (isset($param['like'])) {  
+                foreach ($param['like'] as $key=>$value) {  
+                    $like = "WHERE $key LIKE '%$value%'";  
                 }  
             }  */
         }  
-        $_selectFields = empty($_fileld)?"*":implode(',', $_fileld);  
-        $_sql = "SELECT $_selectFields FROM {$this->table} $_where $_group $_order $_limit";  
+        $selectFields = empty($fileld)?"*":implode(',', $fileld);  
+        $sql = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";  
 
-        $_stmt = $this->execute($_sql);  
-        $_result = array();  
-        while (!!$_objs = $_stmt->fetchObject()) {  
-            $_result[] = $_objs;  
+        $stmt = $this->execute($sql);  
+        $result = array();  
+        while (!!$objs = $stmt->fetchObject()) {  
+            $result[] = $objs;  
         }  
         
-        return $_result;  
+        return $result;  
     }  
        
     /**
@@ -225,20 +225,20 @@ class DPdo
 	 *
 	 * @access public
 	 *
-     * @param array|null $_param 条件
+     * @param array|null $param 条件
 	 * @return int 返回总数,
 	 */ 
-    public function count( Array $_param = array()) {  
-        $_where = '';  
-        if (isset($_param['where'])) {  
-            foreach ($_param['where'] as $_key=>$_value) {  
-                $_where .= $_value.' AND ';  
+    public function count( Array $param = array()) {  
+        $where = '';  
+        if (isset($param['where'])) {  
+            foreach ($param['where'] as $key=>$value) {  
+                $where .= $value.' AND ';  
             }  
-            $_where = 'WHERE '.substr($_where, 0, -4);  
+            $where = 'WHERE '.substr($where, 0, -4);  
         }  
-        $_sql = "SELECT COUNT(*) as count FROM {$this->table} $_where";  
-        $_stmt = $this->execute($_sql);  
-        return $_stmt->fetchObject()->count;  
+        $sql = "SELECT COUNT(*) as count FROM {$this->table} $where";  
+        $stmt = $this->execute($sql);  
+        return $stmt->fetchObject()->count;  
     }  
        
     /**
@@ -249,9 +249,9 @@ class DPdo
 	 * @return string 返回id,
 	 */  
     public function nextId() {  
-        $_sql = "SHOW TABLE STATUS LIKE '{$this->table}'";  
-        $_stmt = $this->execute($_sql);  
-        return $_stmt->fetchObject()->Auto_increment;  
+        $sql = "SHOW TABLE STATUS LIKE '{$this->table}'";  
+        $stmt = $this->execute($sql);  
+        return $stmt->fetchObject()->Auto_increment;  
     }  
    
     /**
@@ -271,20 +271,20 @@ class DPdo
         {
             $sql = new HSql($this->prefix);
               
-            $_stmt = $this->execute($sql->getSQL($param));            //获取SQL语句
-            while (!!$_objs = $_stmt->fetchObject()) 
+            $stmt = $this->execute($sql->getSQL($param));            //获取SQL语句
+            while (!!$objs = $stmt->fetchObject()) 
             {  
                 if($isList)
                 {
                     $list = array();
-                    foreach ($_objs as $_key => $_value) 
+                    foreach ($objs as $key => $value) 
                     {
-                        $list[$_key] = $_value;
+                        $list[$key] = $value;
                     }
                     $result[] = $list;
                 }else
                 {
-                   $result[] = $_objs;   
+                   $result[] = $objs;   
                 }
             }
         }
@@ -292,9 +292,9 @@ class DPdo
     }
     
     
-    public function prepare($_sql)
+    public function prepare($sql)
     {
-        $this->result = $this->pdo->prepare($_sql); 
+        $this->result = $this->pdo->prepare($sql); 
     }
     
     public function bind($param)
@@ -309,14 +309,14 @@ class DPdo
 	 *
 	 * @access public
 	 *
-     * @param array|null $_param 条件
+     * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */ 
-    public function execute($_sql = null) {  
+    public function execute($sql = null) {  
         try {  
-            if(!empty($_sql))
+            if(!empty($sql))
             {
-                $this->result = $this->pdo->prepare($_sql);  
+                $this->result = $this->pdo->prepare($sql);  
             }
             $this -> result ->execute();  
         } catch (\PDOException  $ex) {  

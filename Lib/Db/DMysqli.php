@@ -22,7 +22,7 @@ class DMysqli implements IBase
      *
      * @var mysqli
      */
-    private $_mysqli;
+    private $mysqli;
     
     /**
      * 数据库的配置信息
@@ -101,23 +101,23 @@ class DMysqli implements IBase
 	 *
 	 * @access public
 	 *
-	 * @param array $_addData 需要添加的集合
+	 * @param array $addData 需要添加的集合
 	 * @return int 返回影响的行数,
 	 */
-    public function add(Array $_addData) 
+    public function add(Array $addData) 
     {  
-        $_addFields = array();  
-        $_addValues = array();  
-        foreach ($_addData as $_key=>$_value) 
+        $addFields = array();  
+        $addValues = array();  
+        foreach ($addData as $key=>$value) 
         {  
-            $_addFields[] = $_key;  
-            $_addValues[] = $_value;  
+            $addFields[] = $key;  
+            $addValues[] = $value;  
         }  
-        $_addFields = implode(',', $_addFields);  
-        $_addValues = implode("','", $_addValues);  
-        $_sql = "INSERT INTO {$this->table} ($_addFields) VALUES ('$_addValues')";  
+        $addFields = implode(',', $addFields);  
+        $addValues = implode("','", $addValues);  
+        $sql = "INSERT INTO {$this->table} ($addFields) VALUES ('$addValues')";  
         
-        return $this->execute($_sql)->lastId();  
+        return $this->execute($sql)->lastId();  
     }  
 
     
@@ -126,30 +126,30 @@ class DMysqli implements IBase
 	 *
 	 * @access public
 	 *
-	 * @param array $_param 条件
-     * @param array $_updateData 需要修改的内容
+	 * @param array $param 条件
+     * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-    public function update(Array $_param, Array $_updateData) 
+    public function update(Array $param, Array $updateData) 
     {  
-        $_where = $_setData = '';  
-        foreach ($_param as $_key=>$_value) 
+        $where = $setData = '';  
+        foreach ($param as $key=>$value) 
         {  
-            $_where .= $_value.' AND ';  
+            $where .= $value.' AND ';  
         }  
-        $_where = 'WHERE '.substr($_where, 0, -4);  
-        foreach ($_updateData as $_key=>$_value) 
+        $where = 'WHERE '.substr($where, 0, -4);  
+        foreach ($updateData as $key=>$value) 
         {  
-            if (is_array($_value)) 
+            if (is_array($value)) 
             {  
-                $_setData .= "$_key=$_value[0],";  
+                $setData .= "$key=$value[0],";  
             } else {  
-                $_setData .= "$_key='$_value',";  
+                $setData .= "$key='$value',";  
             }  
         }  
-        $_setData = substr($_setData, 0, -1);  
-        $_sql = "UPDATE {$this->table} SET $_setData $_where";  
-        return $this->execute($_sql)->rows();  
+        $setData = substr($setData, 0, -1);  
+        $sql = "UPDATE {$this->table} SET $setData $where";  
+        return $this->execute($sql)->rows();  
     }  
     
     /**
@@ -157,24 +157,24 @@ class DMysqli implements IBase
 	 *
 	 * @access public
 	 *
-	 * @param array|string $_param 条件
+	 * @param array|string $param 条件
 	 * @return int 返回影响的行数,
 	 */
-    public function delete($_param) {  
-        $_where = '';  
-        if(is_array($_param))
+    public function delete($param) {  
+        $where = '';  
+        if(is_array($param))
         {
-            foreach ($_param as $_key=>$_value) 
+            foreach ($param as $key=>$value) 
             {  
-                $_where .= $_value.' AND ';  
+                $where .= $value.' AND ';  
             }  
-            $_where = 'WHERE '.substr($_where, 0, -4);  
+            $where = 'WHERE '.substr($where, 0, -4);  
         }else
         {
-            $_where='WHERE '.$_param;
+            $where='WHERE '.$param;
         }
-        $_sql = "DELETE FROM {$this->table} $_where LIMIT 1";  
-        return $this->execute($_sql)->rows();  
+        $sql = "DELETE FROM {$this->table} $where LIMIT 1";  
+        return $this->execute($sql)->rows();  
     } 
     
     /**
@@ -182,19 +182,19 @@ class DMysqli implements IBase
 	 *
 	 * @access public
 	 *
-	 * @param array $_param 条件
+	 * @param array $param 条件
 	 * @return string|bool 返回id,
 	 */
-    public function findOne(Array $_param) 
+    public function findOne(Array $param) 
     {  
-        $_where = '';  
-        foreach ($_param as $_key=>$_value) 
+        $where = '';  
+        foreach ($param as $key=>$value) 
         {  
-            $_where .=$_value.' AND ';  
+            $where .=$value.' AND ';  
         }  
-        $_where = 'WHERE '.substr($_where, 0, -4);  
-        $_sql = "SELECT * FROM {$this->table} $_where LIMIT 1";  
-        $result = $this->execute($_sql);
+        $where = 'WHERE '.substr($where, 0, -4);  
+        $sql = "SELECT * FROM {$this->table} $where LIMIT 1";  
+        $result = $this->execute($sql);
         if( $result->rowCount(FALSE) > 0)
         {
             return $result->getObject()[0];
@@ -216,14 +216,14 @@ class DMysqli implements IBase
 	 */
     public function find( $param ='' , $filed = '*' )
     {
-        $_sql = "SELECT {$filed} FROM {$this->table} ";
+        $sql = "SELECT {$filed} FROM {$this->table} ";
         if(!empty($param))
         {
-            $_sql .= $param;
+            $sql .= $param;
         }
-        $this->execute($_sql);
-        $_result = $this->getList();
-        return $_result;
+        $this->execute($sql);
+        $result = $this->getList();
+        return $result;
     }
     
     /**
@@ -238,15 +238,15 @@ class DMysqli implements IBase
 	 */ 
     public function findByHelper($param , $islist = false)
     {
-        $_result = array();
+        $result = array();
         if(!empty($param))
         {
             $sql = new HSql($prefix);
               
             $this->execute($sql->getSQL($param));            //获取SQL语句
-            $_result = $islist?$this->getList():$this->getObject();
+            $result = $islist?$this->getList():$this->getObject();
         }
-        return $_result;
+        return $result;
     }
     
     /**
@@ -254,17 +254,17 @@ class DMysqli implements IBase
 	*	
 	* @param array|string $where 数据的条件
 	*/
-	public function count( $_param = '')
+	public function count( $param = '')
     {
-        $_where = '';  
-        if (isset($_param['where'])) {  
-            foreach ($_param['where'] as $_key=>$_value) {  
-                $_where .= $_value.' AND ';  
+        $where = '';  
+        if (isset($param['where'])) {  
+            foreach ($param['where'] as $key=>$value) {  
+                $where .= $value.' AND ';  
             }  
-            $_where = 'WHERE '.substr($_where, 0, -4);  
+            $where = 'WHERE '.substr($where, 0, -4);  
         }  
-        $_sql = "SELECT COUNT(*) as count FROM {$this->table} $_where";  
-        $this->execute($_sql);
+        $sql = "SELECT COUNT(*) as count FROM {$this->table} $where";  
+        $this->execute($sql);
         return $this->getObject()->count;
     }
     
@@ -322,11 +322,11 @@ class DMysqli implements IBase
 	 */
     public function getList($end = TRUE)
     {
-        $_result = array();
+        $result = array();
         if(!is_bool($this->result))
         {
-            while (!!$_objs = mysqli_fetch_assoc($this->result) ) {  
-                $_result[] = $_objs;  
+            while (!!$objs = mysqli_fetch_assoc($this->result) ) {  
+                $result[] = $objs;  
             }
         }else{
             $result = $this->result;
@@ -336,7 +336,7 @@ class DMysqli implements IBase
         {
             $this->close();                            
         }
-        return $_result;
+        return $result;
     }
     /**
 	 * 返回对象数组
@@ -346,27 +346,27 @@ class DMysqli implements IBase
 	 */
     public function getObject($end = TRUE)
     {
-        $_result = array();
-        while (!!$_objs = mysqli_fetch_object($this->result) ) {  
-            $_result[] = $_objs;  
+        $result = array();
+        while (!!$objs = mysqli_fetch_object($this->result) ) {  
+            $result[] = $objs;  
         }
         
         if($end)
         {
             $this->close();                            
         }
-        return $_result;
+        return $result;
     }
     /**
 	 * 执行SQL语句
 	 *
 	 * @access public
 	 *
-     * @param string $_sql 多行查询语句
+     * @param string $sql 多行查询语句
 	 */ 
-    public function execute($_sql)
+    public function execute($sql)
     {
-        $this->result = $this->_mysqli->query($_sql);
+        $this->result = $this->_mysqli->query($sql);
         return $this;
     }
     
@@ -375,12 +375,12 @@ class DMysqli implements IBase
 	 *
 	 * @access public
 	 *
-     * @param string $_sql SQL语句
+     * @param string $sql SQL语句
      * @param array $param 参数
 	 */ 
-    public function prepare( $_sql , $param)
+    public function prepare( $sql , $param)
     {
-        $this->result = mysqli_prepare($this->_mysqli,$_sql);
+        $this->result = mysqli_prepare($this->_mysqli,$sql);
         mysqli_stmt_bind_param($this->result , $param );
         mysqli_stmt_execute($this->result);
     
@@ -406,13 +406,13 @@ class DMysqli implements IBase
 	 */ 
     public function multi_query($query)
     {
-        $_result = array();
+        $result = array();
         if (mysqli_multi_query($this->_mysqli,$query)) 
         {                                           //执行多个查询
             do {
                     if ($this->result = mysqli_store_result($this->_mysqli)) 
                     {
-                        $_result[] = $this->getList();
+                        $result[] = $this->getList();
                         mysqli_free_result($this->result);
                     }
                         /*if (mysqli_more_results($this_mysqli)) {
@@ -423,7 +423,7 @@ class DMysqli implements IBase
         
         $this->close();
         
-        return $_result;
+        return $result;
     }
     
     /**
