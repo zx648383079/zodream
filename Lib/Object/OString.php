@@ -7,6 +7,9 @@ namespace App\Lib\Object;
 
 class OString implements IBase
 {
+	/**
+	* 截取字符串为数组，补充explode函数，不建议过长数组
+	*/
 	public static function toArray($str, $link = ' ', $num = 1 ,$default = null)
 	{
 		$arr = explode($link, $str, $num);

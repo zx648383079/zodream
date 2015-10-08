@@ -113,7 +113,7 @@ class OArray implements IBase
 	}
 	
 	/****
-	根据字符串获取数组值
+	* 根据字符串获取数组值，取多维数组
 	***/
 	public static function getVal($name, $values, $default = null, $link = ',')
 	{
@@ -150,6 +150,9 @@ class OArray implements IBase
 		return $arr;
 	}
 	
+	/**
+	* 根据字符串取一个值，采用递进的方法取值
+	*/
 	public static function getChild( $name , $values, $default = null, $link = '.')
 	{
 		$names = explode($link , $name , 2 );

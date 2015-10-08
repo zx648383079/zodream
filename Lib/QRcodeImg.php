@@ -22,7 +22,7 @@ class QRcodeImg
         //生成二维码图片 
         $QR = QRcode::png($value, false , $errorCorrectionLevel, $matrixPointSize, 2); 
         
-        if (!empty($logo)) { 
+        if (is_file($logo)) { 
             //$QR = imagecreatefromstring(file_get_contents($QR)); 
             $logo = imagecreatefromstring(file_get_contents($logo)); 
             $QR_width = imagesx($QR);//二维码图片宽度 
@@ -911,8 +911,7 @@ class QRcodeImg
             $image = self::image($frame, $pixelPerPoint, $outerFrame);
             
             if ($filename === false) {
-                Header("Content-type: image/png");
-                ImagePng($image);
+                return $image;
             } else {
                 if($saveandprint===TRUE){
                     ImagePng($image, $filename);
@@ -921,9 +920,10 @@ class QRcodeImg
                 }else{
                     ImagePng($image, $filename);
                 }
+                
+                ImageDestroy($image);                
             }
             
-            ImageDestroy($image);
         }
     
         //----------------------------------------------------------------------
@@ -3267,7 +3267,7 @@ class QRcodeImg
                 
                 $maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab)+2*$this->margin));
                 
-                QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
+                return QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin, $saveandprint);
             
             } catch (Exception $e) {
             

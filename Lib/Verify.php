@@ -22,15 +22,15 @@ class Verify
 	 *
 	 *
 	 */
-	 public function load()
+	public function load()
 	{
-		$configs = array_merge( App::config('verify'), func_get_args() );
+		$configs = array_merge( App::config('verify',array()) , func_get_args() );
 	
 		$this->codelen = isset($configs['length'])?$configs['length']:4;
-		$this->width = isset($configs['width'])?$configs['width'] : 130 ;
-		$this->height = isset($configs['height'])?$configs['height'] : 50 ;
+		$this->width = isset($configs['width'])?$configs['width'] : 50 ;
+		$this->height = isset($configs['height'])?$configs['height'] : 25 ;
 		$this->fontsize = isset($configs['fontsize'])?$configs['fontsize'] : 30 ;
-		$this->font = isset($configs['font'])?$configs['font'] : 'asset/font/AcademyKiller.ttf';
+		$this->font = isset($configs['font'])?$configs['font'] : 5;
 		
 	}
 	
@@ -38,7 +38,8 @@ class Verify
 	/**
 	 *生成随机码
      */
-	private function createCode() {
+	private function createCode() 
+	{
 		 $charset = self::CHARSET;
 		  $_len = strlen($charset)-1;
 		  for ($i=0;$i<$this->codelen;$i++) {
@@ -46,34 +47,46 @@ class Verify
 		  }
 	 }
 	 //生成背景
-	 private function createBg() {
+	 private function createBg() 
+	 {
 		  $this->img = imagecreatetruecolor($this->width, $this->height);
 		  $color = imagecolorallocate($this->img, mt_rand(157,255), mt_rand(157,255), mt_rand(157,255));
 		  imagefilledrectangle($this->img,0,$this->height,$this->width,0,$color);
 	 }
 	 //生成文字
-	 private function createFont() {
+	 private function createFont() 
+	 {
 		  $_x = $this->width / $this->codelen;
-		  for ($i=0;$i<$this->codelen;$i++) {
+		  for ($i=0 ; $i<$this->codelen; $i++) 
+		  {
 			   $this->fontcolor = imagecolorallocate($this->img,mt_rand(0,156),mt_rand(0,156),mt_rand(0,156));
-			   imagettftext($this->img,$this->fontsize,mt_rand(-30,30),$_x*$i+mt_rand(1,5),$this->height / 1.4,$this->fontcolor,$this->font,$this->code[$i]);
+			   if(is_string($this->font) && is_file($this->font))
+			   {
+			   		imagettftext($this->img, $this->fontsize, mt_rand(-30,30), $_x*$i+mt_rand(1,5),$this->height / 1.4,$this->fontcolor,$this->font,$this->code[$i]);				   
+			   }else {
+				   imagestring($this->img, $this->font, $_x*$i + mt_rand(1,5), $this->height * 0.2 ,$this->code[$i] , $this->fontcolor);
+			   }
 		  }
 	 }
 	 //生成线条、雪花
-	 private function createLine() {
+	 private function createLine() 
+	 {
 		  //线条
-		  for ($i=0;$i<6;$i++) {
+		  for ($i=0;$i<6;$i++) 
+		  {
 			   $color = imagecolorallocate($this->img,mt_rand(0,156),mt_rand(0,156),mt_rand(0,156));
 			   imageline($this->img,mt_rand(0,$this->width),mt_rand(0,$this->height),mt_rand(0,$this->width),mt_rand(0,$this->height),$color);
 		  }
 		  //雪花
-		  for ($i=0;$i<100;$i++) {
+		  for ($i=0;$i<100;$i++) 
+		  {
 			   $color = imagecolorallocate($this->img,mt_rand(200,255),mt_rand(200,255),mt_rand(200,255));
 			   imagestring($this->img,mt_rand(1,5),mt_rand(0,$this->width),mt_rand(0,$this->height),'*',$color);
 		  }
 	 }
 	//对外生成
-	 public function render() {
+	 public function render() 
+	 {
 		 if(empty($this->font))
 		 {
 			$this->load();	 

@@ -36,23 +36,15 @@ class Base{
 	* @access globe
 	*
 	* @param string|null $key 要获取的配置名
+	* @param $default 返回默认值
 	* @return array,
 	*/
-	public static function config( $key = null )
+	public static function config( $key = null ,$default = null)
 	{
-		$configs=require(APP_DIR."/app/config/config.php");
+		$configs = require(APP_DIR."/app/config/config.php");
 		if(!empty($key))
 		{
-			$arr = explode('.',$key);
-			foreach ($arr as $value) {
-				if(isset($configs[$value]))
-				{
-					$configs = $configs[$value];
-				}else{
-					$configs = '';	
-					continue;
-				}
-			}
+			$configs = OArray::getChild($key, $configs , $default);
 		}
 		return $configs;
 	}
