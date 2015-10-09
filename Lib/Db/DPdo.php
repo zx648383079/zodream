@@ -11,7 +11,7 @@ class DPdo implements IBase
     //用于存放实例化的对象  
     static protected $instance = null;  
     //存放表名前缀
-    protected $prefix = null;
+    public $prefix = null;
     
     //存放当前操作的错误信息
     protected $error=null;
@@ -21,7 +21,8 @@ class DPdo implements IBase
     
        
     //公共静态方法获取实例化的对象  
-    static public function getInstance() {  
+    static public function getInstance() 
+    {  
         if (!(self::$instance instanceof self)) {  
             self::$instance = new self();  
         }  
@@ -38,7 +39,8 @@ class DPdo implements IBase
      *
      * @internal param array|string $config_path 数据库的配置信息.
      */
-    public function __construct() {  
+    public function __construct() 
+    {  
         
 		$config = App::config('mysql');
         $host = $config['host'];
@@ -49,13 +51,8 @@ class DPdo implements IBase
         $port = $config['port'];
 	    $this->prefix = $config['prefix'];
         
-        if(isset($this->table))
-        {
-            $this->table = $this->prefix.$this->table;            
-        }
-
-        
-        try {  
+        try 
+        {  
             //$this->pdo = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
             //                     array(\PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES {$coding}"));  
             $this->pdo = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd );
@@ -69,191 +66,7 @@ class DPdo implements IBase
             return false;
         }  
     }  
-       
-    /**
-	 * 新增记录
-	 *
-	 * @access public
-	 *
-	 * @param array $addData 需要添加的集合
-	 * @return int 返回影响的行数,
-	 */
-    public function add($addData) {
-        $addFields = array();  
-        $addValues = array();  
-        foreach ($addData as $key => $value) {  
-            $addFields[] = $key;  
-            $addValues[] = $value;  
-        }  
-        $addFields = implode('`,`', $addFields);  
-        $addValues = implode("','", $addValues);  
-        $sql = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";  
-        $this->execute($sql);
-        return $this->pdo->lastInsertId();  
-    }  
-       
-    /**
-	 * 修改记录
-	 *
-	 * @access public
-	 *
-	 * @param array $param 条件
-     * @param array $updateData 需要修改的内容
-	 * @return int 返回影响的行数,
-	 */
-    public function update($updateData , $param) {
-        $where = $setData = '';  
-        foreach ($param as $key => $value) {  
-            $where .= $value.' AND ';  
-        }  
-        $where = 'WHERE '.substr($where, 0, -4);  
-        foreach ($updateData as $key => $value) {  
-            if (is_array($value)) {  
-                $setData .= "`$key` = $value[0],";  
-            } else {  
-                $setData .= "`$key` = '$value',";  
-            }  
-        }  
-        $setData = substr($setData, 0, -1);  
-        $sql = "UPDATE {$this->table} SET $setData $where";  
-        return $this->execute($sql)->rowCount();  
-    }  
-       
-    /**
-	 * 验证一条数据
-	 *
-	 * @access public
-	 *
-	 * @param array $param 条件
-	 * @return string|bool 返回id,
-	 */
-    public function findOne($param) {
-        $where = '';  
-        foreach ($param as $key => $value) {  
-            $where .=$value.' AND ';  
-        }  
-        $where = 'WHERE '.substr($where, 0, -4);  
-        $sql = "SELECT * FROM {$this->table} $where LIMIT 1";  
-        $result = $this->execute($sql);
-        if($result->rowCount() > 0)
-        {
-            return $result->fetchObject();
-        }else{
-            return false;
-        } 
-    }  
-       
-    /**
-	 * 删除第一条数据
-	 *
-	 * @access public
-	 *
-	 * @param array|string $param 条件
-	 * @return int 返回影响的行数,
-	 */
-    public function delete($param) {  
-        $where = '';  
-        if(is_array($param))
-        {
-            foreach ($param as $key=>$value) {  
-            $where .= $value.' AND ';  
-            }  
-            $where = 'WHERE '.substr($where, 0, -4);  
-        }else{
-            $where='WHERE '.$param;
-        }
-        $sql = "DELETE FROM {$this->table} $where LIMIT 1";  
-        return $this->execute($sql)->rowCount();  
-    }  
-       
-    /**
-	 * 查询数据
-	 *
-	 * @access public
-	 *
-     * @param array $fileld 要显示的字段
-     * @param array|null $param 条件
-	 * @return array 返回查询结果,
-	 */  
-    public function find( $param = array(),$fileld=array()) {
-        $limit = $order =$group = $where = $like = '';  
-        if (is_array($param) && !empty($param)) {  
-            $limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';  
-            $order = isset($param['order']) ? 'ORDER BY '.$param['order'] : '';  
-            $group = isset($param['group']) ? 'GROUP BY '.$param['group'] : '';  
-            if (isset($param['where'])) {  
-                foreach ($param['where'] as $key=>$value) {  
-                    if(empty($where))
-                    {
-                        $where='WHERE'.$value;
-                    }else{
-                        if(is_array($value))
-                        {
-                            switch($value[1])
-                            {
-                                case "or":
-                                    $where .= 'OR'.$value;
-                                case "and":
-                                    $where .= 'AND'.$value;
-                            }
-                        }else{
-                            $where .= 'AND'.$value;
-                        }
-                    }
-                }  
-            }  
-            /*if (isset($param['like'])) {  
-                foreach ($param['like'] as $key=>$value) {  
-                    $like = "WHERE $key LIKE '%$value%'";  
-                }  
-            }  */
-        }  
-        $selectFields = empty($fileld)?"*":implode(',', $fileld);  
-        $sql = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";  
-
-        $stmt = $this->execute($sql);  
-        $result = array();  
-        while (!!$objs = $stmt->fetchObject()) {  
-            $result[] = $objs;  
-        }  
-        
-        return $result;  
-    }  
-       
-    /**
-	 * 总记录
-	 *
-	 * @access public
-	 *
-     * @param array|null $param 条件
-	 * @return int 返回总数,
-	 */ 
-    public function count( $param = array()) {
-        $where = '';  
-        if (isset($param['where'])) {  
-            foreach ($param['where'] as $key=>$value) {  
-                $where .= $value.' AND ';  
-            }  
-            $where = 'WHERE '.substr($where, 0, -4);  
-        }  
-        $sql = "SELECT COUNT(*) as count FROM {$this->table} $where";  
-        $stmt = $this->execute($sql);  
-        return $stmt->fetchObject()->count;  
-    }  
-       
-    /**
-	 * 得到下一个id
-	 *
-	 * @access public
-	 *
-	 * @return string 返回id,
-	 */  
-    public function nextId() {  
-        $sql = "SHOW TABLE STATUS LIKE '{$this->table}'";  
-        $stmt = $this->execute($sql);  
-        return $stmt->fetchObject()->Auto_increment;  
-    }  
-   
+    
     /**
 	 * 执行SQL语句
 	 *
@@ -261,7 +74,6 @@ class DPdo implements IBase
 	 *
      * @param array $param 条件
      * @param bool $isList 返回类型
-     * @param bool $need 是否需要表的前缀
 	 * @return array 返回查询结果,
 	 */ 
     public function findByHelper($param ,$isList = TRUE)
@@ -335,23 +147,5 @@ class DPdo implements IBase
     public function getError()
     {
         return $this->error;
-    }
-
-    /**
-     * 查询返回array
-     *
-     */
-    function getList()
-    {
-        // TODO: Implement getList() method.
-    }
-
-    /**
-     * 查询返回object
-     *
-     */
-    function getObject()
-    {
-        // TODO: Implement getObject() method.
     }
 }

@@ -5,11 +5,11 @@
 namespace App\Model;
 
 use App\Lib\Auth;
-use App\Lib\Db\DPdo;
+use App\Lib\Db\DbFactory;
 use App\Lib\Object\OTime;
 use App\Lib\Object\OArray;
 
-abstract class Model extends DPdo{
+abstract class Model extends DbFactory{
 	/*查询到的数据*/
 	protected $models;
 	/**
@@ -44,46 +44,8 @@ abstract class Model extends DPdo{
 		return $this->add($arr);
 	}
 
-	/**
-	* 根据id 查找值
-	*
-	* @param $id
-	* @return mixed
-	*/
-	public function findById($id)
-	{
-		$sql = "SELECT * FROM {$this->table} WHERE id = {$id}";
-		return $this->execute($sql)->fetchObject();
-	}
 	
-	/**
-	* 设置bool值
-	*
-	* @param string $filed
-	* @param string $where
-	* @return int
-	*/
-	public function updateBool($filed , $where )
-	{
-		$sql = "UPDATE {$this->table} SET {$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END WHERE ";
-		$sql .= $where;
-		return $this->execute($sql)->rowCount();
-	}
 	
-	/**
-	* int加
-	*
-	* @param string $filed
-	* @param string $where
-	* @param string $num
-	* @return int
-	*/
-	public function updateOne( $filed , $where ,$num = 1)
-	{
-		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} + {$num} WHERE ";
-		$sql .= $where;
-		return $this->execute($sql)->rowCount();
-	}
 	
 	/**
 	* 返回Object

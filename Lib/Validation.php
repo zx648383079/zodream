@@ -7,7 +7,7 @@
 */
 namespace App\Lib;
 
-use App\Lib\Db\DPdo;
+use App\Lib\Db\DbFactory;
 	
 class Validation
 {
@@ -137,7 +137,7 @@ class Validation
 	 */
 	public function unique($table , $colum ,$value)
 	{
-		$pdo =new DPdo();
+		$pdo =new DbFactory();
 		$data = $pdo->findByHelper(array(
 			'select' => 'COUNT(*) as num',
 			'from' => $table,
