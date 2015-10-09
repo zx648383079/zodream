@@ -103,6 +103,11 @@ class DPdo implements IBase
         return $result;
     }
     
+    public function lastInsertId()
+    {
+        return $this->pdo->lastInsertId();
+    }
+    
     
     public function prepare($sql)
     {

@@ -33,7 +33,7 @@ class DbFactory
         $addValues = implode("','", $addValues);  
         $sql = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";  
         $this->db->execute($sql);
-        return $this->db->pdo->lastInsertId();  
+        return $this->db->lastInsertId();  
     }  
        
     /**

@@ -40,16 +40,43 @@ class HUrl implements IBase
 		if( $extra === null )
 		{
 			return $url;
-		}
-		
-		if(strpos($url,'?') === false)
+		}else if( is_string ( $extra ) )
 		{
-			$url .= '?'.$extra;
-		}else {
-			$url .= '&'.$extra;
+			if(strpos($url,'?') === false)
+			{
+				$url .= '?'.$extra;
+			}else {
+				$url .= '&'.$extra;
+			}
+		}else if(is_array($extra))
+		{
+			$url = self::setValue($url, $extra);
 		}
 		
 		return $url;
+	}
+	
+	/**
+	 * 替换url中的参数
+	 *
+	 * @return string 真实显示的网址
+     */
+	public static function setValue( $url, $key , $value = null)
+	{
+		$arr = explode('?',$url, 2);
+		$data = array();
+		if(count($arr) > 1)
+		{
+			parse_str( $arr[1], $data );
+		}
+		 
+		if($value === null && is_array($key))
+		{
+			$data = array_merge( $data, $key);
+		}else{
+			$data[ $key ] = $value;			
+		}
+		return $arr[0].'?'.http_build_query($data); 
 	}
 	
 	/**
