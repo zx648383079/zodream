@@ -29,28 +29,43 @@ class Controller{
 			$role = isset($this->rules['*']) ? $this->rules['*'] : '';
 			$role = isset($this->rules[$func]) ? $this->rules[$func] : $role;
 			
-			switch ($role) {
-				case '?':
-					if(!Auth::guest())
-					{
-						App::redirect('/');
-					}
-					break;
-				case '1':
-					if(Auth::guest())
-					{
-						App::redirect('?c=auth');
-					}
-					break;
-				case '!':
-					App::redirect('/' , 4 ,'您访问的页面暂未开放！','413');
-					break;
-				default:
-					if(!App::role($role))
-					{
-						App::redirect('?c=auth' , 4 ,'您无权操作！','401');
-					}
-					break;
+			if(is_object($role))
+			{
+				if(!$role())
+				{
+					App::redirect('/');
+				}
+			}else if(is_string($role))
+			{
+				switch ($role) {
+					case '?':
+						if(!Auth::guest())
+						{
+							App::redirect('/');
+						}
+						break;
+					case '1':
+						if(Auth::guest())
+						{
+							App::redirect('?c=auth');
+						}
+						break;
+					case 'p':
+						if(!App::$request->isPost())
+						{
+							App::redirect('/', 4, '您不能直接访问此页面！', '400');
+						}
+						break;
+					case '!':
+						App::redirect('/' , 4 ,'您访问的页面暂未开放！','413');
+						break;
+					default:
+						if(!App::role($role))
+						{
+							App::redirect('?c=auth' , 4 ,'您无权操作！','401');
+						}
+						break;
+				}
 			}
 			
 		}
