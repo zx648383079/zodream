@@ -77,6 +77,9 @@ class Validation
 			case 'number':
 				$result = $this->isNum($value)?TRUE:' is not number';
 				break;
+			case 'float':
+				$result = $this->isNum($value , 'float')?TRUE:' is not float';
+				break;
 			case 'email':
 				$result = $this->isEmail($value)?TRUE:' is not email';
 				break;
@@ -85,6 +88,9 @@ class Validation
 				break;
 			case 'url':
 				$result = $this->isUrl($value)?TRUE:' is not url';
+				break;
+			case 'datetime':
+				$result = $this->isDateTime($value)?TRUE:' is not datetime';
 				break;
 			case 'length':
 				$len = explode('-',$arr[1]);
@@ -122,9 +128,14 @@ class Validation
 		return $result;
 	}
 	
-	public function isNull($value)
+	private function isNull($value)
 	{
 		return ($value === null || $value === '');
+	}
+	
+	private function isDateTime($value) 
+	{
+		return strtotime($value);
 	}
 	
 	/**
@@ -135,7 +146,7 @@ class Validation
 	 * @param string $value  要验证的值
 	 * @return bool
 	 */
-	public function unique($table , $colum ,$value)
+	private function unique($table , $colum ,$value)
 	{
 		$pdo =new DbFactory();
 		$data = $pdo->findByHelper(array(
@@ -183,6 +194,16 @@ class Validation
             return ((string)(float)$str === (string)$str) ? true : false;
         }
     }
+	
+	/**
+	 * 验证是否是带小数的浮点型
+	 * @param $value
+	 * @return bool
+	 */
+	private function isFloat($value)
+	{
+		return is_float($value) || ( (float) $value > (int) $value || strlen($value) != strlen( (int) $value) ) && (int) $value != 0 ;
+	}
 
 	/**
 	 * 邮箱验证
