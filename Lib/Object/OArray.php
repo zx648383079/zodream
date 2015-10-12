@@ -30,6 +30,7 @@ class OArray implements IBase
 		{
 			switch ($key) {
 				case 'before':
+				case 'before[]':
 					if(is_array($value))
 					{
 						$this->before = array_merge($this->before , $value);
@@ -38,6 +39,7 @@ class OArray implements IBase
 					}
 					break;
 				case 'after':
+				case 'after[]':
 					if(is_array($value))
 					{
 						$this->after = array_merge($this->after , $value);
