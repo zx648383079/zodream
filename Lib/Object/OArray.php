@@ -127,11 +127,12 @@ class OArray implements IBase
 		{
 			//使用方法 post:key default
 			
-			$temp = explode(' ' , $name , 2 );
-			$def = ( count($temp) == 1) ? $default : $temp[1];
+			$temp = OString::toArray($name , ' ', 2 , $default);
+			$def = $temp[1];
 			
-			$temp = explode(':',$temp[0],2);
-			$key = ( count($temp) == 1 ) ? $name : $temp[1];
+			$temp = explode(':', $temp[0], 2);
+			$name = $temp[0];
+			$key = end( $temp );
 			
 			if(isset($values[$name]))
 			{
@@ -178,13 +179,18 @@ class OArray implements IBase
 	/**
 	*   扩展 array_combine 能够用于不同数目
 	*/
-	public static function combine( $keys , $values )
+	public static function combine( $keys , $values , $complete = TRUE)
 	{
 		$arr = array();
 		if( self::isAssoc($values) )
 		{
 			foreach ($keys as $key) {
-				$arr[$key] = isset($values[$key])?$values[$key]:null;
+				if(isset($values[$key]))
+				{
+					$arr[$key] = $values[$key];
+				}else if($complete){
+					$arr[$key] = null;
+				}
 			}
 		}else {
 			for ($i = 0; $i < count($keys) ; $i++) { 

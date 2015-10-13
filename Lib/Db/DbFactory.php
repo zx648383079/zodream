@@ -100,13 +100,13 @@ class DbFactory
 	 * @param array $param 条件
 	 * @return string|bool 返回id,
 	 */
-    public function findOne($param) {
+    public function findOne($param , $filed = "*") {
         $where = '';  
         foreach ($param as $key => $value) {  
             $where .=$value.' AND ';  
         }  
         $where = 'WHERE '.substr($where, 0, -4);  
-        $sql = "SELECT * FROM {$this->table} $where LIMIT 1";  
+        $sql = "SELECT {$filed} FROM {$this->table} {$where} LIMIT 1";  
         $result = $this->db->execute($sql);
         if($result->rowCount() > 0)
         {
@@ -122,9 +122,9 @@ class DbFactory
 	* @param $id
 	* @return mixed
 	*/
-	public function findById($id)
+	public function findById($id, $filed = "*")
 	{
-		$sql = "SELECT * FROM {$this->table} WHERE id = {$id} LIMIT 1";
+		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
 		return $this->db->execute($sql)->fetchObject();
 	}
        

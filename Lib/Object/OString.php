@@ -15,13 +15,13 @@ class OString implements IBase
 		$arr = explode($link, $str, $num);
 		for ($i = 0 ; $i < $num ; $i++) 
 		{
-			if(!isset($arr[i]) || $arr[i] === '')
+			if(!isset($arr[$i]) || $arr[$i] === '')
 			{
 				if(is_array($default))
 				{
-					$arr[i] = $default[i];
+					$arr[$i] = $default[$i];
 				}else {
-					$arr[i] = $default;
+					$arr[$i] = $default;
 				}
 			} 
 		}

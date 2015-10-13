@@ -44,7 +44,15 @@ abstract class Model extends DbFactory{
 		return $this->add($arr);
 	}
 
-	
+	public function updateById($param, $id)
+	{
+		$arr = OArray::combine( $this->fillable, $param, FALSE);
+		if(in_array('udate', $this->fillable))
+		{
+			$arr['udate'] = OTime::Now();
+		}
+		$this->update($arr , 'id ='.$id);
+	}
 	
 	
 	/**
