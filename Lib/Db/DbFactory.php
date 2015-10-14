@@ -102,10 +102,16 @@ class DbFactory
 	 */
     public function findOne($param , $filed = "*") {
         $where = '';  
-        foreach ($param as $key => $value) {  
-            $where .=$value.' AND ';  
-        }  
-        $where = 'WHERE '.substr($where, 0, -4);  
+        if( is_array($param) ) 
+        {
+            foreach ($param as $key => $value) {  
+                $where .=$value.' AND ';  
+            }  
+            $where = 'WHERE '.substr($where, 0, -4);  
+        }else if( is_string($param) )
+        {
+            $where = 'WHERE '.$param;
+        }
         $sql = "SELECT {$filed} FROM {$this->table} {$where} LIMIT 1";  
         $result = $this->db->execute($sql);
         if($result->rowCount() > 0)

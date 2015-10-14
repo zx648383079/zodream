@@ -12,7 +12,7 @@ use App\Lib\Object\OString;
 
 class Route
 {
-		/**
+	/**
 	 * 加载控制器和视图
 	 *
 	 * @access globe
