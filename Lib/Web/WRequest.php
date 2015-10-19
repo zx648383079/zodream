@@ -47,15 +47,6 @@ class WRequest implements IBase
 	{
 		
 	}
-    
-	public function server($name = null , $default = null)
-	{
-		if($name === null)
-		{
-			return $_SERVER;
-		}
-		return OArray::getVal($name, $_SERVER, $default);
-	}
 	
 	public function getMethod()
     {
@@ -66,16 +57,7 @@ class WRequest implements IBase
             return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
         }
     }
-    
-    public function isCli() 
-    {
-        if(isset($_SERVER['argv']))
-        {
-            return TRUE;
-        }
-        return FALSE;
-    }
-    
+	
 	public function isGet()
     {
         return $this->getMethod() === 'GET';
