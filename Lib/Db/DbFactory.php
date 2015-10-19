@@ -46,11 +46,15 @@ class DbFactory
 	 * @return int 返回影响的行数,
 	 */
     public function update($updateData , $param) {
-        $where = $setData = '';  
-        foreach ($param as $key => $value) {  
-            $where .= $value.' AND ';  
-        }  
-        $where = 'WHERE '.substr($where, 0, -4);  
+        $where = $setData = '';
+        if(is_array($param)) {
+            foreach ($param as $key => $value) {  
+                $where .= $value.' AND ';  
+            }  
+            $where = 'WHERE '.substr($where, 0, -4);  
+        }else{
+            $where = 'WHERE '.$param;
+        }
         foreach ($updateData as $key => $value) {  
             if (is_array($value)) {  
                 $setData .= "`$key` = $value[0],";  
@@ -87,8 +91,10 @@ class DbFactory
 	*/
 	public function updateOne( $filed , $where ,$num = 1)
 	{
-		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} + {$num} WHERE ";
-		$sql .= $where;
+		if($num >= 0) {
+            $num = '+'.$num;
+        }
+		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} {$num} WHERE $where";
 		return $this->db->execute($sql)->rowCount();
 	}
       
@@ -153,7 +159,7 @@ class DbFactory
         }else{
             $where='WHERE '.$param;
         }
-        $sql = "DELETE FROM {$this->table} $where LIMIT 1";  
+        $sql = "DELETE FROM {$this->table} $where";
         return $this->db->execute($sql)->rowCount();  
     }  
        
@@ -221,12 +227,14 @@ class DbFactory
 	 */ 
     public function count( $param = array()) {
         $where = '';  
-        if (isset($param['where'])) {  
+         if ( is_array($param) ) {  
             foreach ($param['where'] as $key=>$value) {  
                 $where .= $value.' AND ';  
             }  
             $where = 'WHERE '.substr($where, 0, -4);  
-        }  
+        }else {
+            $where = 'WHERE '.$param;
+        } 
         $sql = "SELECT COUNT(*) as count FROM {$this->table} $where";  
         $stmt = $this->db->execute($sql);  
         return $stmt->fetchObject()->count;  
