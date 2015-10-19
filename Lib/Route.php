@@ -51,6 +51,12 @@ class Route
 			$key = 0;
 		}
 		$url = new Route();
+		
+		if(App::$request->isCli()) 
+		{
+			return $url->cli();	
+		}
+		
 		switch ($key) {
 			case 0:
 				return $url -> c();
@@ -135,5 +141,11 @@ class Route
 		}
 		
 		return $arr;
+	}
+	
+	private function cli()
+	{
+		$url = App::$request->server('argv')[0];
+		return OString::toArray($url , '/' ,2 , array( 'home', 'index' ));
 	}
 }
