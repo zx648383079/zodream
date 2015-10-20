@@ -28,33 +28,37 @@ class OArray implements IBase
 	{
 		foreach ($arr as $key => $value)
 		{
-			switch ($key) {
-				case 'before':
-				case 'before[]':
-					if(is_array($value))
-					{
-						$this->before = array_merge($this->before , $value);
-					}else{
-						$this->before[] = $value;
-					}
-					break;
-				case 'after':
-				case 'after[]':
-					if(is_array($value))
-					{
-						$this->after = array_merge($this->after , $value);
-					}else{
-						$this->after[] = $value;
-					}
-					break;
-				default:
-					if(is_array($value))
-					{
-						$this->arr_list($value);
-					}else{
-						$this->content[] = $value;
-					}
-					break;
+			if(is_numeric($key)) 
+			{
+				if(is_array($value))
+				{
+					$this->arr_list($value);
+				}else{
+					$this->content[] = $value;
+				}
+			}else {
+				switch ($key) {
+					case 'before':
+					case 'before[]':
+						if(is_array($value))
+						{
+							$this->before = array_merge($this->before , $value);
+						}else{
+							$this->before[] = $value;
+						}
+						break;
+					case 'after':
+					case 'after[]':
+						if(is_array($value))
+						{
+							$this->after = array_merge($this->after , $value);
+						}else{
+							$this->after[] = $value;
+						}
+						break;
+					default:
+						break;
+				}
 			}
 		}
 	}
