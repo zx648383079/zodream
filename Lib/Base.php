@@ -11,8 +11,9 @@ use App\Lib\Helper\HUrl;
 use App\Lib\Web\WRequest;
 use App\Lib\Role\RComma;
 use App\Lib\Html\HScript;
+use App\Lib\Html\HView;
 
- ini_set("session.cookie_httponly", 1);
+ini_set("session.cookie_httponly", 1);
  
 defined("DEBUG") or define("DEBUG", false);
 defined("APP_DIR") or define("APP_DIR", dirname( dirname( dirname( __FILE__ ) ) ) );
@@ -244,7 +245,7 @@ class Base{
 	* @param string|null $replace 额外值是否替换
 	* @,
 	*/
-	public static function extend( $names ,$param = null,$replace = null)
+	public static function extend( $names , $param = null, $replace = null)
 	{
 		if($replace == '+')
 		{
@@ -253,42 +254,9 @@ class Base{
 			self::$extra = $param;
 		}
 		
-		$configs = self::config('view');
-				
-		$view_dir = isset($configs['dir'])?$configs['dir']:'app/view';
-		$ext = isset($configs['ext'])?$configs['ext']:'.php';
-		
-		if(substr( $ext , 0, 1 ) != '.')
-		{
-			$ext = '.'.$ext;
+		foreach (OArray::to( $names , '.') as $value) {
+			include( HView::make( $value ) );
 		}
-		
-		foreach (OArray::to($names,'.') as $value) {
-			self::inc_file($view_dir,$value,$ext);
-		}
-	}
-
-	/**
-	 * 加载视图文件
-	 *
-	 * @param string $view_dir 视图的路径
-	 * @param string $name 视图文件名
-	 * @param string $ext 视图文件的后缀
-     */
-	private static function inc_file($view_dir, $name ,$ext)
-	{
-		if(empty($name))
-		{
-			return;
-		}
-		$name = str_replace('.','/',$name);
-		
-		$file = APP_DIR.'/'.$view_dir.'/'.$name;
-		
-		$file = str_replace('//','/',$file);
-		
-		//extract(self::$data);
-		require($file.$ext);
 	}
 
 

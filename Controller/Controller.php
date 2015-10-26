@@ -10,6 +10,7 @@ use App;
 use App\Lib\Lang;
 use App\Lib\Validation;
 use App\Lib\Auth;
+use App\Lib\Html\HView;
 
 class Controller{
 	function __construct()
@@ -121,7 +122,7 @@ class Controller{
 	* @param string $name 视图的文件名
 	* @param array $data 要传的数据
 	*/
-	function show($name = "index",$data = array())
+	function show( $name = "index", $data = array())
 	{
 		if(!empty($data))
 		{
@@ -132,27 +133,35 @@ class Controller{
 		{
 			$this->ajaxJson(App::$data);
 		}else{
-			
-			if (extension_loaded('zlib')) { 
-				if (  !headers_sent() AND isset($_SERVER['HTTP_ACCEPT_ENCODING']) && 
-					strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) 
-				//页面没有输出且浏览器可以接受GZIP的页面 
-				{ 
-					ob_start('ob_gzhandler'); 
-				}else{
-					ob_start();
-				}
-			}else{
-				ob_start();
-			} 
-			header( 'Content-Type:text/html;charset=utf-8' );
-			ob_implicit_flush(FALSE);
-			App::extend($name);
-			ob_end_flush();
-			exit;
+			ob_start();
+			include( HView::make( $name) );
+			$content = ob_get_contents();
+			ob_end_clean();
+			$this->showGzip( $content );
 		}
 		
 	} 
+	
+	function showGzip($content)
+	{
+		if (extension_loaded('zlib')) { 
+			if (  !headers_sent() AND isset($_SERVER['HTTP_ACCEPT_ENCODING']) && 
+				strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) 
+			//页面没有输出且浏览器可以接受GZIP的页面 
+			{ 
+				ob_start('ob_gzhandler'); 
+			}else{
+				ob_start();
+			}
+		}else{
+			ob_start();
+		} 
+		header( 'Content-Type:text/html;charset=utf-8' );
+		ob_implicit_flush(FALSE);
+		echo $content;
+		ob_end_flush();
+		exit;
+	}
 
 	/**
 	* 返回JSON数据
