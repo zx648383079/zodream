@@ -43,7 +43,8 @@ class Auth
 	*/
 	public static function guest()
 	{
-		return empty(self::getId());
+		$id = self::getId();
+		return empty($id);
 	}
 
 	/**
@@ -52,10 +53,11 @@ class Auth
 	private static function getId()
 	{
 		$id = App::session('user');
+		$token = App::cookie('token');
 		if(!empty($id))
 		{
 			return $id;
-		}else if(!empty($token = App::cookie('token')))
+		}else if(!empty($token))
 		{
 			$user = new UserModel();
 			$id = $user -> findByToken($token);

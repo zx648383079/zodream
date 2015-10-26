@@ -11,9 +11,15 @@ class HSql implements IBase
 	/********
 	SQL中的关键字数组
 	*********/
-	const SQL_KEYS=array(/*'show','alter','drop','create,'*/'select','update','set','delete','insert','from','values','left','right','inner','exec','where','and','or','group','having','order','asc','desc','limit');
+	private $sqlKeys = array(
+		/*'show','alter','drop','create,'*/
+		'select','update','set','delete','insert',
+		'from','values','left','right','inner','exec',
+		'where','and','or','group','having','order',
+		'asc','desc','limit'
+	);
 	
-	private $prefix=NULL;
+	private $prefix = NULL;
 	/**
 	 * 公有构造函数
 	 *
@@ -24,7 +30,7 @@ class HSql implements IBase
 	 */
 	public function __construct($prefix=NULL)
 	{
-		$this->prefix=$prefix;
+		$this->prefix = $prefix;
 	}
 	/**
 	 * 根据数组获取SQL语句
@@ -35,14 +41,14 @@ class HSql implements IBase
 	 * @param boolen $sort 是否先进行排序.
 	 * @return 返回排序的数组,
 	 */
-	public function getSQL($param,$sort=FALSE)
+	public function getSQL($param, $sort = FALSE)
 	{
 		if($sort)
 		{
-			$param=$this->sortarr($param,self::SQL_KEYS);
+			$param = $this->sortarr( $param, $this->sqlKeys );
 		}
 		
-		return $this->sqlCheck($param);
+		return $this->sqlCheck( $param );
 	}
 	
 	/**
@@ -56,7 +62,7 @@ class HSql implements IBase
 	 */
 	private function sqlJoin($key,$value)
 	{
-		$result=' ';
+		$result = ' ';
 		switch($key)
 		{
 			/*case 'show':
@@ -72,58 +78,58 @@ class HSql implements IBase
 				$result.='DROP TABLE '.sqlCheck($value,',');
 				break;*/
 			case 'exec':
-				$result.='EXEC '.$this->sqlCheck($value);
+				$result .= 'EXEC '.$this->sqlCheck($value);
 				break;
 			case 'select':
-				$result.='SELECT '.$this->sqlCheck($value,',');
+				$result .= 'SELECT '.$this->sqlCheck($value, ',');
 				break;
 			case 'from':
-				$result.='FROM '.$this->sqlCheck($value,',',$this->prefix);
+				$result .= 'FROM '.$this->sqlCheck($value, ',', $this->prefix);
 				break;
 			case 'update':
-				$result.='UPDATE '.$this->sqlCheck($value,',');
+				$result .= 'UPDATE '.$this->sqlCheck($value, ',');
 				break;
 			case 'set':
-				$result.='SET '.$this->sqlCheck($value,',');
+				$result .= 'SET '.$this->sqlCheck($value, ',');
 				break;
 			case 'delete':
-				$result.='DELETE FROM '.$this->sqlCheck($value,',');
+				$result .= 'DELETE FROM '.$this->sqlCheck($value, ',');
 				break;
 			case 'insert':
-				$result.='INSERT INTO '.$this->sqlCheck($value);
+				$result .= 'INSERT INTO '.$this->sqlCheck($value);
 				break;
 			case 'values':
-				$result.='VALUES '.$this->sqlCheck($value,',');
+				$result .= 'VALUES '.$this->sqlCheck($value, ',');
 				break;
 			case 'limit':
-				$result.='LIMIT '.$this->sqlCheck($value,',');
+				$result .= 'LIMIT '.$this->sqlCheck($value, ',');
 				break;
 			case 'order':
-				$result.='ORDER BY '.$this->sqlCheck($value,',');
+				$result .= 'ORDER BY '.$this->sqlCheck($value, ',');
 				break;
 			case 'group':
-				$result.='GROUP BY '.$this->sqlCheck($value,',');
+				$result .= 'GROUP BY '.$this->sqlCheck($value, ',');
 				break;
 			case 'having':
-				$result.='HAVING '.$this->sqlCheck($value);
+				$result .= 'HAVING '.$this->sqlCheck($value);
 				break;
 			case 'where':
-				$result.='WHERE '.$this->sqlCheck($value,' AND ');
+				$result .= 'WHERE '.$this->sqlCheck($value, ' AND ');
 				break;
 			case 'or':
-				$result.='OR '.$this->sqlCheck($value);
+				$result .= 'OR '.$this->sqlCheck($value);
 				break;
 			case 'and':
-				$result.='AND '.$this->sqlCheck($value);
+				$result .= 'AND '.$this->sqlCheck($value);
 				break;
 			case 'desc':
-				$result.=$this->sqlCheck($value,',').' DESC';
+				$result .= $this->sqlCheck($value, ',').' DESC';
 				break;
 			case 'asc':
-				$result.=$this->sqlCheck($value,',').' ASC';
+				$result .= $this->sqlCheck($value, ',').' ASC';
 				break;
 			default:															//默认为是这些关键词 'left','right','inner'
-				$result.=strtoupper($key).' JOIN '.$this->sqlCheck($value,' ON ',$this->prefix);
+				$result .= strtoupper($key).' JOIN '.$this->sqlCheck($value, ' ON ', $this->prefix);
 				break;
 		}
 		
@@ -139,60 +145,60 @@ class HSql implements IBase
 	 * @param string $link 数组之间的连接符.
 	 * @return 返回拼接的语句,
 	 */
-	private function sqlCheck($value,$link=' ',$pre=null,$end=null)
+	private function sqlCheck($value, $link = ' ', $pre = null, $end = null)
 	{
 		
-		$result='';
+		$result = '';
 		
 		if(is_array($value))
 		{
-			foreach($value as $key=>$v)
+			foreach($value as $key => $v)
 			{
-				$space=' ';
+				$space = ' ';
 				
 				//把关键字转换成小写进行检测
-				$low=strtolower($key);
-				$lowkey=str_replace('`','',$low);                   //解决重关键字冲突关键
-				if(in_array($lowkey,self::SQL_KEYS,TRUE))
+				$low = strtolower($key);
+				$lowkey = str_replace('`', '', $low);                   //解决重关键字冲突关键
+				if(in_array($lowkey, $this->sqlKeys, TRUE))
 				{
-					$space.=$this->sqlJoin($lowkey,$v);
+					$space .= $this->sqlJoin($lowkey, $v);
 				}else{
 					if(is_numeric($key))
 					{
 						if(empty($result))
 						{
-							$space.=$this->sqlCheck($v,' ',$pre,$end);
+							$space .= $this->sqlCheck($v, ' ', $pre, $end);
 						}else{
-							$space.=$link.$this->sqlCheck($v);
+							$space .= $link. $this->sqlCheck($v);
 						}
 					}else{
-						$space.=$pre.$key.$end.$link.$this->sqlCheck($v);
+						$space .= $pre. $key. $end. $link. $this->sqlCheck($v);
 					}
 				}
 				
-				$result.=$space;
+				$result .= $space;
 			}
 			
 		}else{
-			$unsafe=self::SQL_KEYS;
-			array_push($unsafe,';');                        //替换SQL关键字和其他非法字符，
-			$safe=$this->safeCheck($value,'\'',$unsafe,' ');
-			$safe=$this->safeCheck($value,'"',$unsafe,' ');
-			if(strpos($safe,'(')!==FALSE)                      //验证是表名还是其他
+			$unsafe = $this->sqlKeys;
+			array_push($unsafe, ';');                        //替换SQL关键字和其他非法字符，
+			$safe = $this->safeCheck($value, '\'', $unsafe, ' ');
+			$safe = $this->safeCheck($value, '"', $unsafe, ' ');
+			if(strpos($safe, '(') !== FALSE)                      //验证是表名还是其他
 			{
-				$result.=$safe;
+				$result .= $safe;
 			}else{
-				if(!empty($pre) && strpos($safe,$pre) === 0)              //判断是否存在重复前缀；
+				if(!empty($pre) && strpos($safe, $pre) === 0)              //判断是否存在重复前缀；
 				{
 					$pre = '';
 				}
-				$result.=$pre.$safe.$end;
+				$result .= $pre. $safe. $end;
 			}
 		}
 		
-		$result=preg_replace('/\s+/', ' ', $result);
-		$result =str_replace("WHERE AND","WHERE",$result);
-		$result =str_replace("WHERE OR","WHERE",$result);
+		$result = preg_replace('/\s+/', ' ', $result);
+		$result = str_replace("WHERE AND", "WHERE", $result);
+		$result = str_replace("WHERE OR", "WHERE", $result);
 		
 		return $result;
 	}
@@ -208,24 +214,24 @@ class HSql implements IBase
 	 * @param string|array $enresplace 替换的字符或数组.
 	 * @return 返回完成检查的语句,
 	 */
-	private function safeCheck($unsafe,$scope,$find,$enresplace)
+	private function safeCheck($unsafe, $scope, $find, $enresplace)
 	{
-		$safe='';
-		$arr=explode($scope,$unsafe);
-		$len=count($arr);
-		if($len==1)
+		$safe = '';
+		$arr = explode($scope, $unsafe);
+		$len = count($arr);
+		if($len == 1)
 		{
-			$safe=$unsafe;
+			$safe = $unsafe;
 		}else{
-			foreach($arr as $key=>$val)
+			foreach($arr as $key => $val)
 			{
-				if($key%2==0)
+				if($key % 2 == 0)
 				{
-					$low=strtolower($val);                      //转化为小写
-					$safe.=str_replace($find,$enresplace,$low);
+					$low = strtolower($val);                      //转化为小写
+					$safe .= str_replace($find, $enresplace, $low);
 				}else{
 					//如果排除标志不是成对出现，默认在最后加上
-					$safe.=$scope.$val.$scope;
+					$safe .= $scope. $val. $scope;
 				}
 			}
 		}
@@ -241,26 +247,26 @@ class HSql implements IBase
 	 * @param array $keys 关键字数组.
 	 * @return 返回排序的数组,
 	 */
-	private function sortarr($arr,$keys)
+	private function sortarr($arr, $keys)
 	{
-		$keyarr=$noarr=array();
-		foreach($keys as $key=>$value)
+		$keyarr = $noarr = array();
+		foreach($keys as $key => $value)
 		{
-			if(isset($arr[$value]))
+			if(isset( $arr[$value] ))
 			{
-				$keyarr[$value]=$arr[$value];
+				$keyarr[$value] = $arr[$value];
 			}
 		}
 		
-		foreach($arr as $key=>$value)
+		foreach($arr as $key => $value)
 		{
-			if(!in_array($key,$keys))
+			if(!in_array($key, $keys))
 			{
-				$noarr[$key]=$value;
+				$noarr[$key] = $value;
 			}
 		}
 		
-		return array_merge($keyarr,$noarr);
+		return array_merge($keyarr, $noarr);
 	}
 	
 }

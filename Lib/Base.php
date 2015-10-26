@@ -12,6 +12,8 @@ use App\Lib\Web\WRequest;
 use App\Lib\Role\RComma;
 use App\Lib\Html\HScript;
 
+ ini_set("session.cookie_httponly", 1);
+ 
 defined("DEBUG") or define("DEBUG", false);
 defined("APP_DIR") or define("APP_DIR", dirname( dirname( dirname( __FILE__ ) ) ) );
 defined("APP_URL") or define('APP_URL', Base::config('app.host'));
