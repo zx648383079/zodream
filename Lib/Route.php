@@ -10,6 +10,8 @@ use App;
 use App\Lib\Helper\HUrl;
 use App\Lib\Object\OString;
 
+defined("APP_URL") or define('APP_URL', Base::config('app.host'));
+
 class Route
 {
 	/**
@@ -19,12 +21,12 @@ class Route
 	 * @param $c string 控制器的名称
 	 * @param $v string 视图所在的方法名
 	 */
-	public static function load()
+	public static function load($arg = 'app')
 	{
 		$url = self::get();
 		
 		$con = ucfirst(strtolower($url[0]));
-		$name = 'App\\Controller\\'.$con."Controller";
+		$name = ucfirst(strtolower($arg)).'\\Controller\\'.$con."Controller";
 		$view = strtolower($url[1]);
 		if( class_exists($name))
 		{

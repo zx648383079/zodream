@@ -17,24 +17,25 @@ ini_set("session.cookie_httponly", 1);
  
 defined("DEBUG") or define("DEBUG", false);
 defined("APP_DIR") or define("APP_DIR", dirname( dirname( dirname( __FILE__ ) ) ) );
-defined("APP_URL") or define('APP_URL', Base::config('app.host'));
 defined("APP_API") or define('APP_API' , isset($_GET['api'])?TRUE:FALSE);    //是否是API模式
 
 class Base{
 	
 	public static $request;
 	
-	public static function main()
+	private static $root;
+	
+	public static function main($arg = 'app')
 	{
 		set_error_handler(array('app','error'));         //自定义错误输出
 		register_shutdown_function(array('app','out'));   //程序结束时输出
 		//Lang::setLang();                                //加载语言包 
-		
+		self::$root = $arg;
 		self::$request = new WRequest();
 		
 		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
 		
-		Route::load();
+		Route::load($arg);
 	}
 	/**
 	* 获取配置文件
@@ -47,7 +48,7 @@ class Base{
 	*/
 	public static function config( $key = null ,$default = null)
 	{
-		$configs = require(APP_DIR."/app/config/config.php");
+		$configs = require(APP_DIR.'/'.self::$root.'/config/config.php');
 		if(!empty($key))
 		{
 			$configs = OArray::getChild($key, $configs , $default);
