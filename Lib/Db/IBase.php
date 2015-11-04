@@ -5,15 +5,14 @@ namespace App\Lib\Db;
 * 数据库的接口
 */
 
-interface IBase
-{
+interface IBase {
 	/**
 	* 查询一条数据
 	*
 	* @param array|string $param 语句数组
 	* @param array|string $where 返回类型
 	*/
-	function findByHelper($param , $kind);	
+	function findByHelper($param, $kind);	
 
 	/**
 	* 执行数据库语句

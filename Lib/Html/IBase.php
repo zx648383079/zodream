@@ -1,7 +1,6 @@
 <?php 
 namespace App\Lib\Html;
 
-interface IBase
-{
+interface IBase {
 	static function make($files);
 }

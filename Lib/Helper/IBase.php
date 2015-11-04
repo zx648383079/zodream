@@ -1,7 +1,6 @@
 <?php 
 namespace App\Lib\Helper;
 
-interface IBase
-{
+interface IBase {
 	
 }

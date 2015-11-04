@@ -1,28 +1,25 @@
 <?php 
 namespace App\Lib\Html;
 
-class HTree implements IBase
-{
+class HTree implements IBase {
 	private static $tree;
 	
-	public static function make($data) 
-	{
+	public static function make($data) {
 		self::$tree = array();
-		if(empty($data)) 
-		{
+		if (empty($data)) {
 			echo '<ul>暂无数据！</ul>';
 			return;
 		}
 		foreach ($data as $value) {
-			if( isset( self::$tree[$value['pid']] ) ) {
+			if (isset( self::$tree[$value['pid']])) {
 				self::$tree[$value['pid']][] = $value; 
-			}else {
+			} else {
 				self::$tree[$value['pid']] = array($value);
 			}
 		}
 		ksort(self::$tree);
 		
-		self::makeTree(self::$tree[0],FALSE);
+		self::makeTree(self::$tree[0], FALSE);
 		
 		    /*<ul>
 				<li>a1</li>
@@ -48,19 +45,16 @@ class HTree implements IBase
 			</ul>*/
 	}
 	
-	private static function makeTree($tree, $more = true) 
-	{
-		if(isset($tree['pid']))
-		{
-			echo '<li data="',$tree['id'],'">',$tree['title'];
-			if(isset(self::$tree[$tree['id']])) 
-			{
+	private static function makeTree($tree, $more = true) {
+		if (isset($tree['pid'])) {
+			echo '<li data="', $tree['id'], '">', $tree['title'];
+			if (isset(self::$tree[$tree['id']])) {
 				self::makeTree(self::$tree[$tree['id']]);
 			}
 			echo '</li>';	
 			return;		
 		}
-		echo $more?'<span class="more">+</span>':'','<ul>';
+		echo $more ? '<span class="more">+</span>' : '', '<ul>';
 		
 		foreach ($tree as $value) {
 			self::makeTree($value);

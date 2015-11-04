@@ -1,16 +1,12 @@
 <?php
 namespace App\Lib\Db;
 
-class DbFactory
-{
+class DbFactory {
     protected $db = null;
-    public function __construct() 
-    {
+    public function __construct() {
         $this->db = DPdo::getInstance();
-        
-        if( isset( $this->table ) )
-        {
-            $this->table = $this->db->prefix.$this->table;            
+        if (isset($this->table)) {
+            $this->table = $this->db->prefix. $this->table;            
         }
     }
     
@@ -31,7 +27,7 @@ class DbFactory
         }  
         $addFields = implode('`,`', $addFields);  
         $addValues = implode("','", $addValues);  
-        $sql = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";  
+        $sql       = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";  
         $this->db->execute($sql);
         return $this->db->lastInsertId();  
     }  
@@ -47,12 +43,12 @@ class DbFactory
 	 */
     public function update($updateData , $param) {
         $where = $setData = '';
-        if(is_array($param)) {
+        if (is_array($param)) {
             foreach ($param as $key => $value) {  
                 $where .= $value.' AND ';  
             }  
             $where = 'WHERE '.substr($where, 0, -4);  
-        }else{
+        } else {
             $where = 'WHERE '.$param;
         }
         foreach ($updateData as $key => $value) {  
@@ -63,7 +59,7 @@ class DbFactory
             }  
         }  
         $setData = substr($setData, 0, -1);  
-        $sql = "UPDATE {$this->table} SET $setData $where";  
+        $sql     = "UPDATE {$this->table} SET $setData $where";  
         return $this->db->execute($sql)->rowCount();  
     }  
      
@@ -74,9 +70,8 @@ class DbFactory
 	* @param string $where
 	* @return int
 	*/
-	public function updateBool($filed , $where )
-	{
-		$sql = "UPDATE {$this->table} SET {$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END WHERE ";
+	public function updateBool($filed, $where) {
+		$sql =  "UPDATE {$this->table} SET {$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END WHERE ";
 		$sql .= $where;
 		return $this->db->execute($sql)->rowCount();
 	}
@@ -89,9 +84,8 @@ class DbFactory
 	* @param string $num
 	* @return int
 	*/
-	public function updateOne( $filed , $where ,$num = 1)
-	{
-		if($num >= 0) {
+	public function updateOne($filed, $where, $num = 1) {
+		if ($num >= 0) {
             $num = '+'.$num;
         }
 		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} {$num} WHERE $where";
@@ -108,22 +102,19 @@ class DbFactory
 	 */
     public function findOne($param , $filed = "*") {
         $where = '';  
-        if( is_array($param) ) 
-        {
+        if ( is_array($param) ) {
             foreach ($param as $key => $value) {  
                 $where .=$value.' AND ';  
             }  
             $where = 'WHERE '.substr($where, 0, -4);  
-        }else if( is_string($param) )
-        {
+        } else if (is_string($param)) {
             $where = 'WHERE '.$param;
         }
-        $sql = "SELECT {$filed} FROM {$this->table} {$where} LIMIT 1";  
+        $sql    = "SELECT {$filed} FROM {$this->table} {$where} LIMIT 1";  
         $result = $this->db->execute($sql);
-        if($result->rowCount() > 0)
-        {
+        if ($result->rowCount() > 0) {
             return $result->fetchObject();
-        }else{
+        } else {
             return false;
         } 
     }  
@@ -134,8 +125,7 @@ class DbFactory
 	* @param $id
 	* @return mixed
 	*/
-	public function findById($id, $filed = "*")
-	{
+	public function findById($id, $filed = "*") {
 		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
 		return $this->db->execute($sql)->fetchObject();
 	}
@@ -152,12 +142,12 @@ class DbFactory
         $where = '';  
         if(is_array($param))
         {
-            foreach ($param as $key=>$value) {  
+            foreach ($param as $key => $value) {  
             $where .= $value.' AND ';  
             }  
             $where = 'WHERE '.substr($where, 0, -4);  
-        }else{
-            $where='WHERE '.$param;
+        } else {
+            $where = 'WHERE '.$param;
         }
         $sql = "DELETE FROM {$this->table} $where";
         return $this->db->execute($sql)->rowCount();  
@@ -173,47 +163,37 @@ class DbFactory
 	 * @return array 返回查询结果,
 	 */  
     public function find( $param = array(),$fileld=array()) {
-        $limit = $order =$group = $where = $like = '';  
+        $limit = $order = $group = $where = $like = '';  
         if (is_array($param) && !empty($param)) {  
             $limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';  
             $order = isset($param['order']) ? 'ORDER BY '.$param['order'] : '';  
             $group = isset($param['group']) ? 'GROUP BY '.$param['group'] : '';  
             if (isset($param['where'])) {  
-                foreach ($param['where'] as $key=>$value) {  
-                    if(empty($where))
-                    {
-                        $where='WHERE'.$value;
-                    }else{
-                        if(is_array($value))
-                        {
-                            switch($value[1])
-                            {
+                foreach ($param['where'] as $key => $value) {  
+                    if (empty($where)) {
+                        $where = 'WHERE'.$value;
+                    } else {
+                        if (is_array($value)) {
+                            switch ($value[1]) {
                                 case "or":
                                     $where .= 'OR'.$value;
                                 case "and":
                                     $where .= 'AND'.$value;
                             }
-                        }else{
+                        } else {
                             $where .= 'AND'.$value;
                         }
                     }
                 }  
-            }  
-            /*if (isset($param['like'])) {  
-                foreach ($param['like'] as $key=>$value) {  
-                    $like = "WHERE $key LIKE '%$value%'";  
-                }  
-            }  */
+            }
         }  
-        $selectFields = empty($fileld)?"*":implode(',', $fileld);  
-        $sql = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";  
-
-        $stmt = $this->db->execute($sql);  
+        $selectFields = empty($fileld) ? '*' : implode(',', $fileld);  
+        $sql    = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";  
+        $stmt   = $this->db->execute($sql);  
         $result = array();  
         while (!!$objs = $stmt->fetchObject()) {  
             $result[] = $objs;  
         }  
-        
         return $result;  
     }  
        
@@ -225,17 +205,17 @@ class DbFactory
      * @param array|null $param 条件
 	 * @return int 返回总数,
 	 */ 
-    public function count( $param = array()) {
+    public function count($param = array()) {
         $where = '';  
-         if ( is_array($param) ) {  
-            foreach ($param['where'] as $key=>$value) {  
+         if (is_array($param)) {  
+            foreach ($param['where'] as $key => $value) {  
                 $where .= $value.' AND ';  
             }  
             $where = 'WHERE '.substr($where, 0, -4);  
-        }else {
+        } else {
             $where = 'WHERE '.$param;
         } 
-        $sql = "SELECT COUNT(*) as count FROM {$this->table} $where";  
+        $sql  = "SELECT COUNT(*) as count FROM {$this->table} $where";  
         $stmt = $this->db->execute($sql);  
         return $stmt->fetchObject()->count;  
     }  
@@ -247,20 +227,17 @@ class DbFactory
 	 *
 	 * @return string 返回id,
 	 */  
-    public function nextId() 
-    {  
-        $sql = "SHOW TABLE STATUS LIKE '{$this->table}'";  
+    public function nextId() {  
+        $sql  = "SHOW TABLE STATUS LIKE '{$this->table}'";  
         $stmt = $this->db->execute($sql);  
         return $stmt->fetchObject()->Auto_increment;  
     } 
     
-    public function findByHelper($param, $islist = TRUE)
-    {
+    public function findByHelper($param, $islist = TRUE) {
         return $this->db->findByHelper($param, $islist);
     }
     
-    public function getError()
-    {
+    public function getError() {
         return $this->db->getError();
     }
 }

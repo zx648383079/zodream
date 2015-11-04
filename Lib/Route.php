@@ -12,8 +12,7 @@ use App\Lib\Object\OString;
 
 defined("APP_URL") or define('APP_URL', Base::config('app.host'));
 
-class Route
-{
+class Route {
 	/**
 	 * 加载控制器和视图
 	 *
@@ -21,41 +20,34 @@ class Route
 	 * @param $c string 控制器的名称
 	 * @param $v string 视图所在的方法名
 	 */
-	public static function load($arg = 'app')
-	{
-		$url = self::get();
+	public static function load($arg = 'app') {
+		$url  = self::get();
 		
-		$con = ucfirst(strtolower($url[0]));
+		$con  = ucfirst(strtolower($url[0]));
 		$name = ucfirst(strtolower($arg)).'\\Controller\\'.$con."Controller";
 		$view = strtolower($url[1]);
-		if( class_exists($name))
-		{
+		if ( class_exists($name)) {
 			$controller = new $name();
-			
 			$controller -> before($view);
 			$view .= 'Action';
-			if(method_exists( $controller, $view ) )
-			{
+			if (method_exists($controller, $view)) {
 				$controller->$view();
-			}else{
-				App::error(0,$view,__FILE__,__LINE__);
+			} else {
+				App::error(0, $view, __FILE__, __LINE__);
 			}
-		}else{
-			App::error(0,$name.$view,__FILE__,__LINE__);
+		} else {
+			App::error(0, $name.$view, __FILE__ ,__LINE__);
 		}
 	}
 	
-	private static function get()
-	{
+	private static function get() {
 		$key = App::config('app.url');
-		if(empty($key))
-		{
+		if (empty($key)) {
 			$key = 0;
 		}
 		$url = new Route();
 		
-		if(App::$request->isCli()) 
-		{
+		if (!empty(App::$request) && App::$request->isCli()) {
 			return $url->cli();	
 		}
 		
@@ -84,70 +76,58 @@ class Route
 		}
 	} 
 	
-	private function c()
-	{
+	private function c() {
 		return array(
 			App::$request->get('c' , 'home'),
 			App::$request->get('v' , 'index')
 		);
 	}
 	
-	private function r()
-	{
-		$r = App::$request->get('r' , 'home/index');
-		
-		return OString::toArray($r, '/' ,2 , array( 'home', 'index' ));
+	private function r() {
+		$r = App::$request->get('r', 'home/index');
+		return OString::toArray($r, '/', 2, array('home', 'index'));
 	}
 	
-	private function u()
-	{
+	private function u() {
 		$url = HUrl::request_uri();
-		$arr = OString::toArray($url, '.php' ,2 , array( '','/home/index' ));
-		$arr = OString::toArray($arr[1], '/' ,4 , array( '' , 'home', 'index',''));
-		
-		return array($arr[1],$arr[2]);
+		$arr = OString::toArray($url, '.php', 2, array('', '/home/index'));
+		$arr = OString::toArray($arr[1], '/', 4, array('', 'home', 'index', ''));
+		return array($arr[1], $arr[2]);
 	}
 	
-	private function y()
-	{
+	private function y() {
 		$url = HUrl::request_uri();
-		$arr = OString::toArray($url , '/' , 4 , array( '' , 'home', 'index',''));
-		
-		return array($arr[1],$arr[2]);
+		$arr = OString::toArray($url, '/', 4, array('', 'home', 'index', ''));
+		return array($arr[1], $arr[2]);
 	}
 	
-	private function p()
-	{
+	private function p() {
 		$url = HUrl::request_uri();
-		preg_match($preg , $url , $result);
+		preg_match($preg, $url, $result);
 		return $result;
 	}
 	
-	private function s()
-	{
+	private function s() {
 		$key = App::$request->get('s');
-		if($key === null)
-		{
+		if ($key === null) {
 			$url = HUrl::request_uri();
-			$ar = explode('/',$url ,2);
-			$ar = explode('?',$ar[1],2);
+			$ar  = explode('/', $url, 2);
+			$ar  = explode('?', $ar[1], 2);
 			$key = $ar[0];
-			$key = $key == ''?'*':$key;
+			$key = $key == '' ? '*' : $key;
 		}
-		if(strlen($key) < 4)
-		{
+		if (strlen($key) < 4) {
 			$short = App::config('short.'.$key);
-			$arr = OString::toArray( $short , '.' ,2 , array( 'home', 'index' )); 
-		}else{
+			$arr   = OString::toArray($short , '.', 2, array('home', 'index')); 
+		} else {
 			
 		}
 		
 		return $arr;
 	}
 	
-	private function cli()
-	{
+	private function cli() {
 		$url = App::$request->server('argv')[0];
-		return OString::toArray($url , '/' ,2 , array( 'home', 'index' ));
+		return OString::toArray($url, '/', 2, array('home', 'index'));
 	}
 }

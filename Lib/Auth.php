@@ -8,8 +8,7 @@ namespace App\Lib;
 use App;
 use App\Model\UserModel;
 
-class Auth
-{
+class Auth {
 	
 	public static $userModel;
 	/*
@@ -19,19 +18,16 @@ class Auth
 	*
 	* @return 返回True|False,
 	*/
-	public static function user()
-	{
+	public static function user() {
 		$id = App::session('user');
-		if( !empty($id ) )
-		{
-			if(empty(self::$userModel))
-			{
-				$user = new UserModel();
+		if (!empty($id)) {
+			if (empty(self::$userModel)) {
+				$user            = new UserModel();
 				$user -> assignRow('id',$id);
 				self::$userModel = $user;
 			}
 			return self::$userModel;
-		}else{
+		} else {
 			return false;
 		}
 	}
@@ -41,8 +37,7 @@ class Auth
 	*
 	* @return bool
 	*/
-	public static function guest()
-	{
+	public static function guest() {
 		$id = self::getId();
 		return empty($id);
 	}
@@ -50,19 +45,16 @@ class Auth
 	/**
 	 * @return bool|string
      */
-	private static function getId()
-	{
-		$id = App::session('user');
+	private static function getId() {
+		$id    = App::session('user');
 		$token = App::cookie('token');
-		if(!empty($id))
-		{
+		if (!empty($id)) {
 			return $id;
-		}else if(!empty($token))
-		{
+		} else if (!empty($token)) {
 			$user = new UserModel();
-			$id = $user -> findByToken($token);
-			App::session('user' , $id);
-			$user -> assignRow('id',$id);
+			$id   = $user -> findByToken($token);
+			App::session('user', $id);
+			$user -> assignRow('id', $id);
 			self::$userModel = $user;
 			return $id;
 		}

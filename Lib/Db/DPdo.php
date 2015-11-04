@@ -4,25 +4,23 @@ namespace App\Lib\Db;
 use App;
 use App\Lib\Helper\HSql;
     
-class DPdo implements IBase
-{
+class DPdo implements IBase {
 	//pdo对象  
-    protected $pdo = null;  
+    protected $pdo             = null;  
     //用于存放实例化的对象  
     static protected $instance = null;  
     //存放表名前缀
-    public $prefix = null;
+    public $prefix             = null;
     
     //存放当前操作的错误信息
-    protected $error=null;
+    protected $error           = null;
     
     protected $result;
     
     
        
     //公共静态方法获取实例化的对象  
-    static public function getInstance() 
-    {  
+    static public function getInstance() {  
         if (!(self::$instance instanceof self)) {  
             self::$instance = new self();  
         }  
@@ -39,30 +37,27 @@ class DPdo implements IBase
      *
      * @internal param array|string $config_path 数据库的配置信息.
      */
-    public function __construct() 
-    {  
-        
-		$config = App::config('mysql');
-        $host = $config['host'];
-	    $user = $config['user'];
-	    $pwd = $config['password'];
-	    $database = $config['database'];
-	    $coding = $config['encoding'];
-        $port = $config['port'];
+    public function __construct() {  
+		$config       = App::config('mysql');
+        $host         = $config['host'];
+	    $user         = $config['user'];
+	    $pwd          = $config['password'];
+	    $database     = $config['database'];
+	    $coding       = $config['encoding'];
+        $port         = $config['port'];
 	    $this->prefix = $config['prefix'];
         
-        try 
-        {  
+        try {  
             //$this->pdo = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
             //                     array(\PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES {$coding}"));  
-            $this->pdo = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd );
-            $this->pdo ->exec('SET NAMES {$coding}');
+            $this->pdo = new \PDO ('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd);
+            $this->pdo->exec ('SET NAMES {$coding}');
             $this->pdo->query ( "SET character_set_client={$coding}" );
             $this->pdo->query ( "SET character_set_connection={$coding}" );
             $this->pdo->query ( "SET character_set_results={$coding}" );
-            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);  
+            $this->pdo->setAttribute (\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);  
         } catch (\PDOException $ex) {  
-            $this->error=$ex->getMessage();
+            $this->error = $ex->getMessage();
             return false;
         }  
     }  
@@ -76,26 +71,19 @@ class DPdo implements IBase
      * @param bool $isList 返回类型
 	 * @return array 返回查询结果,
 	 */ 
-    public function findByHelper($param ,$isList = TRUE)
-    {
+    public function findByHelper($param, $isList = TRUE) {
         $result = array();
-        if(!empty($param))
-        {
-            $sql = new HSql($this->prefix);
-              
+        if (!empty($param)) {
+            $sql  = new HSql($this->prefix);
             $stmt = $this->execute($sql->getSQL($param));            //获取SQL语句
-            while (!!$objs = $stmt->fetchObject()) 
-            {  
-                if($isList)
-                {
+            while (!!$objs = $stmt->fetchObject()) {  
+                if ($isList) {
                     $list = array();
-                    foreach ($objs as $key => $value) 
-                    {
+                    foreach ($objs as $key => $value) {
                         $list[$key] = $value;
                     }
                     $result[] = $list;
-                }else
-                {
+                } else {
                    $result[] = $objs;   
                 }
             }
@@ -103,21 +91,17 @@ class DPdo implements IBase
         return $result;
     }
     
-    public function lastInsertId()
-    {
+    public function lastInsertId() {
         return $this->pdo->lastInsertId();
     }
     
-    
-    public function prepare($sql)
-    {
+    public function prepare($sql) {
         $this->result = $this->pdo->prepare($sql); 
     }
     
-    public function bind($param)
-    {
+    public function bind($param) {
         foreach ($param as $key => $value) {
-           $this->result->bindParam( $key, $value);
+           $this->result->bindParam($key, $value);
         }
     }
    
@@ -131,13 +115,12 @@ class DPdo implements IBase
 	 */ 
     public function execute($sql = null) {  
         try {  
-            if(!empty($sql))
-            {
+            if (!empty($sql)) {
                 $this->result = $this->pdo->prepare($sql);  
             }
             $this -> result ->execute();  
         } catch (\PDOException  $ex) {  
-            $this->error=$ex->getMessage();
+            $this->error = $ex->getMessage();
         }  
         return $this -> result;  
     } 
@@ -149,8 +132,7 @@ class DPdo implements IBase
 	 *
 	 * @return string 返回错误信息,
 	 */ 
-    public function getError()
-    {
+    public function getError() {
         return $this->error;
     }
 }

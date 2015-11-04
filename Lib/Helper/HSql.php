@@ -5,21 +5,20 @@ namespace App\Lib\Helper;
 *
 *
 */
-class HSql implements IBase
-{
+class HSql implements IBase {
 	
 	/********
 	SQL中的关键字数组
 	*********/
-	private $sqlKeys = array(
-		/*'show','alter','drop','create,'*/
-		'select','update','set','delete','insert',
-		'from','values','left','right','inner','exec',
-		'where','and','or','group','having','order',
-		'asc','desc','limit'
+	private $sqlKeys = array (
+		/*'show', 'alter', 'drop', 'create,'*/
+		'select', 'update', 'set', 'delete', 'insert',
+		'from', 'values', 'left', 'right', 'inner', 'exec',
+		'where', 'and', 'or', 'group', 'having', 'order',
+		'asc', 'desc', 'limit'
 	);
 	
-	private $prefix = NULL;
+	private $prefix  = NULL;
 	/**
 	 * 公有构造函数
 	 *
@@ -28,8 +27,7 @@ class HSql implements IBase
 	 * @param boolen $sort 是否先进行排序.
 	 *
 	 */
-	public function __construct($prefix=NULL)
-	{
+	public function __construct($prefix = NULL) {
 		$this->prefix = $prefix;
 	}
 	/**
@@ -41,14 +39,11 @@ class HSql implements IBase
 	 * @param boolen $sort 是否先进行排序.
 	 * @return 返回排序的数组,
 	 */
-	public function getSQL($param, $sort = FALSE)
-	{
-		if($sort)
-		{
-			$param = $this->sortarr( $param, $this->sqlKeys );
+	public function getSQL($param, $sort = FALSE) {
+		if ($sort) {
+			$param = $this->sortarr($param, $this->sqlKeys);
 		}
-		
-		return $this->sqlCheck( $param );
+		return $this->sqlCheck($param);
 	}
 	
 	/**
@@ -60,11 +55,9 @@ class HSql implements IBase
 	 * @param string|array $value 值.
 	 * @return 返回拼接后的SQL语句,
 	 */
-	private function sqlJoin($key,$value)
-	{
+	private function sqlJoin($key, $value) {
 		$result = ' ';
-		switch($key)
-		{
+		switch ($key) {
 			/*case 'show':
 				$result.='SHOW '.$this->sqlCheck($value);
 				break;
@@ -145,33 +138,24 @@ class HSql implements IBase
 	 * @param string $link 数组之间的连接符.
 	 * @return 返回拼接的语句,
 	 */
-	private function sqlCheck($value, $link = ' ', $pre = null, $end = null)
-	{
-		
+	private function sqlCheck($value, $link = ' ', $pre = null, $end = null) {
 		$result = '';
-		
-		if(is_array($value))
-		{
-			foreach($value as $key => $v)
-			{
+		if (is_array($value)) {
+			foreach ($value as $key => $v) {
 				$space = ' ';
-				
 				//把关键字转换成小写进行检测
-				$low = strtolower($key);
+				$low    = strtolower($key);
 				$lowkey = str_replace('`', '', $low);                   //解决重关键字冲突关键
-				if(in_array($lowkey, $this->sqlKeys, TRUE))
-				{
+				if (in_array($lowkey, $this->sqlKeys, TRUE)) {
 					$space .= $this->sqlJoin($lowkey, $v);
-				}else{
-					if(is_numeric($key))
-					{
-						if(empty($result))
-						{
+				} else {
+					if (is_numeric($key)) {
+						if (empty($result)) {
 							$space .= $this->sqlCheck($v, ' ', $pre, $end);
-						}else{
+						} else {
 							$space .= $link. $this->sqlCheck($v);
 						}
-					}else{
+					} else {
 						$space .= $pre. $key. $end. $link. $this->sqlCheck($v);
 					}
 				}
@@ -179,17 +163,15 @@ class HSql implements IBase
 				$result .= $space;
 			}
 			
-		}else{
+		} else {
 			$unsafe = $this->sqlKeys;
 			array_push($unsafe, ';');                        //替换SQL关键字和其他非法字符，
 			$safe = $this->safeCheck($value, '\'', $unsafe, ' ');
 			$safe = $this->safeCheck($value, '"', $unsafe, ' ');
-			if(strpos($safe, '(') !== FALSE)                      //验证是表名还是其他
-			{
+			if (strpos($safe, '(') !== FALSE) {                      //验证是表名还是其他
 				$result .= $safe;
-			}else{
-				if(!empty($pre) && strpos($safe, $pre) === 0)              //判断是否存在重复前缀；
-				{
+			} else {
+				if (!empty($pre) && strpos($safe, $pre) === 0) {            //判断是否存在重复前缀；
 					$pre = '';
 				}
 				$result .= $pre. $safe. $end;
@@ -214,22 +196,18 @@ class HSql implements IBase
 	 * @param string|array $enresplace 替换的字符或数组.
 	 * @return 返回完成检查的语句,
 	 */
-	private function safeCheck($unsafe, $scope, $find, $enresplace)
-	{
+	private function safeCheck($unsafe, $scope, $find, $enresplace) {
 		$safe = '';
-		$arr = explode($scope, $unsafe);
-		$len = count($arr);
-		if($len == 1)
-		{
+		$arr  = explode($scope, $unsafe);
+		$len  = count($arr);
+		if ($len == 1) {
 			$safe = $unsafe;
-		}else{
-			foreach($arr as $key => $val)
-			{
-				if($key % 2 == 0)
-				{
-					$low = strtolower($val);                      //转化为小写
+		} else {
+			foreach ($arr as $key => $val) {
+				if ($key % 2 == 0) {
+					$low   = strtolower($val);                      //转化为小写
 					$safe .= str_replace($find, $enresplace, $low);
-				}else{
+				} else {
 					//如果排除标志不是成对出现，默认在最后加上
 					$safe .= $scope. $val. $scope;
 				}
@@ -247,25 +225,18 @@ class HSql implements IBase
 	 * @param array $keys 关键字数组.
 	 * @return 返回排序的数组,
 	 */
-	private function sortarr($arr, $keys)
-	{
+	private function sortarr($arr, $keys) {
 		$keyarr = $noarr = array();
-		foreach($keys as $key => $value)
-		{
-			if(isset( $arr[$value] ))
-			{
+		foreach ($keys as $key => $value) {
+			if (isset( $arr[$value] )) {
 				$keyarr[$value] = $arr[$value];
 			}
 		}
-		
-		foreach($arr as $key => $value)
-		{
-			if(!in_array($key, $keys))
-			{
+		foreach ($arr as $key => $value) {
+			if (!in_array($key, $keys)) {
 				$noarr[$key] = $value;
 			}
 		}
-		
 		return array_merge($keyarr, $noarr);
 	}
 	

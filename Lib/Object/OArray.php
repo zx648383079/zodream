@@ -5,54 +5,46 @@ namespace App\Lib\Object;
 *把数组或字符串转为单列数组
 */
 
-class OArray implements IBase
-{
+class OArray implements IBase {
 	
-	private $before = array();
+	private $before  = array();
 	
 	private $content = array();
 	
-	private $after = array();
+	private $after   = array();
 	/**
 	自定义排序 根据关键词 before after
 	*/
-	public static function sort($arr)
-	{
+	public static function sort($arr) {
 		$oarray = new OArray();
 		$oarray->arr_list($arr);
 		
 		return array_merge($oarray->before, $oarray->content ,$oarray->after);
 	}
 	
-	private function arr_list($arr)
-	{
-		foreach ($arr as $key => $value)
-		{
-			if(is_numeric($key)) 
-			{
-				if(is_array($value))
-				{
+	private function arr_list($arr) {
+		foreach ($arr as $key => $value) {
+			if (is_numeric($key)) {
+				if (is_array($value)) {
 					$this->arr_list($value);
-				}else{
+				} else {
 					$this->content[] = $value;
 				}
-			}else {
+			} else {
 				switch ($key) {
 					case 'before':
 					case 'before[]':
-						if(is_array($value))
-						{
-							$this->before = array_merge($this->before , $value);
-						}else{
+						if (is_array($value)) {
+							$this->before = array_merge($this->before, $value);
+						} else {
 							$this->before[] = $value;
 						}
 						break;
 					case 'after':
 					case 'after[]':
-						if(is_array($value))
-						{
-							$this->after = array_merge($this->after , $value);
-						}else{
+						if (is_array($value)) {
+							$this->after = array_merge($this->after, $value);
+						} else {
 							$this->after[] = $value;
 						}
 						break;
@@ -71,48 +63,40 @@ class OArray implements IBase
 	)) 
 	
 	**/
-	public static function to( $arr , $link = null,$pre = null)
-	{
+	public static function to($arr, $link = null, $pre = null) {
 		$list = array();
-		if(is_array($arr))
-		{
+		if (is_array($arr)) {
 				foreach ($arr as $key => $value) {
-					if(is_int($key))
-					{
-						if(is_array($value))
-						{
-							$list = array_merge($list, self::to($value,$link,$pre));
-						}else{
+					if (is_int($key)) {
+						if (is_array($value)) {
+							$list = array_merge($list, self::to($value, $link, $pre));
+						} else {
 							$list[] = $pre.$value;
 						}
-					}else{
-						if(is_array($value))
-						{
-							$list = array_merge($list, self::to($value,$link,$key.$link));
-						}else{
+					} else {
+						if (is_array($value)) {
+							$list = array_merge($list, self::to($value, $link, $key.$link));
+						} else {
 							$list[] = $pre.$key.$link.$value;
 						}
 					}
 				}
-		}else{
+		} else {
 			$list[] = $pre.$arr;
 		}
-		
 		return $list;
 	}
 	
 	/****
 	把多维数组转换成字符串
 	*******/
-	public static function tostring($arr ,$link  = '')
-	{
+	public static function tostring($arr, $link  = '') {
 		$str = '';
-		if(is_array($arr))
-		{
+		if (is_array($arr)) {
 			foreach ($arr as $value) {
-				$str .= self::tostring($value , $link);
+				$str .= self::tostring($value, $link);
 			}
-		}else{
+		} else {
 			$str .= $arr.$link;
 		}
 		return $str;
@@ -121,34 +105,29 @@ class OArray implements IBase
 	/****
 	* 根据字符串获取数组值，取多维数组
 	***/
-	public static function getVal($name, $values, $default = null, $link = ',')
-	{
-		$names = explode( $link, $name );
+	public static function getVal($name, $values, $default = null, $link = ',') {
+		$names = explode($link, $name);
 		
-		$arr = array();
+		$arr   = array();
 		
-		foreach ($names as $name) 
-		{
+		foreach ($names as $name) {
 			//使用方法 post:key default
 			
-			$temp = OString::toArray($name , ' ', 2 , $default);
-			$def = $temp[1];
+			$temp = OString::toArray($name, ' ', 2, $default);
+			$def  = $temp[1];
 			
 			$temp = explode(':', $temp[0], 2);
 			$name = $temp[0];
-			$key = end( $temp );
+			$key  = end( $temp );
 			
-			if(isset($values[$name]))
-			{
+			if (isset($values[$name])) {
 				$arr[$key] = $values[$name];
-			} else
-			{
+			} else {
 				$arr[$key] = $def;
 			}
 		}
 		
-		if(count($arr) == 1)
-		{
+		if (count($arr) == 1) {
 			foreach ($arr as $value) {
 				$arr = $value;
 			}
@@ -160,45 +139,37 @@ class OArray implements IBase
 	/**
 	* 根据字符串取一个值，采用递进的方法取值
 	*/
-	public static function getChild( $name , $values, $default = null, $link = '.')
-	{
-		$names = explode($link , $name , 2 );
-		if( count($names) === 1)
-		{
-			return isset($values[$name])?$values[$name]:$default;
-		}
-		else if( !isset($values[$names[0]]) ){
+	public static function getChild($name, $values, $default = null, $link = '.') {
+		$names = explode($link, $name, 2);
+		if ( count($names) === 1) {
+			return isset($values[$name]) ? $values[$name] : $default;
+		} else if ( !isset($values[$names[0]])) {
 			return $default;
-		}
-		else {
-			return self::getChild( $names[1] , $values[ $names[0] ] ,$default , $link);
+		} else {
+			return self::getChild($names[1], $values[ $names[0] ], $default, $link);
 		}
 	}
 	
-	public static function setChild($name , $value , &$arr)
-	{
+	public static function setChild($name, $value, &$arr) {
 		
 	}
 	
 	/**
 	*   扩展 array_combine 能够用于不同数目
 	*/
-	public static function combine( $keys , $values , $complete = TRUE)
-	{
+	public static function combine($keys, $values, $complete = TRUE) {
 		$arr = array();
-		if( self::isAssoc($values) )
-		{
+		if ( self::isAssoc($values) ) {
 			foreach ($keys as $key) {
-				if(isset($values[$key]))
-				{
+				if (isset($values[$key])) {
 					$arr[$key] = $values[$key];
-				}else if($complete){
+				} else if ($complete) {
 					$arr[$key] = null;
 				}
 			}
-		}else {
-			for ($i = 0; $i < count($keys) ; $i++) { 
-				$arr[$keys[$i]] = isset($values[$i])?$values[$i]:null;
+		} else {
+			for ($i = 0; $i < count($keys) ; $i ++) { 
+				$arr[$keys[$i]] = isset($values[$i]) ? $values[$i] : null;
 			}
 		}
 		

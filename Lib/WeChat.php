@@ -10,8 +10,7 @@ define ( 'TOKEN', App::config('wechat.token'));
 *
 *
 ****************************************************/
-class WeChat
-{
+class WeChat {
 
     //消息类型
     public static $msgtype;
@@ -32,20 +31,19 @@ class WeChat
 
     #{服务号才可得到
     //AppId
-    public static $appid = "";
+    public static $appid  = "";
     //AppSecret
     public static $secret = "";
     #}
     
     /**
-        *  初次校验
-        */
-    public static function valid()
-    {
+    *  初次校验
+    */
+    public static function valid() {
         $echoStr = $_GET["echostr"];
 
         //valid signature , option
-        if(self::checkSignature()){
+        if (self::checkSignature()) {
             echo $echoStr;
         }
     }
@@ -53,9 +51,8 @@ class WeChat
     /**
         *  创建自定义菜单
         */
-    private static function createMenu()
-    {
-        $url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="
+    private static function createMenu() {
+        $url      = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="
                 .self::getAccessToken();
         $menujson = '{
             "button":[
@@ -80,8 +77,8 @@ class WeChat
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS,$menujson);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $menujson);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         $info = curl_exec($ch);
 
@@ -97,14 +94,13 @@ class WeChat
     /**
         *  删除自定义菜单
         */
-    private static function deleteMenu()
-    {
+    private static function deleteMenu() {
         $url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token="
                 .self::getAccessToken();
 
-        $ch = curl_init($url);
+        $ch  = curl_init($url);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         $info = curl_exec($ch);
 
@@ -124,18 +120,17 @@ class WeChat
     public static function getMsg()
     {
         //验证消息的真实性
-        if(!self::checkSignature()){
+        if (!self::checkSignature()) {
             exit();
         }
 
         //接收消息
         self::$msg = $poststr = $GLOBALS["HTTP_RAW_POST_DATA"];
-        if(!empty($poststr)){
-            self::$msgobj = simplexml_load_string($poststr,
-                            'SimpleXMLElement',LIBXML_NOCDATA);
+        if (!empty($poststr)) {
+            self::$msgobj  = simplexml_load_string($poststr, 
+                            'SimpleXMLElement', LIBXML_NOCDATA);
             self::$msgtype = strtolower( self::$msgobj-> MsgType);
-        }
-        else{
+        } else {
             self::$msgobj = null;
         }
         
@@ -145,16 +140,14 @@ class WeChat
     /**
         *  回复消息
         */
-    private static function responseMsg()
-    {
+    private static function responseMsg() {
         switch (self::$msgtype) {
             case 'text':
                 $data = self::getData(self::$msgobj->Content);
-                if(empty($data) || !is_array($data)){
+                if (empty($data) || !is_array($data)) {
                     $content = "zx";
                     self::$textMsg($content);//查询不到记录返回提示信息
-                }
-                else{
+                } else {
                     self::newsMsg($data);
                 }
                 break;
@@ -189,18 +182,17 @@ class WeChat
         *  回复文本消息
         * @param string $content
         */
-    public static function textMsg($content='')
-    {
+    public static function textMsg($content = '') {
         $textxml = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]>
         </ToUserName><FromUserName><![CDATA[{self::$msgobj->ToUserName}]]>
         </FromUserName><CreateTime>".time()."</CreateTime><MsgType>
         <![CDATA[text]]></MsgType><Content><![CDATA[%s]]></Content></xml>";
         
         //做搜索处理
-        if(empty($content)){
+        if (empty($content)) {
             $content = "查询功能正在开发中...";
         }
-        $resultstr = sprintf($textxml,$content);
+        $resultstr = sprintf($textxml, $content);
         echo $resultstr;
     }
 
@@ -208,14 +200,13 @@ class WeChat
         *  回复图片消息
         * @param $img
         */
-    public static function imgMsg($img)
-    {
+    public static function imgMsg($img) {
         $imgxml = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]>
         </ToUserName><FromUserName><![CDATA[{self::$msgobj->ToUserName}]]>
         </FromUserName><CreateTime>".time()."</CreateTime><MsgType><![CDATA[image]]></MsgType>
         <Image><MediaId><![CDATA[%s]]></MediaId></Image></xml>";
         
-        $resultstr = sprintf($imgxml,$img);
+        $resultstr = sprintf($imgxml, $img);
         echo $resultstr;
     }
 
@@ -223,14 +214,13 @@ class WeChat
         *  回复语音消息
         * @param $voice
         */
-    public static function voiceMsg($voice)
-    {
-        $voicexml = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]>
+    public static function voiceMsg($voice) {
+        $voicexml  = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]>
         </ToUserName><FromUserName><![CDATA[{self::$msgobj->ToUserName}]]>
         </FromUserName><CreateTime>".time()."</CreateTime><MsgType><![CDATA[voice]]></MsgType>
         <Voice><MediaId><![CDATA[%s]]></MediaId></Voice></xml>";
         
-        $resultstr = sprintf($voicexml,$voice);
+        $resultstr = sprintf($voicexml, $voice);
         echo $resultstr;
     }
 
@@ -240,15 +230,14 @@ class WeChat
         * @param string $title
         * @param string $description
         */
-    public static function videoMsg($video,$title="",$description="")
-    {
+    public static function videoMsg($video, $title = "", $description = "") {
         $videoxml = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]>
         </ToUserName><FromUserName><![CDATA[{self::$msgobj->ToUserName}]]>
         </FromUserName><CreateTime>".time()."</CreateTime><MsgType><![CDATA[video]]></MsgType>
         <Video><MediaId><![CDATA[%s]]></MediaId><Title><![CDATA[%s]]></Title>
         <Description><![CDATA[%s]]></Description></Video></xml>";
         
-        $resultstr = sprintf($videoxml,$video,$title,$description);
+        $resultstr = sprintf($videoxml, $video, $title, $description);
         echo $resultstr;
     }
 
@@ -260,7 +249,7 @@ class WeChat
         * @param string $description
         * @param string $hgmusic
         */
-    public static function musicMsg($pic,$music="",$title="",$description="",$hgmusic=""){
+    public static function musicMsg($pic, $music = "", $title = "", $description = "", $hgmusic = "") {
         $musicxml = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]>
         </ToUserName><FromUserName><![CDATA[{self::$msgobj->ToUserName}]]>
         </FromUserName><CreateTime>".time()."</CreateTime><MsgType><![CDATA[music]]></MsgType>
@@ -268,7 +257,7 @@ class WeChat
         <MusicUrl><![CDATA[%s]]></MusicUrl><HQMusicUrl><![CDATA[%s]]></HQMusicUrl>
         <ThumbMediaId><![CDATA[%s]]></ThumbMediaId></Music></xml>";
         
-        $resultstr = sprintf($musicxml,$title,$description,$music,$hgmusic,$pic);
+        $resultstr = sprintf($musicxml, $title, $description, $music, $hgmusic, $pic);
         echo $resultstr;
     }
 
@@ -276,12 +265,11 @@ class WeChat
         *  回复图文消息
         * @param $data
         */
-    public static function newsMsg($data)
-    {
-        if(!is_array($data)){
+    public static function newsMsg($data) {
+        if (!is_array($data)) {
             exit();
         }
-        $newscount = (count($data) > 10)?10:count($data);
+        $newscount = (count($data) > 10) ? 10 : count($data);
         $newsxml = "<xml><ToUserName><![CDATA[{self::$msgobj->FromUserName}]]></ToUserName><FromUserName>
         <![CDATA[{self::$msgobj->ToUserName}]]></FromUserName><CreateTime>".time()."</CreateTime><MsgType>
         <![CDATA[news]]></MsgType><ArticleCount>{$newscount}</ArticleCount><Articles>%s</Articles></xml>";
@@ -292,22 +280,20 @@ class WeChat
             </Description><PicUrl><![CDATA[{$value['pic']}]]></PicUrl><Url><![CDATA[{$value['url']}]]></Url>";
             $itemxml .= "</item>";
         }
-        $resultstr = sprintf($newsxml,$itemxml);
+        $resultstr = sprintf($newsxml, $itemxml);
         echo $resultstr;
     }
 
     /**
         *  事件处理
         */
-    public static function eventOpt()
-    {
+    public static function eventOpt() {
         self::$eventtype = strtolower(self::$msgobj->Event);
         switch (self::$eventtype) {
             case 'subscribe':
 
                 //做用户绑定处理 
-                if(!empty(self::$msgobj->EventKey))
-                {
+                if (!empty(self::$msgobj->EventKey))  {
                     //新关注扫码
                 }
                 $content = "欢迎";
@@ -339,8 +325,7 @@ class WeChat
     /**
         *  自定义菜单事件处理
         */
-    private static function menuClick()
-    {
+    private static function menuClick() {
         self::$eventkey = self::$msgobj->EventKey;
         switch (self::$eventkey) {
             case 'V1001_NEW':
@@ -358,20 +343,19 @@ class WeChat
     /**
         *  校验签名
         */
-    private static function checkSignature()
-    {
+    private static function checkSignature() {
         $signature = $_GET["signature"];
         $timestamp = $_GET["timestamp"];
-        $nonce = $_GET["nonce"];
+        $nonce     = $_GET["nonce"];
                 
-        $token = TOKEN;
-        $tmpArr = array($token, $timestamp, $nonce);
+        $token     = TOKEN;
+        $tmpArr    = array($token, $timestamp, $nonce);
         // use SORT_STRING rule
         sort($tmpArr, SORT_STRING);
         $tmpStr = implode( $tmpArr );
         $tmpStr = sha1( $tmpStr );
         
-        if( $tmpStr == $signature ){
+        if( $tmpStr == $signature ) {
             return true;
         }else{
             return false;
@@ -381,11 +365,10 @@ class WeChat
     /**
         *  获取access token
         */
-    private static function getAccessToken()
-    {
+    private static function getAccessToken() {
         $url = Main::config('wechat.access_token');
-        $atjson=file_get_contents($url);
-        $result=json_decode($atjson,true);//json解析成数组
+        $atjson = file_get_contents($url);
+        $result = json_decode($atjson,true);//json解析成数组
         
         self::$access_token = isset($result['access_token']) ? $result['access_token'] :'';
         /*if(!isset($result['access_token']))
@@ -401,13 +384,12 @@ class WeChat
         *
         * @return array
         */
-    public static function getMainMsg()
-    {
-        $result = array(
+    public static function getMainMsg() {
+        $result = array (
             'openid' => self::$msgobj->FromUserName,
-            'type' => self::$msgobj->MsgType,
-            'msg' => self::$msg,
-            'cdate' => self::$msgobj->CreateTime
+            'type'   => self::$msgobj->MsgType,
+            'msg'    => self::$msg,
+            'cdate'  => self::$msgobj->CreateTime
         );
         switch (self::$msgtype) {
             case 'text':

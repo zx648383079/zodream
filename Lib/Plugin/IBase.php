@@ -1,7 +1,6 @@
 <?php 
 namespace App\Lib\Plugin;
 
-interface IBase
-{
+interface IBase {
 	function getName();
 }

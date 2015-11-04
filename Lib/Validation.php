@@ -9,8 +9,7 @@ namespace App\Lib;
 
 use App\Lib\Db\DbFactory;
 	
-class Validation
-{
+class Validation {
 	
 	public $error = array();
 	
@@ -23,33 +22,26 @@ class Validation
 	 * @param $pattent 规则数组
 	 * @return bool
      */
-	public function make($request,$pattent)
-	{
-		$success = true;
+	public function make($request, $pattent) {
+		$success       = true;
 		
 		$this->request = $request;
 		
-		foreach($pattent as $key => $val)
-		{
-			$arr=explode('|',$val);
+		foreach ($pattent as $key => $val) {
+			$arr = explode('|', $val);
 			
-			if(isset($request[$key]) && !$this->isNull( $request[$key] ) )
-			{
-				foreach($arr as $v)
-				{
-					$result = $this -> check($key, $v );
-					
-				 	if(!is_bool($result))
-					{
+			if (isset($request[$key]) && !$this->isNull($request[$key])) {
+				foreach ($arr as $v) {
+					$result = $this -> check($key, $v);
+				 	if (!is_bool($result)) {
 						$this->error[$key][] = $key.$result;
 						$success = false;
 					}
 				}
-			}else{
-				if(in_array('required',$arr))
-				{
+			} else {
+				if (in_array('required', $arr)) {
 					$this->error[$key][] = $key.' is required';
-					$success = false;
+					$success             = false;
 				}
 			}
 		}
@@ -64,61 +56,58 @@ class Validation
 	 * @param $patten 规则名
 	 * @return bool|string
      */
-	private function check($key, $patten)
-	{
-		$value = $this->request[$key];
+	private function check($key, $patten) {
+		$value  = $this->request[$key];
 		$result = FALSE;
-		$arr = explode(':' , $patten , 2);
-		switch(strtolower( $arr[0] ))
-		{
+		$arr    = explode(':' , $patten , 2);
+		switch (strtolower($arr[0])) {
 			case 'required':
 				$result = true;
 				break;
 			case 'number':
-				$result = $this->isNum($value)?TRUE:' is not number';
+				$result = $this->isNum($value) ? TRUE : ' is not number';
 				break;
 			case 'float':
-				$result = $this->isNum($value , 'float')?TRUE:' is not float';
+				$result = $this->isNum($value , 'float') ? TRUE : ' is not float';
 				break;
 			case 'email':
-				$result = $this->isEmail($value)?TRUE:' is not email';
+				$result = $this->isEmail($value) ? TRUE : ' is not email';
 				break;
 			case 'phone':
-				$result = $this->isMobile($value)?TRUE:' is not phone';
+				$result = $this->isMobile($value) ? TRUE : ' is not phone';
 				break;
 			case 'url':
-				$result = $this->isUrl($value)?TRUE:' is not url';
+				$result = $this->isUrl($value) ? TRUE : ' is not url';
 				break;
 			case 'datetime':
-				$result = $this->isDateTime($value)?TRUE:' is not datetime';
+				$result = $this->isDateTime($value) ? TRUE : ' is not datetime';
 				break;
 			case 'length':
-				$len = explode('-',$arr[1]);
-				$result = $this->length($value,3,intval($len[0]),intval($len[1]))?TRUE:'\'s length is not between '.$len[0].' and '.$len[1];
+				$len    = explode('-', $arr[1]);
+				$result = $this->length($value, 3, intval($len[0]), intval($len[1])) ? TRUE : '\'s length is not between '.$len[0].' and '.$len[1];
 				break;
 			case 'min':
-				$result = $this->length($value,1,intval($arr[1]))?TRUE:' min length is '.$arr[1];
+				$result = $this->length($value, 1, intval($arr[1])) ? TRUE : ' min length is '.$arr[1];
 				break;
 			case 'max':
-				$result = $this->length($value,2,0,intval($arr[1]))?TRUE:' max length is '.$arr[1];
+				$result = $this->length($value, 2, 0, intval($arr[1])) ? TRUE : ' max length is '.$arr[1];
 				break;
 			case 'regular':
-				$result = $this->regular($value,$arr[1])?TRUE:' is not match';
+				$result = $this->regular($value, $arr[1]) ? TRUE : ' is not match';
 				break;
 			case 'confirm':
-				$result = $this->confirm($value , $arr[1])?TRUE:' is not the same as '.$arr[1];
+				$result = $this->confirm($value, $arr[1]) ? TRUE : ' is not the same as '.$arr[1];
 				break;
 			case 'conform':
-				$result = ($value === $arr[1])?TRUE:' is not equal '.$arr[1];
+				$result = ($value === $arr[1]) ? TRUE : ' is not equal '.$arr[1];
 				break;
 			case 'unique':
-				$tables = explode('.' , $arr[1],2);
-				$colum = $key;
-				if(!empty($tables[1]))
-				{
-					$colum =$tables[1];
+				$tables = explode('.', $arr[1], 2);
+				$colum  = $key;
+				if (!empty($tables[1])) {
+					$colum = $tables[1];
 				}
-				$result =$this->unique($tables[0],$colum , $value)?TRUE:' is exist.';
+				$result = $this->unique($tables[0], $colum, $value) ? TRUE : ' is exist.';
 				break;
 			default:
 				$result = TRUE;
@@ -128,13 +117,11 @@ class Validation
 		return $result;
 	}
 	
-	private function isNull($value)
-	{
+	private function isNull($value) {
 		return ($value === null || $value === '');
 	}
 	
-	private function isDateTime($value) 
-	{
+	private function isDateTime($value) {
 		return strtotime($value);
 	}
 	
@@ -146,18 +133,16 @@ class Validation
 	 * @param string $value  要验证的值
 	 * @return bool
 	 */
-	private function unique($table , $colum ,$value)
-	{
-		$pdo =new DbFactory();
-		$data = $pdo->findByHelper(array(
+	private function unique($table, $colum, $value) {
+		$pdo  = new DbFactory();
+		$data = $pdo->findByHelper(array (
 			'select' => 'COUNT(*) as num',
-			'from' => $table,
-			'where' => "$colum = '$value'" 
-		),false);
-		if(empty($data) || $data[0]->num != '0')
-		{
+			'from'   => $table,
+			'where'  => "$colum = '$value'" 
+		), false);
+		if (empty($data) || $data[0]->num != '0') {
 			return false;
-		}else{
+		} else {
 			return true;
 		}
 	}
@@ -169,15 +154,11 @@ class Validation
 	 * @param string $key 对比值得关键字
 	 * @return bool
 	 */
-	private function confirm( $value, $key)
-	{
-		if(!isset($this->request[$key]))
-		{
+	private function confirm($value, $key) {
+		if (!isset($this->request[$key])) {
 			return false;
 		}
-		
 		return ($value === $this->request[$key]);
-		
 	}
 
 	/**
@@ -187,10 +168,10 @@ class Validation
 	 * @param string $flag int是否是整数，float是否是浮点型
 	 * @return bool
 	 */
-    private function isNum($str,$flag = 'int'){
-        if(strtolower($flag) == 'int'){
+    private function isNum($str, $flag = 'int') {
+        if (strtolower($flag) == 'int') {
             return ((string)(int)$str === (string)$str) ? true : false;
-        }else{
+        } else {
             return ((string)(float)$str === (string)$str) ? true : false;
         }
     }
@@ -200,8 +181,7 @@ class Validation
 	 * @param $value
 	 * @return bool
 	 */
-	private function isFloat($value)
-	{
+	private function isFloat($value) {
 		return is_float($value) || ( (float) $value > (int) $value || strlen($value) != strlen( (int) $value) ) && (int) $value != 0 ;
 	}
 
@@ -210,7 +190,7 @@ class Validation
 	 * @param $str
 	 * @return bool
 	 */
-    private function isEmail($str){
+    private function isEmail($str) {
         return preg_match("/([a-z0-9]*[-_\.]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?/i",$str) ? true : false;
     }
     //手机号码验证
@@ -218,11 +198,11 @@ class Validation
 	 * @param $str
 	 * @return bool
      */
-	private function isMobile($str){
+	private function isMobile($str) {
         $exp = '#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,6,7,8]{1}\d{8}$|^18[\d]{9}$#';
-        if(preg_match($exp,$str)){
+        if (preg_match($exp,$str)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -232,7 +212,7 @@ class Validation
 	 * @param $str
 	 * @return bool
 	 */
-    private function isUrl($str){
+    private function isUrl($str) {
         return preg_match('#(http|https|ftp|ftps)://([w-]+.)+[w-]+(/[w-./?%&=]*)?#i',$str) ? true : false;
     }
 
@@ -245,9 +225,9 @@ class Validation
 	 * @param string $charset 字符
 	 * @return bool
 	 */
-    private function length($str, $type = 3, $min = 0 ,$max = 0, $charset = 'utf-8'){
+    private function length($str, $type = 3, $min = 0, $max = 0, $charset = 'utf-8') {
         $len = mb_strlen($str,$charset);
-        switch($type){
+        switch ($type) {
             case 1: //只匹配最小值
                 return ($len >= $min) ? true : false;
                 break;
@@ -265,8 +245,7 @@ class Validation
 	 * @param: string $patten 正则字符串
 	 * @return bool
 	 */
-	private function regular($str,$patten)
-	{
-        return preg_match($str,$patten)?TRUE:false;
+	private function regular($str, $patten) {
+        return preg_match($str, $patten) ? TRUE : false;
 	}
 }

@@ -4,8 +4,7 @@ namespace App\Lib;
  * Lang 语言包类 
  * 
  */  
-class Lang  
-{  
+class Lang {  
     
     public static $language;
     /** 
@@ -25,9 +24,8 @@ class Lang
      * @access public 
      * @return void 
      */  
-    public static function load($lang=null) 
-    {  
-        switch ( strtolower($lang) ) {  
+    public static function load($lang = null) {  
+        switch (strtolower($lang)) {  
             case 'zh_cn':  
                 self::$options = array('lang' => 'zh_CN.UTF8', 'domain' => 'nways');  
                 break;  
@@ -52,8 +50,7 @@ class Lang
      * @param mixed $options 
      * @return void 
      */  
-    public static function setOptions($options) 
-    {  
+    public static function setOptions($options) {  
         if (!empty($options)) {
             foreach ($options as $key => $option) {  
                 self::$options[$key] = $option;  
@@ -67,10 +64,8 @@ class Lang
 	*
 	* @return string 返回语言,
 	*/
-	public static function getLang() 
-    {
-        if( empty( self::$language ))
-        {
+	public static function getLang() {
+        if (empty( self::$language)) {
             $language = $_SERVER ['HTTP_ACCEPT_LANGUAGE'];  
             preg_match_all ( "/[\w-]+/", $language, $language );  
             self::$language = $language [0] [0];
@@ -83,12 +78,9 @@ class Lang
      * @access public
      * @param null $lang 语言
      */
-    public static function setLang( $lang = null) 
-    {  
-        if(empty(self::$options))
-        {
-            if(empty($lang))
-            {
+    public static function setLang($lang = null) {  
+        if (empty(self::$options)) {
+            if (empty($lang)) {
                 $lang = self::getLang();
             }
             self::load($lang);
