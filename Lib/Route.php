@@ -21,23 +21,8 @@ class Route {
 	 * @param $v string 视图所在的方法名
 	 */
 	public static function load($arg = 'app') {
-		$url  = self::get();
-		
-		$con  = ucfirst(strtolower($url[0]));
-		$name = ucfirst(strtolower($arg)).'\\Controller\\'.$con."Controller";
-		$view = strtolower($url[1]);
-		if ( class_exists($name)) {
-			$controller = new $name();
-			$controller -> before($view);
-			$view .= 'Action';
-			if (method_exists($controller, $view)) {
-				$controller->$view();
-			} else {
-				App::error(0, $view, __FILE__, __LINE__);
-			}
-		} else {
-			App::error(0, $name.$view, __FILE__ ,__LINE__);
-		}
+		$routes = self::get();
+		call_user_func_array( array(ucfirst(strtolower($arg)). '\\Controller\\'. implode('\\', $routes['controller']). 'Controller', $routes['function']. 'Action'), $routes['value']);
 	}
 	
 	private static function get() {
@@ -46,6 +31,8 @@ class Route {
 			$key = 0;
 		}
 		$url = new Route();
+		
+		$url -> d();
 		
 		if (!empty(App::$request) && App::$request->isCli()) {
 			return $url->cli();	
@@ -75,6 +62,19 @@ class Route {
 				break;
 		}
 	} 
+	
+	private function d() {
+		$url    = HUrl::request_uri();
+		$url    = explode('?', $url)[0];
+		$url    = trim($url, '/');
+		$routes = App::config('route');
+		if (array_key_exists($url, $routes)) {
+			$file = $routes[$url];
+		}
+		
+		echo $url;
+		die();
+	}
 	
 	private function c() {
 		return array(
