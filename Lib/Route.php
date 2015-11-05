@@ -88,15 +88,18 @@ class Route {
 	private function d() {
 		$url    = HUrl::request_uri();
 		$url    = explode('?', $url)[0];
-		$url    = rtrim($url, '.html');
 		$url    = trim($url, '/');
 		$routes = App::config('route');
+		if (array_key_exists($url, $routes)) {
+			return $this->getRoute($routes[$url]);
+		}
 		foreach ($routes as $key => $value) {
 		    $pattern = str_replace(':num', '[0-9]+', $key);
 		    $pattern = str_replace(':any', '[^/]+', $pattern);
+			$pattern = str_replace('/', '\\/', $pattern);
 		    $matchs  = array();
-		    preg_match($pattern, $url, $matchs);
-		    if(count($matchs) > 0) {
+		    preg_match('/'.$pattern.'/i', $url, $matchs);
+		    if(count($matchs) > 0 && $matchs[0] === $url) {
 		        $route = $value;
 		        foreach ($matchs as $k => $val) {
 		          $route = str_replace('$'.$k, $val, $route);
@@ -143,7 +146,7 @@ class Route {
 	private function y() {
 	    $url    = HUrl::request_uri();
 	    $url    = explode('?', $url)[0];
-		return $this->getRoute(rtrim($url, '.html'));
+		return $this->getRoute($url);
 	}
 	
 	/**
