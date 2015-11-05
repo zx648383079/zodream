@@ -182,4 +182,15 @@ class OArray implements IBase {
 	public static function isAssoc($arr) {  
 		return array_keys($arr) !== range(0, count($arr) - 1);  
 	}  
+	
+	/**
+	 * 把数组的值的首字母大写
+	 * @param array $arr
+	 */
+	public static function ucFirst($arr) {
+	    foreach ($arr as &$value) {
+	        $value = ucfirst($value);
+	    }
+	    return $arr;
+	}
 }

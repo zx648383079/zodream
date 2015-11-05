@@ -9,6 +9,7 @@ namespace App\Lib;
 use App;
 use App\Lib\Helper\HUrl;
 use App\Lib\Object\OString;
+use App\Lib\Object\OArray;
 
 defined("APP_URL") or define('APP_URL', Base::config('app.host'));
 
@@ -22,7 +23,21 @@ class Route {
 	 */
 	public static function load($arg = 'app') {
 		$routes = self::get();
-		call_user_func_array( array(ucfirst(strtolower($arg)). '\\Controller\\'. implode('\\', $routes['controller']). 'Controller', $routes['function']. 'Action'), $routes['value']);
+		$name = ucfirst(strtolower($arg)). '\\Controller\\'. implode('\\', $routes['controller']). 'Controller';
+		$view = $routes['function'];
+		if ( class_exists($name)) {
+		    $controller = new $name();
+		    $controller -> before($view);
+		    $view .= 'Action';
+		    if (method_exists($controller, $view)) {
+		        call_user_func_array( array($controller, $view), $routes['value']);
+		    } else {
+		        App::error(0, $view, __FILE__, __LINE__);
+		    }
+		} else {
+		    App::error(0, $name.$view, __FILE__ ,__LINE__);
+		}
+		
 	}
 	
 	/**
@@ -205,7 +220,7 @@ class Route {
 	    }
 	    return array(
 		    'function'   => array_pop($routes),
-		    'controller' => $routes,
+		    'controller' => OArray::ucFirst($routes),
 	        'value'      => $values
 		);
 	}
