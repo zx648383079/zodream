@@ -40,7 +40,7 @@ class Controller {
 						break;
 					case '1':
 						if (Auth::guest()) {
-							App::redirect('?c=auth');
+							App::redirect('auth');
 						}
 						break;
 					case 'p':
@@ -53,7 +53,7 @@ class Controller {
 						break;
 					default:
 						if (!App::role($role)) {
-							App::redirect('?c=auth', 4, '您无权操作！', '401');
+							App::redirect('auth', 4, '您无权操作！', '401');
 						}
 						break;
 				}

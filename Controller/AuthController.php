@@ -30,7 +30,7 @@ class AuthController extends Controller {
 					if (App::$request->post('remember') == 1) {
 						App::cookie('token', $user->setToken($result), time() + 315360000);
 					}
-					App::redirect('?c=home');
+					App::redirect('/');
 					exit;
 				} else {
 					$this->send(array(
@@ -67,7 +67,7 @@ class AuthController extends Controller {
 		$user = new UserModel();
 		$user->clearToken($id);
 		App::session('user', '');
-		App::redirect('/?c=auth');
+		App::redirect('auth');
 	}
 	/**
 	*注册界面
@@ -88,7 +88,7 @@ class AuthController extends Controller {
 				$user = new UserModel();
 				$id   = $user -> fillWeb($post);
 				App::session('user', $id);
-				App::redirect('?c=home');
+				App::redirect('/');
 			}
 		}
 		
