@@ -114,7 +114,7 @@ class Route {
 	private function c() {
 		$values = explode('/', App::$request->get('v' , 'index'));
 		$routes = array(
-			'controller' => explode('/', App::$request->get('c' , 'home')),
+			'controller' => OArray::ucFirst(explode('/', App::$request->get('c' , 'home'))),
 			'function'   => array_shift($values),
 			'value'      => $values
 		);
