@@ -183,9 +183,16 @@ class Base {
 	* @param string $msg 显示的消息.
 	* @param string $code 显示的代码标志.
 	*/
-	public static function redirect($url, $time = 0, $msg = '', $code = '') {
-		//多行URL地址支持
-		$url = str_replace(array("\n", "\r"), '', $url);
+	public static function redirect($urls, $time = 0, $msg = '', $code = '') {
+		$url = '';
+		if (is_array($urls)) {
+			foreach ($urls as $value) {
+				$url .= HUrl::to($value);
+			}
+		} else {
+			$url = HUrl::to($urls);
+		}
+		
 		if (empty($msg)) {
 			$msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
 		}

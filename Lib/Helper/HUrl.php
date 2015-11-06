@@ -25,6 +25,9 @@ class HUrl implements IBase {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null, $secret = FALSE) {
+		if (strstr($file, '://')) {
+			return $file;
+		}
 		if ($file === null) {
 			$file = self::request_uri();
 		}
