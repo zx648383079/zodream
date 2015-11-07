@@ -34,6 +34,8 @@ class Base {
 		date_default_timezone_set('Etc/GMT-8');            //这里设置了时区
 		Route::load($arg);
 	}
+	
+	private static $_configs;
 	/**
 	* 获取配置文件
 	*
@@ -44,9 +46,11 @@ class Base {
 	* @return array,
 	*/
 	public static function config($key = null, $default = null) {
-		$configs = require(APP_DIR.(empty(self::$root) ? '' : '/'.self::$root).'/config/config.php');
+		if (empty(self::$_configs)) {
+			self::$_configs = include(APP_DIR.(empty(self::$root) ? '' : '/'.self::$root).'/config/config.php');
+		}
 		if (!empty($key)) {
-			$configs = OArray::getChild($key, $configs, $default);
+			$configs = OArray::getChild($key, self::$_configs, $default);
 		}
 		return $configs;
 	}

@@ -90,6 +90,9 @@ class Route {
 		$url    = explode('?', $url)[0];
 		$url    = trim($url, '/');
 		$routes = App::config('route');
+		if (!is_array($routes)) {
+			return $this->getRoute($url);
+		}
 		if (array_key_exists($url, $routes)) {
 			return $this->getRoute($routes[$url]);
 		}
@@ -135,8 +138,8 @@ class Route {
 	 * 带index。php的链接解析，格式 index.php/home/index
 	 */
 	private function u() {
-		$url    = HUrl::request_uri();
-		$arr    = OString::toArray($url, '.php', 2, array('', '/home/index'));
+		$url = HUrl::request_uri();
+		$arr = OString::toArray($url, '.php', 2, array('', '/home/index'));
 		return $this->getRoute($arr[1]);
 	}
 	
