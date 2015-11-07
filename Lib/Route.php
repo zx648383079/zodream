@@ -6,12 +6,12 @@ namespace App\Lib;
 *
 *
 ********************************************************/
-use App;
 use App\Lib\Helper\HUrl;
 use App\Lib\Object\OString;
 use App\Lib\Object\OArray;
 
-defined("APP_URL") or define('APP_URL', Base::config('app.host'));
+defined("APP_URL")  or define('APP_URL', Base::config('app.host'));
+defined('APP_MODE') or define('APP_MODE', Base::config('app.mode'));
 
 class Route {
 	/**
@@ -45,16 +45,12 @@ class Route {
 	 * @return \App\Lib\array|multitype:\App\Lib\array |\App\Lib\Ambigous|\App\Lib\unknown
 	 */
 	private static function get() {
-		$key = App::config('app.url');
-		if (empty($key)) {
-			$key = 0;
-		}
 		$url = new Route();
-		if (!empty(App::$request) && App::$request->isCli()) {
+		if (!empty(Base::$request) && Base::$request->isCli()) {
 			return $url->cli();	
 		}
 		
-		switch ($key) {
+		switch (APP_MODE) {
 			case 0:
 				return $url -> c();
 				break;
@@ -89,7 +85,7 @@ class Route {
 		$url    = HUrl::request_uri();
 		$url    = explode('?', $url)[0];
 		$url    = trim($url, '/');
-		$routes = App::config('route');
+		$routes = Base::config('route');
 		if (!is_array($routes)) {
 			return $this->getRoute($url);
 		}
@@ -118,9 +114,9 @@ class Route {
 	 * @return multitype:array NULL
 	 */
 	private function c() {
-		$values = explode('/', App::$request->get('v' , 'index'));
+		$values = explode('/', Base::$request->get('v' , 'index'));
 		$routes = array(
-			'controller' => OArray::ucFirst(explode('/', App::$request->get('c' , 'home'))),
+			'controller' => OArray::ucFirst(explode('/', Base::$request->get('c' , 'home'))),
 			'function'   => array_shift($values),
 			'value'      => $values
 		);
@@ -131,7 +127,7 @@ class Route {
 	 * 获取r的参数解析     格式?r=home/index
 	 */
 	private function r() {
-		return $this->getRoute(App::$request->get('r', 'home/index'));
+		return $this->getRoute(Base::$request->get('r', 'home/index'));
 	}
 	
 	/**
@@ -168,7 +164,7 @@ class Route {
 	 * @return Ambigous <array, string>
 	 */
 	private function s() {
-		$key = App::$request->get('s');
+		$key = Base::$request->get('s');
 		if ($key === null) {
 			$url = HUrl::request_uri();
 			$ar  = explode('/', $url, 2);
@@ -177,7 +173,7 @@ class Route {
 			$key = $key == '' ? '*' : $key;
 		}
 		if (strlen($key) < 4) {
-			$short = App::config('short.'.$key);
+			$short = Base::config('short.'.$key);
 			$arr   = OString::toArray($short , '.', 2, array('home', 'index')); 
 		} else {
 			
@@ -190,7 +186,7 @@ class Route {
 	 * 控制台的路由
 	 */
 	private function cli() {
-		$url = App::$request->server('argv')[0];
+		$url = Base::$request->server('argv')[0];
 		return $this->getRoute($url);
 	}
 	

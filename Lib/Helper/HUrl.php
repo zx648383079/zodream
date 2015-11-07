@@ -1,6 +1,7 @@
 <?php 
 namespace App\Lib\Helper;
 
+
 class HUrl implements IBase {
 	/**
 	 * 上个页面网址
@@ -31,11 +32,26 @@ class HUrl implements IBase {
 		if ($file === null) {
 			$file = self::request_uri();
 		}
-		$url = rtrim(APP_URL,'/').'/'.ltrim($file, '/');
+		$url = rtrim(APP_URL,'/'). '/';
+		switch (APP_MODE) {
+			case 1:
+				if (strstr('r=', $file)) {
+					$url .= ltrim($file, '/');
+				} else {
+					$url .= '?r='. $file;
+				}
+				break;
+			case 2:
+				$url .= (strstr('.php', $file) ? '' : 'index.php/'). ltrim($file, '/');
+				break;
+			default:
+				$url .= ltrim($file, '/');
+				break;
+		}
 		if ($extra === null) {
 			return $url;
 		} else if (is_string($extra)) {
-			if (strpos($url,'?') === false) {
+			if (strpos($url, '?') === false) {
 				$url .= '?'.$extra;
 			} else {
 				$url .= '&'.$extra;
