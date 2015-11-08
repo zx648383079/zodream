@@ -10,13 +10,26 @@ use App;
 use App\Lib\Lang;
 use App\Lib\Validation;
 use App\Lib\Auth;
+use App\Lib\Loader;
 use App\Lib\Html\HView;
 
 class Controller {
-	function __construct() {
+	protected $loader;
+	
+	function __construct($loader = null) {
 		App::$data         = App::config('App');
 		App::$data['lang'] = Lang::$language;
+		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 	}
+	
+	public function __get($key) {
+		return $this->loader->get($key);
+	}
+	
+	public function __set($key, $value) {
+		$this->loader->set($key, $value);
+	}
+	
 	/**
 	* 在执行之前做规则验证
 	*

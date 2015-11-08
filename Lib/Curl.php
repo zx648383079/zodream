@@ -5,7 +5,7 @@ namespace App\Lib;
 
 */
 
-class Curl
+final class Curl
 {
     // The HTTP authentication method(s) to use.
     const AUTH_BASIC = CURLAUTH_BASIC;

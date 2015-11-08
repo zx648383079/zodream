@@ -12,7 +12,7 @@
 			'url'   => 0                            //URL解析方式
 		),
 		'view'   => array(                           //视图文件信息
-			'dir' => 'app/view',
+			'dir' => 'view',
 			'ext' => '.php'
 		),
 		'mysql'  => array(							//MYSQL数据库的信息

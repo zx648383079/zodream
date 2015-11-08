@@ -13,7 +13,7 @@ use App\Lib\Object\OArray;
 defined("APP_URL")  or define('APP_URL', Base::config('app.host'));
 defined('APP_MODE') or define('APP_MODE', Base::config('app.mode'));
 
-class Route {
+final class Route {
 	/**
 	 * 加载控制器和视图
 	 *
@@ -21,9 +21,9 @@ class Route {
 	 * @param $c string 控制器的名称
 	 * @param $v string 视图所在的方法名
 	 */
-	public static function load($arg = 'app') {
+	public static function load() {
 		$routes = self::get();
-		$name = ucfirst(strtolower($arg)). '\\Controller\\'. implode('\\', $routes['controller']). 'Controller';
+		$name = APP_MODULE. '\\Controller\\'. implode('\\', $routes['controller']). 'Controller';
 		$view = $routes['function'];
 		if ( class_exists($name)) {
 		    $controller = new $name();

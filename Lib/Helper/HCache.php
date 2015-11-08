@@ -3,7 +3,7 @@ namespace App\Lib\Helper;
 
 use App;
 
-class HCache implements IBase {
+final class HCache implements IBase {
 	public static function make($name, $content, $life = 0) {
 		$path    = APP_DIR.App::config('cache.path').$name.'.php';
 		$content = '<?php if (!defined(\'APP_DIR\')) exit(\'NO THING!\');?>'.$content;
@@ -17,4 +17,6 @@ class HCache implements IBase {
 		}
 		return FALSE;
 	}
+	
+	
 }

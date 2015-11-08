@@ -3,16 +3,40 @@ namespace App\Lib\Web;
 
 use App\Lib\Object\OArray;
 
-class WRequest implements IBase {
+final class WRequest implements IBase {
 	public $posts;
-	
 	public $gets;
+	public $requests;
+	public $cookies;
+	public $files;
+	public $servers;
 	
 	public $error = FALSE;
 	
 	public function __construct() {
-		$this->gets  = $_GET;
-		$this->posts = $_POST;
+		$this->gets     = $this->_clean($_GET);
+		$this->posts    = $this->_clean($_POST);
+		$this->requests = $this->_clean($_REQUEST);
+		$this->cookies  = $this->_clean($_COOKIE);
+		$this->files    = $this->_clean($_FILES);
+		$this->servers  = $this->_clean($_SERVER);
+	}
+	
+	/**
+	 * 格式化
+	 * @param unknown $data
+	 */
+	private function _clean($data) {
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				unset($data[$key]);
+				$data[$this->_clean($key)] = $this->_clean($value);
+			}
+		} else {
+			$data = htmlspecialchars($data, ENT_COMPAT);
+		}
+	
+		return $data;
 	}
 	
 	public function get($name = null, $default = null) {

@@ -4,7 +4,7 @@ namespace App\Lib;
  * Lang 语言包类 
  * 
  */  
-class Lang {  
+final class Lang {  
     
     public static $language;
     /** 

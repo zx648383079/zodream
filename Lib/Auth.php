@@ -8,7 +8,7 @@ namespace App\Lib;
 use App;
 use App\Model\UserModel;
 
-class Auth {
+final class Auth {
 	
 	public static $userModel;
 	/*

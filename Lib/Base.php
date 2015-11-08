@@ -15,24 +15,22 @@ use App\Lib\Html\HView;
 
 ini_set("session.cookie_httponly", 1);
  
-defined("DEBUG")   or define("DEBUG", false);
-defined("APP_DIR") or define("APP_DIR", dirname(dirname(__FILE__)));
-defined("APP_API") or define('APP_API', isset($_GET['api']) ? TRUE : FALSE);    //是否是API模式
+defined("DEBUG")      or define("DEBUG", false);
+defined("APP_DIR")    or define("APP_DIR", dirname(dirname(__FILE__)));
+defined('APP_MODULE') or define('APP_MODULE', 'App');
+defined("APP_API")    or define('APP_API', isset($_GET['api']) ? TRUE : FALSE);    //是否是API模式
 
 class Base {
 	
 	public static $request;
 	
-	private static $root;
-	
-	public static function main($arg = 'app') {
+	public static function main() {
 		set_error_handler(array('app', 'error'));          //自定义错误输出
 		register_shutdown_function(array('app', 'out'));   //程序结束时输出
-		//Lang::setLang();                                 //加载语言包 
-		self::$root    = $arg;
+		//Lang::setLang();                                 //加载语言包
 		self::$request = new WRequest();
 		date_default_timezone_set('Etc/GMT-8');            //这里设置了时区
-		Route::load($arg);
+		Route::load();
 	}
 	
 	private static $_configs;
@@ -47,7 +45,7 @@ class Base {
 	*/
 	public static function config($key = null, $default = null) {
 		if (empty(self::$_configs)) {
-			self::$_configs = include(APP_DIR.(empty(self::$root) ? '' : '/'.self::$root).'/config/config.php');
+			self::$_configs = include(APP_DIR.'/config/config.php');
 		}
 		if (!empty($key)) {
 			$configs = OArray::getChild($key, self::$_configs, $default);
@@ -145,7 +143,7 @@ class Base {
      */
 	public static function session($keys, $value = false, $life = '') {
 		if (!isset($_SESSION)) {
-			session_save_path(APP_DIR.'/tmp');
+			session_save_path(dirname(APP_DIR).'/tmp');
 			session_start();
 		}
 		
