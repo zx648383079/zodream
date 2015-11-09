@@ -11,7 +11,7 @@ use App\Model\UserModel;
 final class Auth {
 	
 	public static $userModel;
-	/*
+	/**
 	* 判断是否登录
 	*
 	* @access public static
@@ -35,7 +35,7 @@ final class Auth {
 	/**
 	* 判断是否是游客
 	*
-	* @return bool
+	* @return boolean
 	*/
 	public static function guest() {
 		$id = self::getId();
@@ -43,7 +43,7 @@ final class Auth {
 	}
 
 	/**
-	 * @return bool|string
+	 * @return boolean|string
      */
 	private static function getId() {
 		$id    = App::session('user');

@@ -1,12 +1,11 @@
 <?php 
-/* 
-*
-* 数据验证类，主要是表单验证
-*
-*
-*/
 namespace App\Lib;
-
+/**
+ *
+ * 数据验证类，主要是表单验证
+ *
+ *
+ */
 use App\Lib\Db\DbFactory;
 	
 class Validation {
@@ -20,7 +19,7 @@ class Validation {
 	 *
 	 * @param $request 要验证的数组
 	 * @param $pattent 规则数组
-	 * @return bool
+	 * @return boolean
      */
 	public function make($request, $pattent) {
 		$success       = true;
@@ -54,7 +53,7 @@ class Validation {
 	 *
 	 * @param $key 关键字
 	 * @param $patten 规则名
-	 * @return bool|string
+	 * @return boolean|string
      */
 	private function check($key, $patten) {
 		$value  = $this->request[$key];
@@ -131,7 +130,7 @@ class Validation {
 	 * @param string $table  不带前缀的表名
 	 * @param string $value  要验证的列
 	 * @param string $value  要验证的值
-	 * @return bool
+	 * @return boolean
 	 */
 	private function unique($table, $colum, $value) {
 		$pdo  = new DbFactory();
@@ -152,7 +151,7 @@ class Validation {
 	 *
 	 * @param string $value  要验证的值
 	 * @param string $key 对比值得关键字
-	 * @return bool
+	 * @return boolean
 	 */
 	private function confirm($value, $key) {
 		if (!isset($this->request[$key])) {
@@ -166,7 +165,7 @@ class Validation {
 	 *
 	 * @param $str
 	 * @param string $flag int是否是整数，float是否是浮点型
-	 * @return bool
+	 * @return boolean
 	 */
     private function isNum($str, $flag = 'int') {
         if (strtolower($flag) == 'int') {
@@ -188,7 +187,7 @@ class Validation {
 	/**
 	 * 邮箱验证
 	 * @param $str
-	 * @return bool
+	 * @return boolean
 	 */
     private function isEmail($str) {
         return preg_match("/([a-z0-9]*[-_\.]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?/i",$str) ? true : false;
@@ -196,7 +195,7 @@ class Validation {
     //手机号码验证
 	/**
 	 * @param $str
-	 * @return bool
+	 * @return boolean
      */
 	private function isMobile($str) {
         $exp = '#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,6,7,8]{1}\d{8}$|^18[\d]{9}$#';
@@ -210,7 +209,7 @@ class Validation {
 	/**
 	 * URL验证，纯网址格式，不支持IP验证
 	 * @param $str
-	 * @return bool
+	 * @return boolean
 	 */
     private function isUrl($str) {
         return preg_match('#(http|https|ftp|ftps)://([w-]+.)+[w-]+(/[w-./?%&=]*)?#i',$str) ? true : false;
@@ -223,7 +222,7 @@ class Validation {
 	 * @param int $min,最小值;
 	 * @param int $max,最大值;
 	 * @param string $charset 字符
-	 * @return bool
+	 * @return boolean
 	 */
     private function length($str, $type = 3, $min = 0, $max = 0, $charset = 'utf-8') {
         $len = mb_strlen($str,$charset);
@@ -243,7 +242,7 @@ class Validation {
 	 * 正则验证
 	 * @param: string $str
 	 * @param: string $patten 正则字符串
-	 * @return bool
+	 * @return boolean
 	 */
 	private function regular($str, $patten) {
         return preg_match($str, $patten) ? TRUE : false;

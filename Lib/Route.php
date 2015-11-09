@@ -10,8 +10,11 @@ use App\Lib\Helper\HUrl;
 use App\Lib\Object\OString;
 use App\Lib\Object\OArray;
 
-defined("APP_URL")  or define('APP_URL', Base::config('app.host'));
-defined('APP_MODE') or define('APP_MODE', Base::config('app.mode'));
+defined("APP_URL")         or define('APP_URL', Base::config('app.host'));
+defined('APP_MODE')        or define('APP_MODE', Base::config('app.mode'));
+defined("APP_CONTROLLER")  or define('APP_CONTROLLER', Base::config('app.controller', 'Controller'));
+defined('APP_MODEL')       or define('APP_MODEL', Base::config('app.model', 'Model'));
+defined('APP_ACTION')      or define('APP_ACTION', Base::config('app.action', 'Action'));
 
 final class Route {
 	/**
@@ -22,22 +25,51 @@ final class Route {
 	 * @param $v string 视图所在的方法名
 	 */
 	public static function load() {
-		$routes = self::get();
-		$name = APP_MODULE. '\\Controller\\'. implode('\\', $routes['controller']). 'Controller';
-		$view = $routes['function'];
-		if ( class_exists($name)) {
-		    $controller = new $name();
-		    $controller -> before($view);
-		    $view .= 'Action';
-		    if (method_exists($controller, $view)) {
-		        call_user_func_array( array($controller, $view), $routes['value']);
-		    } else {
-		        App::error(0, $view, __FILE__, __LINE__);
-		    }
-		} else {
-		    App::error(0, $name.$view, __FILE__ ,__LINE__);
+		$routes      = self::get();
+		$controllers = $routes['controller'];
+		$action      = $routes['function'];
+		$values      = isset($routes['value']) ? $routes['value'] : array();
+		unset($routes);
+		if(self::call_func($controllers, $action, $values)) {
+			return ;
 		}
+		$tem = $controllers;
+		$tem[] = $action;
+		if(self::call_func($tem, 'index', $values)) {
+			return ;
+		}
+		unset($tem);
+		for ($i = 0, $len = count($controllers); $i < $len; $i ++) {
+			array_unshift($values, $action);
+			$action = array_pop($controllers);
+			if (empty($controllers)) {
+				$controllers = array('home');
+			}
+			if (self::call_func($controllers, $action, $values)) {
+				return ;
+			}
+		}
+		array_unshift($values, $action);
+		$action = 'index';
+		if (self::call_func($controllers, $action, $values)) {
+			return ;
+		}
+		Base::error(0, $name.$routes['function'], __FILE__ ,__LINE__);
+		return;
 		
+	}
+	
+	private static function call_func($controllers, $action, $values) {
+		$controller = APP_MODULE. '\\Controller\\'. implode('\\', $controllers). APP_CONTROLLER;
+		if ( class_exists($controller)) {
+			$controller = new $controller();
+			if (method_exists($controller, $action. APP_ACTION)) {
+				$controller -> before($action);
+				call_user_func_array( array($controller, $action. APP_ACTION), $values);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -220,6 +252,15 @@ final class Route {
 	            break;
 	        }
 	    }
+	    switch (count($routes)) {
+			case 0:
+				$routes[] = 'home';
+			case 1:
+				$routes[] = 'index';
+				break;
+			default:
+				break;
+		}
 	    return array(
 		    'function'   => array_pop($routes),
 		    'controller' => OArray::ucFirst($routes),

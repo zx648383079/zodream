@@ -9,7 +9,7 @@ class AuthController extends Controller {
 	
 	protected $rules = array (
 		'logout'   => '1',
-		'register' => '!',
+		'register' => '?',
 		'*'        => '?'
 	);
 	/**

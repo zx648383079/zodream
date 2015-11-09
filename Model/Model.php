@@ -32,6 +32,11 @@ abstract class Model extends DbFactory {
 		return $this->add($assocArray);
 	}
 
+	/**
+	 * 根据id执行更新
+	 * @param array $args 需要跟新的数据
+	 * @param string|int $id
+	 */
 	public function updateById($args, $id) {
 		$assocArray = OArray::combine( $this->fillable, $args, FALSE);
 		if (in_array('udate', $this->fillable)) {
@@ -42,10 +47,10 @@ abstract class Model extends DbFactory {
 	
 	
 	/**
-	* 返回Object
+	* 查询返回Object
 	*
-	* @param string $param
-	* @param string $filed
+	* @param string|array $args Where条件 
+	* @param string $filed 需要返回的列
 	* @return array
 	*/
 	public function findObject($args = '', $filed = '*') {
@@ -61,14 +66,14 @@ abstract class Model extends DbFactory {
 	}
 	
 	/**
-	* 返回array
+	* 查询返回array
 	*
-	* @param string $param
-	* @param string $filed
+	* @param string|array $args Where条件 
+	* @param string $filed 需要返回的列
 	* @return array
 	*/
-	public function findList($arg = '', $filed = '*') {
-		$stmt   = $this->findObject($arg , $filed);
+	public function findList($args = '', $filed = '*') {
+		$stmt   = $this->findObject($args , $filed);
 		$result = array(); 
 		foreach ($stmt as $key => $value) {
 			foreach ($value as $k => $val) {
@@ -78,6 +83,12 @@ abstract class Model extends DbFactory {
 		return $result;  
 	}
 	
+	/**
+	 * 执行关联查询
+	 * @param unknown $key
+	 * @param unknown $value
+	 * @param string $one
+	 */
 	public function assignRow($key, $value, $one = true) {
 		$assocArray = $this->findList("{$key} = '{$value}'");
 		if ( $one && count($assocArray) > 0) {
@@ -86,19 +97,31 @@ abstract class Model extends DbFactory {
 		$this->models = $assocArray;
 	}
 	
+	/**
+	 * 一对一关联
+	 * @param unknown $model
+	 * @param unknown $key
+	 * @param string $forkey
+	 */
 	public function hasOne($model, $key, $forkey = 'id') {
 		$table =  new $model();
 		$table -> assignRow($forkey, $this->$key);
 		return $table;
 	}
 	
+	/**
+	 * 一对多关联
+	 * @param unknown $model
+	 * @param unknown $key
+	 * @param string $forkey
+	 */
 	public function hasMany($model, $key, $forkey = 'id') {
 		$table =  new $model();
 		$table -> assignRow($forkey, $this->$key, FALSE);
 		return $table;
 	}
 	
-	/*
+	/**
 	* 魔术变量
 	* 指定获取的数据来源
 	*

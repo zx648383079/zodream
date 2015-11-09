@@ -77,7 +77,7 @@ class DbFactory {
 	}
     
     /**
-	* int加
+	* int加减
 	*
 	* @param string $filed
 	* @param string $where
@@ -120,11 +120,10 @@ class DbFactory {
     }  
     
     /**
-	* 根据id 查找值
-	*
-	* @param $id
-	* @return mixed
-	*/
+     * 根据id 查找值
+     * @param unknown $id
+     * @param string $filed
+     */
 	public function findById($id, $filed = "*") {
 		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
 		return $this->db->execute($sql)->fetchObject();
@@ -233,10 +232,18 @@ class DbFactory {
         return $stmt->fetchObject()->Auto_increment;  
     } 
     
+    /**
+     * 根据插件
+     * @param unknown $param
+     * @param string $islist
+     */
     public function findByHelper($param, $islist = TRUE) {
         return $this->db->findByHelper($param, $islist);
     }
     
+    /**
+     * 获取错误信息
+     */
     public function getError() {
         return $this->db->getError();
     }

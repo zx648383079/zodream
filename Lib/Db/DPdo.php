@@ -19,8 +19,10 @@ class DPdo implements IBase {
     
     
        
-    //公共静态方法获取实例化的对象  
-    static public function getInstance() {  
+    /**
+     * 公共静态方法获取实例化的对象 
+     */ 
+    public static function getInstance() {  
         if (!(self::$instance instanceof self)) {  
             self::$instance = new self();  
         }  
@@ -91,14 +93,26 @@ class DPdo implements IBase {
         return $result;
     }
     
+    /**
+     * 获取最后修改的id
+     * @return string
+     */
     public function lastInsertId() {
         return $this->pdo->lastInsertId();
     }
     
+    /**
+     * 预处理
+     * @param unknown $sql
+     */
     public function prepare($sql) {
         $this->result = $this->pdo->prepare($sql); 
     }
     
+    /**
+     * 绑定值
+     * @param unknown $param
+     */
     public function bind($param) {
         foreach ($param as $key => $value) {
            $this->result->bindParam($key, $value);

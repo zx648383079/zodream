@@ -142,8 +142,8 @@ class OArray implements IBase {
 	public static function getChild($name, $values, $default = null, $link = '.') {
 		$names = explode($link, $name, 2);
 		if ( count($names) === 1) {
-			return isset($values[$name]) ? $values[$name] : $default;
-		} else if ( !isset($values[$names[0]])) {
+			return array_key_exists($name, $values) ? $values[$name] : $default;
+		} else if (!array_key_exists($names[0], $values)) {
 			return $default;
 		} else {
 			return self::getChild($names[1], $values[ $names[0] ], $default, $link);
