@@ -100,7 +100,7 @@ class DbFactory {
 	 * @param array $param 条件
 	 * @return string|bool 返回id,
 	 */
-    public function findOne($param , $filed = "*") {
+    public function findOne($param , $filed = '*') {
         $where = '';  
         if ( is_array($param) ) {
             foreach ($param as $key => $value) {  
@@ -124,7 +124,7 @@ class DbFactory {
      * @param unknown $id
      * @param string $filed
      */
-	public function findById($id, $filed = "*") {
+	public function findById($id, $filed = '*') {
 		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
 		return $this->db->execute($sql)->fetchObject();
 	}
@@ -234,8 +234,8 @@ class DbFactory {
     
     /**
      * 根据插件
-     * @param unknown $param
-     * @param string $islist
+     * @param array $param
+     * @param boolean $islist
      */
     public function findByHelper($param, $islist = TRUE) {
         return $this->db->findByHelper($param, $islist);

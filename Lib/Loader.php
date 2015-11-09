@@ -51,7 +51,7 @@ final class Loader {
 	 * @param unknown $model
 	 */
 	public function model($model) {
-		$class = APP_MODULE.'/Model/'.ucfirst($model). APP_MODEL;
+		$class = APP_MODULE.'\\Model\\'.ucfirst($model). APP_MODEL;
 		if (class_exists($class)) {
 			$this->set($model.'Model', new $class);
 		} else {
@@ -77,9 +77,9 @@ final class Loader {
 	 * @param unknown $library
 	 */
 	public function library($library) {
-		$class = APP_MODULE.'/Lib/'.ucfirst($library);
+		$class = APP_MODULE.'\\Lib\\'.ucfirst($library);
 		if (class_exists($class)) {
-			$this->set(str_replace('/', '_', $library), new $class);
+			$this->set(str_replace('\\', '_', $library), new $class);
 		} else {
 			exit('Error: Could not load library ' . $library . '!');
 		}
