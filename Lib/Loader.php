@@ -50,13 +50,8 @@ final class Loader {
 	 * 添加数据类
 	 * @param unknown $model
 	 */
-	public function model($model) {
-		$class = APP_MODULE.'\\Model\\'.ucfirst($model). APP_MODEL;
-		if (class_exists($class)) {
-			$this->set($model.'Model', new $class);
-		} else {
-			exit('Error: Could not load model ' . $model . '!');
-		}
+	public function model($models) {
+		$this->_add($models, APP_MODULE.'\\Model\\', APP_MODEL);
 	}
 	
 	/**
@@ -77,11 +72,27 @@ final class Loader {
 	 * @param unknown $library
 	 */
 	public function library($library) {
-		$class = APP_MODULE.'\\Lib\\'.ucfirst($library);
-		if (class_exists($class)) {
-			$this->set(str_replace('\\', '_', $library), new $class);
-		} else {
-			exit('Error: Could not load library ' . $library . '!');
+		$this->_add($library, APP_MODULE.'\\Lib\\');
+	}
+	
+	/**
+	 * 添加控件
+	 * @param string|array $names 名字
+	 * @param string $pre 前缀
+	 * @param string $after 后缀
+	 * @param string $up 是否大写首字母 默认 true
+	 */
+	private function _add($names, $pre = '', $after = '', $up = true) {
+		if (is_string($names)) {
+			$names = explode(',', $names);
+		}
+		foreach ($names as $key => $value) {
+			$class = $pre. ($up ? ucfirst($value) : $value). $after;
+			if (class_exists($class)) {
+				$this->set(is_numeric($key) ? (str_replace('\\', '_', $value).$after) : $key, new $class);
+			} else {
+				exit('Error: Could not load ' . $class . '!');
+			}
 		}
 	}
 }
