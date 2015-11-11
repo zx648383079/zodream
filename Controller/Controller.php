@@ -9,16 +9,15 @@ namespace App\Controller;
 use App;
 use App\Lib\Lang;
 use App\Lib\Validation;
-use App\Lib\Auth;
 use App\Lib\Loader;
-use App\Lib\Html\HView;
+use App\Lib\Role\RVerify;
 
 class Controller {
 	protected $loader;
 	
 	function __construct($loader = null) {
-		App::$data         = App::config('App');
-		App::$data['lang'] = Lang::$language;
+		App::$response->set('title', App::config('App'));
+		App::$response->set('lang', Lang::$language);
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 	}
 	
@@ -31,48 +30,18 @@ class Controller {
 	}
 	
 	/**
-	* 在执行之前做规则验证
-	*
-	* @param string $func 方法名
-	*/
-	function before($func) {
+	 * 在执行之前做规则验证
+	 * @param string $func 方法名
+	 * @return boolean
+	 */
+	public function before($func) {
 		if (isset($this->rules)) {
+			$func = str_replace(APP_ACTION, '', $func);
 			$role = isset($this->rules['*']) ? $this->rules['*'] : '';
 			$role = isset($this->rules[$func]) ? $this->rules[$func] : $role;
-			
-			if (is_object($role)) {
-				if (!$role()) {
-					App::redirect('/');
-				}
-			} else if (is_string($role)) {
-				switch ($role) {
-					case '?':
-						if (!Auth::guest()) {
-							App::redirect('/');
-						}
-						break;
-					case '1':
-						if (Auth::guest()) {
-							App::redirect('auth');
-						}
-						break;
-					case 'p':
-						if (!App::$request->isPost()) {
-							App::redirect('/', 4, '您不能直接访问此页面！', '400');
-						}
-						break;
-					case '!':
-						App::redirect('/', 4, '您访问的页面暂未开放！', '413');
-						break;
-					default:
-						if (!App::role($role)) {
-							App::redirect('auth', 4, '您无权操作！', '401');
-						}
-						break;
-				}
-			}
-			
+			return RVerify::make($role);
 		}
+		return true;
 	}
 
 	/**
@@ -91,23 +60,14 @@ class Controller {
 		return $result;
 	}
 	
-
 	/**
 	* 传递数据
 	*
 	* @param string|array $key 要传的数组或关键字
 	* @param string $value  要传的值
 	*/
-	function send($key, $value = "") {
-		if (empty($value)) {
-			if (is_array($key)) {
-				App::$data = array_merge(App::$data, $key);
-			} else {
-				App::$data['data'] = $key;	
-			}
-		} else {
-			App::$data[$key] = $value;
-		}
+	function send($key, $value = null) {
+		App::$response->set($key, $value);
 	}
 	
 
@@ -117,39 +77,9 @@ class Controller {
 	* @param string $name 视图的文件名
 	* @param array $data 要传的数据
 	*/
-	function show($name = "index", $data = array()) {
-		if (!empty($data)) {
-			App::$data = array_merge(App::$data, $data);
-		}
+	function show($name = "index", $data = null) {
+		App::$response->show($name, $data);
 		
-		if (APP_API) {
-			$this->ajaxJson(App::$data);
-		} else {
-			ob_start();
-			include(HView::make($name));
-			$content = ob_get_contents();
-			ob_end_clean();
-			$this->showGzip( $content );
-		}
-		
-	} 
-	
-	function showGzip($content) {
-		if (extension_loaded('zlib')) { 
-			if (!headers_sent() && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && 
-				strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== FALSE) { 
-				ob_start('ob_gzhandler'); 
-			} else {
-				ob_start();
-			}
-		} else {
-			ob_start();
-		} 
-		header( 'Content-Type:text/html;charset=utf-8' );
-		ob_implicit_flush(FALSE);
-		echo $content;
-		ob_end_flush();
-		exit;
 	}
 
 	/**
@@ -158,62 +88,8 @@ class Controller {
 	* @param array|string $data 要传的值
 	* @param string $type 返回类型
 	*/
-	function ajaxJson($data, $type = 'JSON')
-	{
-		switch (strtoupper($type)) {
-			case 'JSON' :
-				// 返回JSON数据格式到客户端 包含状态信息
-				header('Content-Type:application/json; charset=utf-8');
-				exit(json_encode($data));
-			case 'XML'  :
-				// 返回xml格式数据
-				header('Content-Type:text/xml; charset=utf-8');
-				exit($this->xml_encode($data));
-			case 'JSONP':
-				// 返回JSON数据格式到客户端 包含状态信息
-				header('Content-Type:application/json; charset=utf-8');
-				$handler = isset($_GET['callback']) ? $_GET['callback'] : 'jsonpReturn';
-				exit($handler.'('.json_encode($data).');');  
-			case 'EVAL' :
-				// 返回可执行的js脚本
-				header('Content-Type:text/html; charset=utf-8');
-				exit($data);            
-		}
-		
-		exit;
-	}
-
-	/**
-	* 数组转XML
-	*
-	* @param array $data 要转的数组
-	* @param string $rootNodeName
-	* @param null $xml
-	* @return mixed
-	*/
-	function xml_encode($data, $rootNodeName = 'data', $xml = null) {
-		// turn off compatibility mode as simple xml throws a wobbly if you don't.
-		if (ini_get('zend.ze1_compatibility_mode') == 1) {
-			ini_set ('zend.ze1_compatibility_mode', 0);
-		}
-		if ($xml == null) {
-			$xml = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><$rootNodeName />");
-		}
-		foreach($data as $key => $value) {
-			if (is_numeric($key)) {
-				$key = "unknownNode_". (string) $key;
-			}
-			$key = preg_replace('/[^a-z]/i', '', $key);
-			if (is_array($value)) {
-				$node = $xml->addChild($key);
-				$this->xml_encode($value, $rootNodeName, $node);
-			} else {
-				$value = htmlentities($value);
-				$xml->addChild($key,$value);
-			}
-
-		}
-		return $xml->asXML();
+	function ajaxJson($data, $type = 'JSON') {
+		App::$response->ajaxJson($data, $type);
 	}
 
 	/**
@@ -222,8 +98,6 @@ class Controller {
 	* @param $img
 	*/
 	function showImg($img) {
-		header('Content-type:image/png');
-		imagepng($img);
-		imagedestroy($img);
+		App::$response->showImg($img);
 	}
 }

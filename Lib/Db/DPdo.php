@@ -136,7 +136,7 @@ class DPdo implements IBase {
         } catch (\PDOException  $ex) {  
             $this->error = $ex->getMessage();
         }  
-        return $this -> result;  
+        return $this->result;  
     } 
     
     /**
@@ -148,5 +148,13 @@ class DPdo implements IBase {
 	 */ 
     public function getError() {
         return $this->error;
+    }
+    
+    public function getObject() {
+    	
+    }
+    
+    public function getArray() {
+    	return $this->result->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

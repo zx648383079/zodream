@@ -1,7 +1,7 @@
 <?php
 namespace App\Lib\Web;
 
-final class Session implements IBase {
+final class Session {
 	public $data = array();
 		
 	public function __construct() {
@@ -13,6 +13,6 @@ final class Session implements IBase {
 			session_start();
 		}
 
-		$this->data =& $_SESSION;
+		$this->data = & $_SESSION;
 	}
 }

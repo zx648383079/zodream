@@ -5,47 +5,9 @@ namespace App\Lib;
  * @author zodream
  *
  */
+use App\Lib\Object\OBase;
 
-final class Loader {
-	private $data = array();
-	
-	/**
-	 * 根据key获取类
-	 * @param unknown $key
-	 */
-	public function get($key) {
-		return (isset($this->data[$key]) ? $this->data[$key] : NULL);
-	}
-	
-	/**
-	 * 添加类
-	 * @param unknown $key
-	 * @param unknown $value
-	 */
-	public function set($key, $value) {
-		if (is_string($value)) {
-			$this->data[$key] = new $value;
-		} else {
-			$this->data[$key] = $value;
-		}
-	}
-	
-	public function __get($key) {
-		return $this->get($key);
-	}
-	
-	public function __set($key, $value) {
-		$this->set($key, $value);
-	}
-	
-	/**
-	 * 判断是否有
-	 * @param unknown $key
-	 */
-	public function has($key) {
-		return isset($this->data[$key]);
-	}
-	
+final class Loader extends OBase {
 	/**
 	 * 添加数据类
 	 * @param unknown $model

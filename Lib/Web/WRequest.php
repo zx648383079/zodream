@@ -4,6 +4,18 @@ namespace App\Lib\Web;
 use App\Lib\Object\OArray;
 
 final class WRequest implements IBase {
+	private static $_instance;
+	/**
+	 * 单例模式
+	 * @return \App\Lib\Web\WResponse
+	 */
+	public static function getInstance() {
+		if (!(self::$_instance instanceof self)) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
 	public $posts;
 	public $gets;
 	public $requests;

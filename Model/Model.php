@@ -4,7 +4,7 @@
 *********************************/
 namespace App\Model;
 
-use App\Lib\Auth;
+use App\Lib\Account;
 use App\Lib\Db\DbFactory;
 use App\Lib\Object\OTime;
 use App\Lib\Object\OArray;
@@ -20,8 +20,8 @@ abstract class Model extends DbFactory {
 	public function fill() {
 		$args = func_num_args() > 1 ? func_get_args() : func_get_arg(0);
 		$assocArray = OArray::combine($this->fillable, $args);
-		if (array_key_exists('user_id', $assocArray) && empty($assocArray['user_id'])) {
-			$assocArray['user_id'] = Auth::user() === FALSE ? 0 : Auth::user()->id;
+		if (array_key_exists('account_id', $assocArray) && empty($assocArray['account_id'])) {
+			$assocArray['account_id'] = Account::user() === FALSE ? 0 : Account::user()->id;
 		}
 		if (array_key_exists('udate', $assocArray) && empty($assocArray['udate'])) {
 			$assocArray['udate'] = OTime::Now();

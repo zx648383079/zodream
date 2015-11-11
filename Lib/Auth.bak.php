@@ -8,7 +8,7 @@ namespace App\Lib;
 use App;
 use App\Model\UserModel;
 
-final class Auth {
+final class Auth.bak {
 	
 	public static $userModel;
 	/**
@@ -22,7 +22,7 @@ final class Auth {
 		$id = App::session('user');
 		if (!empty($id)) {
 			if (empty(self::$userModel)) {
-				$user            = new UserModel();
+				$user = new UserModel();
 				$user -> assignRow('id',$id);
 				self::$userModel = $user;
 			}

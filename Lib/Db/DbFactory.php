@@ -161,7 +161,7 @@ class DbFactory {
      * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */  
-    public function find( $param = array(),$fileld=array()) {
+    public function find($param = array(),$fileld = array()) {
         $limit = $order = $group = $where = $like = '';  
         if (is_array($param) && !empty($param)) {  
             $limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';  
@@ -170,17 +170,17 @@ class DbFactory {
             if (isset($param['where'])) {  
                 foreach ($param['where'] as $key => $value) {  
                     if (empty($where)) {
-                        $where = 'WHERE'.$value;
+                        $where = 'WHERE '.$value;
                     } else {
                         if (is_array($value)) {
                             switch ($value[1]) {
                                 case "or":
-                                    $where .= 'OR'.$value;
+                                    $where .= ' OR '.$value;
                                 case "and":
-                                    $where .= 'AND'.$value;
+                                    $where .= ' AND '.$value;
                             }
                         } else {
-                            $where .= 'AND'.$value;
+                            $where .= ' AND '.$value;
                         }
                     }
                 }  
@@ -188,12 +188,8 @@ class DbFactory {
         }  
         $selectFields = empty($fileld) ? '*' : implode(',', $fileld);  
         $sql    = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";  
-        $stmt   = $this->db->execute($sql);  
-        $result = array();  
-        while (!!$objs = $stmt->fetchObject()) {  
-            $result[] = $objs;  
-        }  
-        return $result;  
+        $this->db->execute($sql);
+        return $this->db->getArray();  
     }  
        
     /**

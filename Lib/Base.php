@@ -9,9 +9,12 @@ namespace App\Lib;
 use App\Lib\Object\OArray;
 use App\Lib\Helper\HUrl;
 use App\Lib\Web\WRequest;
+use App\Lib\Web\WResponse;
 use App\Lib\Role\RComma;
+use App\Lib\Role\RVerify;
 use App\Lib\Html\HScript;
 use App\Lib\Html\HView;
+use App\Lib\Web\WConfig;
 
 ini_set("session.cookie_httponly", 1);
  
@@ -23,34 +26,20 @@ defined("APP_API")    or define('APP_API', isset($_GET['api']) ? TRUE : FALSE); 
 class Base {
 	
 	public static $request;
+	public static $response;
 	
 	public static function main() {
 		set_error_handler(array('app', 'error'));          //自定义错误输出
 		register_shutdown_function(array('app', 'out'));   //程序结束时输出
 		//Lang::setLang();                                 //加载语言包
-		self::$request = new WRequest();
+		self::$request  = WRequest::getInstance();
+		self::$response = WResponse::getInstance();
 		date_default_timezone_set('Etc/GMT-8');            //这里设置了时区
 		Route::load();
 	}
 	
-	private static $_configs;
-	/**
-	* 获取配置文件
-	*
-	* @access globe
-	*
-	* @param string|null $key 要获取的配置名
-	* @param $default 返回默认值
-	* @return array,
-	*/
 	public static function config($key = null, $default = null) {
-		if (empty(self::$_configs)) {
-			self::$_configs = include(APP_DIR.'/config/config.php');
-		}
-		if (!empty($key)) {
-			$configs = OArray::getChild($key, self::$_configs, $default);
-		}
-		return $configs;
+		return WConfig::getInstance()->get($key, $default);
 	}
 
 	/**
@@ -63,11 +52,7 @@ class Base {
 	 * @return string
 	 */
 	public static function role($role) {
-		if (Auth::guest()) {
-			return empty($role);
-		} else {
-			return RComma::judge($role, Auth::user()->role()->roles);
-		}
+		return RVerify::judge($role);
 	}
 	
 	/**
@@ -110,12 +95,7 @@ class Base {
 	* @param string|function $text 默认值.
 	*/
 	public static function ech($name, $text = '') {
-		$result = OArray::getChild($name, self::$data, is_object($text) ? '' : $text);
-		if (is_object($text)) {
-			$text($result);
-		} else {
-			echo OArray::tostring($result);
-		}
+		echo OArray::tostring(self::$response->get($name, $text));
 	}
 	
 	/**
@@ -126,12 +106,7 @@ class Base {
 	* @param string|function $text 默认值.
 	*/
 	public static function ret($name, $text = '') {
-		$result = OArray::getChild($name, self::$data, is_object($text) ? '' : $text);
-		if (is_object($text)) {
-			$text($result);
-		} else {
-			return $result;
-		}
+		return self::$response->get($name, $text);
 	}
 
 	/**
@@ -206,19 +181,16 @@ class Base {
 			}
 		} else {
 			$str    = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-			self::$data['meta'] = $str;
+			self::$response->set('meta', $str);
 		}
-		self::$data['title'] = "出错了！";
-		self::$data['code']  = $code;
-		self::$data['error'] = $msg;
+		self::$response->set(array(
+			'title' => "出错了！",
+			'code'  => $code,
+			'error' => $msg
+		));
 		self::extend('404');
 		exit();
 	}
-	
-	//要传的值
-	public static $data;
-	//额外的值
-	public static $extra;
 	/**
 	* 包含文件
 	*
@@ -226,18 +198,11 @@ class Base {
 	*
 	* @param string $names 路径加文件名
 	* @param string|null $param 要传的额外的值
-	* @param string|null $replace 额外值是否替换
+	* @param boolean $replace 额外值是否替换
 	* @,
 	*/
-	public static function extend($names, $param = null, $replace = null) {
-		if ($replace == '+') {
-			self::$extra[] = $param;
-		} else {
-			self::$extra = $param;
-		}
-		foreach (OArray::to( $names , '.') as $value) {
-			include(HView::make($value));
-		}
+	public static function extend($names, $param = null, $replace = TRUE) {
+		self::$response->extend($names, $param, $replace);
 	}
 
 
@@ -274,9 +239,9 @@ class Base {
 	public static function error($errno, $errstr, $errfile, $errline) {
 		header( 'Content-Type:text/html;charset=utf-8' );
 		if (defined('DEBUG') && DEBUG) {
-			self::$data['error'] = '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！';
+			self::$response->set('error', '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！');
 		} else {
-			self::$data['error'] = '出错了！';
+			self::$response->set('error', '出错了！');
 		}
 		self::extend('404');
 		die();
