@@ -70,6 +70,9 @@ class Controller {
 		App::$response->set($key, $value);
 	}
 	
+	function component($name = 'index', $data = null) {
+		return App::$response->component($name, $data);
+	}
 
 	/**
 	* 加载视图
@@ -79,7 +82,6 @@ class Controller {
 	*/
 	function show($name = "index", $data = null) {
 		App::$response->show($name, $data);
-		
 	}
 
 	/**

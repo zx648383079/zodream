@@ -28,7 +28,7 @@ class RVerify {
 					return false;
 				}
 				break;
-			case '1':
+			case '@':
 				if (Account::guest()) {
 					App::redirect('account');
 					return false;

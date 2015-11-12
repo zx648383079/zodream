@@ -42,6 +42,29 @@ final class WResponse extends OBase {
 		}
 	}
 	
+	private $_components;
+	
+	/**
+	 * 按部件加载视图
+	 * @param string $name
+	 * @param string $data
+	 */
+	public function component($name = 'index', $data = null) {
+		extract($data);
+		ob_start();
+		include(HView::make($name));
+		$this->_components .= ob_get_contents();
+		ob_end_clean();
+		return $this;
+	}
+	
+	/**
+	 * 结束并释放视图
+	 */
+	public function render() {
+		$this->showGzip($this->_components);
+	}
+	
 	/**
 	 * 加载视图
 	 *
