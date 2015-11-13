@@ -1,8 +1,11 @@
 <?php
 namespace App\Lib\Db;
 
+use App\Lib\Helper\HSql;
+
 class DbFactory {
     protected $db = null;
+    
     public function __construct() {
         $this->db = DPdo::getInstance();
         if (isset($this->table)) {
@@ -28,8 +31,7 @@ class DbFactory {
         $addFields = implode('`,`', $addFields);  
         $addValues = implode("','", $addValues);  
         $sql       = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";  
-        $this->db->execute($sql);
-        return $this->db->lastInsertId();  
+        return $this->db->insert($sql);  
     }  
        
     /**
@@ -60,7 +62,7 @@ class DbFactory {
         }  
         $setData = substr($setData, 0, -1);  
         $sql     = "UPDATE {$this->table} SET $setData $where";  
-        return $this->db->execute($sql)->rowCount();  
+        return $this->db->update($sql);  
     }  
      
     /**
@@ -73,7 +75,7 @@ class DbFactory {
 	public function updateBool($filed, $where) {
 		$sql =  "UPDATE {$this->table} SET {$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END WHERE ";
 		$sql .= $where;
-		return $this->db->execute($sql)->rowCount();
+		return $this->db->update($sql);
 	}
     
     /**
@@ -89,16 +91,16 @@ class DbFactory {
             $num = '+'.$num;
         }
 		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} {$num} WHERE $where";
-		return $this->db->execute($sql)->rowCount();
+		return $this->db->update($sql);
 	}
       
     /**
-	 * 验证一条数据
+	 * 查询一条数据
 	 *
 	 * @access public
 	 *
 	 * @param array $param 条件
-	 * @return string|bool 返回id,
+	 * @return array,
 	 */
     public function findOne($param , $filed = '*') {
         $where = '';  
@@ -111,22 +113,20 @@ class DbFactory {
             $where = 'WHERE '.$param;
         }
         $sql    = "SELECT {$filed} FROM {$this->table} {$where} LIMIT 1";  
-        $result = $this->db->execute($sql);
-        if ($result->rowCount() > 0) {
-            return $result->fetchObject();
-        } else {
-            return false;
-        } 
+        $result = $this->db->select($sql);
+        return array_shift($result);
     }  
     
     /**
      * 根据id 查找值
      * @param unknown $id
      * @param string $filed
+     * @return array
      */
 	public function findById($id, $filed = '*') {
 		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
-		return $this->db->execute($sql)->fetchObject();
+		$result = $this->db->execute($sql);
+		return array_shift($result);
 	}
        
     /**
@@ -149,7 +149,7 @@ class DbFactory {
             $where = 'WHERE '.$param;
         }
         $sql = "DELETE FROM {$this->table} $where";
-        return $this->db->execute($sql)->rowCount();  
+        return $this->db->delete($sql);  
     }  
        
     /**
@@ -189,7 +189,7 @@ class DbFactory {
         $selectFields = empty($fileld) ? '*' : implode(',', $fileld);  
         $sql    = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";  
         $this->db->execute($sql);
-        return $this->db->getArray();  
+        return $this->db->select($sql);  
     }  
        
     /**
@@ -211,8 +211,8 @@ class DbFactory {
             $where = 'WHERE '.$param;
         } 
         $sql  = "SELECT COUNT(*) as count FROM {$this->table} $where";  
-        $stmt = $this->db->execute($sql);  
-        return $stmt->fetchObject()->count;  
+        $result = $this->db->select($sql);  
+        return $result[0]['count'];  
     }  
        
     /**
@@ -229,12 +229,32 @@ class DbFactory {
     } 
     
     /**
-     * 根据插件
-     * @param array $param
-     * @param boolean $islist
-     */
-    public function findByHelper($param, $islist = TRUE) {
-        return $this->db->findByHelper($param, $islist);
+	 * 执行SQL语句
+	 *
+	 * @access public
+	 *
+     * @param array $param 条件
+     * @param bool $isList 返回类型
+	 * @return array 返回查询结果,
+	 */ 
+    public function findByHelper($param, $isList = TRUE) {
+        $result = array();
+        if (!empty($param)) {
+            $sql  = new HSql($this->prefix);
+            $stmt = $this->execute($sql->getSQL($param));            //获取SQL语句
+            while (!!$objs = $stmt->fetchObject()) {  
+                if ($isList) {
+                    $list = array();
+                    foreach ($objs as $key => $value) {
+                        $list[$key] = $value;
+                    }
+                    $result[] = $list;
+                } else {
+                   $result[] = $objs;   
+                }
+            }
+        }
+        return $result;
     }
     
     /**

@@ -6,13 +6,30 @@ namespace App\Lib\Db;
 */
 
 interface IBase {
+	
 	/**
-	* 查询一条数据
-	*
-	* @param array|string $param 语句数组
-	* @param array|string $where 返回类型
-	*/
-	function findByHelper($param, $kind);	
+	 * 查询
+	 * @param unknown $sql
+	 */
+	function select($sql);
+	
+	/**
+	 * 插入
+	 * @param unknown $sql
+	 */
+	function insert($sql);
+	
+	/**
+	 * 修改
+	 * @param unknown $sql
+	 */
+	function update($sql);
+	
+	/**
+	 * 删除
+	 * @param unknown $sql
+	 */
+	function delete($sql);
 
 	/**
 	* 执行数据库语句
@@ -26,4 +43,14 @@ interface IBase {
 	*
 	*/
 	function getError();
+	
+	/**
+	 * 获取结果集的Object
+	 */
+	function getObject($sql);
+	
+	/**
+	 * 获取结果集的关联数组
+	 */
+	function getArray($sql);
 }

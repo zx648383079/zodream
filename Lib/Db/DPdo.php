@@ -8,16 +8,14 @@ class DPdo implements IBase {
 	//pdo对象  
     protected $pdo             = null;  
     //用于存放实例化的对象  
-    static protected $instance = null;  
-    //存放表名前缀
+    protected static $instance = null;
+    
     public $prefix             = null;
     
     //存放当前操作的错误信息
     protected $error           = null;
     
     protected $result;
-    
-    
        
     /**
      * 公共静态方法获取实例化的对象 
@@ -39,7 +37,7 @@ class DPdo implements IBase {
      *
      * @internal param array|string $config_path 数据库的配置信息.
      */
-    public function __construct() {  
+    private function __construct() {  
 		$config       = App::config('mysql');
         $host         = $config['host'];
 	    $user         = $config['user'];
@@ -62,35 +60,43 @@ class DPdo implements IBase {
             $this->error = $ex->getMessage();
             return false;
         }  
-    }  
+    } 
     
     /**
-	 * 执行SQL语句
-	 *
-	 * @access public
-	 *
-     * @param array $param 条件
-     * @param bool $isList 返回类型
-	 * @return array 返回查询结果,
-	 */ 
-    public function findByHelper($param, $isList = TRUE) {
-        $result = array();
-        if (!empty($param)) {
-            $sql  = new HSql($this->prefix);
-            $stmt = $this->execute($sql->getSQL($param));            //获取SQL语句
-            while (!!$objs = $stmt->fetchObject()) {  
-                if ($isList) {
-                    $list = array();
-                    foreach ($objs as $key => $value) {
-                        $list[$key] = $value;
-                    }
-                    $result[] = $list;
-                } else {
-                   $result[] = $objs;   
-                }
-            }
-        }
-        return $result;
+     * 查询
+     * @param string $sql
+     * @return array
+     */
+    public function select($sql) {
+    	return $this->getArray($sql);
+    }
+    
+    /**
+     * 插入
+     * @param string $sql
+     * @return integer id
+    */
+    public function insert($sql) {
+    	$this->execute($sql);
+    	return $this->lastInsertId();
+    }
+    
+    /**
+     * 修改
+     * @param string $sql
+     * @return integer 改变的行数
+    */
+    public function update($sql){
+    	return $this->execute($sql)->rowCount();
+    }
+    
+    /**
+     * 删除
+     * @param string $sql
+     * @return integer 删除的行数
+    */
+    public function delete($sql) {
+    	return $this->execute($sql)->rowCount();
     }
     
     /**
@@ -127,7 +133,10 @@ class DPdo implements IBase {
      * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */ 
-    public function execute($sql = null) {  
+    public function execute($sql = null) {
+    	if (empty($sql)) {
+    		return;
+    	}
         try {  
             if (!empty($sql)) {
                 $this->result = $this->pdo->prepare($sql);  
@@ -150,11 +159,26 @@ class DPdo implements IBase {
         return $this->error;
     }
     
-    public function getObject() {
-    	
+    /**
+     * 获取Object结果集
+     * @param string $sql
+     * @return multitype:mixed
+     */
+    public function getObject($sql = null) {
+    	$this->execute($sql);
+    	$result = array();
+    	while (!!$objs = $this->result->fetchObject()) {
+    		$result[] = $objs;
+    	}
+    	return $result;
     }
     
-    public function getArray() {
+    /**
+     * 获取关联数组
+     * @param string $sql
+     */
+    public function getArray($sql = null) {
+    	$this->execute($sql);
     	return $this->result->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
