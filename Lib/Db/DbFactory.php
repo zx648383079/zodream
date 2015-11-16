@@ -121,7 +121,7 @@ class DbFactory {
      * 根据id 查找值
      * @param unknown $id
      * @param string $filed
-     * @return array
+     * @return array 
      */
 	public function findById($id, $filed = '*') {
 		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
@@ -151,6 +151,10 @@ class DbFactory {
         $sql = "DELETE FROM {$this->table} $where";
         return $this->db->delete($sql);  
     }  
+    
+    public function deleteById($id) {
+    	return $this->delete('id = '.$id);
+    }
        
     /**
 	 * 查询数据
@@ -241,7 +245,7 @@ class DbFactory {
         $result = array();
         if (!empty($param)) {
             $sql  = new HSql($this->prefix);
-            $stmt = $this->execute($sql->getSQL($param));            //获取SQL语句
+            $stmt = $this->db->execute($sql->getSQL($param));            //获取SQL语句
             while (!!$objs = $stmt->fetchObject()) {  
                 if ($isList) {
                     $list = array();

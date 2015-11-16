@@ -27,7 +27,7 @@ class TempletModel extends Model {
 	}
 	
 	public function deleteById($id) {
-		return $this->delete('id = '.$id);
+		return parent::deleteById($id);
 	}
 	
 	/**
