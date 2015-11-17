@@ -16,7 +16,7 @@ class Controller {
 	protected $loader;
 	
 	function __construct($loader = null) {
-		App::$response->set('title', App::config('App'));
+		App::$response->set('title', App::config('App.title'));
 		App::$response->set('lang', Lang::$language);
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 	}
@@ -41,7 +41,10 @@ class Controller {
 			$role = isset($this->rules[$func]) ? $this->rules[$func] : $role;
 			return RVerify::make($role);
 		}
-		return true;
+		if (method_exists($this, '_initialize')) {
+			$this->_initialize();
+		}
+		return TRUE;
 	}
 
 	/**
@@ -51,7 +54,7 @@ class Controller {
 	* @param array $param 验证的规则
 	* @return array
 	*/
-	function validata( $request, $param) {
+	protected function validata( $request, $param) {
 		$vali   = new Validation();
 		$result = $vali->make($request, $param);
 		if (!$result) {
@@ -66,11 +69,11 @@ class Controller {
 	* @param string|array $key 要传的数组或关键字
 	* @param string $value  要传的值
 	*/
-	function send($key, $value = null) {
+	protected function send($key, $value = null) {
 		App::$response->set($key, $value);
 	}
 	
-	function component($name = 'index', $data = null) {
+	protected function component($name = 'index', $data = null) {
 		return App::$response->component($name, $data);
 	}
 
@@ -80,7 +83,7 @@ class Controller {
 	* @param string $name 视图的文件名
 	* @param array $data 要传的数据
 	*/
-	function show($name = "index", $data = null) {
+	protected function show($name = "index", $data = null) {
 		App::$response->show($name, $data);
 	}
 
@@ -90,7 +93,7 @@ class Controller {
 	* @param array|string $data 要传的值
 	* @param string $type 返回类型
 	*/
-	function ajaxJson($data, $type = 'JSON') {
+	protected function ajaxJson($data, $type = 'JSON') {
 		App::$response->ajaxJson($data, $type);
 	}
 
@@ -99,7 +102,7 @@ class Controller {
 	*
 	* @param $img
 	*/
-	function showImg($img) {
+	protected function showImg($img) {
 		App::$response->showImg($img);
 	}
 }

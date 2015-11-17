@@ -12,13 +12,13 @@ class HScript implements IBase {
 					$arr = explode('.', $file);
 					switch (end($arr)) {
 						case 'js':
-							$result = '<script src="'.HUrl::to('asset/js/'.$file).'"></script>';
+							$result = '<script src="'.HUrl::file('asset/js/'.$file).'"></script>';
 							break;
 						case 'css':
-							$result = '<link rel="stylesheet" type="text/css" href="'.HUrl::to('asset/css/'.$file).'"/>';
+							$result = '<link rel="stylesheet" type="text/css" href="'.HUrl::file('asset/css/'.$file).'"/>';
 							break;
 						default:
-							$result = '<script src="'.HUrl::to('asset/js/'.$file).'.js"></script>';
+							$result = '<script src="'.HUrl::file('asset/js/'.$file).'.js"></script>';
 							break;
 					}
 					echo $result;

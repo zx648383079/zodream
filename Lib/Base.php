@@ -73,6 +73,15 @@ class Base {
 			return $url;
 		}
 	}	
+	
+	public static function file($file, $echo = TRUE) {
+		$url = HUrl::file($file);
+		if ($echo) {
+			echo $url;
+		} else {
+			return $url;
+		}
+	}
 
 	/**
 	* 主要是加载 js、css 文件

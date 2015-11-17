@@ -17,15 +17,13 @@ class HUrl implements IBase {
 	
 	/**
 	 * 产生完整的网址
-	 *
-	 * @access globe
-	 *
-	 * @param string $file 本站链接
-	 * @param bool $extra 是否输出
-	 *
+	 * @param string $file 
+	 * @param string $extra
+	 * @param string $secret
+	 * @param string $mode 是哪种模式 ，文件用null
 	 * @return string
 	 */
-	public static function to($file = null, $extra = null, $secret = FALSE) {
+	public static function to($file = null, $extra = null, $secret = FALSE, $mode = APP_MODE) {
 		if (strstr($file, '://')) {
 			return $file;
 		}
@@ -33,7 +31,7 @@ class HUrl implements IBase {
 			$file = self::request_uri();
 		}
 		$url = rtrim(APP_URL,'/'). '/';
-		switch (APP_MODE) {
+		switch ($mode) {
 			case 1:
 				if (strstr('r=', $file)) {
 					$url .= ltrim($file, '/');
@@ -42,7 +40,7 @@ class HUrl implements IBase {
 				}
 				break;
 			case 2:
-				$url .= (strstr('.php', $file) ? '' : 'index.php/'). ltrim($file, '/');
+				$url .= (!empty($file) && strstr('.php', $file) ? '' : lcfirst(APP_MODULE).'.php/'). ltrim($file, '/');
 				break;
 			default:
 				$url .= ltrim($file, '/');
@@ -60,6 +58,15 @@ class HUrl implements IBase {
 			$url = self::setValue($url, $extra);
 		}
 		return $url;
+	}
+	
+	/**
+	 * 文件路径
+	 * @param unknown $file
+	 * @return string
+	 */
+	public static function file($file) {
+		return self::to($file, null, false, null);
 	}
 	
 	/**

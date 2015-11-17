@@ -17,6 +17,8 @@ defined('APP_MODEL')       or define('APP_MODEL', Base::config('app.model', 'Mod
 defined('APP_ACTION')      or define('APP_ACTION', Base::config('app.action', 'Action'));
 
 final class Route {
+	
+	public static $route;
 	/**
 	 * 加载控制器和视图
 	 *
@@ -65,6 +67,11 @@ final class Route {
 			$controller = new $controller();
 			if (method_exists($controller, $action. APP_ACTION)) {
 				$controller -> before($action);
+				self::$route = array(
+					'controller' => $controllers,
+					'action'     => $action,
+					'value'      => $values
+				);
 				call_user_func_array( array($controller, $action. APP_ACTION), $values);
 				return true;
 			}
