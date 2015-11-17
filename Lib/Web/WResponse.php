@@ -38,7 +38,13 @@ final class WResponse extends OBase {
 		}
 		$this->set('_extra', $param);
 		foreach (OArray::to($names, '.') as $value) {
-			include(HView::make($value));
+			$file = HView::make($value);
+			if (file_exists($file)) {
+				include($file);
+			} else {
+				echo $file,' 不存在！';
+				var_dump($this->get());
+			}
 		}
 	}
 	

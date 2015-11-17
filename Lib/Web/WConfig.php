@@ -18,6 +18,9 @@ class WConfig extends OBase {
 	}
 	
 	private function __construct() {
-		$this->_data = include(APP_DIR.'/config/config.php');
+		$file = APP_DIR.'/config/config.php';
+		if (file_exists($file)) {
+			$this->_data = include($file);
+		}
 	}
 }
