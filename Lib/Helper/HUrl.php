@@ -25,7 +25,7 @@ class HUrl implements IBase {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null, $secret = FALSE, $mode = APP_MODE) {
-		if (strstr($file, '://')) {
+		if (strstr($file, '//')) {
 			return $file;
 		}
 		if ($file === null) {
