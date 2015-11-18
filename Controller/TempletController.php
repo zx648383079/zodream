@@ -13,41 +13,41 @@ class TempletController extends Controller {
 	);
 	
 	function indexAction($limit) {
-		$templet = new TempletModel();
-		$this->show('', array(
-			'templets' => $templet->findLimit($limit)
+		$model = new TempletModel();
+		$this->show('templet.index', array(
+			'data' => $model->findLimit($limit)
 		));
 	}
 	
 	function addAction() {
-		$templet = new TempletModel();
+		$model = new TempletModel();
 		if (App::$request->isPost()) {
-			$templet->fill(App::$request->post());
+			$model->fill(App::$request->post());
 		}
-		$this->show('', array());
+		$this->show('templet.add', array());
 	}
 	
 	function editAction($id) {
-		$templet = new TempletModel();
+		$model = new TempletModel();
 		if (App::$request->isPost()) {
-			$templet->updateById(App::$request->post(), $id);
+			$model->updateById(App::$request->post(), $id);
 		}
 		
-		$this->show('', array(
-				'templet' => $templet->findById($id)
+		$this->show('templet.add', array(
+			'data' => $model->findById($id)
 		));
 	}
 	
 	function deleteAction($id) {
-		$templet = new TempletModel();
-		$templet->deleteById($id);
+		$model = new TempletModel();
+		$model->deleteById($id);
 		App::redirect(HUrl::referer());
 	}
 	
 	function ViewAction($id) {
-		$templet = new TempletModel();
-		$this->show('', array(
-			'templet' => $templet->findById($id)
+		$model = new TempletModel();
+		$this->show('templet.view', array(
+			'data' => $model->findById($id)
 		));
 	}
 }

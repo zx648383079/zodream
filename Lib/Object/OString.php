@@ -24,6 +24,16 @@ class OString implements IBase {
 		return $arr;
 	}
 	
+	/**
+	 * 首字符替换
+	 * @param unknown $search
+	 * @param unknown $arg
+	 * @param string $relace
+	 */
+	public static function fReplace($arg, $search, $relace = null) {
+		return preg_replace('/^'.$search.'/', $relace, $arg, 1);
+	}
+	
 	public static function abslength($str) {
 		if (empty($str)) {
 			return 0;

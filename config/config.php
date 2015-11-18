@@ -1,5 +1,6 @@
 <?php
-	/****************************************************
+	use App\Lib\Enum\ERoute;
+/****************************************************
 	*配置文件
 	*
 	*
@@ -9,7 +10,7 @@
 		'app'    => array(                           //网站信息
 			'title'      => 'ZoDream',
 			'host'       => 'http://localhost/',        //主目录
-			'url'        => 0,                            //URL解析方式
+			'url'        => ERoute::COMMON,                            //URL解析方式
 			'model'      => 'Model',                     //后缀
 			'controller' => 'Controller',
 			'action'     => 'Action',

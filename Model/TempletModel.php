@@ -2,13 +2,9 @@
 namespace App\Model;
 
 class TempletModel extends Model {
-	protected $table = "templet";
+	protected $table = 'templet';
 	
-	protected $fillable = array (
-		'title',
-		'udate',
-		'cdate'
-	);
+	protected $fillable = array ();
 	
 	/**
 	 * 

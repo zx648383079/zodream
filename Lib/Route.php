@@ -9,6 +9,7 @@ namespace App\Lib;
 use App\Lib\Helper\HUrl;
 use App\Lib\Object\OString;
 use App\Lib\Object\OArray;
+use App\Lib\Enum\ERoute;
 
 defined("APP_URL")         or define('APP_URL', Base::config('app.host'));
 defined('APP_MODE')        or define('APP_MODE', Base::config('app.mode'));
@@ -90,25 +91,25 @@ final class Route {
 		}
 		
 		switch (APP_MODE) {
-			case 0:
+			case ERoute::COMMON:
 				return $url -> c();
 				break;
-			case 1:
+			case ERoute::R:
 				return $url -> r();
 				break;
-			case 2:
+			case ERoute::PHP:
 				return $url -> u();
 				break;
-			case 3:
+			case ERoute::SHORT:
 				return $url -> s();
 				break;
-			case 4:
+			case ERoute::GRACE:
 				return $url -> y();
 				break;
-			case 5:
+			case ERoute::REGEX:
 				return $url -> p();
 				break;
-			case 6:
+			case ERoute::CONFIG:
 			    return $url -> d();
 			    break;
 			default:

@@ -2,6 +2,7 @@
 namespace App\Lib\Helper;
 
 
+use App\Lib\Enum\ERoute;
 class HUrl implements IBase {
 	/**
 	 * 上个页面网址
@@ -32,14 +33,14 @@ class HUrl implements IBase {
 		}
 		$url = rtrim(APP_URL,'/'). '/';
 		switch ($mode) {
-			case 1:
+			case ERoute::R:
 				if (strstr('r=', $file)) {
 					$url .= ltrim($file, '/');
 				} else {
 					$url .= '?r='. $file;
 				}
 				break;
-			case 2:
+			case ERoute::PHP:
 				$url .= (!empty($file) && strstr('.php', $file) ? '' : lcfirst(APP_MODULE).'.php/'). ltrim($file, '/');
 				break;
 			default:
