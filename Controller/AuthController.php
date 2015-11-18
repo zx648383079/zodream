@@ -8,7 +8,7 @@ use App\Lib\Object\OArray;
 class AuthController extends Controller {
 	
 	protected $rules = array (
-		'logout'   => '1',
+		'logout'   => '@',
 		'register' => '?',
 		'*'        => '?'
 	);
@@ -25,7 +25,7 @@ class AuthController extends Controller {
 			if (is_bool($error)) {
 				$user   = new UserModel();
 				$result = $user->findByUser($post);
-				if (!is_bool($result)) {
+				if ($result > 0) {
 					App::session('user', $result);
 					if (App::$request->post('remember') == 1) {
 						App::cookie('token', $user->setToken($result), time() + 315360000);
@@ -74,10 +74,10 @@ class AuthController extends Controller {
 	*/
 	function registerAction() {
 		if (App::$request->isPost()) {
-			$post  = App::$request->post('name,email,pwd');
+			$post  = App::$request->post('name,email,pwd,cpwd');
 			$error = $this->validata($post, array(
 				'name'  => 'required',
-				'email' =>'unique:users|email|required',
+				'email' => 'unique:users|email|required',
 				'pwd'   => 'confirm:cpwd|min:6|required'
 			));
 			if (!is_bool($error)) {
@@ -85,8 +85,9 @@ class AuthController extends Controller {
 					'error' => $error
 				));
 			} else {
+				unset($post['cpwd']);
 				$user = new UserModel();
-				$id   = $user -> fillWeb($post);
+				$id   = $user->fillWeb($post);
 				App::session('user', $id);
 				App::redirect('/');
 			}

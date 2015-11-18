@@ -125,7 +125,7 @@ class DbFactory {
      */
 	public function findById($id, $filed = '*') {
 		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
-		$result = $this->db->execute($sql);
+		$result = $this->db->select($sql);
 		return array_shift($result);
 	}
        
@@ -215,7 +215,7 @@ class DbFactory {
             $where = 'WHERE '.$param;
         } 
         $sql  = "SELECT COUNT(*) as count FROM {$this->table} $where";  
-        $result = $this->db->select($sql);  
+        $result = $this->db->select($sql);
         return $result[0]['count'];  
     }  
        
@@ -244,7 +244,7 @@ class DbFactory {
     public function findByHelper($param, $isList = TRUE) {
         $result = array();
         if (!empty($param)) {
-            $sql  = new HSql($this->prefix);
+            $sql  = new HSql($this->db->prefix);
             $stmt = $this->db->execute($sql->getSQL($param));            //获取SQL语句
             while (!!$objs = $stmt->fetchObject()) {  
                 if ($isList) {
