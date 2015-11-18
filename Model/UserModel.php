@@ -30,6 +30,7 @@ class UserModel extends Model {
 	从网页注册
 	*/
 	public function fillWeb($data) {
+		$data['pwd']   = md5($data['pwd']);
 		$data['udate'] = $data['cdate'] = OTime::Now();
 		return $this->add($data);
 	}
@@ -40,10 +41,7 @@ class UserModel extends Model {
 	
 	public function findByToken($token) {
 		$result = $this->findOne(array("token = '{$token}'"));
-		if (is_object($result)) {
-			$result = $result->id;
-		}
-		return $result;
+		return $result['id'];
 	}
 	
 	public function setToken($id) {
@@ -57,11 +55,9 @@ class UserModel extends Model {
 	}
 	
 	public function findByUser($data) {
-		$result = $this->findOne(array("email = '{$data['email']}'", "pwd = '{$data['pwd']}'"));
-		if (is_object($result)) {
-			$result = $result->id;
-		}
-		return $result;
+		$pwd = md5($data['pwd']);
+		$result = $this->findOne(array("email = '{$data['email']}'", "pwd = '{$pwd}'"));
+		return $result['id'];
 	}
 	
 	public function findWithRoles($where, $field) {
