@@ -42,7 +42,7 @@ abstract class Model extends DbFactory {
 		if (in_array('udate', $this->fillable)) {
 			$assocArray['udate'] = OTime::Now();
 		}
-		$this->update($assocArray, 'id = '.$id);
+		return $this->update($assocArray, 'id = '.$id);
 	}
 	
 	
