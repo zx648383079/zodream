@@ -2,7 +2,7 @@
 namespace App\Lib\Role;
 
 use App;
-use App\Lib\Account;
+use App\Lib\Auth;
 
 class RVerify {
 	public static function make($role) {
@@ -23,14 +23,14 @@ class RVerify {
 	private static function _verify($role) {
 		switch ($role) {
 			case '?':
-				if (!Account::guest()) {
+				if (!Auth::guest()) {
 					App::redirect('/');
 					return false;
 				}
 				break;
 			case '@':
-				if (Account::guest()) {
-					App::redirect('account');
+				if (Auth::guest()) {
+					App::redirect('c=auth');
 					return false;
 				}
 				break;
@@ -46,7 +46,7 @@ class RVerify {
 				break;
 			default:
 				if (!self::judge($role)) {
-					App::redirect('account', 4, '您无权操作！', '401');
+					App::redirect('/', 4, '您无权操作！', '401');
 					return false;
 				}
 				break;
@@ -59,10 +59,10 @@ class RVerify {
 	 * @param string $role 权限
 	 */
 	public static function judge($role) {
-		if (Account::guest()) {
+		if (Auth::guest()) {
 			return empty($role);
 		} else {
-			return RComma::judge($role, Account::user()->role()->roles);
+			return RComma::judge($role, Auth::user()->role()->roles);
 		}
 	}
 }
