@@ -10,7 +10,7 @@
 		'app'    => array(                           //网站信息
 			'title'      => 'ZoDream',
 			'host'       => 'http://localhost/',        //主目录
-			'url'        => ERoute::COMMON,                            //URL解析方式
+			'mode'        => ERoute::COMMON,                            //URL解析方式
 			'model'      => 'Model',                     //后缀
 			'controller' => 'Controller',
 			'action'     => 'Action',

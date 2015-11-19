@@ -87,9 +87,8 @@ final class Route {
 	private static function get() {
 		$url = new Route();
 		if (!empty(Base::$request) && Base::$request->isCli()) {
-			return $url->cli();	
+			//return $url->cli();	
 		}
-		
 		switch (APP_MODE) {
 			case ERoute::COMMON:
 				return $url -> c();

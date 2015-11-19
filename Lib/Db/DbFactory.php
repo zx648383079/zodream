@@ -99,7 +99,7 @@ class DbFactory {
 	 *
 	 * @access public
 	 *
-	 * @param array $param 条件
+	 * @param array|string $param 条件
 	 * @return array,
 	 */
     public function findOne($param , $filed = '*') {
