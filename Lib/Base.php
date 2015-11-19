@@ -272,9 +272,9 @@ class Base {
 		} else {
 			$log = $logs;
 		}
-		$logFile = date('Y-m-d').'.txt';
+		$logFile = dirname(APP_DIR).'/log/'.date('Y-m-d').'.txt';
 		$log     = date('Y-m-d H:i:s').' >>> '.$log."\r\n";
-		file_put_contents($logFile,$log, FILE_APPEND );
+		file_put_contents($logFile, $log, FILE_APPEND );
 	}
 
 }
