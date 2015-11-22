@@ -32,6 +32,9 @@ class HUrl implements IBase {
 			$file = self::request_uri();
 		}
 		$url = rtrim(APP_URL,'/'). '/';
+		if ($file === '' || $file === '/') {
+			return $url;
+		}
 		switch ($mode) {
 			case ERoute::R:
 				if (strstr('r=', $file)) {

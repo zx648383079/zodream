@@ -36,6 +36,9 @@ final class Route {
 		if(self::call_func($controllers, $action, $values)) {
 			return ;
 		}
+		if ($action == 'index' && count($controllers) == 1 && self::call_func(array('Home'), strtolower($controllers[0]), $values)) {
+			return ;
+		}
 		$tem = $controllers;
 		$tem[] = $action;
 		if(self::call_func($tem, 'index', $values)) {

@@ -271,7 +271,7 @@ class Base {
 			$str = '出错了！';
 		}
 		self::$response->set('error', $str);
-		self::extend('404');
+		self::$response->show('404');
 		die();
 	}
 	
