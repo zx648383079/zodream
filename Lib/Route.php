@@ -30,7 +30,7 @@ final class Route {
 	public static function load() {
 		$routes      = self::get();
 		$controllers = $routes['controller'];
-		$action      = $routes['function'];
+		$action      = $routes['action'];
 		$values      = isset($routes['value']) ? $routes['value'] : array();
 		unset($routes);
 		if(self::call_func($controllers, $action, $values)) {
@@ -57,7 +57,7 @@ final class Route {
 		if (self::call_func($controllers, $action, $values)) {
 			return ;
 		}
-		Base::error(0, $name.$routes['function'], __FILE__ ,__LINE__);
+		Base::error(0, $name.$routes['action'], __FILE__ ,__LINE__);
 		return;
 		
 	}
@@ -156,7 +156,7 @@ final class Route {
 		$values = explode('/', Base::$request->get('v' , 'index'));
 		$routes = array(
 			'controller' => OArray::ucFirst(explode('/', Base::$request->get('c' , 'home'))),
-			'function'   => array_shift($values),
+			'action'   => array_shift($values),
 			'value'      => $values
 		);
 		return $routes;
@@ -269,9 +269,33 @@ final class Route {
 				break;
 		}
 	    return array(
-		    'function'   => array_pop($routes),
+		    'action'   => array_pop($routes),
 		    'controller' => OArray::ucFirst($routes),
 	        'value'      => $values
 		);
+	}
+	
+	/**
+	 * 判断当前网址是否是url
+	 * @param string $url
+	 * @return boolean
+	 */
+	public static function judge($url = null) {
+		$route = implode('/', self::$route['controller']);
+		if ($url === $route) {
+			return true;
+		}
+		$route .= '/'. self::$route['action'];
+		if (empty($url) || $url == '/') {
+			return $route == 'Home/index';
+		}
+		if ($url === $route) {
+			return true;
+		}
+		$route .= '/'. implode('/', self::$route['value']);
+		if ($url === $route) {
+			return true;
+		}
+		return false;
 	}
 }

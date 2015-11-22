@@ -72,7 +72,25 @@ class Base {
 		} else {
 			return $url;
 		}
-	}	
+	}
+	
+	/**
+	 * 判断是否是url
+	 * @param string $url
+	 * @param string $isTrue 是url且不为null是输出
+	 * @param string $isFalse 不是url且不为null是输出
+	 * @return unknown
+	 */
+	public static function isUrl($url = null, $isTrue = null, $isFalse = null) {
+		$isUrl = Route::judge($url);
+		if ($isTrue === null && $isFalse === null) {
+			return $isUrl;
+		} else if($isUrl) {
+			echo $isTrue;
+		} else {
+			echo $isFalse;
+		}
+	}
 	
 	public static function file($file, $echo = TRUE) {
 		$url = HUrl::file($file);
