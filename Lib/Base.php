@@ -30,7 +30,7 @@ class Base {
 	
 	public static function main() {
 		set_error_handler(array('app', 'error'));          //自定义错误输出
-		register_shutdown_function(array('app', 'out'));   //程序结束时输出
+		//register_shutdown_function(array('app', 'out'));   //程序结束时输出
 		//Lang::setLang();                                 //加载语言包
 		self::$request  = WRequest::getInstance();
 		self::$response = WResponse::getInstance();
@@ -237,8 +237,8 @@ class Base {
 	 * @param array|string $info 调试的信息
      */
 	public static function out($info = null) {
+		$error = error_get_last();
 		if (defined('DEBUG') && DEBUG) {
-			$error = error_get_last();
 			if (!empty($error) || !empty($info)) {
 				if (!empty($error) || !empty($info)) {
 					header( 'Content-Type:text/html;charset=utf-8' );
@@ -265,11 +265,12 @@ class Base {
 	 */
 	public static function error($errno, $errstr, $errfile, $errline) {
 		header( 'Content-Type:text/html;charset=utf-8' );
-		if (defined('DEBUG') && DEBUG) {
-			self::$response->set('error', '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！');
-		} else {
-			self::$response->set('error', '出错了！');
+		$str = '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！';
+		self::writeLog($str);
+		if (!defined('DEBUG') || !DEBUG) {
+			$str = '出错了！';
 		}
+		self::$response->set('error', $str);
 		self::extend('404');
 		die();
 	}
