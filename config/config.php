@@ -15,6 +15,7 @@ return array(
 		'controller' => 'Controller',
 		'action'     => 'Action',
 	),
+	'auth'   => 'App\\Lib\\Account',
 	'view'   => array(                           //视图文件信息
 		'dir' => 'view',
 		'ext' => '.php'

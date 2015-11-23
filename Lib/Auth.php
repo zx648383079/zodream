@@ -6,9 +6,10 @@ namespace App\Lib;
 *
 *********************************************************/
 use App;
+use App\Lib\Role\IAuth;
 use App\Model\UserModel;
 
-final class Auth.bak {
+final class Auth implements IAuth {
 	
 	public static $userModel;
 	/**

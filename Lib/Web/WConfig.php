@@ -27,7 +27,7 @@ class WConfig extends OBase {
 		if (file_exists($file)) {
 			$tem = include($file);
 			foreach ($tem as $key => $value) {
-				if (!array_key_exists($key, $configs)) {
+				if (!array_key_exists($key, $configs) || !is_array($value)) {
 					$configs[$key] = $value;
 					continue;
 				}

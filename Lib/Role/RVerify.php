@@ -2,7 +2,7 @@
 namespace App\Lib\Role;
 
 use App;
-use App\Lib\Account;
+use App\Model\Model;
 
 class RVerify {
 	public static function make($role) {
@@ -23,13 +23,13 @@ class RVerify {
 	private static function _verify($role) {
 		switch ($role) {
 			case '?':
-				if (!Account::guest()) {
+				if (!call_user_func(array(App::config('auth'), 'guest'))) {
 					App::redirect('/');
 					return false;
 				}
 				break;
 			case '@':
-				if (Account::guest()) {
+				if (call_user_func(array(App::config('auth'), 'guest'))) {
 					App::redirect('account');
 					return false;
 				}
@@ -59,10 +59,14 @@ class RVerify {
 	 * @param string $role 权限
 	 */
 	public static function judge($role) {
-		if (Account::guest()) {
+		if (call_user_func(array(App::config('auth'), 'guest'))) {
 			return empty($role);
 		} else {
-			return RComma::judge($role, Account::user()->role()->roles);
+			$model = call_user_func(array(App::config('auth'), 'user'));
+			if ($model instanceof Model) {
+				return RComma::judge($role, $model->role()->roles);
+			}
+			return false;
 		}
 	}
 }
