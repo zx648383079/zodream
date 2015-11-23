@@ -5,6 +5,7 @@ namespace App\Lib\Helper;
  * @author zx648
  *
  */
+use App;
 
 class HMailer {
 	
@@ -19,6 +20,9 @@ class HMailer {
 		if (defined('DEBUG') && DEBUG) {
 			$this->_mail->SMTPDebug = 1;
 		}
+		
+		$config = App::config('mail');
+		$this->setHost($config['host'], $config['port'])->setUser($config['user'], $config['password']);
 	}
 	
 	/**
