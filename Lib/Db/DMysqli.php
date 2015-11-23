@@ -302,4 +302,8 @@ class DMysqli implements IBase {
     public function getError() {
         return mysqli_error($this->_mysqli);
     }
+    
+    public function __destruct() {
+    	$this->close();
+    }
 }
