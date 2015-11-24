@@ -265,7 +265,7 @@ class Base {
 	 */
 	public static function error($errno, $errstr, $errfile, $errline) {
 		header( 'Content-Type:text/html;charset=utf-8' );
-		$str = '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！';
+		$str = '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！当前网址：'.HUrl::to();
 		self::writeLog($str);
 		if (!defined('DEBUG') || !DEBUG) {
 			$str = '出错了！';

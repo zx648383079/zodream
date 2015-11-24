@@ -60,7 +60,7 @@ final class Route {
 		if (self::call_func($controllers, $action, $values)) {
 			return ;
 		}
-		Base::error(0, $name.$routes['action'], __FILE__ ,__LINE__);
+		Base::error(0, ' 请保证默认HomeController->indexAction存在！', __FILE__ ,__LINE__);
 		return;
 		
 	}
