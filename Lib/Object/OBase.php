@@ -30,7 +30,7 @@ class OBase implements IBase {
 	 * @param string $value
 	 */
 	public function set($key, $value = null) {
-		if ($key === '_extra' || $value !== null) {
+		if ($key === '_extra' || $value !== null || is_string($key)) {
 			return $this->_data[$key] = $value;
 		}
 		if(is_array($key)) {

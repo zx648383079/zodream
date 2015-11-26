@@ -16,7 +16,7 @@ class Controller {
 	protected $loader;
 	
 	function __construct($loader = null) {
-		App::$response->set('title', App::config('App.title'));
+		App::$response->set('title', App::config('app.title'));
 		App::$response->set('lang', Lang::$language);
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 	}
