@@ -22,13 +22,12 @@ class Obj {
 		if (array_key_exists($key, $this->_data)) {
 			return $this->_data[$key];
 		}
-		return null;
-		/*$result = OArray::getChild($key, $this->_data, is_object($default) ? null : $default);
+		$result = Arr::getChild($key, $this->_data, is_object($default) ? null : $default);
 		if (is_object($default)) {
 			return $default($result);
 		} else {
 			return $result;
-		}*/
+		}
 	}
 	
 	/**

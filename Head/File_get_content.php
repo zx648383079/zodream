@@ -1,10 +1,10 @@
 <?php 
 namespace App\Head;
 /*
-* url 
+* file_get_contents 
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-12-1
 */
 class File_get_content {
 	public static function get($url) {

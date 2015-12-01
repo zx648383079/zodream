@@ -7,6 +7,6 @@ namespace App\Body;
 * @time 2015-11.29
 */
 
-class Error {
+class Error extends \ErrorException {
 	
 }

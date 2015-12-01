@@ -7,9 +7,11 @@ namespace App\Head;
 * @time 2015-11.29
 */
 defined('VERSION') or define('VERSION', 1.0);
+defined('APP_DIR') or define('APP_DIR', dirname(dirname(__FILE__)).'/');
 
 class App {
 	public static function main() {
+		date_default_timezone_set('Etc/GMT-8');            //这里设置了时区
 		Route::run();
 	}
 }
