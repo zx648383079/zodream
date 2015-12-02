@@ -1,10 +1,9 @@
 <?php
-namespace App\Lib\Role;
+namespace App\Head\Auth;
 
-use App;
-use App\Model\Model;
+use App\Body\Config;
 
-class RVerify {
+class Verify {
 	public static function make($role) {
 		if (is_object($role) && !$role()) {
 			App::redirect('/');
@@ -20,17 +19,26 @@ class RVerify {
 		return true;
 	}
 	
+	private static function _auth() {
+		static $auth = null;
+		if (empty($auth)) {
+			$auth = Config::getInstance()->get('auth');
+		}
+		return $auth;
+	}
+	
 	private static function _verify($role) {
+		$auth = self::_auth();
 		switch ($role) {
 			case '?':
-				if (!call_user_func(array(App::config('auth'), 'guest'))) {
+				if (!call_user_func(array($auth['driver'], 'guest'))) {
 					App::redirect('/');
 					return false;
 				}
 				break;
 			case '@':
-				if (call_user_func(array(App::config('auth'), 'guest'))) {
-					App::redirect('account');
+				if (call_user_func(array($auth['driver'], 'guest'))) {
+					App::redirect($auth['home']);
 					return false;
 				}
 				break;
@@ -46,7 +54,7 @@ class RVerify {
 				break;
 			default:
 				if (!self::judge($role)) {
-					App::redirect('account', 4, '您无权操作！', '401');
+					App::redirect('/', 4, '您无权操作！', '401');
 					return false;
 				}
 				break;
@@ -59,12 +67,13 @@ class RVerify {
 	 * @param string $role 权限
 	 */
 	public static function judge($role) {
-		if (call_user_func(array(App::config('auth'), 'guest'))) {
+		$auth = self::_auth();
+		if (call_user_func(array($auth['driver'], 'guest'))) {
 			return empty($role);
 		} else {
-			$model = call_user_func(array(App::config('auth'), 'user'));
-			if ($model instanceof Model) {
-				return RComma::judge($role, $model->role()->roles);
+			$model = call_user_func(array($auth['driver'], 'user'));
+			if (!is_null($model)) {
+				return call_user_func(array($auth['role'], 'judge'), $role, $model->role()->roles);
 			}
 			return false;
 		}

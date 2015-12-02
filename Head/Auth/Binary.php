@@ -1,10 +1,14 @@
 <?php 
-namespace App\Lib\Role;
-/**
-* 二进制法
-*/
+namespace App\Head\Auth;
+/*
+ * 二进制法
+ *
+ * @author Jason
+ * @time 2015-12-2
+ */
+use App\Body\Interfaces\IRole;
 
-class RBinary implements IBase {
+class Binary implements IRole {
 	public static function judge($role, $roles) {
 		$role  = intval($role);
 		$roles = intval($roles);

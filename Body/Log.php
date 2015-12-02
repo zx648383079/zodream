@@ -1,13 +1,17 @@
 <?php 
 namespace App\Body;
-/*
+/**
 * 日志类
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-12-2
 */
 
 class Log {
+	/**
+	 * 写日志
+	 * @param unknown $logs
+	 */
 	public static function write($logs) {
 		$log = '';
 		if (is_array($logs)) {

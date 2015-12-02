@@ -1,13 +1,14 @@
 <?php 
 namespace App\Body\Db;
-/*
+/**
 * pdo
 * 
 * @author Jason
 * @time 2015-12-1
 */
+use App\Body\Interfaces\IDb;
 
-class Pdo {
+class Pdo implements IDb {
 	//pdo对象
 	protected $pdo             = null;
 	//用于存放实例化的对象

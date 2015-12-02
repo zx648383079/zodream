@@ -1,13 +1,14 @@
 <?php 
 namespace App\Body\Db;
-/*
+/**
 * mysql 
 * 
 * @author Jason
 * @time 2015-11.29
 */
+use App\Body\Interfaces\IDb;
 
-class Mysql {
+class Mysql implements IDb {
 	/**
 	 * 连接标识符
 	 *

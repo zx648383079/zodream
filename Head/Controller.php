@@ -1,6 +1,6 @@
 <?php
 namespace App\Head;
-/*
+/**
  * 控制器基类
  *
  * @author Jason

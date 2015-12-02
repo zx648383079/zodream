@@ -1,10 +1,14 @@
 <?php 
-namespace App\Lib\Role;
-/**
-* 符号分割法
-*/
+namespace App\Head\Auth;
+/*
+ * 符号分割法
+ *
+ * @author Jason
+ * @time 2015-12-2
+ */
+use App\Body\Interfaces\IRole;
 
-class RComma implements IBase {
+class Comma implements IRole {
 	public static function judge($role, $roles) {
 		$roles = explode(',', $roles);
 		return in_array($role , $roles);

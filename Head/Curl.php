@@ -1,6 +1,6 @@
 <?php
 namespace App\Head;
-/*
+/**
  * curl
  *
  * @author Jason

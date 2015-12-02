@@ -1,13 +1,14 @@
 <?php 
 namespace App\Body\Db;
-/*
+/**
 * mysqli 
 * 
 * @author Jason
 * @time 2015-12-1
 */
+use App\Body\Interfaces\IDb;
 
-class Mysqli {
+class Mysqli implements IDb {
 	/**
 	 * 连接标识符
 	 *

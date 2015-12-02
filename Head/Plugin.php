@@ -1,6 +1,6 @@
 <?php
 namespace App\Head;
-/*
+/**
  * 插件功能
  *
  * @author Jason

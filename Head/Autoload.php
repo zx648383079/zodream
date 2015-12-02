@@ -1,6 +1,6 @@
 <?php
 namespace App\Head;
-/*
+/**
  * 自动加载功能
  *
  * @author Jason
@@ -26,6 +26,9 @@ class Autoload extends Obj {
 		return static::$instance;
 	}
 	
+	/**
+	 * 注册自动加载
+	 */
 	public function register() {
 		if (!$this->registered) {
 			spl_autoload_register(array($this, '_load'), true, true);
@@ -39,6 +42,9 @@ class Autoload extends Obj {
 		}
 	}
 	
+	/**
+	 * 自定义错误输出
+	 */
 	public function setError() {
 		set_error_handler(array($this, '_error'));          //自定义错误输出
 	}
@@ -54,8 +60,11 @@ class Autoload extends Obj {
 		));
 	}
 	
+	/**
+	 * 自定义程序结束时输出
+	 */
 	public function shutDown() {
-		register_shutdown_function(array('app', 'out'));   //程序结束时输出
+		register_shutdown_function(array($this, '_shutDown'));   //程序结束时输出
 	}
 	
 	protected function _shutDown() {

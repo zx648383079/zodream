@@ -1,5 +1,5 @@
 <?php
-namespace App\Lib\Role;
+namespace App\Body\Interfaces;
 
 interface IAuth {
 	/**

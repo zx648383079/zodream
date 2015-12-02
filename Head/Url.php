@@ -60,7 +60,7 @@ class Url {
 	 * @param string $mode 是哪种模式 ，文件用null
 	 * @return string
 	 */
-	public static function get($file = null, $extra = null, $secret = FALSE, $mode = APP_MODE) {
+	public static function to($file = null, $extra = null, $secret = FALSE, $mode = APP_MODE) {
 		if (strstr($file, '//')) {
 			return $file;
 		}

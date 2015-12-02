@@ -1,11 +1,12 @@
 <?php 
 namespace App\Body;
-/*
+/**
 * 数据基类
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-12-2
 */
+use App\Hand\SqlFilter;
 
 class Model {
 	protected $db = null;
@@ -15,6 +16,7 @@ class Model {
 	public function __construct() {
 		$configs = Config::getInstance()->get('db');
 		$this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);
+		$this->prefix = $configs['prefix'];
 		if (isset($this->table)) {
 			$this->table = $this->prefix. $this->table;
 		}
@@ -251,7 +253,7 @@ class Model {
 	public function findByHelper($param, $isList = TRUE) {
 		$result = array();
 		if (!empty($param)) {
-			$sql  = new HSql($this->prefix);
+			$sql  = new SqlFilter($this->prefix);
 			$stmt = $this->db->execute($sql->getSQL($param));            //获取SQL语句
 			while (!!$objs = $stmt->fetchObject()) {
 				if ($isList) {
