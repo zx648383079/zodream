@@ -1,36 +1,104 @@
 <?php 
 namespace App\Head;
-/*
+/**
 * 路由
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-12-3
 */
 
 use App\Body\Object\Obj;
+use App\Body\Config;
+use App\Body\Error;
 
 class Route extends Obj{
+	/**
+	 * 运行加载方法
+	 */
 	public static function run() {
+		$config   = Config::getInstance()->get('route');
+		$instance = call_user_func(array($config['driver'], 'get'));
+		$default  = $config['default'];
+		unset($config['driver'], $config['default']);
 		
+		$controllers = $instance['controller'];
+		$action     = $instance['action'];
+		$value      = $instance['value'];
+		unset($instance);
+		//执行默认的
+		if (empty($instance) || (empty($controllers) && empty($action))) {
+			self::_getController($default, $value);
+		}
+		//执行已注册的
+		$url = implode('/', $controllers);
+		if (!empty($action)) {
+			$url .= '/'.$action;
+		}
+		self::_loopConfig($url, $config, $value);
+		unset($config, $url);
+		//自动判断
+		if (empty($controllers)) {
+			$controllers = array('home');
+		}
+		if (empty($action)) {
+			$action = 'index';
+		}
+		self::_autoload($controllers, $action, $value);
 	}
 	
-	public static function get($url, $controller) {
-		
+	/**
+	 * 循环匹配已注册路由
+	 * @param unknown $url
+	 * @param unknown $config
+	 * @param unknown $value
+	 */
+	private static function _loopConfig($url, $config, $value = array()) {
+		foreach ($config as $key => $instance) {
+			$pattern = str_replace(':num', '[0-9]+', $key);
+			$pattern = str_replace(':any', '[^/]+', $pattern);
+			$pattern = str_replace('/', '\\/', $pattern);
+			$matchs  = array();
+			preg_match('/'.$pattern.'/i', $url, $matchs);
+			if(count($matchs) > 0 && array_shift($matchs) === $url) {
+				self::_getController($instance, array_merge($matchs, (array)$value));
+			}
+		}
 	}
 	
-	public static function post($url, $controller) {
-		
+	/**
+	 * 执行
+	 * @param unknown $instance
+	 * @param unknown $value
+	 */
+	private static function _getController($instance, $value = array()) {
+		if (is_object($instance)) {
+			call_user_func_array($instance, $value);
+			exit();
+		}
+		list($controller, $action) = explode('@', $instance, 2);
+		self::_runController($controller, $action, $value);
 	}
-	
-	public static function delete($url, $controller) {
-		
+	/**
+	 * 执行
+	 * @param unknown $controller
+	 * @param unknown $action
+	 * @param unknown $value
+	 * @throws Error
+	 */
+	private static function _runController($controller, $action, $value = array()) {
+		if (!class_exists($controller)) {
+			throw new Error('Not find class : '.$controller);
+		}
+		$instance = new $controller();
+		if (!method_exists($instance, $action)) {
+			throw new Error($controller.' class doesn\'t find method :'.$action);
+		}
+		if (method_exists($instance, 'before')) {
+			$instance -> before(str_replace(APP_ACTION, '', $action));
+		}
+		call_user_func_array(array($instance, $action), (array)$value);
+		exit();
 	}
-	
-	public static function ajax($url, $controller) {
-		
-	}
-	
-	public static $route;
 	/**
 	 * 加载控制器和视图
 	 *
@@ -38,12 +106,7 @@ class Route extends Obj{
 	 * @param $c string 控制器的名称
 	 * @param $v string 视图所在的方法名
 	 */
-	public static function load() {
-		$routes      = self::get();
-		$controllers = $routes['controller'];
-		$action      = $routes['action'];
-		$values      = isset($routes['value']) ? $routes['value'] : array();
-		unset($routes);
+	private static function _autoload($controllers, $action, $values = array()) {
 		if(self::call_func($controllers, $action, $values)) {
 			return ;
 		}
@@ -71,8 +134,7 @@ class Route extends Obj{
 		if (self::call_func($controllers, $action, $values)) {
 			return ;
 		}
-		Base::error(0, ' 请保证默认HomeController->indexAction存在！', __FILE__ ,__LINE__);
-		return;
+		throw new Error('路由不存在！');
 	
 	}
 	

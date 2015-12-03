@@ -1,10 +1,10 @@
 <?php 
 namespace App\Body;
-/*
+/**
 * http 请求信息获取类
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-12-3
 */
 
 final class Request {
@@ -56,6 +56,12 @@ final class Request {
 		return $data;
 	}
 	
+	/**
+	 * $_GET
+	 * @param string $name
+	 * @param string $default
+	 * @return Ambigous <unknown, string>
+	 */
 	public function get($name = null, $default = null) {
 		if ($name === null) {
 			return $this->gets;
@@ -63,6 +69,11 @@ final class Request {
 		return OArray::getVal($name, $this->gets, $default);
 	}
 	
+	/**
+	 * $_POST
+	 * @param string $name
+	 * @param string $default
+	 */
 	public function post($name = null, $default = null) {
 		if ($name === null) {
 			return $this->posts;
@@ -70,6 +81,11 @@ final class Request {
 		return OArray::getVal($name, $this->posts , $default);
 	}
 	
+	/**
+	 * $_FILES
+	 * @param string $name
+	 * @param string $default
+	 */
 	public function file($name = null, $default = null) {
 		if ($name === null) {
 			return $this->files;
@@ -77,6 +93,11 @@ final class Request {
 		return OArray::getVal($name, $this->files , $default);
 	}
 	
+	/**
+	 * $_REQUEST
+	 * @param string $name
+	 * @param string $default
+	 */
 	public function request($name = null, $default = null) {
 		if ($name === null) {
 			return $this->requests;
@@ -84,6 +105,23 @@ final class Request {
 		return OArray::getVal($name, $this->requests , $default);
 	}
 	
+	/**
+	 * $_COOKIE
+	 * @param string $name
+	 * @param string $default
+	 */
+	public function cookie($name = null, $default = null) {
+		if ($name === null) {
+			return $this->cookies;
+		}
+		return OArray::getVal($name, $this->cookies , $default);
+	}
+	
+	/**
+	 * PHP://INPUT
+	 * @param string $name
+	 * @param string $default
+	 */
 	public function input($name = null, $default = null) {
 		if ($name === null) {
 			return $this->input;
@@ -91,6 +129,11 @@ final class Request {
 		return OArray::getVal($name, $this->input , $default);
 	}
 	
+	/**
+	 * $_SERVER
+	 * @param string $name
+	 * @param string $default
+	 */
 	public function server($name = null, $default = null) {
 		if ($name === null) {
 			return $_SERVER;

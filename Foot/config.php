@@ -10,7 +10,6 @@ return array(
 		'app'    => array(                           //网站信息
 				'title'      => 'ZoDream',
 				'host'       => 'http://localhost/',        //主目录
-				'router'     => ERoute::COMMON,                            //URL解析方式
 				'model'      => 'Model',                     //后缀
 				'controller' => 'Controller',
 				'action'     => 'Action',
@@ -23,6 +22,11 @@ return array(
 		'view'   => array(                           //视图文件信息
 				'dir' => 'view',
 				'ext' => '.php'
+		),
+		'route'  => array(
+				'driver'  => App\Head\Route::class,
+				'default' => 'HomeController@indexAction',
+				'admin'   => 'AdminController@indexAction'
 		),
 		'db'     => array(							//MYSQL数据库的信息
 				'driver'   => App\Body\Db\Pdo::class,

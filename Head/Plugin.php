@@ -28,16 +28,20 @@ class Plugin extends Obj {
 	
 	}
 	
-	private function _findPlugin() {
+	public function find() {
 		$pluginPath = APP_DIR.'/plugin/';
 		if (!is_dir($pluginPath)) {
 			return ;
 		}
-	
 	}
 	
-	public function get($key = null, $arg = null) {
-		$plugins = parent::get($key);
+	/**
+	 * 执行插件
+	 * @param string $key
+	 * @param string $arg
+	 */
+	public function execute($key = null, $arg = null) {
+		$plugins = $this->get($key);
 		if (!empty($key)) {
 			$plugins = array($plugins);
 		}
@@ -54,24 +58,32 @@ class Plugin extends Obj {
 			$args[] = func_get_arg($i);
 		}
 		do {
-			foreach ((array) current($plugins) as $plugin)
+			foreach ((array) current($plugins) as $plugin) {
 				if (!is_null($plugin['function'])) {
 					call_user_func_array($plugin['function'], array_slice($args, 0, (int) $plugin['accept']));
 				}
+			}
 		} while ( next($plugins) !== false );
 	}
 	
-	public function set($key, $arg, $priority = 10, $accept = 1) {
+	/**
+	 * 添加插件
+	 * @param string $key 关键字
+	 * @param unknown $arg 方法 
+	 * @param boolean $before 是否放到最前 默认false 
+	 * @param number $accept 接受的值
+	 */
+	public function add($key, $arg, $before = FALSE, $accept = 1) {
 		$plugin = array(
 				'function' => $arg,
 				'accept'   => $accept
 		);
-		if ($this->has($key)) {
-			$this->_data[$key][] = $plugin;
+		$plugins = $this->get($key, array());
+		if ($before) {
+			array_unshift($plugins, $plugin);
 		} else {
-			parent::set($key, array(
-					$plugin
-			));
+			$plugins[] = $plugin;
 		}
+		$this->set($key, $plugins);
 	}
 }
