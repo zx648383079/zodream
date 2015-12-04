@@ -1,5 +1,5 @@
 <?php 
-namespace App\Body\Object;
+namespace Zodream\Body\Object;
 /*
 * array 的扩展
 * 
@@ -114,7 +114,7 @@ class Arr {
 		foreach ($names as $name) {
 			//使用方法 post:key default
 				
-			$temp = OString::toArray($name, ' ', 2, $default);
+			$temp = Str::toArray($name, ' ', 2, $default);
 			$def  = $temp[1];
 				
 			$temp = explode(':', $temp[0], 2);
@@ -191,6 +191,23 @@ class Arr {
 	public static function ucFirst($arr) {
 		foreach ($arr as &$value) {
 			$value = ucfirst($value);
+		}
+		return $arr;
+	}
+	
+	/**
+	 * 合并多维数组 如果键名相同后面的数组会覆盖前面的数组
+	 * @param array $arr
+	 * @param array $arg
+	 * @return array
+	 */
+	public static function merge(array $arr, array $arg) {
+		foreach ($arg as $key => $value) {
+			if (!array_key_exists($key, $arr) || !is_array($value)) {
+				$arr[$key] = $arg;
+				continue;
+			}
+			$arr[$key] = self::merge((array)$arr[$key], $value);
 		}
 		return $arr;
 	}

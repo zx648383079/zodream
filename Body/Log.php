@@ -1,5 +1,5 @@
 <?php 
-namespace App\Body;
+namespace Zodream\Body;
 /**
 * 日志类
 * 

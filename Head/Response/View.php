@@ -1,19 +1,19 @@
 <?php 
-namespace App\Head;
+namespace Zodream\Head;
 /*
 * 响应
 * 
 * @author Jason
 * @time 2015-11.29
 */
-use App\Body\Object\Obj;
-use App\Body\Html\View;
+use Zodream\Body\Object\Obj;
+use Zodream\Body\Html\View;
 
 final class View extends Obj {
 	private static $_instance;
 	/**
 	 * 单例模式
-	 * @return \App\Head\Response
+	 * @return \Zodream\Head\Response
 	 */
 	public static function getInstance() {
 		if (!(self::$_instance instanceof self)) {

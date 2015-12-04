@@ -1,7 +1,7 @@
 <?php
-namespace App\Head\Response;
+namespace Zodream\Head\Response;
 
-use App\Body\Request;
+use Zodream\Body\Request;
 class Ajax {
 	/**
 	 * 返回JSON数据

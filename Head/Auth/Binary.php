@@ -1,12 +1,12 @@
 <?php 
-namespace App\Head\Auth;
+namespace Zodream\Head\Auth;
 /*
  * 二进制法
  *
  * @author Jason
  * @time 2015-12-2
  */
-use App\Body\Interfaces\IRole;
+use Zodream\Body\Interfaces\IRole;
 
 class Binary implements IRole {
 	public static function judge($role, $roles) {

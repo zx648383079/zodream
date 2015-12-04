@@ -1,5 +1,5 @@
 <?php 
-namespace App\Hand;
+namespace Zodream\Hand;
 /*
  * 攻击
  *

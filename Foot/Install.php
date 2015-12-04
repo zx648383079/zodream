@@ -1,5 +1,5 @@
 <?php 
-namespace App\Foot;
+namespace Zodream\Foot;
 /**
 * 建立
 * 

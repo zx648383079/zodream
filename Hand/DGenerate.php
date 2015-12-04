@@ -1,8 +1,8 @@
 <?php
-namespace App\Lib\Db;
+namespace Zodream\Lib\Db;
 
-use App\Lib\File\FBase;
-use App\Lib\Object\OString;
+use Zodream\Lib\File\FBase;
+use Zodream\Lib\Object\OString;
 class DGenerate extends DbFactory {
 	
 	public function make() {

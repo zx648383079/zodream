@@ -1,12 +1,12 @@
 <?php 
-namespace App\Head\Auth;
+namespace Zodream\Head\Auth;
 /*
  * 符号分割法
  *
  * @author Jason
  * @time 2015-12-2
  */
-use App\Body\Interfaces\IRole;
+use Zodream\Body\Interfaces\IRole;
 
 class Comma implements IRole {
 	public static function judge($role, $roles) {

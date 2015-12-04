@@ -15,8 +15,8 @@ return array(
 				'action'     => 'Action',
 		),
 		'auth'   => array(
-				'driver' => App\Head\Auth\Auth::class,        //用户判断
-				'role'   => App\Head\Auth\Comma::class,       //权限判断
+				'driver' => Zodream\Head\Auth\Auth::class,        //用户判断
+				'role'   => Zodream\Head\Auth\Comma::class,       //权限判断
 				'home'  => 'auth'                             //用户登录主页
 		),
 		'view'   => array(                           //视图文件信息
@@ -24,12 +24,12 @@ return array(
 				'ext' => '.php'
 		),
 		'route'  => array(
-				'driver'  => App\Head\Route\Yii::class,
+				'driver'  => Zodream\Head\Route\Yii::class,
 				'default' => 'HomeController@indexAction',
 				'admin'   => 'AdminController@indexAction'
 		),
 		'db'     => array(							//MYSQL数据库的信息
-				'driver'   => App\Body\Db\Pdo::class,
+				'driver'   => Zodream\Body\Db\Pdo::class,
 				'host'     => 'localhost',                //服务器
 				'port'     => '3306',						//端口
 				'database' => 'test',				//数据库
@@ -39,7 +39,7 @@ return array(
 				'encoding' => 'utf8'					//编码
 		),
 		'mail'   => array(
-				'driver'   => App\Head\Mailer::class,
+				'driver'   => Zodream\Head\Mailer::class,
 				'host'     => 'smtp.zodream.cn',
 				'port'     => 25,
 				'user'     => 'admin@zodream.cn',

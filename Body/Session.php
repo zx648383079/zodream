@@ -1,5 +1,5 @@
 <?php 
-namespace App\Body;
+namespace Zodream\Body;
 /**
 * session 读写类
 * 

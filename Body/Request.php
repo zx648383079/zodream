@@ -1,17 +1,18 @@
 <?php 
-namespace App\Body;
+namespace Zodream\Body;
 /**
 * http 请求信息获取类
 * 
 * @author Jason
 * @time 2015-12-3
 */
+use Zodream\Body\Object\Arr;
 
 final class Request {
 	private static $_instance;
 	/**
 	 * 单例模式
-	 * @return \App\Body\Request
+	 * @return \Zodream\Body\Request
 	 */
 	public static function getInstance() {
 		if (!(self::$_instance instanceof self)) {
@@ -20,13 +21,13 @@ final class Request {
 		return self::$_instance;
 	}
 	
-	public $posts;
-	public $gets;
-	public $requests;
-	public $cookies;
-	public $files;
-	public $servers;
-	public $input;
+	private $posts;
+	private $gets;
+	private $requests;
+	private $cookies;
+	private $files;
+	private $servers;
+	private $input;
 	
 	public $error = FALSE;
 	
@@ -35,6 +36,7 @@ final class Request {
 		$this->posts    = $this->_clean($_POST);
 		$this->requests = $this->_clean($_REQUEST);
 		$this->cookies  = $this->_clean($_COOKIE);
+		$this->servers  = $this->_clean($_SERVER);
 		$this->files    = $this->_clean($_FILES);
 		$this->input    = $this->_clean(file_get_contents('php://input'));
 	}
@@ -47,7 +49,7 @@ final class Request {
 		if (is_array($data)) {
 			foreach ($data as $key => $value) {
 				unset($data[$key]);
-				$data[$this->_clean($key)] = $this->_clean($value);
+				$data[strtolower($this->_clean($key))] = $this->_clean($value);
 			}
 		} else {
 			$data = htmlspecialchars($data, ENT_COMPAT);
@@ -63,10 +65,21 @@ final class Request {
 	 * @return Ambigous <unknown, string>
 	 */
 	public function get($name = null, $default = null) {
+		return $this->_getValue($name, $this->gets, $default);
+	}
+	
+	/**
+	 * 获取值得总方法
+	 * @param unknown $name
+	 * @param unknown $args
+	 * @param string $default
+	 */
+	private function _getValue($name, $args, $default = null) {
 		if ($name === null) {
-			return $this->gets;
+			return $args;
 		}
-		return OArray::getVal($name, $this->gets, $default);
+		
+		return Arr::getVal(strtolower($name), $args, $default);
 	}
 	
 	/**
@@ -75,10 +88,7 @@ final class Request {
 	 * @param string $default
 	 */
 	public function post($name = null, $default = null) {
-		if ($name === null) {
-			return $this->posts;
-		}
-		return OArray::getVal($name, $this->posts , $default);
+		return $this->_getValue($name, $this->posts , $default);
 	}
 	
 	/**
@@ -87,10 +97,7 @@ final class Request {
 	 * @param string $default
 	 */
 	public function file($name = null, $default = null) {
-		if ($name === null) {
-			return $this->files;
-		}
-		return OArray::getVal($name, $this->files , $default);
+		return $this->_getValue($name, $this->files , $default);
 	}
 	
 	/**
@@ -99,10 +106,7 @@ final class Request {
 	 * @param string $default
 	 */
 	public function request($name = null, $default = null) {
-		if ($name === null) {
-			return $this->requests;
-		}
-		return OArray::getVal($name, $this->requests , $default);
+		return $this->_getValue($name, $this->requests , $default);
 	}
 	
 	/**
@@ -111,10 +115,7 @@ final class Request {
 	 * @param string $default
 	 */
 	public function cookie($name = null, $default = null) {
-		if ($name === null) {
-			return $this->cookies;
-		}
-		return OArray::getVal($name, $this->cookies , $default);
+		return $this->_getValue($name, $this->cookies , $default);
 	}
 	
 	/**
@@ -123,10 +124,7 @@ final class Request {
 	 * @param string $default
 	 */
 	public function input($name = null, $default = null) {
-		if ($name === null) {
-			return $this->input;
-		}
-		return OArray::getVal($name, $this->input , $default);
+		return $this->_getValue($name, $this->input , $default);
 	}
 	
 	/**
@@ -135,10 +133,7 @@ final class Request {
 	 * @param string $default
 	 */
 	public function server($name = null, $default = null) {
-		if ($name === null) {
-			return $_SERVER;
-		}
-		return OArray::getVal($name, $_SERVER, $default);
+		return $this->_getValue($name, $this->servers, $default);
 	}
 	
 	/**

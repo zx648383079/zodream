@@ -1,14 +1,14 @@
 <?php
-namespace App\Head;
+namespace Zodream\Head;
 /**
  * 控制器基类
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Body\Config;
-use App\Body\Language;
-use App\Body\Loader;
+use Zodream\Body\Config;
+use Zodream\Body\Language;
+use Zodream\Body\Loader;
 
 abstract class Controller {
 	protected $loader;

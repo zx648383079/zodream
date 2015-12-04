@@ -1,8 +1,8 @@
 <?php
-namespace App\Head\Route;
+namespace Zodream\Head\Route;
 
-use App\Body\Interfaces\IRoute;
-use App\Body\Request;
+use Zodream\Body\Interfaces\IRoute;
+use Zodream\Body\Request;
 
 class Yii implements IRoute {
 	public static function get() {
@@ -10,6 +10,11 @@ class Yii implements IRoute {
 	}
 	
 	public static function to($file) {
-		return rtrim(APP_URL, '/').'/?r='.$file;
+		$root = rtrim(APP_URL, '/') .'/';
+		if (!strpos($file, '.php')) {
+			$root .= '/?r=';
+		}
+		$root .= ltrim($file, '/');
+		return $root;
 	}
 }

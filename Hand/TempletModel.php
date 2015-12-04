@@ -1,5 +1,5 @@
 <?php 
-namespace App\Model;
+namespace Zodream\Model;
 
 class TempletModel extends Model {
 	protected $table = 'templet';

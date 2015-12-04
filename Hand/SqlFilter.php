@@ -1,5 +1,5 @@
 <?php
-namespace App\Hand;
+namespace Zodream\Hand;
 /*
  * 数据库语句过滤
  *

@@ -1,12 +1,12 @@
 <?php 
-namespace App\Body\Html;
+namespace Zodream\Body\Html;
 /*
  * 分页链接
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Head\Url;
+use Zodream\Head\Url;
 class Pager {
 	private static $max = 0;
 	

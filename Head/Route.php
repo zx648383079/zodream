@@ -1,5 +1,5 @@
 <?php 
-namespace App\Head;
+namespace Zodream\Head;
 /**
 * 路由
 * 
@@ -7,9 +7,9 @@ namespace App\Head;
 * @time 2015-12-3
 */
 
-use App\Body\Object\Obj;
-use App\Body\Config;
-use App\Body\Error;
+use Zodream\Body\Object\Obj;
+use Zodream\Body\Config;
+use Zodream\Body\Error;
 
 class Route extends Obj{
 	/**

@@ -1,5 +1,5 @@
 <?php
-namespace App\Head\Response;
+namespace Zodream\Head\Response;
 
 class Component {
 	protected static $components;

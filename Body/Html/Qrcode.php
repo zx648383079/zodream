@@ -1,5 +1,5 @@
 <?php
-namespace App\Body\Html;
+namespace Zodream\Body\Html;
 /*
  * 二维码
  *

@@ -1,12 +1,12 @@
 <?php 
-namespace App\Body\Db;
+namespace Zodream\Body\Db;
 /**
 * mysql 
 * 
 * @author Jason
 * @time 2015-11.29
 */
-use App\Body\Interfaces\IDb;
+use Zodream\Body\Interfaces\IDb;
 
 class Mysql implements IDb {
 	/**

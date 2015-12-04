@@ -1,5 +1,5 @@
 <?php
-namespace App\Body\Interfaces;
+namespace Zodream\Body\Interfaces;
 
 interface IRole {
 	/**

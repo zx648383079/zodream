@@ -1,12 +1,12 @@
 <?php 
-namespace App\Hand;
+namespace Zodream\Hand;
 /*
  * 验证
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Body\Model;
+use Zodream\Body\Model;
 
 class Validate {
 

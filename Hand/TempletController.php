@@ -1,14 +1,14 @@
 <?php
-namespace App\Controller;
+namespace Zodream\Controller;
 /*
  * 模板
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App;
-use App\Model\TempletModel;
-use App\Lib\Helper\HUrl;
+use Zodream;
+use Zodream\Model\TempletModel;
+use Zodream\Lib\Helper\HUrl;
 
 class TempletController extends Controller {
 	protected $rules = array (

@@ -1,5 +1,5 @@
 <?php
-namespace App\Body\Object;
+namespace Zodream\Body\Object;
 /**
  * Abstract class that enables creation of PHP enums. All you
 * have to do is extend this class and define some constants.

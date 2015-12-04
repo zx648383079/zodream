@@ -1,7 +1,7 @@
 <?php
-namespace App\Head\Auth;
+namespace Zodream\Head\Auth;
 
-use App\Body\Config;
+use Zodream\Body\Config;
 
 class Verify {
 	public static function make($role) {

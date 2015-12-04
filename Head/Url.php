@@ -1,13 +1,16 @@
 <?php 
-namespace App\Head;
-/*
+namespace Zodream\Head;
+/**
  * url
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Body\Request;
-use App\Body\Config;
+use Zodream\Body\Request;
+use Zodream\Body\Config;
+
+defined('APP_URL') or define('APP_URL', Url::getRoot());
+
 class Url {
 	
 	#字符表
@@ -60,28 +63,21 @@ class Url {
 	 * @param string $mode 是哪种模式 ，文件用null
 	 * @return string
 	 */
-	public static function to($file = null, $extra = null, $secret = FALSE, $mode = APP_MODE) {
+	public static function to($file = null, $extra = null, $secret = FALSE) {
 		if (strstr($file, '//')) {
 			return $file;
 		}
-		switch ($file) {
-			case '-':
-			case -1:
-				return self::referer();
-				break;
-			case null:
-			case 0:
-				return self::request_uri();
-				break;
-			case '':
-			case '/':
-				return APP_URL;
-				break;
-			default:
-				break;
+		if ($file === null || $file === 0) {
+			return APP_URL.ltrim(self::request_uri(), '/');
 		}
+		if ($file === '-' || $file === -1) {
+			return self::referer();
+		}
+		if ($file === '' || $file === '/') {
+			return APP_URL;
+		}
+		$url = call_user_func(array(Config::getInstance()->get('route.driver'), 'to'), $file);
 		
-		$url = call_user_func(array(Config::getInstance()->get('app.rounte'), 'get'), $file);
 		if ($extra === null) {
 			return $url;
 		} else if (is_string($extra)) {
@@ -102,7 +98,32 @@ class Url {
 	 * @return string
 	 */
 	public static function file($file) {
-		return self::to($file, null, false, null);
+		return self::to($file, null);
+	}
+	
+	/**
+	 * 获取根网址
+	 */
+	public static function getRoot() {
+		$args = parse_url(self::request_uri());
+		$root = '';
+		$secret = Request::getInstance()->server('HTTPS');
+		if (empty($secret) || 'off' === strtolower($secret)) {
+			$root = 'http';
+		} else {
+			$root = 'https';
+		}
+		$root .= '://'.Request::getInstance()->server('HTTP_HOST');
+		$port = Request::getInstance()->server('SERVER_PORT');
+		if (!empty($port) && $port != 80) {
+			$root .= ':'.$port;
+		}
+		$root .= '/';
+		$self = Request::getInstance()->server('PHP_SELF');
+		if ($self !== '/index.php') {
+			$root .= ltrim($self, '/');
+		}
+		return $root;
 	}
 	
 	/**
@@ -130,18 +151,17 @@ class Url {
 	 * @return string 真实显示的网址
 	 */
 	private static function request_uri() {
-		$uri = '';
-		if (isset($_SERVER['REQUEST_URI'])) {
-			$uri = $_SERVER['REQUEST_URI'];
+		$uri         = '';
+		$request_uri = Request::getInstance()->server('REQUEST_URI');
+		if (!is_null($request_uri)) {
+			$uri = $request_uri;
 		} else {
-			if (isset( $_SERVER['argv'])) {
-				$uri = $_SERVER['REQUEST_URI'];
+			$argv = Request::getInstance()->server('argv');
+			$self = Request::getInstance()->server('PHP_SELF');
+			if (!is_null($argv)) {
+				$uri = $self .'?'. $argv[0];
 			} else {
-				if (isset($_SERVER['argv'])) {
-					$uri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['argv'][0];
-				} else {
-					$uri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['QUERY_STRING'];
-				}
+				$uri = $self .'?'. Request::getInstance()->server('QUERY_STRING');
 			}
 		}
 		return $uri;

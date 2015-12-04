@@ -1,9 +1,9 @@
 <?php
-namespace App\Head\Route;
+namespace Zodream\Head\Route;
 
-use App\Body\Interfaces\IRoute;
-use App\Body\Object\Str;
-use App\Head\Url;
+use Zodream\Body\Interfaces\IRoute;
+use Zodream\Body\Object\Str;
+use Zodream\Head\Url;
 
 class Php implements IRoute {
 	public static function get() {

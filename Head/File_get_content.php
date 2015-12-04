@@ -1,5 +1,5 @@
 <?php 
-namespace App\Head;
+namespace Zodream\Head;
 /*
 * file_get_contents 
 * 

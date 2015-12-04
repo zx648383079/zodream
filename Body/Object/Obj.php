@@ -1,5 +1,5 @@
 <?php 
-namespace App\Body\Object;
+namespace Zodream\Body\Object;
 /*
 * object 的扩展
 * 

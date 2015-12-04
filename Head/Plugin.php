@@ -1,12 +1,12 @@
 <?php
-namespace App\Head;
+namespace Zodream\Head;
 /**
  * 插件功能
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Body\Object\Obj;
+use Zodream\Body\Object\Obj;
 
 class Plugin extends Obj {
 	protected static $instance = null;

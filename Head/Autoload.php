@@ -1,12 +1,12 @@
 <?php
-namespace App\Head;
+namespace Zodream\Head;
 /**
  * 自动加载功能
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Body\Object\Obj;
+use Zodream\Body\Object\Obj;
 
 class Autoload extends Obj{
 	

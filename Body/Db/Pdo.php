@@ -1,12 +1,12 @@
 <?php 
-namespace App\Body\Db;
+namespace Zodream\Body\Db;
 /**
 * pdo
 * 
 * @author Jason
 * @time 2015-12-1
 */
-use App\Body\Interfaces\IDb;
+use Zodream\Body\Interfaces\IDb;
 
 class Pdo implements IDb {
 	//pdo对象

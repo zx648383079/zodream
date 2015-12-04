@@ -1,6 +1,6 @@
 <?php
-namespace App\Body\Db;
-/*
+namespace Zodream\Body\Db;
+/**
  * redis
  *
  * @author Jason

@@ -1,12 +1,12 @@
 <?php 
-namespace App\Body;
+namespace Zodream\Body;
 /**
 * 数据基类
 * 
 * @author Jason
 * @time 2015-12-2
 */
-use App\Hand\SqlFilter;
+use Zodream\Hand\SqlFilter;
 
 class Model {
 	protected $db = null;

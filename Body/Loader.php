@@ -1,12 +1,12 @@
 <?php 
-namespace App\Body;
-/*
+namespace Zodream\Body;
+/**
 * 反射调用类
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-11-29
 */
-use App\Body\Object\Obj;
+use Zodream\Body\Object\Obj;
 
 class Loader extends Obj {
 	/**

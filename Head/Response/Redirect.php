@@ -1,11 +1,11 @@
 <?php
-namespace App\Head\Response;
+namespace Zodream\Head\Response;
 /**
  * 跳转
  * @author Jason
  * @final 2015-12-2
  */
-use App\Head\Url;
+use Zodream\Head\Url;
 
 class Redirect {
 	/**
@@ -20,14 +20,10 @@ class Redirect {
 	 */
 	public static function to($urls, $time = 0, $msg = '', $code = '') {
 		$url = '';
-		if (is_array($urls)) {
-			foreach ($urls as $value) {
-				$url .= Url::to($value);
-			}
-		} else {
-			$url = HUrl::to($urls);
+		foreach ((array)$urls as $value) {
+			$url .= Url::to($value);
 		}
-	
+		die($url);
 		if (empty($msg)) {
 			$msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
 		}

@@ -1,5 +1,5 @@
 <?php 
-namespace App\Head;
+namespace Zodream\Head;
 /*
  * 文件操作
  *
