@@ -21,9 +21,12 @@ class Route extends Obj{
 		$default  = $config['default'];
 		unset($config['driver'], $config['default']);
 		
+		if (!is_array($instance)) {
+			$instance = self::_getValue($instance);
+		}
 		$controllers = $instance['controller'];
-		$action     = $instance['action'];
-		$value      = $instance['value'];
+		$action      = $instance['action'];
+		$value       = $instance['value'];
 		unset($instance);
 		//执行默认的
 		if (empty($instance) || (empty($controllers) && empty($action))) {
@@ -44,6 +47,35 @@ class Route extends Obj{
 			$action = 'index';
 		}
 		self::_autoload($controllers, $action, $value);
+	}
+	
+	/**
+	 * 根据数字判断是否带值
+	 * @param array $routes
+	 * @return array:
+	 */
+	private function _getValue($routes) {
+		$values = array();
+		for ($i = 0, $len = count($routes); $i < $len; $i++) {
+			if (is_numeric($routes[$i])) {
+				$values = array_splice($routes, $i);
+				break;
+			}
+		}
+		switch (count($routes)) {
+			case 0:
+				$routes[] = 'home';
+			case 1:
+				$routes[] = 'index';
+				break;
+			default:
+				break;
+		}
+		return array(
+				'action'   => array_pop($routes),
+				'controller' => OArray::ucFirst($routes),
+				'value'      => $values
+		);
 	}
 	
 	/**
@@ -157,95 +189,6 @@ class Route extends Obj{
 	}
 	
 	/**
-	 * 分类获取路由
-	 * @return \App\Lib\array|multitype:\App\Lib\array |\App\Lib\Ambigous|\App\Lib\unknown
-	 */
-	private static function get() {
-		$url = new Route();
-		if (!empty(Base::$request) && Base::$request->isCli()) {
-			//return $url->cli();
-		}
-		switch (APP_MODE) {
-			case ERoute::COMMON:
-				return $url -> c();
-				break;
-			case ERoute::R:
-				return $url -> r();
-				break;
-			case ERoute::PHP:
-				return $url -> u();
-				break;
-			case ERoute::SHORT:
-				return $url -> s();
-				break;
-			case ERoute::GRACE:
-				return $url -> y();
-				break;
-			case ERoute::REGEX:
-				return $url -> p();
-				break;
-			case ERoute::CONFIG:
-				return $url -> d();
-				break;
-			default:
-				return $url -> c();
-				break;
-		}
-	}
-	
-	/**
-	 * 根据配置文件中自定义的路由解析
-	 */
-	private function d() {
-		$url    = HUrl::request_uri();
-		$url    = explode('?', $url)[0];
-		$url    = trim($url, '/');
-		$routes = Base::config('route');
-		if (!is_array($routes)) {
-			return $this->getRoute($url);
-		}
-		if (array_key_exists($url, $routes)) {
-			return $this->getRoute($routes[$url]);
-		}
-		foreach ($routes as $key => $value) {
-			$pattern = str_replace(':num', '[0-9]+', $key);
-			$pattern = str_replace(':any', '[^/]+', $pattern);
-			$pattern = str_replace('/', '\\/', $pattern);
-			$matchs  = array();
-			preg_match('/'.$pattern.'/i', $url, $matchs);
-			if(count($matchs) > 0 && $matchs[0] === $url) {
-				$route = $value;
-				foreach ($matchs as $k => $val) {
-					$route = str_replace('$'.$k, $val, $route);
-				}
-				return $this->getRoute($route);
-			}
-		}
-		return $this->getRoute($url);
-	}
-	
-	/**
-	 * 获取c、v的参数解析   ?c=home&v=index
-	 * @return multitype:array NULL
-	 */
-	private function c() {
-		$values = explode('/', Base::$request->get('v' , 'index'));
-		$routes = array(
-				'controller' => OArray::ucFirst(explode('/', Base::$request->get('c' , 'home'))),
-				'action'   => array_shift($values),
-				'value'      => $values
-		);
-		return $routes;
-	}
-	
-	/**
-	 * 获取r的参数解析     格式?r=home/index
-	 */
-	private function r() {
-		return $this->getRoute(Base::$request->get('r', 'home/index'));
-	}
-	
-	/**
 	 * 带index。php的链接解析，格式 index.php/home/index
 	 */
 	private function u() {
@@ -274,30 +217,6 @@ class Route extends Obj{
 	}
 	
 	/**
-	 * 短链接匹配
-	 *
-	 * @return Ambigous <array, string>
-	 */
-	private function s() {
-		$key = Base::$request->get('s');
-		if ($key === null) {
-			$url = HUrl::request_uri();
-			$ar  = explode('/', $url, 2);
-			$ar  = explode('?', $ar[1], 2);
-			$key = $ar[0];
-			$key = $key == '' ? '*' : $key;
-		}
-		if (strlen($key) < 4) {
-			$short = Base::config('short.'.$key);
-			$arr   = OString::toArray($short , '.', 2, array('home', 'index'));
-		} else {
-				
-		}
-	
-		return $arr;
-	}
-	
-	/**
 	 * 控制台的路由
 	 */
 	private function cli() {
@@ -322,34 +241,7 @@ class Route extends Obj{
 		return $this->getValue($routes);
 	}
 	
-	/**
-	 * 根据数字判断是否带值
-	 * @param array $routes
-	 * @return array:
-	 */
-	private function getValue($routes) {
-		$values = array();
-		for ($i = 0, $len = count($routes); $i < $len; $i++) {
-			if (is_numeric($routes[$i])) {
-				$values = array_splice($routes, $i);
-				break;
-			}
-		}
-		switch (count($routes)) {
-			case 0:
-				$routes[] = 'home';
-			case 1:
-				$routes[] = 'index';
-				break;
-			default:
-				break;
-		}
-		return array(
-				'action'   => array_pop($routes),
-				'controller' => OArray::ucFirst($routes),
-				'value'      => $values
-		);
-	}
+	
 	
 	/**
 	 * 判断当前网址是否是url

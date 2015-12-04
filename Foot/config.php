@@ -24,7 +24,7 @@ return array(
 				'ext' => '.php'
 		),
 		'route'  => array(
-				'driver'  => App\Head\Route::class,
+				'driver'  => App\Head\Route\Yii::class,
 				'default' => 'HomeController@indexAction',
 				'admin'   => 'AdminController@indexAction'
 		),

@@ -6,12 +6,11 @@ namespace App\Head;
  * @author Jason
  * @time 2015-12-1
  */
-
 use App\Body\Object\Obj;
 
-class Autoload extends Obj {
+class Autoload extends Obj{
 	
-	protected $registered = false;
+	protected $_registerAlias = false;
 
 	protected static $instance;
 	
@@ -30,9 +29,9 @@ class Autoload extends Obj {
 	 * 注册自动加载
 	 */
 	public function register() {
-		if (!$this->registered) {
+		if (!$this->_registerAlias) {
 			spl_autoload_register(array($this, '_load'), true, true);
-			$this->registered = true;
+			$this->_registerAlias = TRUE;
 		}
 	}
 	
