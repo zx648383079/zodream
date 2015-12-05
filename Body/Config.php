@@ -51,4 +51,32 @@ class Config extends Obj {
 		}
 		return array();
 	}
+	
+	/**
+	 * 根据方法换取多维中的一个值
+	 * @param unknown $method
+	 * @param unknown $value
+	 */
+	public function getMultidimensional($method, $value) {
+		$length = count($value);
+		if ($length < 1) {
+			return $this->get($method);
+		}
+		if ($length > 1) {
+			return $this->get($method. implode('.', $value));
+		}
+		
+		if (!$this->has($method) || !isset($this->_data[$method][$value[0]])) {
+			return null;
+		}
+		return $this->_data[$method][$value[0]];
+	}
+	
+	public function __call($method, $value) {
+		$this->getMultidimensional($method, $value);
+	}
+	
+	public static function __callstatic($method, $value) {
+		return static::getInstance()->getMultidimensional($method, $value);
+	}
 }

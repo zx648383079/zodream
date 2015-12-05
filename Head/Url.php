@@ -76,8 +76,11 @@ class Url {
 		if ($file === '' || $file === '/') {
 			return APP_URL;
 		}
-		$url = call_user_func(array(Config::getInstance()->get('route.driver'), 'to'), $file);
-		
+		if (strpos($file, '.') !== false) {
+			$url = rtrim(explode('.php', APP_URL)[0], '/').'/'.ltrim($file, '/');
+		} else {
+			$url = call_user_func(array(Config::getInstance()->get('route.driver'), 'to'), $file);
+		}
 		if ($extra === null) {
 			return $url;
 		} else if (is_string($extra)) {
@@ -90,15 +93,6 @@ class Url {
 			$url = self::setValue($url, $extra);
 		}
 		return $url;
-	}
-	
-	/**
-	 * 文件路径
-	 * @param unknown $file
-	 * @return string
-	 */
-	public static function file($file) {
-		return self::to($file, null);
 	}
 	
 	/**
@@ -119,7 +113,7 @@ class Url {
 			$root .= ':'.$port;
 		}
 		$root .= '/';
-		$self = Request::getInstance()->server('PHP_SELF');
+		$self = Request::getInstance()->server('script_name');
 		if ($self !== '/index.php') {
 			$root .= ltrim($self, '/');
 		}

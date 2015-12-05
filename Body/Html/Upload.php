@@ -1,6 +1,6 @@
 <?php
-namespace App\Body\Html;
-/*
+namespace Zodream\Body\Html;
+/**
  * 上传类
  *
  * @author Jason

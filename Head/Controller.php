@@ -9,6 +9,10 @@ namespace Zodream\Head;
 use Zodream\Body\Config;
 use Zodream\Body\Language;
 use Zodream\Body\Loader;
+use Zodream\Head\Response\Theme;
+use Zodream\Head\Response\Component;
+use Zodream\Head\Response\Ajax;
+use Zodream\Head\Response\Image;
 
 abstract class Controller {
 	protected $loader;
@@ -70,11 +74,11 @@ abstract class Controller {
 	 * @param string $value  要传的值
 	 */
 	protected function send($key, $value = null) {
-		Response::getInstance()->set($key, $value);
+		Theme::getInstance()->set($key, $value);
 	}
 	
 	protected function component($name = 'index', $data = null) {
-		return Response::getInstance()->component($name, $data);
+		return Component::view($name, $data);
 	}
 	
 	/**
@@ -83,8 +87,8 @@ abstract class Controller {
 	 * @param string $name 视图的文件名
 	 * @param array $data 要传的数据
 	 */
-	protected function show($name = "index", $data = null) {
-		Response::getInstance()->show($name, $data);
+	protected function show($name = null, $data = null) {
+		Theme::getInstance()->show($name, $data);
 	}
 	
 	/**
@@ -94,7 +98,7 @@ abstract class Controller {
 	 * @param string $type 返回类型
 	 */
 	protected function ajaxJson($data, $type = 'JSON') {
-		Response::getInstance()->ajaxJson($data, $type);
+		Ajax::view($data, $type);
 	}
 	
 	/**
@@ -103,6 +107,6 @@ abstract class Controller {
 	 * @param $img
 	 */
 	protected function image($img) {
-		Response::getInstance()->image($img);
+		Image::view($img);
 	}
 }

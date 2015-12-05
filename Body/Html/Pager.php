@@ -1,6 +1,6 @@
 <?php 
 namespace Zodream\Body\Html;
-/*
+/**
  * 分页链接
  *
  * @author Jason

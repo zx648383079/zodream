@@ -1,6 +1,6 @@
 <?php
-namespace App\Body\Html;
-/*
+namespace Zodream\Body\Html;
+/**
  * 运行时间纪录
  *
  * @author Jason

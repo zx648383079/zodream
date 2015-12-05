@@ -1,6 +1,6 @@
 <?php
 namespace Zodream\Body\Html;
-/*
+/**
  * 二维码
  *
  * @author Jason

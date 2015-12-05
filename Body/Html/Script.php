@@ -1,12 +1,13 @@
 <?php 
-namespace App\Body\Html;
-/*
+namespace Zodream\Body\Html;
+/**
  * 加载脚本
  *
  * @author Jason
  * @time 2015-12-1
  */
-use App\Head\Url;
+use Zodream\Head\Url;
+defined('THEME_DIR') or define('THEME_DIR', '/');
 
 class Script {
 	public static function make($files) {
@@ -15,11 +16,11 @@ class Script {
 				$result = '';
 				if (!strstr($file,'//')) {
 					if (stristr($file, '.css')) {
-						$result = '<link rel="stylesheet" type="text/css" href="'.Url::file('asset/css/'.$file).'"/>';
+						$result = '<link rel="stylesheet" type="text/css" href="'.Url::to(THEME_DIR.'css/'.$file).'"/>';
 					} elseif (stristr($file, '.js')) {
-						$result = '<script src="'.Url::file('asset/js/'.$file).'"></script>';
+						$result = '<script src="'.Url::to(THEME_DIR.'js/'.$file).'"></script>';
 					} else {
-						$result = '<script src="'.Url::file('asset/js/'.$file).'.js"></script>';
+						$result = '<script src="'.Url::to(THEME_DIR.'js/'.$file.'.js').'"></script>';
 					}
 				} else {
 					if (stristr($file, '.css')) {

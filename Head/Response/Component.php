@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Head\Response;
 
+use Zodream\Head\FileSystem;
 class Component {
 	protected static $components;
 	
@@ -12,7 +13,7 @@ class Component {
 	public static function view($name = 'index', $data = null) {
 		extract($data);
 		ob_start();
-		include(View::make($name));
+		include(FileSystem::view($name));
 		self::$components .= ob_get_contents();
 		ob_end_clean();
 		return self;

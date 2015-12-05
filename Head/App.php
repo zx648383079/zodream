@@ -8,6 +8,7 @@ namespace Zodream\Head;
 */
 defined('VERSION') or define('VERSION', 1.0);
 defined('APP_DIR') or define('APP_DIR', dirname(dirname(__FILE__)).'/');
+defined('APP_API') or define('APP_API', false);
 
 class App {
 	/**

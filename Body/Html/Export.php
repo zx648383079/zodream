@@ -1,6 +1,6 @@
 <?php
 namespace Zodream\Body\Html;
-/*
+/**
  * 导出类
  *
  * @author Jason

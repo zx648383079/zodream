@@ -23,7 +23,6 @@ class Redirect {
 		foreach ((array)$urls as $value) {
 			$url .= Url::to($value);
 		}
-		die($url);
 		if (empty($msg)) {
 			$msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
 		}

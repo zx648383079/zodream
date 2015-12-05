@@ -1,33 +1,27 @@
 <?php 
-namespace Zodream\Head;
-/*
+namespace Zodream\Head\Response;
+/**
 * 响应
 * 
 * @author Jason
-* @time 2015-11.29
+* @time 2015-12-4
 */
 use Zodream\Body\Object\Obj;
-use Zodream\Body\Html\View;
+use Zodream\Body\Object\Arr;
+use Zodream\Head\FileSystem;
+use Zodream\Body\Html\Script;
+use Zodream\Head\Route;
 
-final class View extends Obj {
-	private static $_instance;
+class View extends Obj {
+	protected static $instance;
 	/**
 	 * 单例模式
-	 * @return \Zodream\Head\Response
 	 */
 	public static function getInstance() {
-		if (!(self::$_instance instanceof self)) {
-			self::$_instance = new self();
+		if (is_null(static::$instance)) {
+			static::$instance = new static;
 		}
-		return self::$_instance;
-	}
-	
-	/**
-	 * 获取额外的值 主要是js、css文件或脚本
-	 * @return string
-	 */
-	public function getExtra() {
-		return $this->get('_extra');
+		return static::$instance;
 	}
 	
 	/**
@@ -41,34 +35,56 @@ final class View extends Obj {
 			$param = array_merge((array)$this->getExtra(), (array)$param);
 		}
 		$this->set('_extra', $param);
-		foreach (OArray::to($names, '.') as $value) {
-			$file = View::make($value);
+		foreach (Arr::toFile($names, '.') as $value) {
+			$file = FileSystem::view($value);
 			if (file_exists($file)) {
 				include($file);
 			} else {
-				echo $file,' 不存在！';
-				var_dump($this->get());
+				throw new Error('NOT FIND FILE:'.$file);
 			}
 		}
 	}
 	
+	/**
+	 * 输出脚本
+	 */
+	public function jcs() {
+		$args   = func_get_args();
+		$args[] = $this->get('_extra', array());
+		Script::make(Arr::sort($args));
+	}
 	
+	/**
+	 * 直接输出
+	 * @param unknown $key
+	 */
+	public function ech($key) {
+		echo Arr::tostring($this->get($key));
+	}
 	
 	/**
 	 * 加载视图
 	 *
-	 * @param string $name 视图的文件名
-	 * @param array $data 要传的数据
+	 * @param string|array $name 视图的文件名 如果是array|null 将使用 $method引导视图 
+	 * @param array|null $data 要传的数据 如果$name 为array 则$data = $name
+	 * @param system $method 获取方法
 	 */
-	public function show($name = "index", $data = null) {
+	public function show($name = null, $data = null) {
+		if (is_array($name)) {
+			$data = $name;
+			$name = null;
+		}
 		if (!empty($data)) {
 			$this->set($data);
+		}
+		if (empty($name)) {
+			$name = str_replace(array('\\', '::', 'Admin.Head.', APP_CONTROLLER, APP_ACTION), array('.', '.'), Route::$method);
 		}
 		if (APP_API) {
 			$this->ajaxJson($this->get());
 		} else {
 			ob_start();
-			include(View::make($name));
+			include(FileSystem::view($name));
 			$content = ob_get_contents();
 			ob_end_clean();
 			$this->showGzip($content);

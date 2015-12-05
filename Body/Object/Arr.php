@@ -88,9 +88,9 @@ class Arr {
 		return $list;
 	}
 	
-	/****
-	 把多维数组转换成字符串
-	 *******/
+	/**
+	* 把多维数组转换成字符串
+	*/
 	public static function tostring($arr, $link  = '') {
 		$str = '';
 		if (is_array($arr)) {
@@ -151,10 +151,6 @@ class Arr {
 		}
 	}
 	
-	public static function setChild($name, $value, &$arr) {
-	
-	}
-	
 	/**
 	 *   扩展 array_combine 能够用于不同数目
 	 */
@@ -204,7 +200,7 @@ class Arr {
 	public static function merge(array $arr, array $arg) {
 		foreach ($arg as $key => $value) {
 			if (!array_key_exists($key, $arr) || !is_array($value)) {
-				$arr[$key] = $arg;
+				$arr[$key] = $value;
 				continue;
 			}
 			$arr[$key] = self::merge((array)$arr[$key], $value);

@@ -19,8 +19,8 @@ return array(
 				'role'   => Zodream\Head\Auth\Comma::class,       //权限判断
 				'home'  => 'auth'                             //用户登录主页
 		),
-		'view'   => array(                           //视图文件信息
-				'dir' => 'view',
+		'theme'   => array(                           //视图文件信息
+				'dir' => 'default',
 				'ext' => '.php'
 		),
 		'route'  => array(

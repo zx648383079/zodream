@@ -7,6 +7,7 @@ namespace Zodream\Head;
  * @time 2015-12-1
  */
 use Zodream\Body\Object\Obj;
+use Zodream\Body\Config;
 
 class Autoload extends Obj{
 	
@@ -15,7 +16,7 @@ class Autoload extends Obj{
 	protected static $instance;
 	
 	private function __construct() {
-		
+		$this->set(Config::getInstance()->get('alias', array()));
 	}
 	
 	public static function getInstance() {
@@ -35,6 +36,10 @@ class Autoload extends Obj{
 		}
 	}
 	
+	/**
+	 * 设置别名
+	 * @param unknown $alias
+	 */
 	protected function _load($alias) {
 		if ($this->has($alias)) {
 			return class_alias($this->get($alias), $alias);

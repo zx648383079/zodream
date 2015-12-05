@@ -9,7 +9,7 @@ class Ajax {
 	 * @param array|string $data 要传的值
 	 * @param string $type 返回类型
 	 */
-	public function view($data, $type = 'JSON') {
+	public static function view($data, $type = 'JSON') {
 		switch (strtoupper($type)) {
 			case 'JSON' :
 				// 返回JSON数据格式到客户端 包含状态信息
@@ -18,7 +18,7 @@ class Ajax {
 			case 'XML'  :
 				// 返回xml格式数据
 				header('Content-Type:text/xml; charset=utf-8');
-				exit($this->_xmlEncode($data));
+				exit(self::_xmlEncode($data));
 			case 'JSONP':
 				// 返回JSON数据格式到客户端 包含状态信息
 				header('Content-Type:application/json; charset=utf-8');
@@ -40,7 +40,7 @@ class Ajax {
 	 * @param null $xml
 	 * @return mixed
 	 */
-	private function _xmlEncode($data, $rootNodeName = 'data', $xml = null) {
+	private static function _xmlEncode($data, $rootNodeName = 'data', $xml = null) {
 		if (ini_get('zend.ze1_compatibility_mode') == 1) {
 			ini_set ('zend.ze1_compatibility_mode', 0);
 		}
@@ -54,7 +54,7 @@ class Ajax {
 			$key = preg_replace('/[^a-z]/i', '', $key);
 			if (is_array($value)) {
 				$node = $xml->addChild($key);
-				$this->xml_encode($value, $rootNodeName, $node);
+				self::_xmlEncode($value, $rootNodeName, $node);
 			} else {
 				$value = htmlentities($value);
 				$xml->addChild($key, $value);

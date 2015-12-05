@@ -1,12 +1,28 @@
 <?php 
 namespace Zodream\Head;
-/*
+/**
  * 文件操作
  *
  * @author Jason
  * @time 2015-12-1
  */
+use Zodream\Body\Config; 
+
 class FileSystem {
+	
+	/**
+	 * 生成视图路径
+	 * @param unknown $name
+	 * @return string
+	 */
+	public static function view($name) {
+		$name = str_replace('.', '/', $name);
+		$file = APP_DIR .'Theme/' .Config::theme('dir').'/'.$name;
+		$file = str_replace( '//', '/', $file);
+	
+		return $file . Config::theme('ext');
+	}
+	
 	/**
 	 * 遍历文件夹
 	 */

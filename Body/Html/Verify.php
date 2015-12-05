@@ -1,6 +1,6 @@
 <?php
-namespace App\Body\Html;
-/*
+namespace Zodream\Body\Html;
+/**
  * 验证码
  *
  * @author Jason
