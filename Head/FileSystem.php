@@ -16,8 +16,9 @@ class FileSystem {
 	 * @return string
 	 */
 	public static function view($name) {
+		$dir = THEME_DIR === '/' ? VIEW_DIR : THEME_DIR;
 		$name = str_replace('.', '/', $name);
-		$file = APP_DIR .'Theme/' .Config::theme('dir').'/'.$name;
+		$file = APP_DIR. trim($dir, '/').'/'.$name;
 		$file = str_replace( '//', '/', $file);
 	
 		return $file . Config::theme('ext');

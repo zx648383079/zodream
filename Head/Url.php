@@ -77,7 +77,7 @@ class Url {
 			return APP_URL;
 		}
 		if (strpos($file, '.') !== false) {
-			$url = rtrim(explode('.php', APP_URL)[0], '/').'/'.ltrim($file, '/');
+			$url = APP_URL.ltrim($file, '/');
 		} else {
 			$url = call_user_func(array(Config::getInstance()->get('route.driver'), 'to'), $file);
 		}

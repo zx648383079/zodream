@@ -7,20 +7,20 @@ namespace Zodream\Body\Html;
  * @time 2015-12-1
  */
 use Zodream\Head\Url;
-defined('THEME_DIR') or define('THEME_DIR', '/');
 
 class Script {
-	public static function make($files) {
+	public static function make($files, $dir = 'assets/') {
 		foreach ($files as $file) {
 			if (is_string($file) && !empty($file)) {
 				$result = '';
+				$dir = rtrim($dir, '/').'/';
 				if (!strstr($file,'//')) {
 					if (stristr($file, '.css')) {
-						$result = '<link rel="stylesheet" type="text/css" href="'.Url::to(THEME_DIR.'css/'.$file).'"/>';
+						$result = '<link rel="stylesheet" type="text/css" href="'.Url::to($dir.'css/'.$file).'"/>';
 					} elseif (stristr($file, '.js')) {
-						$result = '<script src="'.Url::to(THEME_DIR.'js/'.$file).'"></script>';
+						$result = '<script src="'.Url::to($dir.'js/'.$file).'"></script>';
 					} else {
-						$result = '<script src="'.Url::to(THEME_DIR.'js/'.$file.'.js').'"></script>';
+						$result = '<script src="'.Url::to($dir.'js/'.$file.'.js').'"></script>';
 					}
 				} else {
 					if (stristr($file, '.css')) {

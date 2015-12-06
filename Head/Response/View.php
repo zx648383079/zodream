@@ -12,6 +12,8 @@ use Zodream\Head\FileSystem;
 use Zodream\Body\Html\Script;
 use Zodream\Head\Route;
 
+defined('VIEW_DIR') or define('VIEW_DIR', '/');
+
 class View extends Obj {
 	protected static $instance;
 	/**
@@ -55,6 +57,24 @@ class View extends Obj {
 	}
 	
 	/**
+	 * 输出资源url
+	 * @param unknown $file
+	 * @param string $isView
+	 */
+	public function asset($file, $isView = TRUE) {
+		if ($isView) {
+			$file = strtolower(APP_MODULE).'/'.VIEW_DIR.ltrim($file, '/');
+		} else {
+			$file = 'assets/'.ltrim($file, '/');
+		}
+		echo Url::to($file);
+	}
+	
+	public function url($url) {
+		echo Url::to($url);
+	}
+	
+	/**
 	 * 直接输出
 	 * @param unknown $key
 	 */
@@ -78,7 +98,7 @@ class View extends Obj {
 			$this->set($data);
 		}
 		if (empty($name)) {
-			$name = str_replace(array('\\', '::', 'Admin.Head.', APP_CONTROLLER, APP_ACTION), array('.', '.'), Route::$method);
+			$name = str_replace(array('\\', '::', APP_MODULE.'.Head.', APP_CONTROLLER, APP_ACTION), array('.', '.'), Route::$method);
 		}
 		if (APP_API) {
 			$this->ajaxJson($this->get());
