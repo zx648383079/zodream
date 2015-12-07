@@ -6,7 +6,7 @@ use Zodream\Head\Url;
 
 class Grace implements IRoute {
 	public static function get() {
-		$url = Url::to();
+		$url = Url::request_uri();
 		return end(explode('.php', explode('?', $url)[0]));
 	}
 	

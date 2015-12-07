@@ -65,7 +65,10 @@ class Url {
 	 */
 	public static function to($file = null, $extra = null, $secret = FALSE) {
 		if (strstr($file, '//')) {
-			return $file;
+			if (strstr($file, '://') || ltrim($file, '/') === substr($file, 2)) {
+				return $file;
+			}
+			$file = str_replace('//', '/', $file);
 		}
 		if ($file === null || $file === 0) {
 			return APP_URL.ltrim(self::request_uri(), '/');
@@ -144,7 +147,7 @@ class Url {
 	 *
 	 * @return string 真实显示的网址
 	 */
-	private static function request_uri() {
+	public static function request_uri() {
 		$uri         = '';
 		$request_uri = Request::getInstance()->server('REQUEST_URI');
 		if (!is_null($request_uri)) {

@@ -44,7 +44,7 @@ class Pdo implements IDb {
 		$user     = $config['user'];
 		$pwd      = $config['password'];
 		$database = $config['database'];
-		$codin    = $config['encoding'];
+		$coding   = $config['encoding'];
 		$port     = $config['port'];
 	
 		try {

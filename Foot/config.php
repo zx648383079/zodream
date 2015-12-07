@@ -26,6 +26,7 @@ return array(
 		'route'  => array(
 				'driver'  => Zodream\Head\Route\Yii::class,
 				'default' => 'HomeController@indexAction',
+				'generate' => Zodream\Hand\Generate\Generate::class.'@make',
 				'admin'   => 'AdminController@indexAction'
 		),
 		'db'     => array(							//MYSQL数据库的信息

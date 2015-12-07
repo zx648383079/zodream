@@ -80,7 +80,6 @@ class Route extends Obj{
 			$url .= '/'.$action;
 		}
 		self::_loopConfig($url, static::getInstance()->get(), $value);
-		
 		//自动判断
 		if (empty($controllers)) {
 			$controllers = array('home');

@@ -7,7 +7,7 @@ use Zodream\Head\Url;
 
 class Php implements IRoute {
 	public static function get() {
-		$url = Url::to();
+		$url = Url::request_uri();
 		$arr = Str::toArray($url, '.php', 2, array('', '/home/index'));
 		return end($arr);
 	}

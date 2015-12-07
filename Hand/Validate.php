@@ -1,6 +1,6 @@
 <?php 
 namespace Zodream\Hand;
-/*
+/**
  * 验证
  *
  * @author Jason

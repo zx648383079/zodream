@@ -13,6 +13,7 @@ use Zodream\Head\Response\Theme;
 use Zodream\Head\Response\Component;
 use Zodream\Head\Response\Ajax;
 use Zodream\Head\Response\Image;
+use Zodream\Hand\Validate;
 
 abstract class Controller {
 	protected $loader;
@@ -59,7 +60,7 @@ abstract class Controller {
 	 * @return array
 	 */
 	protected function validata( $request, $param) {
-		$vali   = new Validation();
+		$vali   = new Validate();
 		$result = $vali->make($request, $param);
 		if (!$result) {
 			$result = $vali->error;

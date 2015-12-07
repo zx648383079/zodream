@@ -73,6 +73,15 @@ class Model {
 		$sql     = "UPDATE {$this->table} SET $setData $where";
 		return $this->db->update($sql);
 	}
+	
+	/**
+	 * 更具id 修改记录
+	 * @param unknown $id
+	 * @param unknown $data
+	 */
+	public function updateById($id, $data) {
+		return $this->update($data, 'id = '.$id);
+	}
 	 
 	/**
 	 * 设置bool值
@@ -181,7 +190,7 @@ class Model {
 			$order = isset($param['order']) ? 'ORDER BY '.$param['order'] : '';
 			$group = isset($param['group']) ? 'GROUP BY '.$param['group'] : '';
 			if (isset($param['where'])) {
-				foreach ($param['where'] as $key => $value) {
+				foreach ($param['where'] as $value) {
 					if (empty($where)) {
 						$where = 'WHERE '.$value;
 					} else {
@@ -189,6 +198,7 @@ class Model {
 							switch ($value[1]) {
 								case "or":
 									$where .= ' OR '.$value;
+									
 								case "and":
 									$where .= ' AND '.$value;
 							}
