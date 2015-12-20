@@ -3,7 +3,7 @@ namespace Zodream\Domain\Routing;
 
 use Zodream\Infrastructure\Request;
 
-defined('APP_URL') or define('APP_URL', Url::getRoot());
+defined('APP_URL') or define('APP_URL', UrlGenerator::getRoot());
 class UrlGenerator {
 	/**
 	 * 上个页面网址

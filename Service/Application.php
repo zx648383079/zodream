@@ -17,6 +17,7 @@ class Application {
 	 */
 	public static function main() {
 		Router::run();
+		Router::$route->run();
 	}
 	
 }

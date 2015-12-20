@@ -5,7 +5,7 @@ use Zodream\Infrastructure\Config;
 use Zodream\Domain\Routing\UrlGenerator;
 use Zodream\Domain\Html\Script;
 
-defined('THEME_DIR') or define('THEME_DIR', '/Theme/' .Config::theme('dir').'/');
+defined('THEME_DIR') or define('THEME_DIR', '/' .Config::theme('dir').'/');
 
 class Theme extends View {
 	

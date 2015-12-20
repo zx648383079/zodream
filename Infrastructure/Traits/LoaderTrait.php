@@ -1,5 +1,10 @@
 <?php
 namespace Zodream\Infrastructure\Traits;
+/**
+ * 
+ * @author Jason
+ *
+ */
 
 trait LoaderTrait {
 	protected $loader;

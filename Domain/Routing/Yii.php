@@ -3,6 +3,7 @@ namespace Zodream\Domain\Routing;
 
 
 use Zodream\Infrastructure\DomainObject\RouteObject;
+use Zodream\Infrastructure\Request;
 class Yii implements RouteObject {
 	public static function get() {
 		return Request::getInstance()->get('r', 'home/index');

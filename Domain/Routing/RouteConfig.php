@@ -14,6 +14,8 @@ class RouteConfig extends MagicObject {
 	
 	protected $_driver;
 	
+	protected $_default;
+	
 	protected function __construct() {
 		$this->reset();
 	}
@@ -21,8 +23,13 @@ class RouteConfig extends MagicObject {
 	public function reset() {
 		$config = Config::getInstance()->get('route');
 		$this->_driver = $config['driver'];
-		unset($config['driver']);
+		$this->_default = isset($config['default']) ? $config['default'] : 'home@index';
+		unset($config['driver'], $config['default']);
 		$this->set($config);
+	}
+	
+	public function getDefault() {
+		return $this->_default;
 	}
 	
 	/**

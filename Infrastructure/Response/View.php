@@ -12,10 +12,11 @@ use Zodream\Infrastructure\FileSystem;
 use Zodream\Domain\Html\Script;
 use Zodream\Domain\Routing\UrlGenerator;
 use Zodream\Domain\Routing\Router;
+use Zodream\Infrastructure\MagicObject;
 
 defined('VIEW_DIR') or define('VIEW_DIR', '/');
 
-class View extends Obj {
+class View extends MagicObject {
 	use SingletonPattern;
 	
 	/**
@@ -90,17 +91,13 @@ class View extends Obj {
 			$this->set($data);
 		}
 		if (empty($name)) {
-			$name = str_replace(array('\\', '::', APP_MODULE.'.Head.', APP_CONTROLLER, APP_ACTION), array('.', '.'), Router::$method);
+			$name = str_replace(array('\\', '@'), '.', Router::$route->getClass());
 		}
-		if (APP_API) {
-			$this->ajaxJson($this->get());
-		} else {
-			ob_start();
-			include(FileSystem::view($name));
-			$content = ob_get_contents();
-			ob_end_clean();
-			$this->showGzip($content);
-		}
+		ob_start();
+		include(FileSystem::view($name));
+		$content = ob_get_contents();
+		ob_end_clean();
+		$this->showGzip($content);
 	}
 	
 	public function showGzip($content) {

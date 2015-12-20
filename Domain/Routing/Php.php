@@ -3,10 +3,11 @@ namespace Zodream\Domain\Routing;
 
 
 use Zodream\Infrastructure\DomainObject\RouteObject;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 class Php implements RouteObject {
 	public static function get() {
-		$url = Url::request_uri();
-		$arr = Str::toArray($url, '.php', 2, array('', '/home/index'));
+		$url = UrlGenerator::getUri();
+		$arr = StringExpand::toArray($url, '.php', 2, array('', '/home/index'));
 		return end($arr);
 	}
 	

@@ -16,7 +16,7 @@ class Router{
 	 * 成功执行的method
 	 * @var unknown
 	 */
-	public static $method;
+	public static $route;
 	
 	/**
 	 * 运行加载方法
@@ -32,7 +32,7 @@ class Router{
 		unset($instance);
 		//执行默认的
 		if (empty($controllers) && empty($action)) {
-			return new Route(RouteConfig::getInstance()->get('default'), $value);
+			return self::$route = new Route(RouteConfig::getInstance()->getDefault(), $value);
 		}
 		//执行已注册的
 		$url = implode('/', $controllers);
@@ -59,11 +59,17 @@ class Router{
 				break;
 			}
 		}
-		return array(
-				'action'     => (count($routes) > 1) ? array_pop($routes) : null,
-				'controller' => array_map('ucfirst', $routes),
+		$returnValue = array(
 				'value'      => $values
 		);
+		if (count($routes) == 1) {
+			$returnValue['action'] = null;
+			$returnValue['controller'] = empty($routes[0]) ? array() : $routes[0];
+		} else {
+			$returnValue['action'] = array_pop($routes);
+			$returnValue['controller'] = $routes;
+		}
+		return $returnValue;
 	}
 	
 	/**
@@ -80,7 +86,7 @@ class Router{
 			$matchs  = array();
 			preg_match('/'.$pattern.'/i', $url, $matchs);
 			if(count($matchs) > 0 && array_shift($matchs) === $url) {
-				return new Route($instance, array_merge($matchs, (array)$value));
+				return self::$route = new Route($instance, array_merge($matchs, (array)$value));
 			}
 		}
 	}
@@ -97,7 +103,7 @@ class Router{
 			$action = 'index';
 		}
 		$instance = implode('\\', $controllers);
-		return new Route($instance.'@'.$action, $values);
+		return self::$route = new Route($instance.'@'.$action, $values);
 	}
 	
 	/**

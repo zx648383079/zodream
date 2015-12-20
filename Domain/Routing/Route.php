@@ -1,10 +1,14 @@
 <?php
 namespace Zodream\Domain\Routing;
 
+use Zodream\Infrastructure\Error;
+
 class Route {
 	protected $_action;
 	
 	protected $_param;
+	
+	protected $_class = null;
 	
 	public function __construct($action, $param = null) {
 		$this->_action = $action;
@@ -22,6 +26,10 @@ class Route {
 			return $this->runClass();
 		}
 		return $this->runController();
+	}
+	
+	public function getClass() {
+		return $this->_class;
 	}
 	
 	/**
@@ -56,15 +64,38 @@ class Route {
 	 */
 	protected function runController() {
 		list($class, $action) = explode('@', $this->_action);
-		if (!class_exists($class)) {
-			$class = 'Service\\'.APP_MODULE.'\\'.ucfirst(strtolower($class)).APP_CONTROLLER;
-			$action .= APP_ACTION;
+		if (empty($class) || empty($action)) {
+			throw new Error('CLASS OR ACTION IS EMPTY!');
+		}
+		if (class_exists($class)) {
+			return $this->runControllerWithConfirm($class, $action);
+		}
+		$this->_class = $class = str_replace(APP_CONTROLLER, '', $class);
+		$class .= APP_CONTROLLER;
+		if (strstr('Service\\', $class) === false) {
+			$class = 'Service\\'.APP_MODULE.'\\' .ucfirst($class);
 		}
 		if (!class_exists($class)) {
-			throw new Error('NOT FIND PAGE!', '404');
+			throw new Error('NOT FIND CLASS!'. $class);
 		}
+		$action = str_replace(APP_ACTION, '', $action);
+		$this->_class .= '@'. $action;
+		$action = strtolower($action).APP_ACTION;
+		$this->runControllerWithConfirm($class, $action);
+	}
+	
+	/**
+	 * 执行已确认class存在的
+	 * @param unknown $class
+	 * @param unknown $action
+	 * @return mixed
+	 */
+	protected function runControllerWithConfirm($class, $action) {
 		$this->runFilter($instance = new $class, $action);
-		return call_user_func_array(array($instance, $action), $this->_param);
+		if (method_exists($instance, $action)) {
+			return call_user_func_array(array($instance, $action), $this->_param);
+		}
+		throw Error('Method Not Exists!');
 	}
 	
 	/**

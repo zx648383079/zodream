@@ -5,7 +5,7 @@ namespace Zodream\Domain\Routing;
 use Zodream\Infrastructure\DomainObject\RouteObject;
 class Grace implements RouteObject {
 	public static function get() {
-		$url = Url::request_uri();
+		$url = UrlGenerator::getUri();
 		return end(explode('.php', explode('?', $url)[0]));
 	}
 	
