@@ -25,8 +25,7 @@ return array(
 		),
 		'route'  => array(
 				'driver'  => Zodream\Domain\Routing\Grace::class,
-				'default' => 'HomeController@indexAction',
-				'generate' => '@make',
+				'default' => 'Home@index'                         //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
 		),
 		'db'     => array(							//MYSQL数据库的信息
 				'driver'   => Zodream\Infrastructure\Database\Pdo::class,

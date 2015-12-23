@@ -91,7 +91,8 @@ class View extends MagicObject {
 			$this->set($data);
 		}
 		if (empty($name)) {
-			$name = str_replace(array('\\', '@'), '.', Router::$route->getClass());
+			list($class, $action) = Router::$route->getClassAndAction();
+			$name = str_replace('\\', '.', $class).'.'.$action;
 		}
 		ob_start();
 		include(FileSystem::view($name));

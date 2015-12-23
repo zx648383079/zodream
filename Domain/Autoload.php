@@ -1,33 +1,27 @@
 <?php
-namespace Zodream\Head;
+namespace Zodream\Domain;
 /**
  * 自动加载功能
  *
  * @author Jason
- * @time 2015-12-1
  */
+use Zodream\Infrastructure\Traits\SingletonPattern;
+use Zodream\Infrastructure\MagicObject;
 
-class Autoload extends Obj{
+class Autoload extends MagicObject {
+	
+	use SingletonPattern;
 	
 	protected $_registerAlias = false;
-
-	protected static $instance;
 	
 	private function __construct() {
 		$this->set(Config::getInstance()->get('alias', array()));
 	}
 	
-	public static function getInstance() {
-		if (is_null(static::$instance)) {
-			return static::$instance = new static($aliases);
-		}
-		return static::$instance;
-	}
-	
 	/**
-	 * 注册自动加载
+	 * 注册别名
 	 */
-	public function register() {
+	public function registerAlias() {
 		if (!$this->_registerAlias) {
 			spl_autoload_register(array($this, '_load'), true, true);
 			$this->_registerAlias = TRUE;

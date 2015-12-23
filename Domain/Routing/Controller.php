@@ -9,66 +9,99 @@ namespace Zodream\Domain\Routing;
 use Zodream\Infrastructure\Loader;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Language;
-use Zodream\Infrastructure\Response\Theme;
-use Zodream\Infrastructure\Response\Component;
-use Zodream\Infrastructure\Response\Ajax;
-use Zodream\Infrastructure\Response\Image;
 use Zodream\Infrastructure\Traits\LoaderTrait;
-use Zodream\Infrastructure\Traits\FilterTrait;
 use Zodream\Infrastructure\Traits\ValidataTrait;
+use Zodream\Infrastructure\Error;
+use Zodream\Domain\Validater\ControllerValidate;
+use Zodream\Infrastructure\Traits\ViewTrait;
+use Zodream\Infrastructure\Request;
 
 abstract class Controller {
 	
-	use LoaderTrait, FilterTrait, ValidataTrait;
+	use LoaderTrait, ValidataTrait, ViewTrait;
 	
 	function __construct($loader = null) {
-		$this->send(array(
-				'title'    => Config::getInstance()->get('app.title'),
-				'language' => Language::getLang()
-		));
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 	}
 	
-	/**
-	 * 传递数据
-	 *
-	 * @param string|array $key 要传的数组或关键字
-	 * @param string $value  要传的值
-	 */
-	protected function send($key, $value = null) {
-		Theme::getInstance()->set($key, $value);
-	}
-	
-	protected function component($name = 'index', $data = null) {
-		return Component::view($name, $data);
-	}
+	public function init() { }
 	
 	/**
-	 * 加载视图
-	 *
-	 * @param string $name 视图的文件名
-	 * @param array $data 要传的数据
+	 * 在执行之前做规则验证
+	 * @param string $action 方法名
+	 * @return boolean
 	 */
-	protected function show($name = null, $data = null) {
-		Theme::getInstance()->show($name, $data);
+	protected function beforeFilter($action) {
+		if (isset($this->rules)) {
+			$role = isset($this->rules['*']) ? $this->rules['*'] : '';
+			$role = isset($this->rules[$func]) ? $this->rules[$func] : $role;
+			return ControllerValidate::make($role);
+		}
+		return TRUE;
+	}
+	
+	public function prepare() {  }
+	
+	public function finalize() {  }
+	/**
+	 * 执行方法
+	 * @param unknown $action
+	 * @param array $parameters
+	 * @throws Error
+	 */
+	public function runAction($action, array $vars = array()) {
+		if (!$this->canRunAction($action)) {
+			throw new Error($action .' ACTION CANOT RUN!');
+		}
+		$this->prepare();
+		
+		$reflectionObject = new \ReflectionObject( $this );
+		$action .= APP_ACTION;
+		$method = $reflectionObject->getMethod($action);
+		
+		$parameters = $method->getParameters();
+		$arguments = array();
+		foreach ($parameters as $param) {
+			if ( isset( $vars[ $param->getName() ] ) ) {
+				$arguments[] = $vars[ $param->getName() ];
+			} else {
+				$arguments[] = Request::getInstance()->get($param->getName());
+			}
+		}
+		$ret = call_user_func_array( array($this, $action) , $arguments );
+		
+		$this->finalize();
+		return $ret;
+	}
+	/**
+	 * 加载其他控制器的方法
+	 * @param unknown $controller
+	 * @param string $actionName
+	 * @param array $parameters
+	 */
+	public function forward($controller, $actionName = 'index' , $parameters = array())
+	{
+		if (is_string($controller)) {
+			$controller = new $controller;
+		}
+		return $controller->runAction($actionName, $parameters);
 	}
 	
 	/**
-	 * 返回JSON数据
-	 *
-	 * @param array|string $data 要传的值
-	 * @param string $type 返回类型
+	 * 判断是否存在方法
+	 * @param string $action
+	 * @return boolean
 	 */
-	protected function ajaxJson($data, $type = 'JSON') {
-		Ajax::view($data, $type);
+	public function hasAction($action) {
+		return method_exists($this, $action.APP_ACTION);
 	}
 	
 	/**
-	 * 显示图片
-	 *
-	 * @param $img
+	 * 判断是否能执行方法
+	 * @param string $action
+	 * @return boolean
 	 */
-	protected function image($img) {
-		Image::view($img);
+	public function canRunAction($action) {
+		return $this->hasAction($action) && $this->beforeFilter($action);
 	}
 }

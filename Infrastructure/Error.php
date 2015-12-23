@@ -5,7 +5,6 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
-
 class Error extends \Exception{
 	protected $_message;
 	protected $_file;

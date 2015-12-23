@@ -22,26 +22,23 @@ class Router{
 	 * 运行加载方法
 	 */
 	public static function run() {
-		$instance = call_user_func(array(RouteConfig::getInstance()->getDriver(), 'get'));
-		if (!is_array($instance)) {
-			$instance = self::_getValue($instance);
+		$routes = call_user_func(array(RouteConfig::getInstance()->getDriver(), 'get'));
+		if (is_string($routes)) {
+			//执行已注册的
+			if (self::_loopConfig($routes, RouteConfig::getInstance()->get())) {
+				return self::$route;
+			}
+			$routes = self::_getValue($routes);
 		}
-		$controllers = $instance['controller'];
-		$action      = $instance['action'];
-		$value       = $instance['value'];
-		unset($instance);
+		
+		list($controller, $action, $values) = $routes;
+		unset($routes);
 		//执行默认的
-		if (empty($controllers) && empty($action)) {
-			return self::$route = new Route(RouteConfig::getInstance()->getDefault(), $value);
+		if (empty($controller) && empty($action)) {
+			return self::$route = new Route(RouteConfig::getInstance()->getDefault(), $values, false);
 		}
-		//执行已注册的
-		$url = implode('/', $controllers);
-		if (!empty($action)) {
-			$url .= '/'.$action;
-		}
-		self::_loopConfig($url, RouteConfig::getInstance()->get(), $value);
 		//自动判断
-		self::_autoload($controllers, $action, $value);
+		self::_autoload($controller, $action, $values);
 	}
 	
 	/**
@@ -55,21 +52,35 @@ class Router{
 		$values = array();
 		for ($i = 0, $len = count($routes); $i < $len; $i++) {
 			if (is_numeric($routes[$i])) {
-				$values = array_splice($routes, $i);
+				if (($len - $i) % 2 == 0) {
+					// 数字作为分割符,无意义
+					$values = array_splice($routes, $i + 1);
+					unset($routes[$i]);
+				} else {
+					$values = array_splice($routes, $i - 1);
+				}
 				break;
+			} else {
+				$routes[$i] = ucfirst($routes[$i]);
 			}
 		}
-		$returnValue = array(
-				'value'      => $values
-		);
-		if (count($routes) == 1) {
-			$returnValue['action'] = null;
-			$returnValue['controller'] = empty($routes[0]) ? array() : $routes[0];
-		} else {
-			$returnValue['action'] = array_pop($routes);
-			$returnValue['controller'] = $routes;
+		$args = array();
+		for ($i = 0, $len = count($values); $i < $len; $i += 2) {
+			$args[$values[$i]] = $values[$i + 1];
 		}
-		return $returnValue;
+		
+		if (count($routes) == 1) {
+			$action     = null;
+			$controller = empty($routes[0]) ? null : $routes[0];
+		} else {
+			$action     = array_pop($routes);
+			$controller = implode('\\', $routes);
+		}
+		return array(
+				$controller,
+				$action,
+				$args
+		);
 	}
 	
 	/**
@@ -78,7 +89,7 @@ class Router{
 	 * @param unknown $config
 	 * @param unknown $value
 	 */
-	private static function _loopConfig($url, $config, $value = array()) {
+	private static function _loopConfig($url, $config) {
 		foreach ($config as $key => $instance) {
 			$pattern = str_replace(':num', '[0-9]+', $key);
 			$pattern = str_replace(':any', '[^/]+', $pattern);
@@ -86,9 +97,17 @@ class Router{
 			$matchs  = array();
 			preg_match('/'.$pattern.'/i', $url, $matchs);
 			if(count($matchs) > 0 && array_shift($matchs) === $url) {
-				return self::$route = new Route($instance, array_merge($matchs, (array)$value));
+				$values = array();
+				foreach ($matchs as $key => $value) {
+					if (!is_numeric($key)) {
+						$values[$key] = $value;
+					}
+				}
+				self::$route = new Route($instance, $values, false);
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	/**
@@ -98,12 +117,11 @@ class Router{
 	 * @param $c string 控制器的名称
 	 * @param $v string 视图所在的方法名
 	 */
-	private static function _autoload($controllers, $action, $values = array()) {
+	private static function _autoload($controller, $action, $values = array()) {
 		if (empty($action)) {
 			$action = 'index';
 		}
-		$instance = implode('\\', $controllers);
-		return self::$route = new Route($instance.'@'.$action, $values);
+		return self::$route = new Route($controller.'@'.$action, $values, true);
 	}
 	
 	/**
@@ -112,6 +130,6 @@ class Router{
 	 * @param string $value
 	 */
 	public static function add($route, $value = null) {
-		static::getInstance()->set($route, $value);
+		RouteConfig::getInstance()->set($route, $value);
 	}
 }

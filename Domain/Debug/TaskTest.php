@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Tesst;
+namespace Zodream\Domain\Debug;
 
 class TaskTest {
 	public static function debug() {

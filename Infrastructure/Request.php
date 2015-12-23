@@ -5,31 +5,24 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
-use Zodream\Body\Object\Arr;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 final class Request {
 	use SingletonPattern;
 	
-	private $posts;
-	private $gets;
-	private $requests;
-	private $cookies;
-	private $files;
-	private $servers;
-	private $input;
+	private $_posts;
+	private $_gets;
+	private $_requests;
+	private $_cookies;
+	private $_files;
+	private $_servers;
+	private $_input;
 	
 	public $error = FALSE;
 	
 	public function __construct() {
-		$this->gets     = $this->_clean($_GET);
-		$this->posts    = $this->_clean($_POST);
-		$this->requests = $this->_clean($_REQUEST);
-		$this->cookies  = $this->_clean($_COOKIE);
-		$this->servers  = $this->_clean($_SERVER);
-		$this->files    = $this->_clean($_FILES);
-		$this->input    = $this->_clean(file_get_contents('php://input'));
+		
 	}
 	
 	/**
@@ -56,7 +49,10 @@ final class Request {
 	 * @return Ambigous <unknown, string>
 	 */
 	public function get($name = null, $default = null) {
-		return $this->_getValue($name, $this->gets, $default);
+		if (empty($this->_gets)) {
+			$this->_gets = $this->_clean($_GET);
+		}
+		return $this->_getValue($name, $this->_gets, $default);
 	}
 	
 	/**
@@ -69,7 +65,6 @@ final class Request {
 		if ($name === null) {
 			return $args;
 		}
-		
 		return ArrayExpand::getVal(strtolower($name), $args, $default);
 	}
 	
@@ -79,7 +74,10 @@ final class Request {
 	 * @param string $default
 	 */
 	public function post($name = null, $default = null) {
-		return $this->_getValue($name, $this->posts , $default);
+		if (empty($this->_posts)) {
+			$this->_posts = $this->_clean($_POST);
+		}
+		return $this->_getValue($name, $this->_posts , $default);
 	}
 	
 	/**
@@ -88,7 +86,10 @@ final class Request {
 	 * @param string $default
 	 */
 	public function file($name = null, $default = null) {
-		return $this->_getValue($name, $this->files , $default);
+		if (empty($this->_files)) {
+			$this->_files = $this->_clean($_FILES);
+		}
+		return $this->_getValue($name, $this->_files , $default);
 	}
 	
 	/**
@@ -97,7 +98,10 @@ final class Request {
 	 * @param string $default
 	 */
 	public function request($name = null, $default = null) {
-		return $this->_getValue($name, $this->requests , $default);
+		if (empty($this->_requests)) {
+			$this->_requests = $this->_clean($_REQUEST);
+		}
+		return $this->_getValue($name, $this->_requests , $default);
 	}
 	
 	/**
@@ -106,7 +110,10 @@ final class Request {
 	 * @param string $default
 	 */
 	public function cookie($name = null, $default = null) {
-		return $this->_getValue($name, $this->cookies , $default);
+		if (empty($this->_cookies)) {
+			$this->_cookies = $this->_clean($_COOKIE);
+		}
+		return $this->_getValue($name, $this->_cookies , $default);
 	}
 	
 	/**
@@ -115,7 +122,10 @@ final class Request {
 	 * @param string $default
 	 */
 	public function input($name = null, $default = null) {
-		return $this->_getValue($name, $this->input , $default);
+		if (empty($this->_input)) {
+			$this->_input = $this->_clean(file_get_contents('php://input'));
+		}
+		return $this->_getValue($name, $this->_input , $default);
 	}
 	
 	/**
@@ -124,7 +134,10 @@ final class Request {
 	 * @param string $default
 	 */
 	public function server($name = null, $default = null) {
-		return $this->_getValue($name, $this->servers, $default);
+		if (empty($this->_servers)) {
+			$this->_servers = $this->_clean($_SERVER);
+		}
+		return $this->_getValue($name, $this->_servers, $default);
 	}
 	
 	/**
@@ -223,9 +236,5 @@ final class Request {
 	public function isFlash() {
 		return isset($_SERVER['HTTP_USER_AGENT']) &&
 		(stripos($_SERVER['HTTP_USER_AGENT'], 'Shockwave') !== false || stripos($_SERVER['HTTP_USER_AGENT'], 'Flash') !== false);
-	}
-	
-	private function safeCheck() {
-	
 	}
 }

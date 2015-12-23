@@ -1,10 +1,9 @@
 <?php
-namespace Zodream\Hand;
-/*
+namespace Zodream\Domain\Filter;
+/**
  * 数据库语句过滤
  *
  * @author Jason
- * @time 2015-12-1
  */
 class SqlFilter {
 	/********

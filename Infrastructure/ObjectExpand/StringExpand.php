@@ -112,4 +112,18 @@ class StringExpand {
 		if ($suffix) return $slice."…";
 		return $slice;
 	}
+	
+	//字符串的无乱码截取
+	function sub ($str,$len) {
+		$string = '';
+		for( $i=0; $i < $len; $i++ ){
+			if( ord(substr($str, $i,1))>0xa0 ){
+				$string .= substr($str,$i,3);    //默认采用utf编码，汉字3个字节
+				$i=$i+2;
+			}else{
+				$string .= substr($str,$i,1);
+			}
+		}
+		return $string;
+	}
 }

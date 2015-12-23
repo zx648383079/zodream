@@ -17,4 +17,8 @@ trait SingletonPattern {
 		}
 		return static::$instance;
 	}
+	
+	public static function __callstatic($action, $arguments = array()) {
+		return call_user_func_array(array(self::getInstance(), $action), $arguments);
+	}
 }

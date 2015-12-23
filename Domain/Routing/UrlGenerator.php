@@ -19,7 +19,6 @@ class UrlGenerator {
 	 * @param string $file
 	 * @param string $extra
 	 * @param string $secret
-	 * @param string $mode 是哪种模式 ，文件用null
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null, $secret = FALSE) {
@@ -121,5 +120,37 @@ class UrlGenerator {
 			}
 		}
 		return $uri;
+	}
+	
+	/**
+	 * 判断是否SSL协议
+	 * @return boolean
+	 */
+	public static function isSsl()
+	{
+		if (isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))) {
+			return true;
+		} elseif (isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'])) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 获取host 包括端口
+	 */
+	public static function getHost() {
+		$host = $_SERVER ['HTTP_HOST'];
+		if ($_SERVER['SERVER_PORT'] != 80) {
+			$host .= ':'.$_SERVER['SERVER_PORT'];
+		}
+		return $host;
+	}
+	
+	/**
+	 * 获取执行脚本的文件    /index.php
+	 */
+	public static function getScript() {
+		return $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']; 
 	}
 }

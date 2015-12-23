@@ -8,12 +8,16 @@ use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 class Common implements RouteObject {
 	public static function get() {
 		$values = explode('/', Request::getInstance()->get('v' , 'index'));
-		$routes = array(
-				'controller' => ArrayExpand::ucFirst(explode('/', Request::getInstance()->get('c' , 'home'))),
-				'action'     => array_shift($values),
-				'value'      => $values
+		$action = array_shift($values);
+		$args = array();
+		for ($i = 0, $len = count($values); $i < $len; $i += 2) {
+			$args[$i] = $values[$i + 1];
+		}
+		return array(
+				str_replace('/', '\\', Request::getInstance()->get('c' , 'home')),
+				$action,
+				$args
 		);
-		return $routes;
 	}
 	
 	public static function to($file) {

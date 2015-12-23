@@ -107,19 +107,14 @@ class ArrayExpand {
 	 ***/
 	public static function getVal($name, $values, $default = null, $link = ',') {
 		$names = explode($link, $name);
-	
 		$arr   = array();
-	
 		foreach ($names as $name) {
 			//使用方法 post:key default
-				
 			$temp = StringExpand::toArray($name, ' ', 2, $default);
 			$def  = $temp[1];
-				
 			$temp = explode(':', $temp[0], 2);
 			$name = $temp[0];
 			$key  = end( $temp );
-				
 			if (isset($values[$name])) {
 				$arr[$key] = $values[$name];
 			} else {
@@ -139,14 +134,31 @@ class ArrayExpand {
 	/**
 	 * 根据字符串取一个值，采用递进的方法取值
 	 */
-	public static function getChild($name, $values, $default = null, $link = '.') {
-		$names = explode($link, $name, 2);
-		if ( count($names) === 1) {
-			return array_key_exists($name, $values) ? $values[$name] : $default;
-		} else if (!array_key_exists($names[0], $values)) {
-			return $default;
-		} else {
-			return self::getChild($names[1], $values[ $names[0] ], $default, $link);
+	public static function getChild($keys, $values, $default = null, $link = '.') {
+		return self::getChildByArray(explode($link, $keys), $values, $default);
+	}
+	
+	/**
+	 * 根据数组取值
+	 * @param array $keys
+	 * @param array $values
+	 * @param unknown $default
+	 * @return unknown|string|unknown
+	 */
+	public static function getChildByArray(array $keys, array $values, $default = null) {
+		switch (count($keys)) {
+			case 0:
+				return $values;
+			case 1:
+				return array_key_exists($keys[0], $values) ? $values[$keys[0]] : $default;
+			case 2:
+				return isset($values[$keys[0]][$keys[1]]) ? $values[$keys[0]][$keys[1]] : $default;
+			case 3:
+				return isset($values[$keys[0]][$keys[1]][$keys[2]]) ? $values[$keys[0]][$keys[1]][$keys[2]] : $default;
+			case 4:
+				return isset($values[$keys[0]][$keys[1]][$keys[2]][$keys[3]]) ? $values[$keys[0]][$keys[1]][$keys[2]][$keys[3]] : $default;
+			default:
+				return isset($values[$keys[0]]) ? self::getChildByArray(array_slice($keys, 1), $values[$keys[0]], $default) : $default;
 		}
 	}
 	

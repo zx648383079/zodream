@@ -4,7 +4,7 @@ namespace Zodream\Domain\Routing;
 
 use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
-class Php implements RouteObject {
+class PathInfo implements RouteObject {
 	public static function get() {
 		$url = UrlGenerator::getUri();
 		$arr = StringExpand::toArray($url, '.php', 2, array('', '/home/index'));
