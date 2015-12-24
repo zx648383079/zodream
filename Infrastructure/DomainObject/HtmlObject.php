@@ -4,9 +4,7 @@ namespace Zodream\Infrastructure\DomainObject;
 interface HtmlObject{
 	/**
 	 * 执行
-	 * @param unknown $args
+	 * @param mixed $args
 	 */
-	static function excute($args) {
-		
-	}
+	static function excute($args);
 }

@@ -9,7 +9,7 @@ namespace Zodream\Infrastructure;
 class Loader extends MagicObject {
 	/**
 	 * 添加数据类
-	 * @param unknown $model
+	 * @param string $model
 	 */
 	public function model($models) {
 		$this->_add($models, APP_MODULE.'\\Model\\', APP_MODEL);
@@ -17,20 +17,20 @@ class Loader extends MagicObject {
 	
 	/**
 	 * 添加插件 未实例化
-	 * @param unknown $plugin
+	 * @param string $plugin
 	 */
 	public function plugin($plugin) {
 		$file = APP_DIR. '/Lib/Plugin/'. $plugin. '.php';
 		if (file_exists($file)) {
 			include_once($file);
 		} else {
-			exit('Error: Could not load plugin ' . $library . '!');
+			exit('Error: Could not load plugin ' . $plugin . '!');
 		}
 	}
 	
 	/**
 	 * 添加类
-	 * @param unknown $library
+	 * @param string $library
 	 */
 	public function library($library) {
 		$this->_add($library, APP_MODULE.'\\Lib\\');

@@ -5,6 +5,8 @@ namespace Zodream\Domain;
  *
  * @author Jason
  */
+use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Log;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\MagicObject;
 
@@ -30,7 +32,7 @@ class Autoload extends MagicObject {
 	
 	/**
 	 * 设置别名
-	 * @param unknown $alias
+	 * @param string $alias
 	 */
 	protected function _load($alias) {
 		if ($this->has($alias)) {
@@ -47,13 +49,13 @@ class Autoload extends MagicObject {
 	
 	protected function _error($errno, $errstr, $errfile, $errline) {
 		$str = '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！当前网址：'.Url::get();
-		self::writeLog($str);
+		Log::out('txt', $str);
 		if (!defined('DEBUG') || !DEBUG) {
 			$str = '出错了！';
 		}
-		Response::getInstance()->show('404', array(
+		/*::getInstance()->show('404', array(
 				'error' => $str
-		));
+		));*/
 	}
 	
 	/**
@@ -69,13 +71,13 @@ class Autoload extends MagicObject {
 			return;
 		}
 		$str = '错误类型：'.$error['type'].'错误的信息：'.$error['message'].'<br>发生在 '.$error['file'].' 第 '.$error['line'].' 行！当前网址：'.Url::get();
-		self::writeLog($str);
+		Log::out('txt', $str);
 		if (!defined('DEBUG') || !DEBUG) {
 			$str = '出错了！';
 		}
-		Response::getInstance()->show('404', array(
+		/*Response::getInstance()->show('404', array(
 				'error' => $str
-		));
+		));*/
 	}
 	
 	private function __clone() {

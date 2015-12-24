@@ -1,7 +1,9 @@
 <?php
 namespace Zodream\Infrastructure\Traits;
 
-trait ValidataTrait {
+use Zodream\Domain\Validate;
+
+trait ValidateTrait {
 	/**
 	 * 验证数据
 	 *
@@ -9,11 +11,11 @@ trait ValidataTrait {
 	 * @param array $param 验证的规则
 	 * @return array
 	 */
-	protected function validata($request, $param) {
-		$vali   = new Validate();
-		$result = $vali->make($request, $param);
+	protected function validate($request, $param) {
+		$validate   = new Validate();
+		$result = $validate->make($request, $param);
 		if (!$result) {
-			$result = $vali->error;
+			$result = $validate->getError();
 		}
 		return $result;
 	}

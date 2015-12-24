@@ -20,14 +20,14 @@ class Mailer {
 			$this->_mail->SMTPDebug = 1;
 		}
 	
-		$config = App::config('mail');
+		$config = Config::getInstance()->get('mail');
 		$this->setHost($config['host'], $config['port'])->setUser($config['user'], $config['password']);
 	}
 	
 	/**
 	 * 设置发送者的信息
-	 * @param unknown $username
-	 * @param unknown $password
+	 * @param string $username
+	 * @param string $password
 	 */
 	public function setUser($username, $password) {
 		$this->_mail->Username = $username;
@@ -37,8 +37,8 @@ class Mailer {
 	
 	/**
 	 * 设置host
-	 * @param unknown $host
-	 * @param unknown $port
+	 * @param string $host
+	 * @param string $port
 	 */
 	public function setHost($host, $port) {
 		$this->_mail->Host = $host;
@@ -48,7 +48,7 @@ class Mailer {
 	
 	/**
 	 * 设置接收者
-	 * @param unknown $address
+	 * @param string $address
 	 * @param string $name
 	 * @param string $auto
 	 */
@@ -59,7 +59,7 @@ class Mailer {
 	
 	/**
 	 * 添加接收者
-	 * @param unknown $address
+	 * @param string $address
 	 * @param string $name
 	 */
 	public function addAddress($address, $name = '') {
@@ -69,7 +69,7 @@ class Mailer {
 	
 	/**
 	 * 添加转发
-	 * @param unknown $address
+	 * @param string $address
 	 * @param string $name
 	 */
 	public function addReplyTo($address, $name = '') {
@@ -79,7 +79,7 @@ class Mailer {
 	
 	/**
 	 * 添加抄送
-	 * @param unknown $address
+	 * @param string $address
 	 * @param string $name
 	 */
 	public function addCC($address, $name = '') {
@@ -89,7 +89,7 @@ class Mailer {
 	
 	/**
 	 * 添加
-	 * @param unknown $address
+	 * @param string $address
 	 * @param string $name
 	 */
 	public function addBCC($address, $name = '') {
@@ -99,7 +99,7 @@ class Mailer {
 	
 	/**
 	 * 添加附件
-	 * @param unknown $file
+	 * @param string $file
 	 * @param string $name
 	 */
 	public function addAttachment($file, $name = '') {
@@ -118,8 +118,8 @@ class Mailer {
 	
 	/**
 	 * 发送
-	 * @param unknown $subject
-	 * @param unknown $body
+	 * @param string $subject
+	 * @param string $body
 	 * @param string $altBody
 	 */
 	public function send($subject, $body, $altBody = '') {

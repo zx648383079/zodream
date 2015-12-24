@@ -9,22 +9,22 @@ namespace Zodream\Infrastructure;
 class Cache {
 	/**
 	 * 设置
-	 * @param unknown $name
-	 * @param unknown $content
+	 * @param string $name
+	 * @param string $content
 	 * @param number $life
 	 */
 	public static function set($name, $content, $life = 0) {
-		$path    = APP_DIR.App::config('cache.path').$name.'.php';
+		$path    = APP_DIR. Config::getInstance()->get('cache.path').$name.'.php';
 		$content = '<?php if (!defined(\'APP_DIR\')) exit(\'NO THING!\');?>'.$content;
 		file_put_contents($path, $content);
 	}
 	
 	/**
 	 * 获取
-	 * @param unknown $name
+	 * @param string $name
 	 */
 	public static function get($name) {
-		$path = APP_DIR.App::config('cache.path').$name.'.php';
+		$path = APP_DIR.Config::getInstance()->get('cache.path').$name.'.php';
 		if (is_file($path)) {
 			return file_get_contents($path);
 		}

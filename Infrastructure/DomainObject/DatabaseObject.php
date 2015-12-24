@@ -60,7 +60,7 @@ interface DatabaseObject {
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
-	 * @return multitype:mixed
+	 * @return mixed
 	 */
 	public function getObject($sql);
 	

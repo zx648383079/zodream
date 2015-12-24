@@ -57,7 +57,7 @@ class Socket {
 	
 	/**
 	 * 发送信息
-	 * @param unknown $content
+	 * @param string $content
 	 */
 	public function write($content) {
 		 socket_write($this->socket, $content);

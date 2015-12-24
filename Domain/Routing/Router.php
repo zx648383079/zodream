@@ -14,41 +14,100 @@ class Router{
 	
 	/**
 	 * 成功执行的method
-	 * @var unknown
+	 * @var Route
 	 */
-	public static $route;
-	
+	private static $_route;
+	public static function getRoute() {
+		return self::$_route;
+	}
+	public static function setRoute($route) {
+		return self::$_route = $route;
+	}
+	public static function hasRoute() {
+		return !empty(self::$_route);
+	}
+	public static function getClassAndAction() {
+		if (self::hasRoute()) {
+			return self::getRoute()->getClassAndAction();
+		}
+		return null;
+	}
+
 	/**
-	 * 运行加载方法
+	 * 路由加载及运行方法
+	 * @return null
 	 */
 	public static function run() {
-		$routes = call_user_func(array(RouteConfig::getInstance()->getDriver(), 'get'));
-		if (is_string($routes)) {
-			//执行已注册的
-			if (self::_loopConfig($routes, RouteConfig::getInstance()->get())) {
-				return self::$route;
-			}
-			$routes = self::_getValue($routes);
+		self::_getRouteByDriver();
+		if (self::hasRoute()) {
+			return self::getRoute()->run();
 		}
-		
+		return null;
+	}
+
+	/**
+	 * 通过配置的驱动获取路由
+	 */
+	private static function _getRouteByDriver() {
+		return self::_runByRoute(call_user_func(array(RouteConfig::getInstance()->getDriver(), 'get')));
+	}
+
+	/**
+	 * 根据路由判断
+	 * @param array|string $routes
+	 * @return bool
+	 */
+	private static function _runByRoute($routes) {
+		if (is_string($routes)) {
+			return self::_loopConfig($routes, RouteConfig::getInstance()->get());
+		}
+		return self::_runByRouteWhenArray($routes);
+	}
+
+	/**
+	 * 当获取到的路由是array数组
+	 * @param array $routes
+	 * @return
+	 */
+	private static function _runByRouteWhenArray(array $routes) {
 		list($controller, $action, $values) = $routes;
-		unset($routes);
 		//执行默认的
 		if (empty($controller) && empty($action)) {
-			return self::$route = new Route(RouteConfig::getInstance()->getDefault(), $values, false);
+			return self::setRoute(new Route(RouteConfig::getInstance()->getDefault(), $values, false));
 		}
 		//自动判断
-		self::_autoload($controller, $action, $values);
+		return self::_autoload($controller, $action, $values);
 	}
+
+
 	
 	/**
-	 * 根据数字判断是否带值
-	 * @param array $routes
-	 * @return array:
+	 * 从字符串中分离class,action,value
+	 * @param string $route
+	 * @return array (class, action, values)
 	 */
-	private function _getValue($url) {
-		$url    = trim($url, '/');
-		$routes = explode('/', $url);
+	private function _getRoutesWhenString($route) {
+		list($routes, $values) = self::_spiltArrayByNumber(explode('/', trim($route, '/')));
+		if (count($routes) == 1) {
+			$action     = null;
+			$controller = empty($routes[0]) ? null : $routes[0];
+		} else {
+			$action     = strtolower(array_pop($routes));
+			$controller = implode('\\', $routes);
+		}
+		return array(
+				$controller,
+				$action,
+				$values
+		);
+	}
+
+	/**
+	 * 根据数字值分割数组
+	 * @param array $routes
+	 * @return array (routes, values)
+	 */
+	private static function _spiltArrayByNumber(array $routes) {
 		$values = array();
 		for ($i = 0, $len = count($routes); $i < $len; $i++) {
 			if (is_numeric($routes[$i])) {
@@ -64,68 +123,67 @@ class Router{
 				$routes[$i] = ucfirst($routes[$i]);
 			}
 		}
+		return array(
+			$routes,
+			self::_pairValues($values)
+		);
+	}
+
+	/**
+	 * 将索引数组根据单双转关联数组
+	 * @param $values
+	 * @return array
+	 */
+	private static function _pairValues($values) {
 		$args = array();
 		for ($i = 0, $len = count($values); $i < $len; $i += 2) {
 			$args[$values[$i]] = $values[$i + 1];
 		}
-		
-		if (count($routes) == 1) {
-			$action     = null;
-			$controller = empty($routes[0]) ? null : $routes[0];
-		} else {
-			$action     = array_pop($routes);
-			$controller = implode('\\', $routes);
-		}
-		return array(
-				$controller,
-				$action,
-				$args
-		);
+		return $args;
 	}
 	
 	/**
 	 * 循环匹配已注册路由
-	 * @param unknown $url
-	 * @param unknown $config
-	 * @param unknown $value
+	 * @param string $route
+	 * @param array $config
+	 * @return
 	 */
-	private static function _loopConfig($url, $config) {
+	private static function _loopConfig($route, $config) {
 		foreach ($config as $key => $instance) {
 			$pattern = str_replace(':num', '[0-9]+', $key);
 			$pattern = str_replace(':any', '[^/]+', $pattern);
 			$pattern = str_replace('/', '\\/', $pattern);
-			$matchs  = array();
-			preg_match('/'.$pattern.'/i', $url, $matchs);
-			if(count($matchs) > 0 && array_shift($matchs) === $url) {
+			$matches  = array();
+			preg_match('/'.$pattern.'/i', $route, $matches);
+			if(count($matches) > 0 && array_shift($matches) === $route) {
 				$values = array();
-				foreach ($matchs as $key => $value) {
-					if (!is_numeric($key)) {
-						$values[$key] = $value;
+				foreach ($matches as $k => $value) {
+					if (!is_numeric($k)) {
+						$values[$k] = $value;
 					}
 				}
-				self::$route = new Route($instance, $values, false);
-				return true;
+				return self::setRoute(new Route($instance, $values, false));
 			}
 		}
-		return false;
+		return self::_runByRouteWhenArray(self::_getRoutesWhenString($route));
 	}
 	
 	/**
 	 * 加载控制器和视图
-	 *
-	 * @access globe
-	 * @param $c string 控制器的名称
-	 * @param $v string 视图所在的方法名
+	 * @param string $controller 控制器的名称
+	 * @param string $action 视图所在的方法名
+	 * @param array $values 值
+	 * @return
 	 */
 	private static function _autoload($controller, $action, $values = array()) {
 		if (empty($action)) {
 			$action = 'index';
 		}
-		return self::$route = new Route($controller.'@'.$action, $values, true);
+		return self::setRoute( new Route($controller.'@'.$action, $values, true));
 	}
 	
 	/**
-	 * 
+	 * 手动注册路由
 	 * @param string|array $route
 	 * @param string $value
 	 */

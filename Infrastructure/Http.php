@@ -93,6 +93,7 @@ class Http {
 	}
 	
 	public function download($url, $file) {
+		$this->url = $url;
 		$this->_init();
 		$fp = fopen($file, 'w');
 		curl_setopt($this->curl, CURLOPT_FILE, $fp);

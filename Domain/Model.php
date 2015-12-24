@@ -1,12 +1,13 @@
 <?php 
 namespace Zodream\Domain;
+use Zodream\Domain\Filter\SqlFilter;
+use Zodream\Infrastructure\Config;
+
 /**
 * 数据基类
 * 
 * @author Jason
-* @time 2015-12-2
 */
-use Zodream\Hand\SqlFilter;
 
 class Model {
 	protected $db = null;
@@ -76,8 +77,8 @@ class Model {
 	
 	/**
 	 * 更具id 修改记录
-	 * @param unknown $id
-	 * @param unknown $data
+	 * @param string|integer $id
+	 * @param array $data
 	 */
 	public function updateById($id, $data) {
 		return $this->update($data, 'id = '.$id);
@@ -137,7 +138,7 @@ class Model {
 	
 	/**
 	 * 根据id 查找值
-	 * @param unknown $id
+	 * @param string|integer $id
 	 * @param string $filed
 	 * @return array
 	 */
@@ -169,7 +170,11 @@ class Model {
 		$sql = "DELETE FROM {$this->table} $where";
 		return $this->db->delete($sql);
 	}
-	
+
+	/** 根据id删除数据
+	 * @param string|integer $id
+	 * @return int
+	 */
 	public function deleteById($id) {
 		return $this->delete('id = '.$id);
 	}
@@ -179,11 +184,11 @@ class Model {
 	 *
 	 * @access public
 	 *
-	 * @param array $fileld 要显示的字段
+	 * @param array $field 要显示的字段
 	 * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */
-	public function find($param = array(),$fileld = array()) {
+	public function find($param = array(), $field = array()) {
 		$limit = $order = $group = $where = $like = '';
 		if (is_array($param) && !empty($param)) {
 			$limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';
@@ -196,11 +201,12 @@ class Model {
 					} else {
 						if (is_array($value)) {
 							switch ($value[1]) {
-								case "or":
+								case 'or':
 									$where .= ' OR '.$value;
-									
-								case "and":
+									break;
+								case 'and':
 									$where .= ' AND '.$value;
+									break;
 							}
 						} else {
 							$where .= ' AND '.$value;
@@ -209,7 +215,7 @@ class Model {
 				}
 			}
 		}
-		$selectFields = empty($fileld) ? '*' : implode(',', $fileld);
+		$selectFields = empty($field) ? '*' : implode(',', $field);
 		$sql    = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";
 		$this->db->execute($sql);
 		return $this->db->select($sql);

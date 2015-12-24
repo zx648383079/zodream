@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Response;
 * @author Jason
 * @time 2015-12-19
 */
+use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\FileSystem;
@@ -18,7 +19,11 @@ defined('VIEW_DIR') or define('VIEW_DIR', '/');
 
 class View extends MagicObject {
 	use SingletonPattern;
-	
+
+	public function getExtra() {
+		return $this->get('_extra');
+	}
+
 	/**
 	 * 在视图中包含其他视图的方法
 	 * @param string|array $names 视图文件名
@@ -51,7 +56,7 @@ class View extends MagicObject {
 	
 	/**
 	 * 输出资源url
-	 * @param unknown $file
+	 * @param string $file
 	 * @param string $isView
 	 */
 	public function asset($file, $isView = TRUE) {
@@ -69,7 +74,7 @@ class View extends MagicObject {
 	
 	/**
 	 * 直接输出
-	 * @param unknown $key
+	 * @param string $key
 	 */
 	public function ech($key) {
 		echo ArrayExpand::tostring($this->get($key));
@@ -80,7 +85,6 @@ class View extends MagicObject {
 	 *
 	 * @param string|array $name 视图的文件名 如果是array|null 将使用 $method引导视图 
 	 * @param array|null $data 要传的数据 如果$name 为array 则$data = $name
-	 * @param system $method 获取方法
 	 */
 	public function show($name = null, $data = null) {
 		if (is_array($name)) {
@@ -91,7 +95,7 @@ class View extends MagicObject {
 			$this->set($data);
 		}
 		if (empty($name)) {
-			list($class, $action) = Router::$route->getClassAndAction();
+			list($class, $action) = Router::getClassAndAction();
 			$name = str_replace('\\', '.', $class).'.'.$action;
 		}
 		ob_start();

@@ -41,12 +41,12 @@ class StringExpand {
 	
 	/**
 	 * 首字符替换
-	 * @param unknown $search
-	 * @param unknown $arg
-	 * @param string $relace
+	 * @param string $search
+	 * @param string $arg
+	 * @param string $replace
 	 */
-	public static function fReplace($arg, $search, $relace = null) {
-		return preg_replace('/^'.$search.'/', $relace, $arg, 1);
+	public static function fReplace($arg, $search, $replace = null) {
+		return preg_replace('/^'.$search.'/', $replace, $arg, 1);
 	}
 	
 	public static function abslength($str) {

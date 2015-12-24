@@ -75,7 +75,7 @@ abstract class Controller {
 	}
 	/**
 	 * 加载其他控制器的方法
-	 * @param unknown $controller
+	 * @param string $controller
 	 * @param string $actionName
 	 * @param array $parameters
 	 */

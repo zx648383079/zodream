@@ -34,7 +34,7 @@ class Redirect {
 			}
 		} else {
 			$str    = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-			self::$response->set('meta', $str);
+			//self::$response->set('meta', $str);
 		}
 		(array(
 				'title' => "出错了！",

@@ -50,7 +50,7 @@ class MagicObject {
 	
 	/**
 	 * 判断是否有
-	 * @param unknown $key
+	 * @param string $key
 	 */
 	public function has($key) {
 		return isset($this->_data[$key]);

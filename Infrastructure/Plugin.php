@@ -1,14 +1,12 @@
 <?php
-namespace Zodream\Head;
+namespace Zodream\infrastructure;
 /**
  * 插件功能
  *
  * @author Jason
- * @time 2015-12-1
  */
-use Zodream\Body\Object\Obj;
 
-class Plugin extends Obj {
+class Plugin extends MagicObject {
 	protected static $instance = null;
 	
 	/**
@@ -69,7 +67,7 @@ class Plugin extends Obj {
 	/**
 	 * 添加插件
 	 * @param string $key 关键字
-	 * @param unknown $arg 方法 
+	 * @param string|object $arg 方法
 	 * @param boolean $before 是否放到最前 默认false 
 	 * @param number $accept 接受的值
 	 */

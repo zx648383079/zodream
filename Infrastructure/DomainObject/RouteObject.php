@@ -9,7 +9,7 @@ interface RouteObject {
 	
 	/**
 	 * 生成url
-	 * @param unknown $file
+	 * @param string $file
 	 */
 	static function to($file);
 }

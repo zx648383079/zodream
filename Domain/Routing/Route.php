@@ -1,6 +1,10 @@
 <?php
 namespace Zodream\Domain\Routing;
 
+/**
+ * 单个路由
+ * @author Jason
+ */
 use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\Request;
 
@@ -34,11 +38,15 @@ class Route {
 		}
 		return $this->runClassAndAction();
 	}
-	
+
+	/** 获取当前的 class 和 action
+	 * @return array|null (class, action)
+	 */
 	public function getClassAndAction() {
 		if (!empty($this->_class)) {
 			return $this->_class;
 		}
+		return null;
 	}
 	
 	/**
@@ -56,6 +64,7 @@ class Route {
 		if (is_callable($this->_action)) {
 			return $this->runCallback();
 		}
+		return null;
 	}
 	
 	/**
@@ -65,6 +74,7 @@ class Route {
 		if (class_exists($this->_action)) {
 			return new $this->_action($this->_param);
 		}
+		return null;
 	}
 	
 	/**

@@ -7,6 +7,9 @@ namespace Zodream\Infrastructure\Traits;
  */
 
 trait SingletonPattern {
+	/**
+	 * @var static
+	 */
 	protected static $instance;
 	/**
 	 * 单例
@@ -18,7 +21,7 @@ trait SingletonPattern {
 		return static::$instance;
 	}
 	
-	public static function __callstatic($action, $arguments = array()) {
+	public static function __callStatic($action, $arguments = array()) {
 		return call_user_func_array(array(self::getInstance(), $action), $arguments);
 	}
 }

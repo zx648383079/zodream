@@ -9,6 +9,7 @@ class Component {
 	 * 按部件加载视图
 	 * @param string $name
 	 * @param string $data
+	 * @return self
 	 */
 	public static function view($name = 'index', $data = null) {
 		extract($data);

@@ -23,7 +23,7 @@ class Session {
 	
 	/**
 	 * 删除
-	 * @param unknown $name
+	 * @param string $name
 	 */
 	public function delete($name) {
 		unset($this->data[$name]);

@@ -6,36 +6,36 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 class ArrayExpand {
-	private $before  = array();
+	private static $_before  = array();
 	
-	private $content = array();
+	private static $_content = array();
 	
-	private $after   = array();
+	private static $_after   = array();
 	
-	public function arr_list($arr) {
-		foreach ($arr as $key => $value) {
+	public static function _arrayList($args) {
+		foreach ($args as $key => $value) {
 			if (is_numeric($key)) {
 				if (is_array($value)) {
-					$this->arr_list($value);
+					self::_arrayList($value);
 				} else {
-					$this->content[] = $value;
+					self::$_content[] = $value;
 				}
 			} else {
 				switch ($key) {
 					case 'before':
 					case 'before[]':
 						if (is_array($value)) {
-							$this->before = array_merge($this->before, $value);
+							self::$_before = array_merge(self::$_before, $value);
 						} else {
-							$this->before[] = $value;
+							self::$_before[] = $value;
 						}
 						break;
 					case 'after':
 					case 'after[]':
 						if (is_array($value)) {
-							$this->after = array_merge($this->after, $value);
+							self::$_after = array_merge(self::$_after, $value);
 						} else {
-							$this->after[] = $value;
+							self::$_after[] = $value;
 						}
 						break;
 					default:
@@ -44,29 +44,32 @@ class ArrayExpand {
 			}
 		}
 	}
-	
+
 	/**
-	 自定义排序 根据关键词 before after
-	*/
-	public static function sort($arg) {
-		$arr = new self();
-		$arr->arr_list($arg);
-	
-		return array_merge($arr->before, $arr->content ,$arr->after);
+	 * 自定义排序 根据关键词 before after
+	 * @param array $args 要排序的数组
+	 * @return array 数组
+	 */
+	public static function sort(array $args) {
+		self::$_before = self::$_content = self::$_after = array();
+		self::_arraylist($args);
+		return array_merge(self::$_before, self::$_content, self::$_after);
 	}
 
-	/***
-	 合并前缀  把 key 作为前缀 例如 返回一个文件夹下的多个文件路径
-	 array('a'=>arrray(
-	 'b.txt',
-	 'c.txt'
-	 ))
-	
-	 **/
-	public static function toFile($arr, $link = null, $pre = null) {
+    /*** 合并前缀  把 key 作为前缀 例如 返回一个文件夹下的多个文件路径
+     * array('a'=>arrray(
+    * 'b.txt',
+    * 'c.txt'
+    * ))
+     * @param array $args 初始
+     * @param string $link 连接符
+     * @param string $pre 前缀
+     * @return array
+     */
+	public static function toFile(array $args, $link = null, $pre = null) {
 		$list = array();
-		if (is_array($arr)) {
-			foreach ($arr as $key => $value) {
+		if (is_array($args)) {
+			foreach ($args as $key => $value) {
 				if (is_int($key)) {
 					if (is_array($value)) {
 						$list = array_merge($list, self::toFile($value, $link, $pre));
@@ -82,68 +85,90 @@ class ArrayExpand {
 				}
 			}
 		} else {
-			$list[] = $pre.$arr;
+			$list[] = $pre.$args;
 		}
 		return $list;
 	}
-	
-	/**
-	* 把多维数组转换成字符串
-	*/
-	public static function tostring($arr, $link  = '') {
+
+    /** 把多维数组转换成字符串
+     * @param array $args 数组
+     * @param string $link 连接符
+     * @return string
+     */
+	public static function toString($args, $link  = '') {
 		$str = '';
-		if (is_array($arr)) {
-			foreach ($arr as $value) {
-				$str .= self::tostring($value, $link);
+		if (is_array($args)) {
+			foreach ($args as $value) {
+				$str .= self::toString($value, $link);
 			}
 		} else {
-			$str .= $arr.$link;
+			$str .= $args.$link;
 		}
 		return $str;
 	}
-	
-	/****
-	 * 根据字符串获取数组值，取多维数组
-	 ***/
-	public static function getVal($name, $values, $default = null, $link = ',') {
-		$names = explode($link, $name);
-		$arr   = array();
-		foreach ($names as $name) {
-			//使用方法 post:key default
-			$temp = StringExpand::toArray($name, ' ', 2, $default);
-			$def  = $temp[1];
-			$temp = explode(':', $temp[0], 2);
-			$name = $temp[0];
-			$key  = end( $temp );
-			if (isset($values[$name])) {
-				$arr[$key] = $values[$name];
-			} else {
-				$arr[$key] = $def;
-			}
+
+    /** 根据字符串获取数组值，取多维数组
+     * @param string $name 要取得键
+     * @param array $args
+     * @param null $default
+     * @param string $link
+     * @return array|string
+     */
+	public static function getVal($name, array $args, $default = null, $link = ',') {
+		$names       = explode($link, $name);
+        if (strstr($name, $link) === false ) {
+            list($newKey, $arg, $oldKey) = self::_getValueByKeyWithDefault($name, $args, $default);
+            if ($newKey == $oldKey) {
+                return $arg;
+            }
+            return array(
+                $newKey => $arg
+            );
+        }
+		$returnValue = array();
+		foreach ($names as $value) {
+			list($newKey, $arg) = self::_getValueByKeyWithDefault($value, $args, $default);
+            $returnValue[$newKey] = $arg;
 		}
-	
-		if (count($arr) == 1) {
-			foreach ($arr as $value) {
-				$arr = $value;
-			}
-		}
-	
-		return $arr;
+		return $returnValue;
 	}
-	
-	/**
-	 * 根据字符串取一个值，采用递进的方法取值
-	 */
-	public static function getChild($keys, $values, $default = null, $link = '.') {
+
+    /** 根据 "oldKey:newKey default" 获取值
+     * @param string $key
+     * @param array $args
+     * @param null $default
+     * @return array (newKey, value, oldKey)
+     */
+    private static function _getValueByKeyWithDefault($key,array $args, $default = null) {
+        //使用方法
+        list($temp, $def) = StringExpand::toArray($key, ' ', 2, $default);
+        $temps  = explode(':', $temp, 2);
+        $oldKey = $temps[0];
+        $newKey = end( $temps );
+        return array(
+            $newKey,
+            isset($args[$oldKey]) ? $args[$oldKey] : $def,
+            $oldKey
+        );
+    }
+
+    /** 根据字符串取一个值，采用递进的方法取值
+     * @param string $keys 关键字
+     * @param array $values 值
+     * @param null $default 默认
+     * @param string $link 关键字的连接符
+     * @return string|array
+     */
+	public static function getChild($keys, array $values, $default = null, $link = '.') {
 		return self::getChildByArray(explode($link, $keys), $values, $default);
 	}
 	
 	/**
-	 * 根据数组取值
+	 * 根据关键字数组取值
 	 * @param array $keys
 	 * @param array $values
-	 * @param unknown $default
-	 * @return unknown|string|unknown
+	 * @param null $default
+	 * @return array|string
 	 */
 	public static function getChildByArray(array $keys, array $values, $default = null) {
 		switch (count($keys)) {
@@ -161,11 +186,14 @@ class ArrayExpand {
 				return isset($values[$keys[0]]) ? self::getChildByArray(array_slice($keys, 1), $values[$keys[0]], $default) : $default;
 		}
 	}
-	
-	/**
-	 *   扩展 array_combine 能够用于不同数目
-	 */
-	public static function combine($keys, $values, $complete = TRUE) {
+
+    /** 扩展 array_combine 能够用于不同数目
+     * @param array $keys
+     * @param array $values
+     * @param bool $complete
+     * @return array
+     */
+	public static function combine(array $keys, array $values, $complete = TRUE) {
 		$arr = array();
 		if ( self::isAssoc($values) ) {
 			foreach ($keys as $key) {
@@ -176,25 +204,26 @@ class ArrayExpand {
 				}
 			}
 		} else {
-			for ($i = 0; $i < count($keys) ; $i ++) {
-				$arr[$keys[$i]] = isset($values[$i]) ? $values[$i] : null;
-			}
-		}
-	
+            for ($i = 0; $i < count($keys); $i++) {
+                $arr[$keys[$i]] = isset($values[$i]) ? $values[$i] : null;
+            }
+        }
 		return $arr;
 	}
-	
-	/**
-	 *   判断是否是关联数组
-	 */
-	public static function isAssoc($arr) {
-		return array_keys($arr) !== range(0, count($arr) - 1);
+
+    /** 判断是否是关联数组
+     * @param array $args
+     * @return bool
+     */
+	public static function isAssoc($args) {
+		return array_keys($args) !== range(0, count($args) - 1);
 	}
-	
-	/**
-	 * 把数组的值的首字母大写
-	 * @param array $arr
-	 */
+
+    /**
+     * 把数组的值的首字母大写
+     * @param array $arr
+     * @return array
+     */
 	public static function ucFirst(array $arguments) {
 		return array_map('ucfirst', $arguments);
 	}

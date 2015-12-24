@@ -34,7 +34,7 @@ class RouteConfig extends MagicObject {
 	
 	/**
 	 * 获取驱动
-	 * @throws Error
+	 * @return string
 	 */
 	public function getDriver() {
 		if (empty($this->_driver)) {

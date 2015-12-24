@@ -1,119 +1,111 @@
 <?php 
-namespace Zodream\Hand;
+namespace Zodream\Domain;
 /**
  * 验证
  *
  * @author Jason
- * @time 2015-12-1
  */
-use Zodream\Body\Model;
 
 class Validate {
 
-	public $error = array();
+	protected $error = array();
 	
-	private $request;
+	protected $request;
 	
 	/**
 	 * 开始验证
 	 *
-	 * @param $request 要验证的数组
-	 * @param $pattent 规则数组
+	 * @param array $request 要验证的数组
+	 * @param array $pattern 规则数组
 	 * @return boolean
 	 */
-	public function make($request, $pattent) {
+	public function make(array $request, array $pattern) {
 		$success       = true;
-	
 		$this->request = $request;
-	
-		foreach ($pattent as $key => $val) {
+		foreach ($pattern as $key => $val) {
 			$arr = explode('|', $val);
 				
 			if (isset($request[$key]) && !$this->isNull($request[$key])) {
 				foreach ($arr as $v) {
 					$result = $this -> check($key, $v);
 					if (!is_bool($result)) {
-						$this->error[$key][] = $key.$result;
+						$this->setError($key, $result);
 						$success = false;
 					}
 				}
 			} else {
 				if (in_array('required', $arr)) {
-					$this->error[$key][] = $key.' is required';
-					$success             = false;
+					$this->setError($key, ' is required');
+					$success = false;
 				}
 			}
 		}
-	
 		return $success;
 	}
 	
 	/**
 	 * 验证
 	 *
-	 * @param $key 关键字
-	 * @param $patten 规则名
+	 * @param string $key 关键字
+	 * @param string $patten 规则名
 	 * @return boolean|string
 	 */
 	private function check($key, $patten) {
 		$value  = $this->request[$key];
-		$result = FALSE;
 		$arr    = explode(':' , $patten , 2);
 		switch (strtolower($arr[0])) {
 			case 'required':
-				$result = true;
+				return true;
 				break;
 			case 'number':
-				$result = $this->isNum($value) ? TRUE : ' is not number';
+				return $this->isNum($value) ? TRUE : ' is not number';
 				break;
 			case 'float':
-				$result = $this->isNum($value , 'float') ? TRUE : ' is not float';
+				return $this->isNum($value , 'float') ? TRUE : ' is not float';
 				break;
 			case 'email':
-				$result = $this->isEmail($value) ? TRUE : ' is not email';
+				return $this->isEmail($value) ? TRUE : ' is not email';
 				break;
 			case 'phone':
-				$result = $this->isMobile($value) ? TRUE : ' is not phone';
+				return $this->isMobile($value) ? TRUE : ' is not phone';
 				break;
 			case 'url':
-				$result = $this->isUrl($value) ? TRUE : ' is not url';
+				return $this->isUrl($value) ? TRUE : ' is not url';
 				break;
 			case 'datetime':
-				$result = $this->isDateTime($value) ? TRUE : ' is not datetime';
+				return $this->isDateTime($value) ? TRUE : ' is not datetime';
 				break;
 			case 'length':
-				$len    = explode('-', $arr[1]);
-				$result = $this->length($value, 3, intval($len[0]), intval($len[1])) ? TRUE : '\'s length is not between '.$len[0].' and '.$len[1];
+				$len = explode('-', $arr[1]);
+				return $this->length($value, 3, intval($len[0]), intval($len[1])) ? TRUE : '\'s length is not between '.$len[0].' and '.$len[1];
 				break;
 			case 'min':
-				$result = $this->length($value, 1, intval($arr[1])) ? TRUE : ' min length is '.$arr[1];
+				return $this->length($value, 1, intval($arr[1])) ? TRUE : ' min length is '.$arr[1];
 				break;
 			case 'max':
-				$result = $this->length($value, 2, 0, intval($arr[1])) ? TRUE : ' max length is '.$arr[1];
+				return $this->length($value, 2, 0, intval($arr[1])) ? TRUE : ' max length is '.$arr[1];
 				break;
 			case 'regular':
-				$result = $this->regular($value, $arr[1]) ? TRUE : ' is not match';
+				return $this->regular($value, $arr[1]) ? TRUE : ' is not match';
 				break;
 			case 'confirm':
-				$result = $this->confirm($value, $arr[1]) ? TRUE : ' is not the same as '.$arr[1];
+				return $this->confirm($value, $arr[1]) ? TRUE : ' is not the same as '.$arr[1];
 				break;
 			case 'conform':
-				$result = ($value === $arr[1]) ? TRUE : ' is not equal '.$arr[1];
+				return ($value === $arr[1]) ? TRUE : ' is not equal '.$arr[1];
 				break;
 			case 'unique':
 				$tables = explode('.', $arr[1], 2);
-				$colum  = $key;
+				$column  = $key;
 				if (!empty($tables[1])) {
-					$colum = $tables[1];
+					$column = $tables[1];
 				}
-				$result = $this->unique($tables[0], $colum, $value) ? TRUE : ' is exist.';
+				return $this->unique($tables[0], $column, $value) ? TRUE : ' is exist.';
 				break;
 			default:
-				$result = TRUE;
+				return TRUE;
 				break;
 		}
-	
-		return $result;
 	}
 	
 	private function isNull($value) {
@@ -132,12 +124,12 @@ class Validate {
 	 * @param string $value  要验证的值
 	 * @return boolean
 	 */
-	private function unique($table, $colum, $value) {
+	private function unique($table, $column, $value) {
 		$db  = new Model();
 		$data = $db->findByHelper(array (
 				'select' => 'COUNT(*) as num',
 				'from'   => $table,
-				'where'  => "$colum = '$value'"
+				'where'  => "$column = '$value'"
 		), false);
 		if (empty($data) || $data[0]->num != '0') {
 			return false;
@@ -246,5 +238,25 @@ class Validate {
 	 */
 	private function regular($str, $patten) {
 		return preg_match($str, $patten) ? TRUE : false;
+	}
+
+	/**
+	 * 设置error
+	 * @param string $key
+	 * @param string $error
+	 */
+	public function setError($key, $error) {
+		$error = $key. $error;
+		if (isset($this->error[$key])) {
+			$this->error[$key][] = $error;
+		} else {
+			$this->error[$key] = array($error);
+		}
+	}
+	/**
+	 * @return array 获取错误信息
+	 */
+	public function getError() {
+		return $this->error;
 	}
 }

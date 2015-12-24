@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure;
 * @author Jason
 */
 use Zodream\Infrastructure\Traits\SingletonPattern;
-use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+
 
 class Config extends MagicObject {
 	
@@ -32,32 +32,37 @@ class Config extends MagicObject {
 		$personal = $this->_getConfig(APP_DIR.'/Service/config/'.APP_MODULE.'.php');
 		$this->set(array_merge((array)$configs, (array)$common, (array)$personal));
 	}
-	
+
+	/**
+	 * 获取配置文件
+	 * @param string $file
+	 * @return array
+     */
 	private function _getConfig($file) {
 		if (file_exists($file)) {
-			$tem = include($file);
-			if (is_string($tem)) {
-				return $this->_getConfig($tem);
+			$config = include($file);
+			if (is_string($config)) {
+				return $this->_getConfig($config);
 			}
-			return $tem;
+			return $config;
 		}
 		return array();
 	}
-	
+
 	/**
 	 * 根据方法换取多维中的一个值
-	 * @param unknown $method
-	 * @param unknown $value
+	 * @param string $method
+	 * @param array $value
+	 * @return array|null|string
 	 */
-	public function getMultidimensional($method, $value) {
+	public function getMultidimensional($method, array $value) {
 		$length = count($value);
 		if ($length < 1) {
 			return $this->get($method);
 		}
 		if ($length > 1) {
-			return $this->get($method. implode('.', $value));
+			return $this->get($method . implode('.', $value));
 		}
-		
 		if (!$this->has($method) || !isset($this->_data[$method][$value[0]])) {
 			return null;
 		}
@@ -67,8 +72,14 @@ class Config extends MagicObject {
 	public function __call($method, $value) {
 		$this->getMultidimensional($method, $value);
 	}
-	
-	public static function __callstatic($method, $value) {
+
+	/**
+	 *
+	 * @param string $method
+	 * @param array $value
+	 * @return mixed
+	 */
+	public static function __callStatic($method, $value) {
 		return static::getInstance()->getMultidimensional($method, $value);
 	}
 }

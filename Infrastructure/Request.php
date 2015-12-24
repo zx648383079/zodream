@@ -27,7 +27,7 @@ final class Request {
 	
 	/**
 	 * 格式化
-	 * @param unknown $data
+	 * @param array|string $data
 	 */
 	private function _clean($data) {
 		if (is_array($data)) {
@@ -46,7 +46,7 @@ final class Request {
 	 * $_GET
 	 * @param string $name
 	 * @param string $default
-	 * @return Ambigous <unknown, string>
+	 * @return array|string
 	 */
 	public function get($name = null, $default = null) {
 		if (empty($this->_gets)) {
@@ -57,8 +57,8 @@ final class Request {
 	
 	/**
 	 * 获取值得总方法
-	 * @param unknown $name
-	 * @param unknown $args
+	 * @param string $name
+	 * @param array $args
 	 * @param string $default
 	 */
 	private function _getValue($name, $args, $default = null) {

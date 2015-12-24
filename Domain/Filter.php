@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Hand;
+namespace Zodream\Domain;
 /*
  * 过滤
  *

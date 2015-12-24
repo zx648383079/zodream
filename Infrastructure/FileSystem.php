@@ -11,7 +11,7 @@ class FileSystem {
 	
 	/**
 	 * 生成视图路径
-	 * @param unknown $name
+	 * @param string $name
 	 * @return string
 	 */
 	public static function view($name) {

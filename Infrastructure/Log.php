@@ -18,8 +18,8 @@ class Log {
  
     /**
      * 输出到文件日志
-     * @param $filePath 文件路径
-     * @param $msg  日志信息
+     * @param string $filePath 文件路径
+     * @param mixed $msg  日志信息
      * @return int
      */
     public static function out($filePath, $msg) {
@@ -57,9 +57,9 @@ class Log {
     }
  
     function shutdown_func() {
-        if (!empty(LogFileUtil::$fileHandlerCache)) {
-            if (is_array(LogFileUtil::$fileHandlerCache)) {
-                foreach (LogFileUtil::$fileHandlerCache as $k => $v) {
+        if (!empty(self::$fileHandlerCache)) {
+            if (is_array(self::$fileHandlerCache)) {
+                foreach (self::$fileHandlerCache as $k => $v) {
                     if (is_resource($v))
                         //file_put_contents("close.txt",$k);
                         fclose($v);
