@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Response;
+namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\Request;
 class Ajax {
@@ -9,7 +9,7 @@ class Ajax {
 	 * @param array|string $data 要传的值
 	 * @param string $type 返回类型
 	 */
-	public static function view($data, $type = 'JSON') {
+	public static function ajaxReturn($data, $type = 'JSON') {
 		switch (strtoupper($type)) {
 			case 'JSON' :
 				// 返回JSON数据格式到客户端 包含状态信息

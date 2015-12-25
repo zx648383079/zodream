@@ -4,10 +4,10 @@ namespace Zodream\Domain\Authentication;
  * 二进制法
  *
  * @author Jason
- * @time 2015-12-2
  */
+use Zodream\Infrastructure\DomainObject\AuthObject;
 
-class Auth implements IAuth {
+class Auth implements AuthObject {
 	public static function user() {
 		
 	}

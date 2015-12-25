@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Response;
+namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\FileSystem;
 class Component {

@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Response;
+namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\Config;
 use Zodream\Domain\Routing\UrlGenerator;

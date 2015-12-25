@@ -4,10 +4,10 @@ namespace Zodream\Domain\Authentication;
  * 二进制法
  *
  * @author Jason
- * @time 2015-12-2
  */
+use Zodream\Infrastructure\DomainObject\RoleObject;
 
-class Binary implements IRole {
+class Binary implements RoleObject {
 	public static function judge($role, $roles) {
 		$role  = intval($role);
 		$roles = intval($roles);

@@ -6,8 +6,9 @@ namespace Zodream\Domain\Authentication;
  * @author Jason
  * @time 2015-12-2
  */
+use Zodream\Infrastructure\DomainObject\RoleObject;
 
-class Comma implements IRole {
+class Comma implements RoleObject {
 	public static function judge($role, $roles) {
 		$roles = explode(',', $roles);
 		return in_array($role , $roles);

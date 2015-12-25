@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Validater;
+namespace Zodream\Domain\Validator;
 
 use Zodream\Infrastructure\DomainObject\ValidaterObject;
 class ControllerValidate implements ValidaterObject {

@@ -1,11 +1,10 @@
 <?php
-namespace Zodream\Infrastructure\Response;
-use Zodream\Domain\Routing\UrlGenerator;
+namespace Zodream\Domain\Response;
 /**
  * 跳转
  * @author Jason
- * @final 2015-12-2
  */
+use Zodream\Domain\Routing\UrlGenerator;
 
 class Redirect {
 	/**
