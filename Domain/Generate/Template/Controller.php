@@ -1,8 +1,8 @@
 <?php
-namespace {modules}\Head;
+namespace Service\{module};
 
-use {modules}\Body\{model};
-
+use Domain\Model\{model};
+use Domain\Form\{form};
 class {controller} extends Controller {
 	protected $rules = array(
 			'*' => '@'
@@ -15,14 +15,14 @@ class {controller} extends Controller {
 	}
 	
 	function add{action}() {
-		$model = new {model}();
-		$data  = $model->updateById($id );
+		$form = new {form}();
+		$form->set();
 		$this->show();
 	}
 	
 	function edit{action}($id) {
-		$model = new {model}();
-		$data  = $model->updateById($id);
+		$form = new {form}();
+		$form->set();
 		$this->show();
 	}
 	

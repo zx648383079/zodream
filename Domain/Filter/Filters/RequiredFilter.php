@@ -13,6 +13,6 @@ class RequiredFilter extends FilterObject {
 
     public function validate($arg)
     {
-        return $arg === null || trim($arg) === '';
+        return $arg !== null || trim($arg) !== '';
     }
 }

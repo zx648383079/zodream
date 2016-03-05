@@ -1,18 +1,17 @@
 <?php
-namespace Zodream\Body\Html;
+namespace Zodream\Domain\Response;
 /**
  * 导出类
  *
  * @author Jason
- * @time 2015-12-1
  */
 class Export {
 	public static function csv($text, $file) {
-		header("Content-type:text/csv;");
-		header("Content-Disposition:attachment;filename=" . $file.".csv");
-		header('Cache-Control:must-revalidate,post-check=0,pre-check=0');
-		header('Expires:0');
-		header('Pragma:public');
+		ResponseResult::sendContentType('csv');
+		ResponseResult::sendContentDisposition($file.'.csv');
+		ResponseResult::sendCacheControl('must-revalidate,post-check=0,pre-check=0');
+		ResponseResult::sendExpires(0);
+		ResponseResult::sendPragma('public');
 		echo $text;
 	}
 	
@@ -38,10 +37,10 @@ class Export {
 	 */
 	public static function exportFile($fileName, $title = '', $firstRow = array(), $data = array())
 	{
-		header('Content-Type: application/vnd.ms-execl');
-		header('Content-Disposition: attachment; filename=' . $fileName . '.xls');
-		header('Pragma: no-cache');
-		header('Expires: 0');
+		ResponseResult::sendContentType('application/vnd.ms-execl');
+		ResponseResult::sendContentDisposition($fileName . '.xls');
+		ResponseResult::sendPragma('no-cache');
+		ResponseResult::sendExpires(0);
 	
 		if (!empty($title)) {
 			echo self::excelExportIconv($title) . "\t\n";

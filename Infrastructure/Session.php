@@ -6,19 +6,36 @@ namespace Zodream\Infrastructure;
 * @author Jason
 * @time 2015-12-3
 */
-class Session {
-	public $data = array();
+use Zodream\Infrastructure\Traits\SingletonPattern;
+
+class Session extends MagicObject {
+	
+	use SingletonPattern;
+	
+	protected $lifeTime = 0;
 	
 	public function __construct() {
+		$this->init();
+	}
+	
+	public function init() {
 		if (!session_id()) {
 			ini_set('session.use_cookies', 'On');
 			ini_set('session.use_trans_sid', 'Off');
-			session_set_cookie_params(0, '/');
-			session_save_path(dirname(APP_DIR).'/tmp');
+			session_set_cookie_params($this->lifeTime, '/', null, null, true);
+			session_save_path(APP_DIR.'/temp');
 			session_start();
 		}
+		
+		$this->_data = & $_SESSION;
+	}
 	
-		$this->data = & $_SESSION;
+	public function setLifeTime($lifeTime) {
+		$this->lifeTime = $lifeTime;
+		if (session_id()) {
+			session_abort();
+		}
+		$this->init();
 	}
 	
 	/**

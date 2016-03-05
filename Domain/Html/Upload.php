@@ -1,11 +1,13 @@
 <?php
-namespace Zodream\Body\Html;
+namespace Zodream\Domain\Html;
 /**
  * 上传类
  *
  * @author Jason
  * @time 2015-12-1
  */
+use Zodream\Infrastructure\Config;
+
 class Upload {
 	private $savepath;          //上传文件保存的路径
 	private $allowtype; //设置限制上传文件的类型
@@ -28,7 +30,7 @@ class Upload {
 	 * @param bool $rand 文件命名方式.
 	 */
 	public function __construct($rand = true) {
-		$config          = App::config("upload");
+		$config          = Config::getInstance()->get("upload");
 		$this->maxsize   = $config['maxsize'];
 		$this->allowtype = explode(';', $config['allowtype']);
 		$this->savepath  = $config['savepath'];

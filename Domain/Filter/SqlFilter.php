@@ -5,6 +5,8 @@ namespace Zodream\Domain\Filter;
  *
  * @author Jason
  */
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+
 class SqlFilter {
 	/********
 	 SQL中的关键字数组
@@ -40,9 +42,136 @@ class SqlFilter {
 	 */
 	public function getSQL($param, $sort = FALSE) {
 		if ($sort) {
-			$param = $this->sortarr($param, $this->sqlKeys);
+			$param = ArrayExpand::sortByKey($param, $this->sqlKeys);
 		}
 		return $this->sqlCheck($param);
+	}
+	
+	protected $select = array();
+	
+	protected $table = array();
+	
+	protected $order = array();
+	
+	protected $group = array();
+	
+	protected $limit = null;
+	
+	protected $offset = null;
+	
+	public function create($table) {
+		
+	}
+	
+	public function select($field = '*') {
+		if (!is_array($field)) {
+			$field = func_get_args();
+		}
+		foreach ($field as $key => $value) {
+			if (is_int($key)) {
+				$this->select[] = $value;
+			} else {
+				$this->select[] = $value. ' AS '.$key;
+			}
+		}
+		return $this;
+	}
+	
+	public function count($column = '*') {
+		return $this->_selectFunction(__FUNCTION__, $column);
+	}
+	
+	public function max($column)  {
+		return $this->_selectFunction(__FUNCTION__, $column);
+	}
+	
+	public function min($column)  {
+		return $this->_selectFunction(__FUNCTION__, $column);
+	}
+	
+	public function avg($column)  {
+		return $this->_selectFunction(__FUNCTION__, $column);
+	}
+	
+	public function sum($column)  {
+		return $this->_selectFunction(__FUNCTION__, $column);
+	}
+	
+	private function _selectFunction($name, $column) {
+		$this->select[] = "{$name}({$column}) AS {$name}";
+		return $this;
+	}
+	
+	public function from($table) {
+		if (!is_array($table)) {
+			$table = func_get_args();
+		}
+		foreach ($table as $key => $value) {
+			if (is_int($key)) {
+				$this->table[] = $value;
+			} else {
+				$this->table[] = $value. ' '.$key;
+			}
+		}
+		return $this;
+	}
+	
+	public function where() {
+		
+	}
+	
+	public function join($table) {
+		
+	}
+	
+	public function group($column) {
+		if (is_string($column)) {
+			$column = func_get_args();
+		}
+		if (is_array($column)) {
+			$this->group = array_merge($this->group, $column);
+		}
+		return $this;
+	}
+	
+	/**
+	 * 用条件筛选已分组的组
+	 */
+	public function having() {
+		
+	}
+	
+	public function oreder($name, $sort = 'ASC') {
+		if (is_string($name)) {
+			$this->order[] = $name.' '.strtoupper($sort);
+		} elseif (is_array($name)) {
+			foreach ($name as $key => $value) {
+				if (is_int($key)) {
+					$this->order[] = $value;
+				} else {
+					$this->order[] = $key.' '. strtoupper($value);
+				}
+			}
+		}
+		return $this;
+	}
+	
+	/**
+	 * 当长度为null是，把第一个参数作为长度
+	 * @param unknown $start
+	 * @param unknown $length
+	 */
+	public function limit($start, $length = null) {
+		$this->limit = $start;
+		if (null !== $length) {
+			$this->limit .= ','.$length;
+		}
+		return $this;
+	}
+	
+	public function offset($start) {
+		$this->offset = $start;
+		return $this;
 	}
 	
 	/**
@@ -214,28 +343,5 @@ class SqlFilter {
 		}
 	
 		return $safe;
-	}
-	/**
-	 * 根据关键字排序，不是在关键字上往后移
-	 *
-	 * @access private
-	 *
-	 * @param array $arr 要排序的数组.
-	 * @param array $keys 关键字数组.
-	 * @return array 返回排序的数组,
-	 */
-	private function sortarr($arr, $keys) {
-		$keyarr = $noarr = array();
-		foreach ($keys as $key => $value) {
-			if (isset( $arr[$value] )) {
-				$keyarr[$value] = $arr[$value];
-			}
-		}
-		foreach ($arr as $key => $value) {
-			if (!in_array($key, $keys)) {
-				$noarr[$key] = $value;
-			}
-		}
-		return array_merge($keyarr, $noarr);
 	}
 }

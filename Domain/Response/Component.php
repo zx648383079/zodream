@@ -24,6 +24,6 @@ class Component {
 	 * 结束并释放视图
 	 */
 	public static function render() {
-		return self::$components;
+		ResponseResult::make(self::$components);
 	}
 }

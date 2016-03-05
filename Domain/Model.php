@@ -29,7 +29,7 @@ class Model {
 	 * @access public
 	 *
 	 * @param array $addData 需要添加的集合
-	 * @return int 返回影响的行数,
+	 * @return int 返回最后插入的ID,
 	 */
 	public function add($addData) {
 		$addFields = array();
@@ -64,11 +64,7 @@ class Model {
 			$where = 'WHERE '.$param;
 		}
 		foreach ($updateData as $key => $value) {
-			if (is_array($value)) {
-				$setData .= "`$key` = $value[0],";
-			} else {
-				$setData .= "`$key` = '$value',";
-			}
+			$setData .= "`$key` = '$value',";
 		}
 		$setData = substr($setData, 0, -1);
 		$sql     = "UPDATE {$this->table} SET $setData $where";
@@ -121,11 +117,15 @@ class Model {
 	 * @param array|string $param 条件
 	 * @return array,
 	 */
-	public function findOne($param , $filed = '*') {
+	public function findOne($param, $filed = '*') {
 		$where = '';
 		if ( is_array($param) ) {
 			foreach ($param as $key => $value) {
-				$where .=$value.' AND ';
+				if (is_numeric($key)) {
+					$where .= $value.' AND ';
+				} else {
+					$where .= $key." = '{$value}' AND ";
+				}
 			}
 			$where = 'WHERE '.substr($where, 0, -4);
 		} else if (is_string($param)) {
@@ -195,17 +195,17 @@ class Model {
 			$order = isset($param['order']) ? 'ORDER BY '.$param['order'] : '';
 			$group = isset($param['group']) ? 'GROUP BY '.$param['group'] : '';
 			if (isset($param['where'])) {
-				foreach ($param['where'] as $value) {
+				foreach ((array)$param['where'] as $value) {
 					if (empty($where)) {
 						$where = 'WHERE '.$value;
 					} else {
 						if (is_array($value)) {
 							switch ($value[1]) {
 								case 'or':
-									$where .= ' OR '.$value;
+									$where .= ' OR '.$value[0];
 									break;
 								case 'and':
-									$where .= ' AND '.$value;
+									$where .= ' AND '.$value[0];
 									break;
 							}
 						} else {
@@ -215,7 +215,7 @@ class Model {
 				}
 			}
 		}
-		$selectFields = empty($field) ? '*' : implode(',', $field);
+		$selectFields = empty($field) ? '*' : implode(',', (array)$field);
 		$sql    = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";
 		$this->db->execute($sql);
 		return $this->db->select($sql);
@@ -227,19 +227,20 @@ class Model {
 	 * @access public
 	 *
 	 * @param array|null $param 条件
+	 * @param string $field 默认为id
 	 * @return int 返回总数,
 	 */
-	public function count($param = array()) {
+	public function count($param = array(), $field = 'id') {
 		$where = '';
-		if (is_array($param)) {
-			foreach ($param['where'] as $key => $value) {
+		if (is_array($param) && !empty($param)) {
+			foreach ($param as $value) {
 				$where .= $value.' AND ';
 			}
 			$where = 'WHERE '.substr($where, 0, -4);
-		} else {
+		} elseif(is_string($param)) {
 			$where = 'WHERE '.$param;
 		}
-		$sql  = "SELECT COUNT(*) as count FROM {$this->table} $where";
+		$sql  = "SELECT COUNT({$field}) as count FROM {$this->table} $where";
 		$result = $this->db->select($sql);
 		return $result[0]['count'];
 	}

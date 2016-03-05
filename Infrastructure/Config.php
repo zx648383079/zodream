@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure;
 * @author Jason
 */
 use Zodream\Infrastructure\Traits\SingletonPattern;
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 
 class Config extends MagicObject {
@@ -30,7 +31,7 @@ class Config extends MagicObject {
 		$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
 		$common  = $this->_getConfig(APP_DIR.'/Service/config/config.php');
 		$personal = $this->_getConfig(APP_DIR.'/Service/config/'.APP_MODULE.'.php');
-		$this->set(array_merge((array)$configs, (array)$common, (array)$personal));
+		$this->set(ArrayExpand::merge2D((array)$configs, (array)$common, (array)$personal));
 	}
 
 	/**

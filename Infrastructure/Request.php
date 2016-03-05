@@ -7,6 +7,9 @@ namespace Zodream\Infrastructure;
 */
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+
+defined('APP_SAFE') or define('APP_SAFE', Config::getInstance()->get('app.safe', true));
 
 final class Request {
 	use SingletonPattern;
@@ -18,6 +21,7 @@ final class Request {
 	private $_files;
 	private $_servers;
 	private $_input;
+	private $_headers;
 	
 	public $error = FALSE;
 	
@@ -35,7 +39,7 @@ final class Request {
 				unset($data[$key]);
 				$data[strtolower($this->_clean($key))] = $this->_clean($value);
 			}
-		} else {
+		} else if (defined('APP_SAFE') && APP_SAFE){
 			$data = htmlspecialchars($data, ENT_COMPAT);
 		}
 	
@@ -138,6 +142,21 @@ final class Request {
 			$this->_servers = $this->_clean($_SERVER);
 		}
 		return $this->_getValue($name, $this->_servers, $default);
+	}
+	
+	public function header($name = null, $default = null) {
+		if (empty($this->_headers)) {
+			$this->_getHeaders();
+		}
+		return $this->_getValue($name, $this->_headers, $default);
+	}
+	
+	private function _getHeaders() {
+		foreach ($this->server() as $key => $value) {
+			if (StringExpand::startsWith($key, 'http_')) {
+				$this->_headers[StringExpand::firstReplace($key, 'http_')] = $value;
+			}
+		}
 	}
 	
 	/**

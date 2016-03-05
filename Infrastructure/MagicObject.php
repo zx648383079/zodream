@@ -49,6 +49,16 @@ class MagicObject {
 	}
 	
 	/**
+	 * 删除键 目前只支持一维
+	 * @param unknown $tag
+	 */
+	public function delete($tag) {
+		foreach (func_get_args() as $value) {
+			unset($this->_data[$value]);
+		}
+	}
+	
+	/**
 	 * 判断是否有
 	 * @param string $key
 	 */

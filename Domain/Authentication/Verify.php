@@ -2,10 +2,12 @@
 namespace Zodream\Domain\Authentication;
 
 
+use Zodream\Infrastructure\Config;
+use Zodream\Domain\Response\Redirect;
 class Verify {
 	public static function make($role) {
 		if (is_object($role) && !$role()) {
-			App::redirect('/');
+			Redirect::to('/');
 			return false;
 		} else if (is_string($role) && !empty($role)) {
 			$roles = explode(',', $role);
@@ -29,31 +31,33 @@ class Verify {
 	private static function _verify($role) {
 		$auth = self::_auth();
 		switch ($role) {
+            case '*':
+                return TRUE;
 			case '?':
 				if (!call_user_func(array($auth['driver'], 'guest'))) {
-					App::redirect('/');
+					Redirect::to('/');
 					return false;
 				}
 				break;
 			case '@':
 				if (call_user_func(array($auth['driver'], 'guest'))) {
-					App::redirect($auth['home']);
+					Redirect::to($auth['home']);
 					return false;
 				}
 				break;
 			case 'p':
 				if (!App::$request->isPost()) {
-					App::redirect('/', 4, '您不能直接访问此页面！', '400');
+					Redirect::to('/', 4, '您不能直接访问此页面！', '400');
 					return false;
 				}
 				break;
 			case '!':
-				App::redirect('/', 4, '您访问的页面暂未开放！', '413');
+				Redirect::to('/', 4, '您访问的页面暂未开放！', '413');
 				return false;
 				break;
 			default:
 				if (!self::judge($role)) {
-					App::redirect('/', 4, '您无权操作！', '401');
+					Redirect::to('/', 4, '您无权操作！', '401');
 					return false;
 				}
 				break;

@@ -9,27 +9,20 @@ class Ajax {
 	 * @param array|string $data 要传的值
 	 * @param string $type 返回类型
 	 */
-	public static function ajaxReturn($data, $type = 'JSON') {
-		switch (strtoupper($type)) {
-			case 'JSON' :
-				// 返回JSON数据格式到客户端 包含状态信息
-				header('Content-Type:application/json; charset=utf-8');
-				exit(json_encode($data));
-			case 'XML'  :
+	public static function ajaxReturn($data, $type = 'json') {
+		switch (strtolower($type)) {
+			case 'json' :
+				return ResponseResult::make(json_encode($data), $type);
+			case 'xml'  :
 				// 返回xml格式数据
-				header('Content-Type:text/xml; charset=utf-8');
-				exit(self::_xmlEncode($data));
+				return ResponseResult::make(self::_xmlEncode($data), $type);
 			case 'JSONP':
 				// 返回JSON数据格式到客户端 包含状态信息
-				header('Content-Type:application/json; charset=utf-8');
-				exit(Request::getInstance()->get('callback', 'jsonpReturn').'('.json_encode($data).');');
+				return ResponseResult::make(Request::getInstance()->get('callback', 'jsonpReturn').'('.json_encode($data).');', 'json');
 			case 'EVAL' :
 				// 返回可执行的js脚本
-				header('Content-Type:text/html; charset=utf-8');
-				exit($data);
+				return ResponseResult::make($data);
 		}
-	
-		exit;
 	}
 	
 	/**
@@ -62,64 +55,5 @@ class Ajax {
 	
 		}
 		return $xml->asXML();
-	}
-	
-	// 发送Http状态信息
-	public static function sendHttpStatus($status)
-	{
-		static $_status = [
-				// Informational 1xx
-				100 => 'Continue',
-				101 => 'Switching Protocols',
-				// Success 2xx
-				200 => 'OK',
-				201 => 'Created',
-				202 => 'Accepted',
-				203 => 'Non-Authoritative Information',
-				204 => 'No Content',
-				205 => 'Reset Content',
-				206 => 'Partial Content',
-				// Redirection 3xx
-				300 => 'Multiple Choices',
-				301 => 'Moved Permanently',
-				302 => 'Moved Temporarily ', // 1.1
-				303 => 'See Other',
-				304 => 'Not Modified',
-				305 => 'Use Proxy',
-				// 306 is deprecated but reserved
-				307 => 'Temporary Redirect',
-				// Client Error 4xx
-				400 => 'Bad Request',
-				401 => 'Unauthorized',
-				402 => 'Payment Required',
-				403 => 'Forbidden',
-				404 => 'Not Found',
-				405 => 'Method Not Allowed',
-				406 => 'Not Acceptable',
-				407 => 'Proxy Authentication Required',
-				408 => 'Request Timeout',
-				409 => 'Conflict',
-				410 => 'Gone',
-				411 => 'Length Required',
-				412 => 'Precondition Failed',
-				413 => 'Request Entity Too Large',
-				414 => 'Request-URI Too Long',
-				415 => 'Unsupported Media Type',
-				416 => 'Requested Range Not Satisfiable',
-				417 => 'Expectation Failed',
-				// Server Error 5xx
-				500 => 'Internal Server Error',
-				501 => 'Not Implemented',
-				502 => 'Bad Gateway',
-				503 => 'Service Unavailable',
-				504 => 'Gateway Timeout',
-				505 => 'HTTP Version Not Supported',
-				509 => 'Bandwidth Limit Exceeded',
-		];
-		if (isset($_status[$status])) {
-			header('HTTP/1.1 ' . $status . ' ' . $_status[$status]);
-			// 确保FastCGI模式下正常
-			header('Status:' . $status . ' ' . $_status[$status]);
-		}
 	}
 }

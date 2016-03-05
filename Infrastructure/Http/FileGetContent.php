@@ -1,12 +1,12 @@
 <?php 
-namespace Zodream\Head;
-/*
+namespace Zodream\Infrastructure\Http;
+/**
 * file_get_contents 
 * 
 * @author Jason
 * @time 2015-12-1
 */
-class File_get_content {
+class FileGetContent {
 	public static function get($url) {
 		return file_get_contents($url);
 	}
@@ -24,5 +24,15 @@ class File_get_content {
 		$stream_context = stream_context_create($context);
 		$data           = file_get_contents($url, FALSE, $stream_context);
 		return $data; 
+	}
+	
+	public static function setTimeOut() {
+		$context = stream_context_create(array(
+				'http' => array(
+						'timeout' => 30
+				)
+		)); // 超时时间，单位为秒
+		
+		return file_get_contents($url, 0, $context);
 	}
 }

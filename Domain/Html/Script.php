@@ -10,31 +10,52 @@ use Zodream\Domain\Routing\UrlGenerator;
 
 class Script {
 	public static function make($files, $dir = 'assets/') {
+		$dir = rtrim($dir, '/').'/';
 		foreach ($files as $file) {
 			if (is_string($file) && !empty($file)) {
-				$result = '';
-				$dir = rtrim($dir, '/').'/';
 				if (!strstr($file,'//')) {
-					if (stristr($file, '.css')) {
-						$result = '<link rel="stylesheet" type="text/css" href="'.UrlGenerator::to($dir.'css/'.$file).'"/>';
-					} elseif (stristr($file, '.js')) {
-						$result = '<script src="'.UrlGenerator::to($dir.'js/'.$file).'"></script>';
-					} else {
-						$result = '<script src="'.UrlGenerator::to($dir.'js/'.$file.'.js').'"></script>';
-					}
+					self::makeWithRelative($file, $dir);
 				} else {
-					if (stristr($file, '.css')) {
-						$result = '<link rel="stylesheet" type="text/css" href="'.$file.'"/>';
-					} elseif (stristr($file, '.js')) {
-						$result = '<script src="'.$file.'"></script>';
-					} else {
-						$result = '<script src="'.$file.'.js"></script>';
-					}
+					self::makeWithUrl($file);
 				}
-				echo $result;
 			} else if (is_object($file)) {
 				$file();
 			}
 		}
 	}
+	
+	private static function makeWithRelative($file, $dir) {
+		$needDeal = true;
+		if (substr($file, 0, 1) === '@') {
+			$needDeal = false;
+			$file = substr($file, 1);
+		}
+		$file = ltrim($file, '/');
+		if (stristr($file, '.css')) {
+			self::makeCss(UrlGenerator::to($dir.($needDeal ? 'css/' : '').$file));
+		} elseif (stristr($file, '.js')) {
+			self::makeJs(UrlGenerator::to($dir.($needDeal ? 'js/' : '').$file));
+		} else {
+			self::makeJs(UrlGenerator::to($dir.($needDeal ? 'js/' : '').$file. '.js'));
+		}
+	}
+	
+	private static function makeWithUrl($file) {
+		if (stristr($file, '.css')) {
+			self::makeCss($file);
+		} elseif (stristr($file, '.js')) {
+			self::makeJs($file);
+		} else {
+			self::makeJs($file.'.js');
+		}
+	}
+	
+	private static function makeCss($file) {
+		echo '<link rel="stylesheet" type="text/css" href="'.$file.'"/>';
+	}
+	
+	private static function makeJs($file) {
+		echo '<script src="'.$file.'"></script>';
+	}
+	
 }

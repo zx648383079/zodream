@@ -11,7 +11,7 @@ use Zodream\Infrastructure\DomainObject\FilterObject;
 
 class SameFilter extends FilterObject {
     public function validate($arg) {
-        return strtotime($arg) === $this->_option[0];
+        return $arg == $this->_option[0];
     }
 
     public function setOption($option)

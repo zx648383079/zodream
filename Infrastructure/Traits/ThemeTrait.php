@@ -2,7 +2,7 @@
 namespace Zodream\Infrastructure\Traits;
 
 use Zodream\Infrastructure\Response\Theme;
-trait ViewTrait {
+trait ThemeTrait {
 	/**
 	 * 传递数据
 	 *

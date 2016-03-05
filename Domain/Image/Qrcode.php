@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Body\Html;
+namespace Zodream\Domain\Image;
 /**
  * 二维码
  *

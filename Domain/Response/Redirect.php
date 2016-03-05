@@ -17,7 +17,7 @@ class Redirect {
 	 * @param string $msg 显示的消息.
 	 * @param string $code 显示的代码标志.
 	 */
-	public static function to($urls, $time = 0, $msg = '', $code = '') {
+	public static function to($urls = '', $time = 0, $msg = '', $code = '') {
 		$url = '';
 		foreach ((array)$urls as $value) {
 			$url .= UrlGenerator::to($value);
@@ -26,19 +26,12 @@ class Redirect {
 			$msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
 		}
 		if (!headers_sent()) {
-			if (0 === $time) {
-				header('Location: ' . $url);
-			} else {
-				header("refresh:{$time};url={$url}");
-			}
+			ResponseResult::sendRedirect($url, $time);
+			
 		} else {
-			$str    = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+			$str = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
 			//self::$response->set('meta', $str);
 		}
-		(array(
-				'title' => "出错了！",
-				'code'  => $code,
-				'error' => $msg
-		));
+		exit();
 	}
 }

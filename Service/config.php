@@ -10,14 +10,16 @@ return array(
 		'app'    => array(                           //网站信息
 				'title'      => 'ZoDream',
 				'host'       => 'http://localhost/',        //主目录
+				'safe'       => true,                       //启动安全模式
 				'model'      => 'Model',                     //后缀
+				'form'       => 'Form',
 				'controller' => 'Controller',
 				'action'     => 'Action',
 		),
 		'auth'   => array(
 				'driver' => Zodream\Domain\Authentication\Auth::class,        //用户判断
 				'role'   => Zodream\Domain\Authentication\Verify::class,       //权限判断
-				'home'  => 'auth'                             //用户登录主页
+				'home'  => 'account'                             //用户登录主页
 		),
 		'theme'   => array(                           //视图文件信息
 				'dir' => 'default',
@@ -25,7 +27,8 @@ return array(
 		),
 		'route'  => array(
 				'driver'  => Zodream\Domain\Routing\Grace::class,
-				'default' => 'Home@index'                         //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
+				'default' => 'Home@index',                        //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
+				'generate' => 'Zodream\\Domain\\Generate\\Generate@make'
 		),
 		'db'     => array(							//MYSQL数据库的信息
 				'driver'   => Zodream\Infrastructure\Database\Pdo::class,
@@ -50,6 +53,9 @@ return array(
 				'savepath'  => 'upload/'               //文件保存路径
 		),
 		'alias'  => array(
-				
+				'Config' => Zodream\Infrastructure\Config::class,
+				'Request' => Zodream\Infrastructure\Request::class,
+				'Session' => Zodream\infrastructure\Session::class,
+				'Cookie' => Zodream\Infrastructure\Cookie::class
 		)
 );

@@ -20,6 +20,13 @@ class TimeExpand {
 		return $time;
 	}
 	
+	public static function format($time = null, $format = 'Y-m-d H:i:s') {
+		if ($time == null) {
+			$time = time();
+		}
+		return date($format, $time);
+	}
+	
 	public static function getBeginAndEndTime() {
 		//php获取今日开始时间戳和结束时间戳
 		$beginToday     = mktime(0, 0, 0, date('m'), date('d'), date('Y'));

@@ -5,135 +5,33 @@ namespace Zodream\Infrastructure\Database;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\DomainObject\DatabaseObject;
 
-class Mysqli implements DatabaseObject {
-	/**
-	 * 连接标识符
-	 *
-	 * @var mysqli
-	 */
-	protected $mysqli;
-	
-	//用于存放实例化的对象
-	protected static $instance = null;
-	
-	//存放当前操作的错误信息
-	protected $error           = null;
-	
-	protected $result;
-	 
-	/**
-	 * 公共静态方法获取实例化的对象
-	 */
-	public static function getInstance(array $config) {
-		if (is_null(static::$instance)) {
-			static::$instance = new static($config);
-		}
-		return static::$instance;
-	}
-	 
-	//私有克隆
-	protected function __clone() {}
-	
-	
-	/**
-	 * 数据库的配置信息
-	 *
-	 * @var string
-	 */
-	protected $host;
-	protected $username;
-	protected $password;
-	protected $db;
-	protected $port;
-	protected $charset;
-	
-	/**
-	 * 公有构造
-	 *
-	 * @access public
-	 *
-	 * @internal param array|string $config_path 数据库的配置信息.
-	 */
-	private function __construct($config) {
-		$this->host     = $config['host'];
-		$this->username = $config['user'];
-		$this->password = $config['password'];
-		$this->db       = $config['database'];
-		$this->charset  = $config['encoding'];
-		$this->port     = $config['port'];
-		$this->connect();
-	}
+class Mysqli extends Database {
 	
 	/**
 	 * 连接数据库
 	 *
 	 */
-	private function connect() {
-		if (empty($this->host)) {
+	protected function connect() {
+		if (empty($this->configs)) {
 			die ('Mysql host is not set');
 		}
-		$this->mysqli = new \mysqli ($this->host, $this->username, $this->password, $this->db, $this->port)
+		$this->driver = new \mysqli(
+				$this->configs['host'], 
+				$this->configs['user'], 
+				$this->configs['password'], 
+				$this->configs['database'], 
+				$this->configs['port']
+		)
 		or die('There was a problem connecting to the database');
 		/* check connection */
 		/*if (mysqli_connect_errno()) {
 		 printf("Connect failed: %s\n", mysqli_connect_error());
 		 exit();
 		}*/
-		if ($this->charset) {
-			$this->mysqli->set_charset($this->charset);
+		if (isset($this->configs['encoding'])) {
+			$this->driver->set_charset($this->configs['encoding']);
 		}
-	}
-	
-	/**
-	 * 返回连接符，能使用原生语法
-	 */
-	public function mysqli () {
-		if (!$this->mysqli) {
-			$this->connect();
-		}
-		return $this->mysqli;
-	}
-	
-	
-	/**
-	 * 查询
-	 * @param string $sql
-	 * @return array
-	 */
-	public function select($sql) {
-		return $this->getArray($sql);
-	}
-	
-	/**
-	 * 插入
-	 * @param string $sql
-	 * @return integer id
-	 */
-	public function insert($sql) {
-		$this->execute($sql);
-		return $this->lastInsertId();
-	}
-	
-	/**
-	 * 修改
-	 * @param string $sql
-	 * @return integer 改变的行数
-	 */
-	public function update($sql){
-		$this->execute($sql);
-		return  $this->rows();
-	}
-	
-	/**
-	 * 删除
-	 * @param string $sql
-	 * @return integer 删除的行数
-	 */
-	public function delete($sql) {
-		$this->execute($sql);
-		return $this->rows();
 	}
 	
 	/**
@@ -141,7 +39,7 @@ class Mysqli implements DatabaseObject {
 	 * @param unknown $sql
 	 */
 	public function prepare($sql) {
-		$this->result = $this->pdo->prepare($sql);
+		$this->result = $this->driver->prepare($sql);
 	}
 	
 	/**
@@ -198,12 +96,8 @@ class Mysqli implements DatabaseObject {
 	 * @access public
 	 *
 	 */
-	public function rows($end = TRUE) {
-		$rows = mysqli_affected_rows($this->mysqli);
-		if ($end) {
-			$this->close();
-		}
-		return $rows;
+	public function rowCount() {
+		return mysqli_affected_rows($this->driver);
 	}
 	
 	/**
@@ -212,25 +106,8 @@ class Mysqli implements DatabaseObject {
 	 * @access public
 	 *
 	 */
-	public function lastInsertId($end = TRUE) {
-		$id = mysqli_insert_id($this->mysqli);
-		if($end) {
-			$this->close();
-		}
-		return $id;
-	}
-	/**
-	 * 返回结果集的行数
-	 *
-	 * @access public
-	 *
-	 */
-	public function rowCount($end = TRUE) {
-		$count = mysqli_num_rows($this->result);
-		if($end) {
-			$this->close();
-		}
-		return $count;
+	public function lastInsertId() {
+		return mysqli_insert_id($this->driver);
 	}
 	
 	/**
@@ -240,12 +117,11 @@ class Mysqli implements DatabaseObject {
 	 *
 	 * @param string $sql 多行查询语句
 	 */
-	public function execute($sql)
-	{
+	public function execute($sql) {
 		if (empty($sql)) {
 			return;
 		}
-		$this->result = $this->_mysqli->query($sql);
+		$this->result = $this->driver->query($sql);
 		return $this->result;
 	}
 	
@@ -258,7 +134,7 @@ class Mysqli implements DatabaseObject {
 	 * @param array $param 参数
 	 */
 	public function prepare($sql, $param) {
-		$this->result = mysqli_prepare($this->mysqli, $sql);
+		$this->result = mysqli_prepare($this->driver, $sql);
 		mysqli_stmt_bind_param($this->result, $param );
 		mysqli_stmt_execute($this->result);
 		mysqli_stmt_bind_result($this->result, $district);
@@ -277,16 +153,16 @@ class Mysqli implements DatabaseObject {
 	 */
 	public function multi_query($query)  {
 		$result = array();
-		if (mysqli_multi_query($this->mysqli, $query)) {                                           //执行多个查询
+		if (mysqli_multi_query($this->driver, $query)) {                                           //执行多个查询
 			do {
-				if ($this->result = mysqli_store_result($this->mysqli)) {
+				if ($this->result = mysqli_store_result($this->driver)) {
 					$result[] = $this->getList();
 					mysqli_free_result($this->result);
 				}
 				/*if (mysqli_more_results($this_mysqli)) {
 				 echo ("-----------------<br>");                   //连个查询之间的分割线
 				 }*/
-			} while (mysqli_next_result($this->mysqli));
+			} while (mysqli_next_result($this->driver));
 		}
 		$this->close();
 		return $result;
@@ -303,11 +179,11 @@ class Mysqli implements DatabaseObject {
 		if (!empty($this->result) && !is_bool($this->result)) {
 			mysqli_free_result($this->result);
 		}
-		mysqli_close($this->mysqli);
+		mysqli_close($this->driver);
 	}
 	
 	public function getError() {
-		return mysqli_error($this->mysqli);
+		return mysqli_error($this->driver);
 	}
 	
 	public function __destruct() {

@@ -32,7 +32,10 @@ class IntFilter extends FilterObject {
 
     public function setOption($option)
     {
-        if (is_string($option)) {
+    	if (empty($option)) {
+    		$option = array(PHP_INT_MIN);
+    	}
+    	if (is_string($option)) {
             $option = explode('-', $option);
         }
         if (is_array($option)) {

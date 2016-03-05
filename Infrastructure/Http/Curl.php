@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Head;
+namespace Zodream\Infrastructure\Http;
 /**
  * curl
  *

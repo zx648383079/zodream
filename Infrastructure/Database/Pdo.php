@@ -5,105 +5,42 @@ namespace Zodream\Infrastructure\Database;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\DomainObject\DatabaseObject;
 
-class Pdo implements DatabaseObject {
-	//pdo对象
-	protected $pdo             = null;
-	//用于存放实例化的对象
-	protected static $instance = null;
+class Pdo extends Database {
 	
-	//存放当前操作的错误信息
-	protected $error           = null;
-	
-	protected $result;
-	 
-	/**
-	 * 公共静态方法获取实例化的对象
-	 */
-	public static function getInstance(array $config) {
-		if (is_null(static::$instance)) {
-			static::$instance = new static($config);
-		}
-		return static::$instance;
-	}
-	 
-	//私有克隆
-	protected function __clone() {}
-	
-	/**
-	 * 公有构造
-	 *
-	 * @access public
-	 *
-	 * @internal param array|string $config_path 数据库的配置信息.
-	 */
-	private function __construct($config) {
-		$host     = $config['host'];
-		$user     = $config['user'];
-		$pwd      = $config['password'];
-		$database = $config['database'];
-		$coding   = $config['encoding'];
-		$port     = $config['port'];
-	
+	protected function connect() {
 		try {
-			//$this->pdo = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
+			//$this->driver = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
 			//                     array(\PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES {$coding}"));
-			$this->pdo = new \PDO ('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd);
-			$this->pdo->exec ('SET NAMES {$coding}');
-			$this->pdo->query ( "SET character_set_client={$coding}" );
-			$this->pdo->query ( "SET character_set_connection={$coding}" );
-			$this->pdo->query ( "SET character_set_results={$coding}" );
-			$this->pdo->setAttribute (\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+			$this->driver = new \PDO (
+					'mysql:host='. $this->configs['host'].
+					';port='.$this->configs['port'].
+					';dbname='.$this->configs['database'], 
+					$this->configs['user'], 
+					$this->configs['password']
+			);
+			$this->driver->exec ('SET NAMES '.$this->configs['encoding']);
+			$this->driver->query ( "SET character_set_client={$this->configs['encoding']}" );
+			$this->driver->query ( "SET character_set_connection={$this->configs['encoding']}" );
+			$this->driver->query ( "SET character_set_results={$this->configs['encoding']}" );
+			$this->driver->setAttribute (\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 		} catch (\PDOException $ex) {
 			$this->error = $ex->getMessage();
 			return false;
 		}
 	}
 	
-	/**
-	 * 查询
-	 * @param string $sql
-	 * @return array
-	 */
-	public function select($sql) {
-		return $this->getArray($sql);
-	}
-	
-	/**
-	 * 插入
-	 * @param string $sql
-	 * @return integer id
-	 */
-	public function insert($sql) {
-		$this->execute($sql);
-		return $this->lastInsertId();
-	}
-	
-	/**
-	 * 修改
-	 * @param string $sql
-	 * @return integer 改变的行数
-	 */
-	public function update($sql){
-		return $this->execute($sql)->rowCount();
-	}
-	
-	/**
-	 * 删除
-	 * @param string $sql
-	 * @return integer 删除的行数
-	 */
-	public function delete($sql) {
-		return $this->execute($sql)->rowCount();
-	}
 	
 	/**
 	 * 获取最后修改的id
 	 * @return string
 	 */
 	public function lastInsertId() {
-		return $this->pdo->lastInsertId();
+		return $this->driver->lastInsertId();
+	}
+	
+	public function rowCount() {
+		return $this->result->rowCount();
 	}
 	
 	/**
@@ -111,16 +48,25 @@ class Pdo implements DatabaseObject {
 	 * @param unknown $sql
 	 */
 	public function prepare($sql) {
-		$this->result = $this->pdo->prepare($sql);
+		$this->result = $this->driver->prepare($sql);
 	}
 	
 	/**
 	 * 绑定值
 	 * @param unknown $param
 	 */
-	public function bind($param) {
+	public function bind(array $param) {
 		foreach ($param as $key => $value) {
-			$this->result->bindParam($key, $value);
+			if (is_null($value)) {
+				$type = PDO::PARAM_NULL;
+			} else if (is_bool($value)) {
+				$type = PDO::PARAM_BOOL;
+			} else if (is_int($value)) {
+				$type = PDO::PARAM_INT;
+			} else {
+				$type = PDO::PARAM_STR;
+			}
+			$this->result->bindParam(is_int($key) ? ++$key : $key, $value, $type);
 		}
 	}
 	 
@@ -132,15 +78,16 @@ class Pdo implements DatabaseObject {
 	 * @param array|null $param 条件
 	 * @return array 返回查询结果,
 	 */
-	public function execute($sql = null) {
+	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {
 			return;
 		}
 		try {
 			if (!empty($sql)) {
-				$this->result = $this->pdo->prepare($sql);
+				$this->result = $this->driver->prepare($sql);
+				$this->bind($parameters);
 			}
-			$this -> result ->execute();
+			$this ->result->execute();
 		} catch (\PDOException  $ex) {
 			$this->error = $ex->getMessage();
 		}

@@ -9,6 +9,8 @@ use Zodream\Infrastructure\Config;
 
 defined('APP_CONTROLLER') or define('APP_CONTROLLER', Config::getInstance()->get('app.controller'));
 defined('APP_ACTION')     or define('APP_ACTION', Config::getInstance()->get('app.action'));
+defined('APP_MODEL')      or define('APP_MODEL', Config::getInstance()->get('app.model'));
+defined('APP_FORM')       or define('APP_FORM', Config::getInstance()->get('app.form'));
 
 class Router{
 	
@@ -58,6 +60,9 @@ class Router{
 	 * @return bool
 	 */
 	private static function _runByRoute($routes) {
+		if (is_string($routes)) {
+			$routes = trim($routes, '/');
+		}
 		if (is_string($routes)) {
 			return self::_loopConfig($routes, RouteConfig::getInstance()->get());
 		}
@@ -116,6 +121,7 @@ class Router{
 					$values = array_splice($routes, $i + 1);
 					unset($routes[$i]);
 				} else {
+					$routes[$i - 1] = strtolower($routes[$i - 1]);
 					$values = array_splice($routes, $i - 1);
 				}
 				break;

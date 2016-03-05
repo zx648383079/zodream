@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Infrastructure\Traits;
 
-use Zodream\Infrastructure\Response\View;
+use Zodream\Domain\Response\View;
 trait ViewTrait {
 	/**
 	 * 传递数据

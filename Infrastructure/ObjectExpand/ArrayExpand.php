@@ -12,9 +12,9 @@ class ArrayExpand {
 	
 	private static $_after   = array();
 	
-	public static function _arrayList($args) {
+	private static function _arrayList(array $args) {
 		foreach ($args as $key => $value) {
-			if (is_numeric($key)) {
+			if (is_int($key)) {
 				if (is_array($value)) {
 					self::_arrayList($value);
 				} else {
@@ -25,7 +25,7 @@ class ArrayExpand {
 					case 'before':
 					case 'before[]':
 						if (is_array($value)) {
-							self::$_before = array_merge(self::$_before, $value);
+							self::$_before = array_merge(self::$_before, self::toFile($value, '/'));
 						} else {
 							self::$_before[] = $value;
 						}
@@ -33,12 +33,13 @@ class ArrayExpand {
 					case 'after':
 					case 'after[]':
 						if (is_array($value)) {
-							self::$_after = array_merge(self::$_after, $value);
+							self::$_after = array_merge(self::$_after, self::toFile($value, '/'));
 						} else {
 							self::$_after[] = $value;
 						}
 						break;
 					default:
+						self::$_content = array_merge(self::$_content, self::toFile((array)$value, '/', $key.'/'));
 						break;
 				}
 			}
@@ -73,6 +74,8 @@ class ArrayExpand {
 				if (is_int($key)) {
 					if (is_array($value)) {
 						$list = array_merge($list, self::toFile($value, $link, $pre));
+					} elseif(is_object($value)) {
+						$list[] = $value;
 					} else {
 						$list[] = $pre.$value;
 					}
@@ -141,7 +144,7 @@ class ArrayExpand {
      */
     private static function _getValueByKeyWithDefault($key,array $args, $default = null) {
         //使用方法
-        list($temp, $def) = StringExpand::toArray($key, ' ', 2, $default);
+        list($temp, $def) = StringExpand::explode($key, ' ', 2, $default);
         $temps  = explode(':', $temp, 2);
         $oldKey = $temps[0];
         $newKey = end( $temps );
@@ -186,6 +189,28 @@ class ArrayExpand {
 				return isset($values[$keys[0]]) ? self::getChildByArray(array_slice($keys, 1), $values[$keys[0]], $default) : $default;
 		}
 	}
+	
+	/**
+	 * 根据关键字数组取值(其中包含特殊关键字*)
+	 * @param string $keys 关键字
+     * @param array $values 值
+     * @param null $default 默认
+     * @param string $link 关键字的连接符
+     * @return string|array
+	 */
+	public static function getChildWithStar($keys, array $values, $default = null, $link = '.') {
+		$keys = explode($link, $keys, 2);
+		$results = null;
+		if ($keys[0] === '*') {
+			$results = $values;
+		} else {
+			$results = array_key_exists($keys[0], $values) ? $values[$keys[0]] : $default;
+		}
+		if (count($keys) == 1) {
+			return $results;
+		}
+		return self::getChildWithStar($keys[1], $results, $default, $link);
+	}
 
     /** 扩展 array_combine 能够用于不同数目
      * @param array $keys
@@ -195,18 +220,18 @@ class ArrayExpand {
      */
 	public static function combine(array $keys, array $values, $complete = TRUE) {
 		$arr = array();
-		if ( self::isAssoc($values) ) {
-			foreach ($keys as $key) {
-				if (isset($values[$key])) {
-					$arr[$key] = $values[$key];
-				} else if ($complete) {
-					$arr[$key] = null;
-				}
-			}
-		} else {
+		if (!self::isAssoc($values) ) {
             for ($i = 0; $i < count($keys); $i++) {
                 $arr[$keys[$i]] = isset($values[$i]) ? $values[$i] : null;
             }
+            return $arr;
+        }
+        foreach ($keys as $key) {
+        	if (isset($values[$key])) {
+        		$arr[$key] = $values[$key];
+        	} else if ($complete) {
+        		$arr[$key] = null;
+        	}
         }
 		return $arr;
 	}
@@ -229,19 +254,58 @@ class ArrayExpand {
 	}
 	
 	/**
-	 * 合并多维数组 如果键名相同后面的数组会覆盖前面的数组
+	 * 合并多个二维数组 如果键名相同后面的数组会覆盖前面的数组
 	 * @param array $arr
-	 * @param array $arg
+	 * @param array ...
 	 * @return array
 	 */
-	public static function merge(array $arr, array $arg) {
-		foreach ($arg as $key => $value) {
-			if (!array_key_exists($key, $arr) || !is_array($value)) {
-				$arr[$key] = $value;
-				continue;
+	public static function merge2D(array $arr) {
+		$args = func_get_args();
+		$results = call_user_func_array('array_merge', $args);
+		foreach ($results as $key => $value) {
+			$temps = array();
+			foreach ($args as $val) {
+				$temps[] = isset($val[$key]) ? $val[$key] : array();
 			}
-			$arr[$key] = self::merge((array)$arr[$key], $value);
+			$results[$key] = call_user_func_array('array_merge', $temps);
 		}
-		return $arr;
+		return $results;
+	}
+	
+	/**
+	 * 判断是否在二维数组中 if no return false; or return $key
+	 * @param unknown $needle
+	 * @param array $args
+	 */
+	public static function inArray($needle,array $args) {
+		foreach ($args as $key => $value) {
+			if (in_array($needle, (array)$value)) {
+				return $key;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 根据关键字排序，不是在关键字上往后移
+	 *
+	 *
+	 * @param array $arr 要排序的数组.
+	 * @param array $keys 关键字数组.
+	 * @return array 返回排序的数组,
+	 */
+	public static function sortByKey(array $args, array $keys) {
+		$keyarr = $noarr = array();
+		foreach ($keys as $value) {
+			if (isset( $args[$value] )) {
+				$keyarr[$value] = $args[$value];
+			}
+		}
+		foreach ($args as $key => $value) {
+			if (!in_array($key, $keys)) {
+				$noarr[$key] = $value;
+			}
+		}
+		return array_merge($keyarr, $noarr);
 	}
 }

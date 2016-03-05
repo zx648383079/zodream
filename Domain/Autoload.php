@@ -9,6 +9,7 @@ use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Log;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\MagicObject;
+use Zodream\Domain\Response\View;
 
 class Autoload extends MagicObject {
 	
@@ -28,6 +29,7 @@ class Autoload extends MagicObject {
 			spl_autoload_register(array($this, '_load'), true, true);
 			$this->_registerAlias = TRUE;
 		}
+		return $this;
 	}
 	
 	/**
@@ -35,8 +37,11 @@ class Autoload extends MagicObject {
 	 * @param string $alias
 	 */
 	protected function _load($alias) {
-		if ($this->has($alias)) {
-			return class_alias($this->get($alias), $alias);
+		if (!class_exists($alias)) {
+			$alias = end(explode('\\', $alias));
+			if ($this->has($alias)) {
+				return class_alias($this->get($alias), $alias);
+			}
 		}
 	}
 	
@@ -45,6 +50,7 @@ class Autoload extends MagicObject {
 	 */
 	public function setError() {
 		set_error_handler(array($this, '_error'));          //自定义错误输出
+		return $this;
 	}
 	
 	protected function _error($errno, $errstr, $errfile, $errline) {
@@ -53,9 +59,9 @@ class Autoload extends MagicObject {
 		if (!defined('DEBUG') || !DEBUG) {
 			$str = '出错了！';
 		}
-		/*::getInstance()->show('404', array(
+		View::getInstance()->show('404', array(
 				'error' => $str
-		));*/
+		));
 	}
 	
 	/**
@@ -63,6 +69,7 @@ class Autoload extends MagicObject {
 	 */
 	public function shutDown() {
 		register_shutdown_function(array($this, '_shutDown'));   //程序结束时输出
+		return $this;
 	}
 	
 	protected function _shutDown() {
@@ -75,9 +82,9 @@ class Autoload extends MagicObject {
 		if (!defined('DEBUG') || !DEBUG) {
 			$str = '出错了！';
 		}
-		/*Response::getInstance()->show('404', array(
+		View::getInstance()->show('404', array(
 				'error' => $str
-		));*/
+		));
 	}
 	
 	private function __clone() {

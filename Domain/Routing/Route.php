@@ -5,8 +5,8 @@ namespace Zodream\Domain\Routing;
  * 单个路由
  * @author Jason
  */
-use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\Request;
+use Zodream\Domain\Response\ResponseResult;
 
 class Route {
 	protected $_action;
@@ -103,30 +103,52 @@ class Route {
 	
 	/**
 	 * 执行 控制器方法
-	 * @throws Error
 	 */
 	protected function runController($class = null, $action = null) {
 		if (empty($class)) {
 			list($class, $action) = explode('@', $this->_action);
 		}
 		$classes = explode('\\', $class);
-		foreach ($classes as &$value) {
-			$value = ucfirst($value);
-		}
-		$class = implode('\\', $classes);
-		
-		$this->_class[0] = $class = str_replace(APP_CONTROLLER, '', $class);
-		$class .= APP_CONTROLLER;
-		if (strstr('Service\\', $class) === false) {
-			$class = 'Service\\'.APP_MODULE.'\\' .ucfirst($class);
-		}
-		if (!class_exists($class)) {
-			throw new Error('NOT FIND CLASS!'. $class);
-		}
-		$action          = str_replace(APP_ACTION, '', $action);
+		list($class, $action) = $this->getController($classes, $action);
 		$this->_class[1] = $action;
 		$instance        = new $class;
 		$instance->init();
 		return call_user_func(array($instance, 'runAction'), $action, $this->_param);
+	}
+	
+	/**
+	 * 获取控制
+	 * @param array $args
+	 * @param unknown $action
+	 */
+	protected function getController(array $args, $action) {
+		$class = $this->existController($args);
+		if ($class !== false) {
+			return array($class, $action);
+		}
+		
+		if (count($args) == 1 && $action = 'index') {
+			$this->_class[0] = 'Home';
+			return array('Service\\'.APP_MODULE.'\\Home'.APP_CONTROLLER, strtolower($args[0]));
+		}
+		
+		$args[] = $action;
+		$class = $this->existController($args);
+		if ($class !== false) {
+			return array($class, 'index');
+		}
+		
+		ResponseResult::sendError('CLASS IS NOT FIND!');
+	}
+	
+	protected function existController(array $args) {
+		$args = array_map('ucfirst', $args);
+		$method = implode('\\', $args);
+		$class = 'Service\\'.APP_MODULE.'\\'.$method.APP_CONTROLLER;
+		if (class_exists($class)) {
+			$this->_class[0] = $method;
+			return $class;
+		}
+		return false;
 	}
 }

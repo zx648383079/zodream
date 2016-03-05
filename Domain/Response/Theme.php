@@ -9,6 +9,10 @@ defined('THEME_DIR') or define('THEME_DIR', '/' .Config::theme('dir').'/');
 
 class Theme extends View {
 	
+	protected function __construct() {
+		$this->setAsset('UserInterface/'.APP_MODULE.'/'.THEME_DIR);
+	}
+	
 	function find() {
 	
 	}
@@ -19,12 +23,12 @@ class Theme extends View {
 	public function jcs() {
 		$args   = func_get_args();
 		$args[] = $this->get('_extra', array());
-		Script::make(Arr::sort($args), strtolower(APP_MODULE).'/'.THEME_DIR);
+		Script::make(Arr::sort($args), $this->getAsset());
 	}
 	
 	public function asset($file, $isTheme = TRUE) {
 		if ($isTheme) {
-			$file = strtolower(APP_MODULE).THEME_DIR.ltrim($file, '/');
+			$file = $this->getAsset().ltrim($file, '/');
 		}
 		echo UrlGenerator::to($file);
 	}

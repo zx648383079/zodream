@@ -6,6 +6,20 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 class StringExpand {
+	
+	/**
+	 * 字节长度
+	 * @param unknown $string
+	 */
+	public static function byteLength($string)
+	{
+		return mb_strlen($string, '8bit');
+	}
+	
+	public static function filterHtml($content) {
+		return preg_replace('/<(.*?)>/', '', htmlspecialchars_decode($content));
+	}
+	
 	/**
 	 * 截取字符串为数组，补充explode函数，不建议过长数组
 	 */
@@ -34,7 +48,6 @@ class StringExpand {
 				return true;
 			}
 		}
-	
 		return false;
 	}
 	
@@ -44,7 +57,7 @@ class StringExpand {
 	 * @param string $arg
 	 * @param string $replace
 	 */
-	public static function fReplace($arg, $search, $replace = null) {
+	public static function firstReplace($arg, $search, $replace = null) {
 		return preg_replace('/^'.$search.'/', $replace, $arg, 1);
 	}
 	
@@ -95,7 +108,7 @@ class StringExpand {
 	 * @param $suffix 是否加尾缀
 	 */
 	
-	public function csubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true) {
+	public static function csubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true) {
 		if (function_exists("mb_substr")) {
 			if (mb_strlen($str, $charset) <= $length) return $str;
 			$slice = mb_substr($str, $start, $length, $charset);
@@ -116,7 +129,7 @@ class StringExpand {
 	function sub ($str,$len) {
 		$string = '';
 		for( $i=0; $i < $len; $i++ ){
-			if( ord(substr($str, $i,1))>0xa0 ){
+			if( ord(substr($str, $i,1)) > 0xa0 ){
 				$string .= substr($str,$i,3);    //默认采用utf编码，汉字3个字节
 				$i=$i+2;
 			}else{
@@ -125,4 +138,6 @@ class StringExpand {
 		}
 		return $string;
 	}
+	
+	
 }

@@ -22,6 +22,23 @@ class UrlGenerator {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null, $secret = FALSE) {
+		$url = self::toByFile($file);
+		if ($extra === null) {
+			return $url;
+		}
+		if (is_array($extra)) {
+			return self::setValue($url, $extra);
+		}
+		if (is_object($extra)) {
+			return $extra($url);
+		}
+		if (strpos($url, '?') === false) {
+			return $url.'?'.$extra;
+		}
+		return self::setValue($url, $extra);
+	}
+	
+	protected static function toByFile($file = null) {
 		if (strstr($file, '//')) {
 			if (strstr($file, '://') || ltrim($file, '/') === substr($file, 2)) {
 				return $file;
@@ -29,7 +46,7 @@ class UrlGenerator {
 			$file = str_replace('//', '/', $file);
 		}
 		if ($file === null || $file === 0) {
-			return APP_URL.ltrim(self::getUri(), '/');
+			return self::getRoot(FALSE).ltrim(self::getUri(), '/');
 		}
 		if ($file === '-' || $file === -1) {
 			return self::referer();
@@ -38,28 +55,22 @@ class UrlGenerator {
 			return APP_URL;
 		}
 		if (strpos($file, '.') !== false) {
-			$url = APP_URL.ltrim($file, '/');
-		} else {
-			$url = call_user_func(array(RouteConfig::getInstance()->getDriver(), 'to'), $file);
+			return self::toAsset($file);
 		}
-		if ($extra === null) {
-			return $url;
-		} else if (is_string($extra)) {
-			if (strpos($url, '?') === false) {
-				$url .= '?'.$extra;
-			} else {
-				$url .= '&'.$extra;
-			}
-		} else if(is_array($extra)) {
-			$url = self::setValue($url, $extra);
-		}
-		return $url;
+		return call_user_func(array(RouteConfig::getInstance()->getDriver(), 'to'), $file);
+	}
+	
+	protected static function toAsset($file) {
+		return self::getRoot(FALSE).ltrim($file, '/');
 	}
 	
 	/**
 	 * 获取根网址
+	 * 
+	 * @param boolean $withScript 是否带执行脚本文件
+	 * @return string
 	 */
-	public static function getRoot() {
+	public static function getRoot($withScript = TRUE) {
 		$args = parse_url(self::getUri());
 		$root = '';
 		$secret = Request::getInstance()->server('HTTPS');
@@ -75,7 +86,7 @@ class UrlGenerator {
 		}
 		$root .= '/';
 		$self = Request::getInstance()->server('script_name');
-		if ($self !== '/index.php') {
+		if ($self !== '/index.php' && $withScript) {
 			$root .= ltrim($self, '/');
 		}
 		return $root;
@@ -92,12 +103,29 @@ class UrlGenerator {
 		if (count($arr) > 1) {
 			parse_str( $arr[1], $data );
 		}
-		if ($value === null && is_array($key)) {
-			$data = array_merge($data, $key);
-		} else {
+		if (!is_null($value)) {
 			$data[ $key ] = $value;
+		} else {
+			if (is_array($key)) {
+				$data = array_merge($data, $key);
+			} else if (is_string($key)) {
+				$keys = array();
+				parse_str($key, $keys);
+				$data = array_merge($data, $keys);
+			}
 		}
 		return $arr[0].'?'.http_build_query($data);
+	}
+	
+	public static function hasUri($search = null) {
+		$url = array_shift(explode('?', self::getUri()));
+		if (is_null($search) && $url == '/') {
+			return true;
+		}
+		if (strstr($url, '/'.trim($search, '/')) !== false) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**

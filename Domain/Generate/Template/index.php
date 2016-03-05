@@ -6,7 +6,7 @@ $this->extend(array(
 ));
 ?>
 <div>
-<form action="<?php $this->url('{name}');?>" method="get">
+<form action="<?php $this->url();?>" method="get">
 <input type="text" name="search">
 <button type="submit">搜索</button>
 </form>

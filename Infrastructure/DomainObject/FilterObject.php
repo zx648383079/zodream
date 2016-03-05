@@ -17,7 +17,7 @@ abstract class FilterObject {
     }
 
     public function setOption($option) {
-        $this->_option = $option + $this->_defaultOption;
+        $this->_option = (array)$option + $this->_defaultOption;
     }
 
     public function getOption() {

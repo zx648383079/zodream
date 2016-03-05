@@ -63,7 +63,7 @@ class FileSystem {
 		return file_get_contents(self::getFile($file));
 	}
 	
-	public static function writ($file, $data) {
+	public static function write($file, $data) {
 		file_put_contents($file, $data);
 	}
 	
