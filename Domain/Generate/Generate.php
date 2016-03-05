@@ -30,6 +30,22 @@ class Generate extends Model {
 		}
 		exit('完成！');
 	}
+
+	public function importSql($file) {
+		if (!is_file($file)) {
+			return;
+		}
+		$content = file_get_contents($file);
+		$sqls = explode(";\n", str_replace("\r", "\n", $content));
+		foreach ($sqls as $sql) {
+			$this->db->execute($sql);
+			$match = array();
+			if (preg_match('/create table ([\w_]+?) \(/i', $sql, $match)) {
+				echo $match[1].' 表创建成功！<br>';
+			}
+		}
+		echo 'SQL文件执行完成！';
+	}
 	
 	/**
 	 * 获取数据库名
@@ -64,7 +80,7 @@ class Generate extends Model {
 	
 	/**
 	 * 获取列名
-	 * @param unknown $arg
+	 * @param string $arg
 	 */
 	public function getColumn($arg) {
 		$arg = $this->prefix.StringExpand::firstReplace($arg, $this->prefix);
