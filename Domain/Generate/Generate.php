@@ -31,9 +31,14 @@ class Generate extends Model {
 		exit('完成！');
 	}
 
-	public function importSql($file) {
+	public function importSql($file, $db = null) {
 		if (!is_file($file)) {
 			return;
+		}
+		if (!empty($db)) {
+			$this->db->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
+				'` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
+			echo $db.'数据库创建成功！';
 		}
 		$content = file_get_contents($file);
 		$sqls = explode(";\n", str_replace("\r", "\n", $content));
