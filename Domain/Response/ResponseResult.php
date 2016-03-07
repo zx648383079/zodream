@@ -9,7 +9,7 @@ class ResponseResult {
 	 * @param number $status
 	 */
 	public static function prepare($type = 'html', $status = 200) {
-		if ((!defined('APP_GZIP') || APP_GZIP) && extension_loaded('zlib')) {
+		if ((!defined('DEBUG') || !DEBUG) &&(!defined('APP_GZIP') || APP_GZIP) && extension_loaded('zlib')) {
 			if (!headers_sent() && strpos(Request::getInstance()->server('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== FALSE) {
 				ob_start('ob_gzhandler');
 			} else {
@@ -38,7 +38,7 @@ class ResponseResult {
 	
 	/**
 	 * 释放指定内容
-	 * @param unknown $result
+	 * @param string $result
 	 * @param string $type
 	 * @param number $status
 	 */

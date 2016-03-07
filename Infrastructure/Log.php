@@ -13,7 +13,7 @@ class Log {
  
     private static function init() {
         self::$initFlag = true;
-        register_shutdown_function(array("Log", "shutdown_func"));
+        register_shutdown_function(__NAMESPACE__.'\Log::_shutDown');
     }
  
     /**
@@ -23,10 +23,11 @@ class Log {
      * @return int
      */
     public static function out($filePath, $msg) {
-        if (!self::$initFlag) {
-            self::init();
+        if (!is_file($filePath)) {
+            $filePath = APP_DIR.'/log/'.ltrim($filePath, '/');
         }
-        return self::internalOut($filePath, $msg);
+        file_put_contents($filePath, $msg, FILE_APPEND | LOCK_EX);
+        //return self::internalOut($filePath, $msg);
     }
  
     /**
@@ -56,7 +57,7 @@ class Log {
         return $result;
     }
  
-    function shutdown_func() {
+    private static function _shutDown() {
         if (!empty(self::$fileHandlerCache)) {
             if (is_array(self::$fileHandlerCache)) {
                 foreach (self::$fileHandlerCache as $k => $v) {

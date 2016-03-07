@@ -1,13 +1,12 @@
 <?php 
 namespace Zodream\Domain;
-use Zodream\Domain\Filter\SqlFilter;
-use Zodream\Infrastructure\Config;
-
 /**
 * 数据基类
 * 
 * @author Jason
 */
+use Zodream\Domain\Filter\SqlFilter;
+use Zodream\Infrastructure\Config;
 
 class Model {
 	protected $db = null;
@@ -158,8 +157,7 @@ class Model {
 	 */
 	public function delete($param) {
 		$where = '';
-		if(is_array($param))
-		{
+		if(is_array($param)) {
 			foreach ($param as $key => $value) {
 				$where .= $value.' AND ';
 			}

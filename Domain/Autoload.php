@@ -6,10 +6,8 @@ namespace Zodream\Domain;
  * @author Jason
  */
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Log;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\MagicObject;
-use Zodream\Domain\Response\View;
 
 class Autoload extends MagicObject {
 	
@@ -20,7 +18,6 @@ class Autoload extends MagicObject {
 	private function __construct() {
 		$this->set(Config::getInstance()->get('alias', array()));
 	}
-	
 	/**
 	 * 注册别名
 	 */
@@ -43,48 +40,24 @@ class Autoload extends MagicObject {
 				return class_alias($this->get($alias), $alias);
 			}
 		}
+		return false;
 	}
 	
 	/**
 	 * 自定义错误输出
 	 */
-	public function setError() {
-		set_error_handler(array($this, '_error'));          //自定义错误输出
+	public function setError($level = E_ALL) {
+		error_reporting($level);
+		set_error_handler('Zodream\Infrastructure\Error::outByError');          //自定义错误输出
 		return $this;
-	}
-	
-	protected function _error($errno, $errstr, $errfile, $errline) {
-		$str = '错误级别：'.$errno.'错误的信息：'.$errstr.'<br>发生在 '.$errfile.' 第 '.$errline.' 行！当前网址：'.Url::get();
-		Log::out('txt', $str);
-		if (!defined('DEBUG') || !DEBUG) {
-			$str = '出错了！';
-		}
-		View::getInstance()->show('404', array(
-				'error' => $str
-		));
 	}
 	
 	/**
 	 * 自定义程序结束时输出
 	 */
 	public function shutDown() {
-		register_shutdown_function(array($this, '_shutDown'));   //程序结束时输出
+		register_shutdown_function('Zodream\Infrastructure\Error::outByShutDown');   //程序结束时输出
 		return $this;
-	}
-	
-	protected function _shutDown() {
-		$error = error_get_last();
-		if (empty($error)) {
-			return;
-		}
-		$str = '错误类型：'.$error['type'].'错误的信息：'.$error['message'].'<br>发生在 '.$error['file'].' 第 '.$error['line'].' 行！当前网址：'.Url::get();
-		Log::out('txt', $str);
-		if (!defined('DEBUG') || !DEBUG) {
-			$str = '出错了！';
-		}
-		View::getInstance()->show('404', array(
-				'error' => $str
-		));
 	}
 	
 	private function __clone() {

@@ -5,7 +5,10 @@ class Page {
 	private $_total = 0;
 	
 	private $_data = array();
-	
+
+	/**
+	 * @var PageLink
+	 */
 	private $_pageLink;
 	
 	public function __construct($total = null) {

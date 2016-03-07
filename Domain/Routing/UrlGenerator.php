@@ -118,7 +118,7 @@ class UrlGenerator {
 	}
 	
 	public static function hasUri($search = null) {
-		$url = array_shift(explode('?', self::getUri()));
+		$url = self::getUriWithoutParam();
 		if (is_null($search) && $url == '/') {
 			return true;
 		}
@@ -148,6 +148,10 @@ class UrlGenerator {
 			}
 		}
 		return $uri;
+	}
+
+	public static function getUriWithoutParam() {
+		return explode('?', self::getUri())[0];
 	}
 	
 	/**

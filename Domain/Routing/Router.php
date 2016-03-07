@@ -91,7 +91,7 @@ class Router{
 	 * @param string $route
 	 * @return array (class, action, values)
 	 */
-	private function _getRoutesWhenString($route) {
+	private static function _getRoutesWhenString($route) {
 		list($routes, $values) = self::_spiltArrayByNumber(explode('/', trim($route, '/')));
 		if (count($routes) == 1) {
 			$action     = null;

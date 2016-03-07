@@ -53,7 +53,7 @@ class View extends MagicObject {
 			if (file_exists($file)) {
 				include($file);
 			} else {
-				throw new Error('NOT FIND FILE:'.$file);
+				Error::out($file.' is not excite', __FILE__, __LINE__);
 			}
 		}
 	}
@@ -92,7 +92,7 @@ class View extends MagicObject {
 	/**
 	 * 直接输出
 	 * @param string $key
-	 * @param any $default
+	 * @param string $default
 	 */
 	public function ech($key, $default = null) {
 		echo ArrayExpand::tostring($this->get($key, $default));
@@ -126,7 +126,7 @@ class View extends MagicObject {
 	
 	/**
 	 * 如果传的是匿名函数  参数问题未解决
-	 * @param unknown $func
+	 * @param \Closure $func
 	 */
 	protected  function showObject($func) {
 		ob_start();

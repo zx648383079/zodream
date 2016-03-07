@@ -50,7 +50,7 @@ class MagicObject {
 	
 	/**
 	 * 删除键 目前只支持一维
-	 * @param unknown $tag
+	 * @param string $tag
 	 */
 	public function delete($tag) {
 		foreach (func_get_args() as $value) {

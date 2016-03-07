@@ -9,7 +9,7 @@ class TimeExpand {
 	/***
 	 返回当前时间
 	 ***/
-	public static function Now($format = null, $time = null) {
+	public static function now($format = null, $time = null) {
 		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
 		if (empty($time)) {
 			$time = time();
@@ -21,6 +21,7 @@ class TimeExpand {
 	}
 	
 	public static function format($time = null, $format = 'Y-m-d H:i:s') {
+		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
 		if ($time == null) {
 			$time = time();
 		}

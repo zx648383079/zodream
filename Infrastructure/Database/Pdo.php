@@ -1,5 +1,7 @@
 <?php 
 namespace Zodream\Infrastructure\Database;
+use Zodream\Infrastructure\Error;
+
 /**
 * pdo
 * 
@@ -25,8 +27,7 @@ class Pdo extends Database {
 			$this->driver->query ( "SET character_set_results={$this->configs['encoding']}" );
 			$this->driver->setAttribute (\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 		} catch (\PDOException $ex) {
-			$this->error = $ex->getMessage();
-			return false;
+			Error::out($ex->getMessage(), __FILE__, __LINE__);
 		}
 	}
 	
@@ -84,7 +85,7 @@ class Pdo extends Database {
 		}
 		try {
 			if (!empty($sql)) {
-				$this->result = $this->driver->prepare($sql);
+				$this->prepare($sql);
 				$this->bind($parameters);
 			}
 			$this ->result->execute();

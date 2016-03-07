@@ -1,26 +1,37 @@
 <?php 
 namespace Zodream\Infrastructure;
+use Zodream\Domain\Response\ResponseResult;
+use Zodream\Domain\Routing\UrlGenerator;
+use Zodream\Infrastructure\ObjectExpand\TimeExpand;
+
 /**
 * 错误信息类
 * 
 * @author Jason
 */
-class Error extends \Exception{
-	protected $_message;
-	protected $_file;
-	protected $_line;
-	
-	public function __construct($message, $file = __FILE__, $line = __LINE__) {
-		$this->_message = $message;
-		$this->_file    = $file;
-		$this->_line    = $line;
+class Error{
+
+	public static function outByError($errno, $errstr, $errfile, $errline) {
+		error_clear_last();
+		self::out($errstr, $errfile, $errline);
 	}
-	
-	public function __toString() {
-		return '错误信息：'.$this->_message.'! 发生在'.$this->_file.'第'.$this->_line.'行';
+
+	public static function outByShutDown() {
+		$error = error_get_last();
+		if (empty($error)) {
+			return;
+		}
+		self::out($error['message'], $error['file'], $error['line']);
 	}
-	
-	public function output() {
-		throw $this;
+
+	public static function out($error, $file = null, $line = null) {
+		$errorInfo = "ERROR: {$error} , in {$file} on line {$line}, URL:".UrlGenerator::to();
+		Log::out(TimeExpand::now('Y-m-d').'.txt', TimeExpand::format().':'.$errorInfo. "\r\n");
+		if (!defined('DEBUG') || !DEBUG) {
+			ResponseResult::sendError();
+		}
+		ResponseResult::make(
+			$errorInfo
+		);
 	}
 }

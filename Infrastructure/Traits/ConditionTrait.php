@@ -34,8 +34,8 @@ trait ConditionTrait {
 		if (null !== $value) {
 			$this->_switchValue = $value;
 		}
-		if ((null == $this->_switchCondition && $condition) ||
-			($this->_switchCondition != null && $this->_switchCondition == $condition)) {
+		if ((null === $this->_switchCondition && true === $condition) ||
+			($this->_switchCondition !== null && $this->_switchCondition == $condition)) {
 			echo $this->_switchValue;
 		}
 	}

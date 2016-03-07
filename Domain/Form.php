@@ -11,23 +11,9 @@ abstract class Form {
 	 * @param string $args
 	 * @return NULL[]
 	 */
-	public function validata($request, $args) {
+	public function validate($request, $args) {
 		$result = DataFilter::validate($request, $args);
 		return !in_array(false, $result);
-	}
-	
-	/**
-	 * 填充表单--编辑的时候用
-	 */
-	public function get() {
-		
-	}
-	
-	/**
-	 * 从表单获取
-	 */
-	public function set() {
-		
 	}
 	
 }

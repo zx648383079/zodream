@@ -77,9 +77,9 @@ class PageLink {
 	
 	/**
 	 * 初始化
-	 * @param type $total       总条数
-	 * @param type $pageSize    每页大小
-	 * @param type $pageParam   分页变量
+	 * @param int $total       总条数
+	 * @param int $pageSize    每页大小
+	 * @param string $pageParam   分页变量
 	 */
 	public function init($total, $pageSize = 10, $pageParam = 'page') {
 		$this->setTotal($total);
@@ -100,7 +100,7 @@ class PageLink {
 	 
 	/**
 	 * 设置分页模板
-	 * @param type $template    模板配置
+	 * @param string $template    模板配置
 	 */
 	public function setTemplate($template) {
 		$this->_template = $template;
@@ -108,7 +108,7 @@ class PageLink {
 	 
 	/**
 	 * 设置选中分页模板
-	 * @param type $activeTemplate      模板配置
+	 * @param string $activeTemplate      模板配置
 	 */
 	public function setActiveTemplate($activeTemplate) {
 		$this->_activeTemplate = $activeTemplate;
@@ -116,7 +116,7 @@ class PageLink {
 
 	/**
 	 * 设置未选中分页模板
-	 * @param type $notActiveTemplate   模板配置
+	 * @param string $notActiveTemplate   模板配置
 	 */
 	public function setNotActiveTemplate($notActiveTemplate) {
 		$this->_notActiveTemplate = $notActiveTemplate;
@@ -124,7 +124,7 @@ class PageLink {
 
 	/**
 	 * 返回分页
-	 * @return type
+	 * @return string
 	 */
 	public function show() {
 		return str_ireplace(array(

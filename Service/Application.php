@@ -17,7 +17,7 @@ class Application {
 	 * 程序启动
 	 */
 	public static function main() {
-		//Autoload::getInstance()->registerAlias();//->setError()->shutDown();
+		Autoload::getInstance()->setError()->shutDown();
 		Router::run();
 	}
 	

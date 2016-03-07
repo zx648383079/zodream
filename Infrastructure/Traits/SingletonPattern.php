@@ -13,6 +13,7 @@ trait SingletonPattern {
 	protected static $instance;
 	/**
 	 * 单例
+	 * @return static
 	 */
 	public static function getInstance() {
 		if (is_null(static::$instance)) {

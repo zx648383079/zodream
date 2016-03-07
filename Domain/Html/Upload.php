@@ -9,8 +9,8 @@ namespace Zodream\Domain\Html;
 use Zodream\Infrastructure\Config;
 
 class Upload {
-	private $savepath;          //上传文件保存的路径
-	private $allowtype; //设置限制上传文件的类型
+	private $savePath;          //上传文件保存的路径
+	private $allowType; //设置限制上传文件的类型
 	private $maxsize;           //限制文件上传大小（字节）
 	private $rand;           //设置是否随机重命名文件， false不随机
 	
@@ -32,15 +32,15 @@ class Upload {
 	public function __construct($rand = true) {
 		$config          = Config::getInstance()->get("upload");
 		$this->maxsize   = $config['maxsize'];
-		$this->allowtype = explode(';', $config['allowtype']);
-		$this->savepath  = $config['savepath'];
+		$this->allowType = explode(';', $config['allowtype']);
+		$this->savePath  = $config['savepath'];
 		$this->rand      = $rand;
 	}
 	
 	
 	
 	/**
-	 * 用于设置成员属性（$path, $allowtype,$maxsize, $israndname）
+	 * 用于设置成员属性（$path, $allowType,$maxsize, $rand）
 	 * 可以通过连贯操作一次设置多个属性值
 	 *@param  string $key  成员属性名(不区分大小写)
 	 *@param  mixed  $val  为成员属性设置的值
@@ -161,7 +161,7 @@ class Upload {
 	
 	/* 设置上传出错信息 */
 	private function getError() {
-		$str = "上传文件<font color='red'>{$this->originName}</font>时出错 : ";
+		$str = "上传文件{$this->originName}时出错 : ";
 		switch ($this->errorNum) {
 			case 4: $str  .= "没有文件被上传"; break;
 			case 3: $str  .= "文件只有部分被上传"; break;
@@ -198,7 +198,7 @@ class Upload {
 	
 	/* 设置上传后的文件名称 */
 	private function setNewFileName() {
-		if ($this->israndname) {
+		if ($this->rand) {
 			$this->setOption('newFileName', $this->proRandName());
 		} else {
 			$this->setOption('newFileName', $this->originName);
@@ -207,7 +207,7 @@ class Upload {
 	
 	/* 检查上传的文件是否是合法的类型 */
 	private function checkFileType() {
-		if (in_array(strtolower($this->fileType), $this->allowtype)) {
+		if (in_array(strtolower($this->fileType), $this->allowType)) {
 			return true;
 		} else {
 			$this->setOption('errorNum', -1);
@@ -249,7 +249,7 @@ class Upload {
 	/* 复制上传文件到指定的位置 */
 	private function copyFile() {
 		if (!$this->errorNum) {
-			$path  = rtrim($this->path, '/').'/';
+			$path  = rtrim($this->savePath, '/').'/';
 			$path .= $this->newFileName;
 			if (@move_uploaded_file($this->tmpFileName, $path)) {
 				return true;
