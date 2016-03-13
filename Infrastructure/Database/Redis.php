@@ -12,7 +12,7 @@ class Redis {
 	 * @param string $host
 	 * @param int $post
 	 */
-	public function __construct($host = '10.102.1.8', $port = 6379) {
+	public function __construct($host = '127.0.0.1', $port = 6379) {
 		$this->_redis = new \Redis();
 		$this->_redis->connect($host, $port);
 		return $this->_redis;

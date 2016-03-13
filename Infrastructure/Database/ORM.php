@@ -38,7 +38,7 @@ namespace Zodream\Infrastructure\Database;
 *
 */
 
-class ORM implements ArrayAccess {
+class ORM implements \ArrayAccess {
 
     // ----------------------- //
     // --- CLASS CONSTANTS --- //
@@ -247,14 +247,14 @@ class ORM implements ArrayAccess {
             !is_object(self::$_db[$connection_name])) {
             self::_setup_db_config($connection_name);
 
-            $db = new PDO(
+            $db = new \PDO(
                 self::$_config[$connection_name]['connection_string'],
                 self::$_config[$connection_name]['username'],
                 self::$_config[$connection_name]['password'],
                 self::$_config[$connection_name]['driver_options']
             );
 
-            $db->setAttribute(PDO::ATTR_ERRMODE, self::$_config[$connection_name]['error_mode']);
+            $db->setAttribute(\PDO::ATTR_ERRMODE, self::$_config[$connection_name]['error_mode']);
             self::set_db($db, $connection_name);
         }
     }

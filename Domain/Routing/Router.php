@@ -143,7 +143,9 @@ class Router{
 	private static function _pairValues($values) {
 		$args = array();
 		for ($i = 0, $len = count($values); $i < $len; $i += 2) {
-			$args[$values[$i]] = $values[$i + 1];
+			if (isset($values[$i + 1])) {
+				$args[$values[$i]] = $values[$i + 1];
+			}
 		}
 		return $args;
 	}

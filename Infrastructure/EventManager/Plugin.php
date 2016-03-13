@@ -1,23 +1,16 @@
 <?php
-namespace Zodream\infrastructure;
+namespace Zodream\infrastructure\EventManager;
 /**
  * 插件功能
  *
  * @author Jason
  */
+use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Traits\SingletonPattern;
 
-class Plugin extends MagicObject {
-	protected static $instance = null;
-	
-	/**
-	 * 公共静态方法获取实例化的对象
-	 */
-	public static function getInstance() {
-		if (!(self::$instance instanceof self)) {
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
+class Plugin extends MagicObject{
+
+	use SingletonPattern;
 	
 	//私有克隆
 	protected function __clone() {}

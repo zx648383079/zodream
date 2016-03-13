@@ -7,9 +7,17 @@ namespace Zodream\Domain;
 */
 use Zodream\Domain\Filter\SqlFilter;
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
-class Model {
-	protected $db = null;
+abstract class Model {
+	/**
+	 * @var \Zodream\infrastructure\Database\Database
+	 */
+	protected $db;
+
+	protected $table;
+
+	protected $fillable = array();
 	
 	protected $prefix;
 	
@@ -20,6 +28,25 @@ class Model {
 		if (isset($this->table)) {
 			$this->table = $this->prefix. $this->table;
 		}
+	}
+
+	/**
+	 * 填充数据 自动识别添加或修改
+	 * 添加 有一个数组参数 或 多个 非数组参数（与fillable字段对应）
+	 * 修改 有两个参数 第一个为数组 第二个为条件,如果第二个参数是数字，则为id
+	 * 关联数组参数不需要一一对应，自东根据 fillable 取需要的
+	 */
+	public function fill() {
+		$args = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
+		$data = ArrayExpand::combine($this->fillable, $args, false);
+		if (func_num_args() == 1 || !is_array(func_get_arg(0))) {
+			return $this->add($data);
+		}
+		$param = func_get_arg(1);
+		if (is_numeric($param)) {
+			$param = 'id = '.$param;
+		}
+		return $this->update($data, $param);
 	}
 	
 	/**
@@ -66,7 +93,7 @@ class Model {
 			$setData .= "`$key` = '$value',";
 		}
 		$setData = substr($setData, 0, -1);
-		$sql     = "UPDATE {$this->table} SET $setData $where";
+		$sql     = "UPDATE {$this->table} SET {$setData} {$where}";
 		return $this->db->update($sql);
 	}
 	
@@ -218,6 +245,7 @@ class Model {
 		$this->db->execute($sql);
 		return $this->db->select($sql);
 	}
+
 	 
 	/**
 	 * 总记录
@@ -266,23 +294,14 @@ class Model {
 	 * @return array 返回查询结果,
 	 */
 	public function findByHelper($param, $isList = TRUE) {
-		$result = array();
-		if (!empty($param)) {
-			$sql  = new SqlFilter($this->prefix);
-			$stmt = $this->db->execute($sql->getSQL($param));            //获取SQL语句
-			while (!!$objs = $stmt->fetchObject()) {
-				if ($isList) {
-					$list = array();
-					foreach ($objs as $key => $value) {
-						$list[$key] = $value;
-					}
-					$result[] = $list;
-				} else {
-					$result[] = $objs;
-				}
-			}
+		if (empty($param)) {
+			return array();
 		}
-		return $result;
+		$sql  = (new SqlFilter($this->prefix))->getSQL($param);
+		if ($isList) {
+			return $this->db->getArray($sql);
+		}
+		return $this->db->getObject($sql);
 	}
 	
 	/**

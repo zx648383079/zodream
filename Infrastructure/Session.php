@@ -20,9 +20,11 @@ class Session extends MagicObject {
 	
 	public function init() {
 		if (!session_id()) {
+			session_name('ZoDream');
 			ini_set('session.use_cookies', 'On');
+			ini_set('session.use_only_cookies', '1');
 			ini_set('session.use_trans_sid', 'Off');
-			session_set_cookie_params($this->lifeTime, '/', null, null, true);
+			//session_set_cookie_params($this->lifeTime, '/', null, null, true);
 			session_save_path(APP_DIR.'/temp');
 			session_start();
 		}
@@ -31,11 +33,11 @@ class Session extends MagicObject {
 	}
 	
 	public function setLifeTime($lifeTime) {
-		$this->lifeTime = $lifeTime;
+		/*$this->lifeTime = $lifeTime;
 		if (session_id()) {
 			session_abort();
 		}
-		$this->init();
+		$this->init();*/
 	}
 	
 	/**

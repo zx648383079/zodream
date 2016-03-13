@@ -52,6 +52,9 @@ return array(
 				'allowtype' => 'mp3',				//允许上次类型，用‘；’分开
 				'savepath'  => 'upload/'               //文件保存路径
 		),
+		'safe' => array(
+			'log' => Domain\Model\LogsModel::class
+		),
 		'alias'  => array(
 				'Config' => Zodream\Infrastructure\Config::class,
 				'Request' => Zodream\Infrastructure\Request::class,

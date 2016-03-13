@@ -22,10 +22,10 @@ class Generate extends Model {
 			$value = StringExpand::firstReplace($value, $this->prefix);
 			echo '<h3>Table ',$value,'执行开始……</h3><br>';
 			$columns = $this->getColumn($value);
-			$this->makeController($value);
+			//$this->makeController($value);
 			$this->makeModel($value, $columns);
 			$this->makeForm($value, $columns);
-			$this->makeView($value, $columns);
+			//$this->makeView($value, $columns);
 			echo '<h3>Table ',$value,'执行成功！</h3><br>';
 		}
 		exit('完成！');
@@ -45,7 +45,7 @@ class Generate extends Model {
 		foreach ($sqls as $sql) {
 			$this->db->execute($sql);
 			$match = array();
-			if (preg_match('/create table ([\w_]+?) \(/i', $sql, $match)) {
+			if (preg_match('/create[^(;]+ table ([\w_]+?) \(/i', $sql, $match)) {
 				echo $match[1].' 表创建成功！<br>';
 			}
 		}
@@ -120,21 +120,23 @@ class Generate extends Model {
 		$data = array(
 			'model' => ucfirst($name).APP_MODEL,
 			'name' => $name,
-			'data' => $this->_modelFill($columns)
+			'data' => $this->_modelFill($columns),
+			'module' => APP_MODULE
 		);
-		return $this->_replace('Model', $data, APP_DIR.'/Domain/Model/'.$data['model'].'.php');
+		return $this->_replace('Model', $data, APP_DIR.'/Domain/Model/'.APP_MODULE.'/'.$data['model'].'.php');
 	}
 	
 	public function makeForm($name, array $columns) {
 		$name = ucfirst(strtolower($name));
 		list($column, $datas) = $this->_formColumn($columns);
 		$data = array(
-				'model'  => $name.APP_MODEL,
-				'form'   => $name.APP_FORM,
-				'colums' => $column,
-				'data'   => $datas
+			'model'  => $name.APP_MODEL,
+			'form'   => $name.APP_FORM,
+			'colums' => $column,
+			'data'   => $datas,
+			'module' => APP_MODULE
 		);
-		return $this->_replace('Form', $data, APP_DIR.'/Domain/Form/'.$data['form'].'.php');
+		return $this->_replace('Form', $data, APP_DIR.'/Domain/Form/'.APP_MODULE.'/'.$data['form'].'.php');
 	}
 	
 	public function makeConfig(array $configs, $module = APP_MODULE) {
@@ -270,7 +272,10 @@ class Generate extends Model {
 	private function _replace($file, array $replaces, $output) {
 		if (is_file($output) && !$this->replace) {
 			echo $output,' 路径已经存在！未使用强制模式！<br>';
-			return;
+			return false;
+		}
+		if (!is_dir(dirname($output))) {
+			mkdir(dirname($output));
 		}
 		$content = file_get_contents($this->template.$file.'.php');
 		foreach ($replaces as $key => $value) {
@@ -278,6 +283,7 @@ class Generate extends Model {
 		}
 		file_put_contents($output, $content);
 		echo $output, ' 生成成功！<br>';
+		return true;
 	}
 	
 	

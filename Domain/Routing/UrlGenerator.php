@@ -60,7 +60,7 @@ class UrlGenerator {
 		return call_user_func(array(RouteConfig::getInstance()->getDriver(), 'to'), $file);
 	}
 	
-	protected static function toAsset($file) {
+	public static function toAsset($file) {
 		return self::getRoot(FALSE).ltrim($file, '/');
 	}
 	
@@ -126,6 +126,10 @@ class UrlGenerator {
 			return true;
 		}
 		return false;
+	}
+
+	public static function isUrl($url) {
+		return trim(self::getUriWithoutParam(), '/') == trim($url, '/');
 	}
 	
 	/**

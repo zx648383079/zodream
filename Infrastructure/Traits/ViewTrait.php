@@ -12,6 +12,10 @@ trait ViewTrait {
 	protected function send($key, $value = null) {
 		View::getInstance()->set($key, $value);
 	}
+
+	protected function get($key) {
+		View::getInstance()->get($key);
+	}
 	
 	/**
 	 * 加载视图

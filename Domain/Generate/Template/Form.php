@@ -1,9 +1,9 @@
 <?php
-namespace Domain\Form;
+namespace Domain\Form\{module};
 
 use Zodream\Domain\Form;
 use Zodream\Infrastructure\Request;
-use Domain\Model\{model};
+use Domain\Model\{module}\{model};
 class {form} extends Form {
 	public function get($id) {
 		$model = new {model}();
@@ -15,7 +15,7 @@ class {form} extends Form {
 			return ;
 		}
 		$data = Request::getInstance()->post('{colums}');
-		if (!$this->validata($data, array(
+		if (!$this->validate($data, array(
 {data}
 		))) {
 			$this->send($data);

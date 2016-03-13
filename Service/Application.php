@@ -20,5 +20,4 @@ class Application {
 		Autoload::getInstance()->setError()->shutDown();
 		Router::run();
 	}
-	
 }

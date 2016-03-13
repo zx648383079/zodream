@@ -1,15 +1,67 @@
 <?php 
 namespace Zodream\Infrastructure\ObjectExpand;
+use Zodream\Infrastructure\Error;
+
 /**
 * string 的扩展
 * 
 * @author Jason
 */
 class StringExpand {
-	
+
+	/**
+	 * 生成更加真实的随机字符串
+	 *
+	 * @param  int  $length
+	 * @return string
+	 */
+	public static function random($length = 16) {
+		if (function_exists('str_random')) {
+			return str_random($length);
+		}
+		$string = '';
+		while (($len = strlen($string)) < $length) {
+			$size = $length - $len;
+			$bytes = static::randomBytes($size);
+			$string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+		}
+		return $string;
+	}
+
+	/**
+	 * 生成更加真实的随机字节
+	 *
+	 * @param  int  $length
+	 * @return string
+	 */
+	public static function randomBytes($length = 16) {
+		if (PHP_MAJOR_VERSION >= 7 || defined('RANDOM_COMPAT_READ_BUFFER')) {
+			return random_bytes($length);
+		} elseif (function_exists('openssl_random_pseudo_bytes')) {
+			$bytes = openssl_random_pseudo_bytes($length, $strong);
+			if ($bytes === false || $strong === false) {
+				Error::out('Unable to generate random string.', __FILE__, __LINE__);
+			}
+			return $bytes;
+		} else {
+			Error::out('OpenSSL extension or paragonie/random_compat is required for PHP 5 users.', __FILE__, __LINE__);
+		}
+		return null;
+	}
+
+	/**
+	 * 生成简单的随机字符串
+	 * @param  int  $length
+	 * @return string
+	 */
+	public static function quickRandom($length = 16) {
+		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
+	}
+
 	/**
 	 * 字节长度
-	 * @param unknown $string
+	 * @param string $string
 	 */
 	public static function byteLength($string)
 	{

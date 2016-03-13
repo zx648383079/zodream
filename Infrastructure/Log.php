@@ -15,6 +15,12 @@ class Log {
         self::$initFlag = true;
         register_shutdown_function(__NAMESPACE__.'\Log::_shutDown');
     }
+
+    public static function save($data, $action) {
+        $instance = Config::getInstance()->get('safe.log');
+        $model = new $instance;
+        return call_user_func(array($model, 'addLog'), $data, $action);
+    }
  
     /**
      * 输出到文件日志

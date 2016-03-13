@@ -8,7 +8,7 @@ namespace Zodream\Infrastructure;
 */
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
-class MagicObject {
+class MagicObject implements \ArrayAccess {
 	
 	protected $_data = array();
 	
@@ -72,5 +72,21 @@ class MagicObject {
 	
 	public function __set($key, $value) {
 		$this->set($key, $value);
+	}
+
+	public function offsetExists($offset) {
+		return $this->has($offset);
+	}
+
+	public function offsetGet($offset) {
+		return $this->get($offset);
+	}
+
+	public function offsetSet($offset, $value) {
+		$this->set($offset, $value);
+	}
+
+	public function offsetUnset($offset) {
+		$this->delete($offset);
 	}
 }

@@ -27,26 +27,44 @@ class TimeExpand {
 		}
 		return date($format, $time);
 	}
-	
-	public static function getBeginAndEndTime() {
-		//php获取今日开始时间戳和结束时间戳
-		$beginToday     = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-		$endToday       = mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')) - 1;
-	
-		//php获取昨日起始时间戳和结束时间戳
-	
-		$beginYesterday = mktime(0, 0, 0, date('m'), date('d') - 1, date('Y'));
-		$endYesterday   = mktime(0, 0, 0, date('m'), date('d'), date('Y')) - 1;
-	
-		//php获取上周起始时间戳和结束时间戳
-	
-		$beginLastweek  = mktime(0, 0, 0, date('m'), date('d') - date('w') + 1 - 7, date('Y'));
-		$endLastweek    = mktime(23, 59, 59, date('m'), date('d') - date('w') + 7 - 7, date('Y'));
-	
-		//php获取本月起始时间戳和结束时间戳
-	
-		$beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y'));
-		$endThismonth   = mktime(23, 59, 59, date('m'), date('t'), date('Y'));
+
+	const TODAY = 0;
+	const YESTERDAY = 1;
+	const LASTWEEK = 2;
+	const MONTH = 3;
+
+	/**
+	 * 获取开始时间和结束时间
+	 * @param int $kind 类型
+	 * @return array 包含开始时间可结束时间
+	 */
+	public static function getBeginAndEndTime($kind = 1) {
+		switch ($kind) {
+			case self::TODAY:
+				return array(
+					mktime(0, 0, 0, date('m'), date('d'), date('Y')),
+					mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')) - 1
+				);
+			case self::YESTERDAY:
+				return array(
+					mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')),
+					mktime(0, 0, 0, date('m'), date('d'), date('Y')) - 1
+				);
+			case self::LASTWEEK:
+				return array(
+					mktime(0, 0, 0, date('m'), date('d') - date('w') + 1 - 7, date('Y')),
+					mktime(23, 59, 59, date('m'), date('d') - date('w') + 7 - 7, date('Y'))
+				);
+			case self::MONTH:
+				return array(
+					mktime(0, 0, 0, date('m'), 1, date('Y')),
+					mktime(23, 59, 59, date('m'), date('t'), date('Y'))
+				);
+		}
+		return array(
+			0,
+			time()
+		);
 	}
 	
 	public static function isTimeAgo($time){
@@ -67,6 +85,7 @@ class TimeExpand {
 			$numberOfUnits = floor($time / $unit);
 			return $numberOfUnits.' '.$text.(($numberOfUnits>1) ? 's' : '');
 		}
+		return time() - $time;
 	}
 	
 	/**

@@ -119,7 +119,7 @@ class Route {
 	/**
 	 * 获取控制
 	 * @param array $args
-	 * @param unknown $action
+	 * @param string $action
 	 */
 	protected function getController(array $args, $action) {
 		$class = $this->existController($args);
@@ -137,8 +137,8 @@ class Route {
 		if ($class !== false) {
 			return array($class, 'index');
 		}
-		
 		ResponseResult::sendError('CLASS IS NOT FIND!');
+		return false;
 	}
 	
 	protected function existController(array $args) {

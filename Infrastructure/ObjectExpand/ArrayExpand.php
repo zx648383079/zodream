@@ -274,7 +274,7 @@ class ArrayExpand {
 	
 	/**
 	 * 判断是否在二维数组中 if no return false; or return $key
-	 * @param unknown $needle
+	 * @param string $needle
 	 * @param array $args
 	 */
 	public static function inArray($needle,array $args) {

@@ -1,5 +1,5 @@
 <?php
-namespace Domain\Model;
+namespace Domain\Model\{module};
 
 use Zodream\Domain\Model;
 class {model} extends Model {

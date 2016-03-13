@@ -167,7 +167,7 @@ final class Request {
 	 * @return string IP,
 	 */
 	public static function ip() {
-		$realip  = '';
+		$realIP  = '';
 		$unknown = 'unknown';
 		if (isset($_SERVER)) {
 			if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) && strcasecmp($_SERVER['HTTP_X_FORWARDED_FOR'], $unknown)) {
@@ -175,30 +175,30 @@ final class Request {
 				foreach ($arr as $ip) {
 					$ip = trim($ip);
 					if ($ip != 'unknown') {
-						$realip = $ip;
+						$realIP = $ip;
 						break;
 					}
 				}
 			} else if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP']) && strcasecmp($_SERVER['HTTP_CLIENT_IP'], $unknown)) {
-				$realip = $_SERVER['HTTP_CLIENT_IP'];
+				$realIP = $_SERVER['HTTP_CLIENT_IP'];
 			} else if (isset($_SERVER['REMOTE_ADDR']) && !empty($_SERVER['REMOTE_ADDR']) && strcasecmp($_SERVER['REMOTE_ADDR'], $unknown)) {
-				$realip = $_SERVER['REMOTE_ADDR'];
+				$realIP = $_SERVER['REMOTE_ADDR'];
 			} else {
-				$realip = $unknown;
+				$realIP = $unknown;
 			}
 		} else {
 			if (getenv('HTTP_X_FORWARDED_FOR') && strcasecmp(getenv('HTTP_X_FORWARDED_FOR'), $unknown)) {
-				$realip = getenv("HTTP_X_FORWARDED_FOR");
+				$realIP = getenv("HTTP_X_FORWARDED_FOR");
 			} else if (getenv('HTTP_CLIENT_IP') && strcasecmp(getenv('HTTP_CLIENT_IP'), $unknown)) {
-				$realip = getenv("HTTP_CLIENT_IP");
+				$realIP = getenv("HTTP_CLIENT_IP");
 			} else if (getenv('REMOTE_ADDR') && strcasecmp(getenv('REMOTE_ADDR'), $unknown)) {
-				$realip = getenv("REMOTE_ADDR");
+				$realIP = getenv("REMOTE_ADDR");
 			} else {
-				$realip = $unknown;
+				$realIP = $unknown;
 			}
 		}
-		$realip = preg_match("/[\d\.]{7,15}/", $realip, $matches) ? $matches[0] : $unknown;
-		return $realip;
+		$realIP = preg_match("/[\d\.]{7,15}/", $realIP, $matches) ? $matches[0] : $unknown;
+		return $realIP;
 	}
 	
 	public function getMethod() {

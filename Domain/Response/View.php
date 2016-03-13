@@ -78,7 +78,7 @@ class View extends MagicObject {
 		} else {
 			$file = $this->getAsset().ltrim($file, '/');
 		}
-		echo UrlGenerator::to($file);
+		echo UrlGenerator::toAsset($file);
 	}
 	
 	public function url($url = null, $extra = null) {
@@ -88,6 +88,14 @@ class View extends MagicObject {
 	public function hasUrl($search = null) {
 		return UrlGenerator::hasUri($search);
 	}
+    
+    public function call($func) {
+       $args = array();
+       if (func_get_args() > 1) {
+           $args = array_slice(func_get_args(), 1);
+       }
+       echo call_user_func_array($func, $args);
+    }
 	
 	/**
 	 * 直接输出
