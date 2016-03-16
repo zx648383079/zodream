@@ -25,7 +25,7 @@ class View extends MagicObject {
 
 	/**
 	 * 设置资源路径
-	 * @param unknown $arg
+	 * @param string $arg
 	 */
 	public function setAsset($arg) {
 		$this->_asset = trim($arg, '/').'/';
@@ -74,7 +74,7 @@ class View extends MagicObject {
 	 */
 	public function asset($file, $isView = TRUE) {
 		if ($isView) {
-			$file = $this->getAsset().VIEW_DIR.ltrim($file, '/');
+			$file = $this->getAsset().ltrim(VIEW_DIR.ltrim($file, '/'), '/');
 		} else {
 			$file = $this->getAsset().ltrim($file, '/');
 		}

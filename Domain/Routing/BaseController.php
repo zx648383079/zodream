@@ -34,7 +34,7 @@ abstract class BaseController {
 	public function finalize() {  }
 	/**
 	 * 执行方法
-	 * @param unknown $action
+	 * @param string $action
 	 * @param array $parameters
 	 */
 	public function runAction($action, array $vars = array()) {

@@ -4,6 +4,8 @@ namespace Zodream\Domain\Authentication;
 
 use Zodream\Infrastructure\Config;
 use Zodream\Domain\Response\Redirect;
+use Zodream\Infrastructure\Request;
+
 class Verify {
 	public static function make($role) {
 		if (is_object($role) && !$role()) {
@@ -46,7 +48,7 @@ class Verify {
 				}
 				break;
 			case 'p':
-				if (!App::$request->isPost()) {
+				if (!Request::getInstance()->isPost()) {
 					Redirect::to('/', 4, '您不能直接访问此页面！', '400');
 					return false;
 				}

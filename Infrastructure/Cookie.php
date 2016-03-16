@@ -27,7 +27,7 @@ class Cookie {
 	 * @param boolean $httpOnly 是否只通过http协议 不允许js等脚本进入，防止xss
 	 */
 	public static function set($name, $value = '', $expire = 0, $path = null, $domain = null, $secure = FALSE, $httpOnly = FALSE) {
-		setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
+		setcookie($name, $value, time() + $expire, $path, $domain, $secure, $httpOnly);
 	}
 	
 	/**
