@@ -12,7 +12,7 @@ class FileCache extends Cache {
 	public $cacheExtension = '.cache';
 	/**
 	 * gc自动执行的几率 0-1000000；
-	 * @var unknown
+	 * @var int
 	 */
 	public $gcChance = 10;
 	
@@ -40,6 +40,7 @@ class FileCache extends Cache {
             }
             return @touch($cacheFile, $duration + time());
         }
+        return null;
 	}
 	
 	protected function addValue($key, $value, $duration) {

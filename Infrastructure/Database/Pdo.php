@@ -1,12 +1,12 @@
 <?php 
 namespace Zodream\Infrastructure\Database;
-use Zodream\Infrastructure\Error;
-
 /**
 * pdo
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\EventManager\EventManger;
 
 class Pdo extends Database {
 	
@@ -46,7 +46,7 @@ class Pdo extends Database {
 	
 	/**
 	 * 预处理
-	 * @param unknown $sql
+	 * @param string $sql
 	 */
 	public function prepare($sql) {
 		$this->result = $this->driver->prepare($sql);
@@ -54,7 +54,7 @@ class Pdo extends Database {
 	
 	/**
 	 * 绑定值
-	 * @param unknown $param
+	 * @param array $param
 	 */
 	public function bind(array $param) {
 		foreach ($param as $key => $value) {
@@ -81,8 +81,9 @@ class Pdo extends Database {
 	 */
 	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {
-			return;
+			return null;
 		}
+		EventManger::getInstance()->run('excuteSql', $sql);
 		try {
 			if (!empty($sql)) {
 				$this->prepare($sql);
@@ -109,7 +110,7 @@ class Pdo extends Database {
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
-	 * @return multitype:mixed
+	 * @return object
 	 */
 	public function getObject($sql = null) {
 		$this->execute($sql);

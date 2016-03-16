@@ -53,13 +53,13 @@ class ResponseResult {
 	 * @param array $data
 	 * @param number $stauts
 	 */
-	public static function sendError($data = '', $stauts = 404) {
+	public static function sendError($data = '', $status = 404) {
 		View::getInstance()->set(array(
 				'error' => $data,
-				'status' => $stauts,
+				'status' => $status,
 				'title' => '出错了！'
 		));
-		view::getInstance()->showWithFile($stauts, $stauts);
+		view::getInstance()->showWithFile($status, $status);
 	}
 	
 	public static function sendRedirect($url, $time = 0) {

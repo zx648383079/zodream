@@ -8,7 +8,8 @@ namespace Zodream\Domain\Routing;
  */
 use Zodream\Infrastructure\Request;
 use Zodream\Domain\Authentication\Verify;
-use Zodream\Domain\Response\ResponseResult;
+use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\EventManager\EventManger;
 
 abstract class BaseController {
 	
@@ -39,10 +40,9 @@ abstract class BaseController {
 	 */
 	public function runAction($action, array $vars = array()) {
 		if (!$this->canRunAction($action)) {
-			ResponseResult::sendError($action .' ACTION CANOT RUN!');
+			Error::out($action .' ACTION CANOT RUN!', __FILE__, __LINE__);
 		}
 		$this->prepare();
-		
 		$reflectionObject = new \ReflectionObject( $this );
 		$action .= APP_ACTION;
 		$method = $reflectionObject->getMethod($action);
@@ -56,6 +56,7 @@ abstract class BaseController {
 				$arguments[] = Request::getInstance()->get($param->getName());
 			}
 		}
+		EventManger::getInstance()->run('runController', $arguments);
 		$ret = call_user_func_array( array($this, $action) , $arguments );
 		
 		$this->finalize();

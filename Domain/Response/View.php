@@ -15,6 +15,7 @@ use Zodream\Domain\Routing\UrlGenerator;
 use Zodream\Domain\Routing\Router;
 use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\Traits\ConditionTrait;
+use Zodream\Infrastructure\EventManager\EventManger;
 
 defined('VIEW_DIR') or define('VIEW_DIR', '/');
 
@@ -45,7 +46,7 @@ class View extends MagicObject {
 	 */
 	public function extend($names, $param = null, $replace = TRUE) {
 		if (!$replace) {
-			$param = array_merge((array)$this->getExtra(), (array)$param);
+			$param = array_merge((array)$this->get('_extra'), (array)$param);
 		}
 		$this->set('_extra', $param);
 		foreach (ArrayExpand::toFile((array)$names, '.') as $value) {
@@ -158,7 +159,7 @@ class View extends MagicObject {
 	
 	/**
 	 * 根据路径判断
-	 * @param unknown $file 路径
+	 * @param string $file 路径
 	 * @param integer $status 状态码
 	 */
 	public function showWithFile($file, $status = 200) {
@@ -166,6 +167,7 @@ class View extends MagicObject {
 		include(FileSystem::view($file));
 		$content = ob_get_contents();
 		ob_end_clean();
+		EventManger::getInstance()->run('show', $content);
 		ResponseResult::make($content, 'html', $status);
 	}
 }

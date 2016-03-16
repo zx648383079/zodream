@@ -6,9 +6,9 @@ namespace Zodream\Domain\Routing;
  * @author Jason
  * @time 2015-12-19
  */
+use Zodream\Domain\Html\VerifyCsrfToken;
 use Zodream\Infrastructure\Loader;
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Language;
 use Zodream\Infrastructure\Traits\LoaderTrait;
 use Zodream\Infrastructure\Traits\ViewTrait;
 
@@ -18,5 +18,8 @@ abstract class Controller extends BaseController {
 	
 	function __construct($loader = null) {
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
+		if (Config::getInstance()->get('app.safe', false) == true) {
+			$this->send('csrf', VerifyCsrfToken::get());
+		}
 	}
 }

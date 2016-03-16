@@ -1,14 +1,14 @@
 <?php 
 namespace Zodream\Infrastructure;
-use Zodream\Domain\Response\ResponseResult;
-use Zodream\Domain\Routing\UrlGenerator;
-use Zodream\Infrastructure\ObjectExpand\TimeExpand;
-
 /**
 * 错误信息类
 * 
 * @author Jason
 */
+use Zodream\Domain\Response\ResponseResult;
+use Zodream\Domain\Routing\UrlGenerator;
+use Zodream\Infrastructure\ObjectExpand\TimeExpand;
+
 class Error{
 
 	public static function outByError($errno, $errstr, $errfile, $errline) {
