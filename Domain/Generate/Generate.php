@@ -5,11 +5,18 @@ namespace Zodream\Domain\Generate;
 use Zodream\Domain\Model;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Template;
+
 class Generate extends Model {
 	
-	protected $template = __DIR__.'/Template/';
+	protected $template;
 	protected $replace = FALSE;
-	
+
+	public function __construct() {
+		parent::__construct();
+		$this->template = new Template(__DIR__.'/Template/');
+	}
+
 	public function make() {
 		echo '自动生成程序启动……<p/>';
 		$table = Request::getInstance()->get('table');
@@ -18,14 +25,28 @@ class Generate extends Model {
 		} else {
 			$table = array(strtolower($table));
 		}
+		$mode = Request::getInstance()->get('mode', 0);
 		foreach ($table as $value) {
 			$value = StringExpand::firstReplace($value, $this->prefix);
 			echo '<h3>Table ',$value,'执行开始……</h3><br>';
 			$columns = $this->getColumn($value);
-			//$this->makeController($value);
-			$this->makeModel($value, $columns);
-			$this->makeForm($value, $columns);
-			//$this->makeView($value, $columns);
+			switch ($mode) {
+				case 4:
+					$this->makeController($value);
+					break;
+				case 3:
+					$this->makeModel($value, $columns);
+					break;
+				case 2:
+					$this->makeForm($value, $columns);
+					break;
+				case 1:
+					$this->makeView($value, $columns);
+					break;
+				default:
+					echo 'table:指定表； mode:1代表视图！2代表表单！3代表模型！4代表控制器！';
+					break;
+			}
 			echo '<h3>Table ',$value,'执行成功！</h3><br>';
 		}
 		exit('完成！');
@@ -277,11 +298,8 @@ class Generate extends Model {
 		if (!is_dir(dirname($output))) {
 			mkdir(dirname($output));
 		}
-		$content = file_get_contents($this->template.$file.'.php');
-		foreach ($replaces as $key => $value) {
-			$content = str_replace('{'.$key.'}', $value, $content);
-		}
-		file_put_contents($output, $content);
+		$this->template->set($replaces);
+		file_put_contents($output, $this->template->getText($file.'.tpl'));
 		echo $output, ' 生成成功！<br>';
 		return true;
 	}

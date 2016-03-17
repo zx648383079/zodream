@@ -13,7 +13,7 @@ trait ViewTrait {
 		View::getInstance()->set($key, $value);
 	}
 
-	protected function get($key) {
+	protected function getData($key) {
 		View::getInstance()->get($key);
 	}
 	

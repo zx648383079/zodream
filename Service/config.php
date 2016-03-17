@@ -53,7 +53,7 @@ return array(
 				'savepath'  => 'upload/'               //文件保存路径
 		),
 		'safe' => array(
-			'log' => Domain\Model\LogsModel::class
+			'log' => ''
 		),
 		'alias'  => array(
 				'Config' => Zodream\Infrastructure\Config::class,

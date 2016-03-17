@@ -1,5 +1,5 @@
 <?php $this->jcs(array(
-		'jquery'
+		'jquery.min'
 ));?>
 </body>
 </html>

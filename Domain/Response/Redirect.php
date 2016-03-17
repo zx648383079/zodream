@@ -13,7 +13,7 @@ class Redirect {
 	 * @access globe
 	 *
 	 * @param string $url 要跳转的网址
-	 * @param int $time 停顿的时间
+	 * @param int $time 停顿的时间 秒
 	 * @param string $msg 显示的消息.
 	 * @param string $code 显示的代码标志.
 	 */
@@ -27,7 +27,6 @@ class Redirect {
 		}
 		if (!headers_sent()) {
 			ResponseResult::sendRedirect($url, $time);
-			
 		} else {
 			$str = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
 			//self::$response->set('meta', $str);

@@ -10,8 +10,10 @@ class {controller} extends Controller {
 	
 	function index{action}() {
 		$model = new {model}();
-		$data  = $model->findPage();
-		$this->show($data);
+		$this->show(array(
+			'title' => '',
+			'page' => $model->findPage()
+		));
 	}
 	
 	function add{action}() {

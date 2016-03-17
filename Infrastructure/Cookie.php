@@ -13,7 +13,7 @@ class Cookie {
 	 * @param string $default
 	 */
 	public static function get($key, $default = NULL) {
-		Request::getInstance()->cookie($key, $default);
+		 return Request::getInstance()->cookie($key, $default);
 	}
 	
 	/**
@@ -35,6 +35,6 @@ class Cookie {
 	 * @param string $name 名称
 	 */
 	public static function delete($name) {
-		self::set($name, '', time() - 3600);
+		setcookie($name, '', time() - 3600);
 	}
 }

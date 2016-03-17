@@ -7,7 +7,6 @@ namespace Zodream\Infrastructure;
 * @time 2015-11-29
 */
 class Mailer {
-
 	private $_mail;
 	
 	public function __construct() {
@@ -19,7 +18,6 @@ class Mailer {
 		if (defined('DEBUG') && DEBUG) {
 			$this->_mail->SMTPDebug = 1;
 		}
-	
 		$config = Config::getInstance()->get('mail');
 		$this->setHost($config['host'], $config['port'])->setUser($config['user'], $config['password']);
 	}
