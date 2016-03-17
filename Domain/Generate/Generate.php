@@ -3,33 +3,38 @@ namespace Zodream\Domain\Generate;
 
 
 use Zodream\Domain\Model;
+use Zodream\Domain\Response\Redirect;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Template;
 
-class Generate extends Model {
+class Generate {
 	
 	protected $template;
 	protected $replace = FALSE;
+	protected $model;
 
 	public function __construct() {
-		parent::__construct();
 		$this->template = new Template(__DIR__.'/Template/');
+		$this->model = new GenerateModel();
 	}
 
 	public function make() {
+		if (!defined('DEBUG') || !DEBUG) {
+			Redirect::to('/');
+		}
 		echo '自动生成程序启动……<p/>';
 		$table = Request::getInstance()->get('table');
 		if (empty($table)) {
-			$table = $this->getTable();
+			$table = $this->model->getTable();
 		} else {
 			$table = array(strtolower($table));
 		}
 		$mode = Request::getInstance()->get('mode', 0);
 		foreach ($table as $value) {
-			$value = StringExpand::firstReplace($value, $this->prefix);
+			$value = StringExpand::firstReplace($value, $this->model->getPrefix());
 			echo '<h3>Table ',$value,'执行开始……</h3><br>';
-			$columns = $this->getColumn($value);
+			$columns = $this->model->getColumn($value);
 			switch ($mode) {
 				case 4:
 					$this->makeController($value);
@@ -52,66 +57,6 @@ class Generate extends Model {
 		exit('完成！');
 	}
 
-	public function importSql($file, $db = null) {
-		if (!is_file($file)) {
-			return;
-		}
-		if (!empty($db)) {
-			$this->db->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
-				'` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
-			echo $db.'数据库创建成功！';
-		}
-		$content = file_get_contents($file);
-		$sqls = explode(";\n", str_replace("\r", "\n", $content));
-		foreach ($sqls as $sql) {
-			$this->db->execute($sql);
-			$match = array();
-			if (preg_match('/create[^(;]+ table ([\w_]+?) \(/i', $sql, $match)) {
-				echo $match[1].' 表创建成功！<br>';
-			}
-		}
-		echo 'SQL文件执行完成！';
-	}
-	
-	/**
-	 * 获取数据库名
-	 */
-	public function getDatabase() {
-		return $this->_getArrayFormDouble($this->db->getArray('SHOW DATABASES'));
-	}
-	
-	/**
-	 * 获取表明
-	 * @param string $arg 数据库名 默认是配置文件中的数据库
-	 */
-	public function getTable($arg = null) {
-		if (!empty($arg)) {
-			$this->db->execute('use '.$arg);
-		}
-		return $this->_getArrayFormDouble($this->db->getArray('SHOW TABLES'));
-	}
-	
-	private function _getArrayFormDouble(array $args) {
-		$result = array();
-		foreach ($args as $value) {
-			if(!is_array($value)) {
-				continue;
-			}
-			foreach ($value as $val) {
-				$result[] = $val;
-			}
-		}
-		return $result;
-	}
-	
-	/**
-	 * 获取列名
-	 * @param string $arg
-	 */
-	public function getColumn($arg) {
-		$arg = $this->prefix.StringExpand::firstReplace($arg, $this->prefix);
-		return $this->db->getArray('SHOW COLUMNS FROM '.$arg);
-	}
 	
 	public function makeController($name) {
 		$this->_baseController();
