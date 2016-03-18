@@ -19,14 +19,14 @@ class {form} extends Form {
 {data}
 		))) {
 			$this->send($data);
-			$this->send('error', '验证失败！')
+			$this->send('error', '验证失败！');
 			return;
 		}
 		$model = new {model}();
 		$result = $model->add($data);
 		if (empty($result)) {
 			$this->send($data);
-			$this->send('error', '服务器出错了！')
+			$this->send('error', '服务器出错了！');
 			return;
 		}
 	}

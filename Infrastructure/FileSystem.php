@@ -10,23 +10,6 @@ namespace Zodream\Infrastructure;
 class FileSystem {
 	
 	/**
-	 * 生成视图路径
-	 * @param string $name
-	 * @return string
-	 */
-	public static function view($name) {
-		$dir = trim((!defined('THEME_DIR') || THEME_DIR === '/') ? VIEW_DIR : THEME_DIR, '/');
-		if (!empty($dir)) {
-			$dir .= '/';
-		}
-		$name = str_replace('.', '/', $name);
-		$file = APP_DIR.'/UserInterface/'.APP_MODULE.'/'. $dir .$name;
-		$file = str_replace( '//', '/', $file);
-	
-		return $file . Config::theme('ext');
-	}
-	
-	/**
 	 * 遍历文件夹
 	 */
 	public static function findDir($dir) {
@@ -43,7 +26,11 @@ class FileSystem {
 		}
 		return $files;
 	}
-	
+	/**
+	 * 获取完整路径
+	 * @param string $file
+	 * @return null|string
+	 */
 	public static function getFile($file) {
 		if(file_exists($file)) {
 			return $file;
@@ -57,6 +44,7 @@ class FileSystem {
 		if (file_exists($app.$file)) {
 			return $app.$file;
 		}
+		return null;
 	}
 	
 	public static function read($file) {

@@ -17,7 +17,7 @@ abstract class Model {
 
 	protected $table;
 
-	protected $fillable = array();
+	protected $fillAble = array();
 	
 	protected $prefix;
 	
@@ -32,13 +32,13 @@ abstract class Model {
 
 	/**
 	 * 填充数据 自动识别添加或修改
-	 * 添加 有一个数组参数 或 多个 非数组参数（与fillable字段对应）
+	 * 添加 有一个数组参数 或 多个 非数组参数（与fillAble字段对应）
 	 * 修改 有两个参数 第一个为数组 第二个为条件,如果第二个参数是数字，则为id
-	 * 关联数组参数不需要一一对应，自东根据 fillable 取需要的
+	 * 关联数组参数不需要一一对应，自东根据 fillAble 取需要的
 	 */
 	public function fill() {
 		$args = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
-		$data = ArrayExpand::combine($this->fillable, $args, false);
+		$data = ArrayExpand::combine($this->fillAble, $args, false);
 		if (func_num_args() == 1 || !is_array(func_get_arg(0))) {
 			return $this->add($data);
 		}

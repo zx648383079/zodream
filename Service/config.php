@@ -21,9 +21,9 @@ return array(
 				'role'   => Zodream\Domain\Authentication\Verify::class,       //权限判断
 				'home'  => 'account'                             //用户登录主页
 		),
-		'theme'   => array(                           //视图文件信息
-				'dir' => 'default',
-				'ext' => '.php'
+		'view'   => array(                           //视图文件信息
+				'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
+				'suffix' => '.php'
 		),
 		'route'  => array(
 				'driver'  => Zodream\Domain\Routing\Grace::class,

@@ -19,15 +19,29 @@ class Template extends  MagicObject {
         }
     }
 
+    /**
+     * 设置基路径
+     * @param string $value
+     */
     public function setBase($value) {
         $this->baseDir = rtrim($value, '/') . '/';
     }
 
+    /**
+     * 设置标志
+     * @param string $beginTag
+     * @param string $endTag
+     */
     public function setTag($beginTag = '{', $endTag = '}') {
         $this->beginTag = $beginTag;
         $this->endTag = $endTag;
     }
 
+    /**
+     * 根据路径获取替换后的内容
+     * @param string $file
+     * @return bool|mixed
+     */
     public function getText($file) {
         $file = $this->baseDir.ltrim($file);
         if (!is_file($file)) {
@@ -37,6 +51,13 @@ class Template extends  MagicObject {
         return $this->replaceByArray($content, $this->get());
     }
 
+    /**
+     * 根据关联数组替换内容
+     * @param string $content
+     * @param array $data
+     * @param null|string $pre
+     * @return string
+     */
     public function replaceByArray($content, array $data, $pre = null) {
         foreach ($data as $key => $item) {
             if (is_array($item)) {
@@ -48,6 +69,13 @@ class Template extends  MagicObject {
         return $content;
     }
 
+    /**
+     * 替换单个
+     * @param string $content
+     * @param string $tag
+     * @param string $value
+     * @return string
+     */
     public function replace($content, $tag, $value) {
         return str_ireplace($this->beginTag.$tag.$this->endTag, $value, $content);
     }

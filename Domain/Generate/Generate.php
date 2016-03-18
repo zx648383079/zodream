@@ -2,7 +2,7 @@
 namespace Zodream\Domain\Generate;
 
 
-use Zodream\Domain\Model;
+use Zodream\Domain\Authentication\Binary;
 use Zodream\Domain\Response\Redirect;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
@@ -19,9 +19,16 @@ class Generate {
 		$this->model = new GenerateModel();
 	}
 
+	/**
+	 * 开始生成的入口
+	 */
 	public function make() {
 		if (!defined('DEBUG') || !DEBUG) {
 			Redirect::to('/');
+		}
+		$mode = Request::getInstance()->get('mode', 0);
+		if (empty($mode)) {
+			exit('table:指定表,为空时表示所以表； mode:二进制标志1111，从左至右1代表视图、表单、模型、控制器！');
 		}
 		echo '自动生成程序启动……<p/>';
 		$table = Request::getInstance()->get('table');
@@ -30,37 +37,53 @@ class Generate {
 		} else {
 			$table = array(strtolower($table));
 		}
-		$mode = Request::getInstance()->get('mode', 0);
 		foreach ($table as $value) {
-			$value = StringExpand::firstReplace($value, $this->model->getPrefix());
-			echo '<h3>Table ',$value,'执行开始……</h3><br>';
-			$columns = $this->model->getColumn($value);
-			switch ($mode) {
-				case 4:
-					$this->makeController($value);
-					break;
-				case 3:
-					$this->makeModel($value, $columns);
-					break;
-				case 2:
-					$this->makeForm($value, $columns);
-					break;
-				case 1:
-					$this->makeView($value, $columns);
-					break;
-				default:
-					echo 'table:指定表； mode:1代表视图！2代表表单！3代表模型！4代表控制器！';
-					break;
-			}
-			echo '<h3>Table ',$value,'执行成功！</h3><br>';
+			$this->generateOne($value, $mode);
 		}
 		exit('完成！');
 	}
 
-	
+	/**
+	 * 生成一个表
+	 * @param string $table
+	 * @param string $mode
+	 */
+	protected function generateOne($table, $mode) {
+		$table = StringExpand::firstReplace($table, $this->model->getPrefix());
+		echo '<h3>Table ',$table,'执行开始……</h3><br>';
+		$columns = $this->model->getColumn($table);
+		$name = $this->getName($table);
+		if (Binary::judge(1, $mode)) {
+			$this->makeController($name);
+		}
+		if (Binary::judge(2, $mode)) {
+			$this->makeModel($name, $table, $columns);
+		}
+		if (Binary::judge(4, $mode)) {
+			$this->makeForm($name, $columns);
+		}
+		if (Binary::judge(8, $mode)) {
+			$this->makeView($name, $columns);
+		}
+		echo '<h3>Table ',$table,'执行成功！</h3><br>';
+	}
+
+	/**
+	 * 是有 _ 的表名采用驼峰法表示
+	 * @param string $table
+	 * @return string
+	 */
+	protected function getName($table) {
+		return str_replace(' ', '', ucwords(str_replace('_', ' ', $table)));
+	}
+
+	/**
+	 * 生成控制器
+	 * @param string $name
+	 * @return bool
+	 */
 	public function makeController($name) {
 		$this->_baseController();
-		$name = ucfirst(strtolower($name));
 		$data = array(
 			'module' => APP_MODULE,
 			'model' => $name.APP_MODEL,
@@ -70,7 +93,11 @@ class Generate {
 		);
 		return $this->_replace('Controller', $data, APP_DIR.'/Service/'.APP_MODULE.'/'.$data['controller'].'.php');
 	}
-	
+
+	/**
+	 * 生成基控制器
+	 * @return bool
+	 */
 	private function _baseController() {
 		$dir = APP_DIR.'/Service/'.APP_MODULE;
 		if (!is_dir($dir)) {
@@ -80,20 +107,31 @@ class Generate {
 				'module' => APP_MODULE
 		), $dir.'/Controller.php');
 	}
-	
-	public function makeModel($name, array $columns) {
-		$name = strtolower($name);
+
+	/**
+	 * 生成数据模型
+	 * @param string $name
+	 * @param string $table
+	 * @param array $columns
+	 * @return bool
+	 */
+	public function makeModel($name, $table, array $columns) {
 		$data = array(
-			'model' => ucfirst($name).APP_MODEL,
-			'name' => $name,
+			'model' => $name.APP_MODEL,
+			'table' => $table,
 			'data' => $this->_modelFill($columns),
 			'module' => APP_MODULE
 		);
 		return $this->_replace('Model', $data, APP_DIR.'/Domain/Model/'.APP_MODULE.'/'.$data['model'].'.php');
 	}
-	
+
+	/**
+	 * 生成表单模型
+	 * @param string $name
+	 * @param array $columns
+	 * @return bool
+	 */
 	public function makeForm($name, array $columns) {
-		$name = ucfirst(strtolower($name));
 		list($column, $datas) = $this->_formColumn($columns);
 		$data = array(
 			'model'  => $name.APP_MODEL,
@@ -104,11 +142,22 @@ class Generate {
 		);
 		return $this->_replace('Form', $data, APP_DIR.'/Domain/Form/'.APP_MODULE.'/'.$data['form'].'.php');
 	}
-	
+
+	/**
+	 * 生成配置文件
+	 * @param array $configs
+	 * @param string $module
+	 * @return bool
+	 */
 	public function makeConfig(array $configs, $module = APP_MODULE) {
 		return $this->_replace('config', array('data' => var_export($configs, true)), APP_DIR.'/Service/config/'.$module.'.php');
 	}
-	
+
+	/**
+	 * 生成视图文件
+	 * @param string $name
+	 * @param array $column
+	 */
 	public function makeView($name = 'Home', array $column = array()) {
 		$dir = APP_DIR.'/UserInterface/'.APP_MODULE;
 		if (!is_dir($dir)) {
@@ -116,8 +165,7 @@ class Generate {
 		}
 		$dir .= '/';
 		$this->_viewLayout($dir);
-		$name = strtolower($name);
-		$viewDir = $dir.ucfirst($name);
+		$viewDir = $dir.$name;
 		if (!is_dir($viewDir)) {
 			mkdir($viewDir);
 		}
@@ -125,11 +173,18 @@ class Generate {
 		$this->_viewEdit($viewDir, $name, $column);
 		$this->_viewView($viewDir, $name, $column);
 	}
-	
+
+	/**
+	 * 生成主视图列表
+	 * @param string $dir
+	 * @param string $name
+	 * @param array $columns
+	 * @return bool
+	 */
 	private function _viewIndex($dir, $name, array $columns) {
-		$colum = '';
+		$column = '';
 		foreach ($columns as $value) {
-			$colum .= '<td>'.ucfirst($value['Field']).'</td>';
+			$column .= '<td>'.ucfirst($value['Field']).'</td>';
 		}
 		$data = '';
 		foreach ($columns as $value) {
@@ -137,11 +192,18 @@ class Generate {
 		}
 		return $this->_replace('index', array(
 				'data'   => $data,
-				'column' => $colum,
+				'column' => $column,
 				'name'   => $name
 		), $dir.'/index.php');
 	}
-	
+
+	/**
+	 * 生成编辑视图
+	 * @param string $dir
+	 * @param string $name
+	 * @param array $columns
+	 * @return bool
+	 */
 	private function _viewEdit($dir, $name, array $columns) {
 		$data = '';
 		foreach ($columns as $value) {
@@ -158,7 +220,14 @@ class Generate {
 				'name'   => $name
 		), $dir.'/edit.php');
 	}
-	
+
+	/**
+	 * 生成单页查看视图
+	 * @param string $dir
+	 * @param string $name
+	 * @param array $columns
+	 * @return bool
+	 */
 	private function _viewView($dir, $name, array $columns) {
 		$data = '';
 		foreach ($columns as $key => $value) {
@@ -169,7 +238,12 @@ class Generate {
 				'name'   => $name
 		), $dir.'/view.php');
 	}
-	
+
+	/**
+	 * 视图中表单的生成
+	 * @param $value
+	 * @return string
+	 */
 	private function _viewForm($value) {
 		$required = null;
 		if ($value['Null'] === 'NO') {
@@ -188,7 +262,11 @@ class Generate {
 				break;
 		}
 	}
-	
+
+	/**
+	 * 生成共享视图
+	 * @param string $dir
+	 */
 	private function _viewLayout($dir) {
 		$layout_dir = $dir.'layout';
 		if (!is_dir($layout_dir)) {
@@ -201,7 +279,12 @@ class Generate {
 			$this->_replace('foot', array(), $layout_dir.'/foot.php');
 		}
 	}
-	
+
+	/**
+	 * 数据模型中的列生成
+	 * @param array $columns
+	 * @return string
+	 */
 	private function _modelFill(array $columns) {
 		$data = '';
 		foreach ($columns as $key => $value) {
@@ -215,7 +298,12 @@ class Generate {
 		}
 		return $data;
 	}
-	
+
+	/**
+	 * 表单模型的列生成
+	 * @param array $columns
+	 * @return array
+	 */
 	private function _formColumn(array $columns) {
 		$column = $data = '';
 		foreach ($columns as $key => $value) {
@@ -223,7 +311,10 @@ class Generate {
 				continue;
 			}
 			$column .= $value['Field'];
-			$data .= "\t\t\t'{$value['Field']}' => 'required'";
+			$validate = $this->getValidate($value);
+			if (!empty($value)) {
+				$data .= "\t\t\t'{$value['Field']}' => '{$validate}'";
+			}
 			if ($key < count($columns)-1) {
 				$column .= ',';
 				$data .= ",\r\n";
@@ -234,7 +325,39 @@ class Generate {
 				$data
 		);
 	}
-	
+
+	protected function getValidate($value) {
+		$result = '';
+		if ($value['Null'] == 'NO') {
+			$result = 'required';
+		}
+		if ($value['Type'] == 'text') {
+			return $result;
+		}
+		if(!preg_match('/(\b+)\((\d+)\)/', $value['Type'], $match)) {
+			return $result;
+		}
+		switch ($match[1]) {
+			case 'int':
+				$result .= ',int';
+				break;
+			case 'varchar':
+				$result .= ',string:3-'.$match[2];
+				break;
+			case 'tinyint':
+				$result .= ',int:0-'.$match[2];
+				break;
+		}
+		return $result;
+	}
+
+	/**
+	 * 替换
+	 * @param string $file
+	 * @param array $replaces
+	 * @param string $output
+	 * @return bool
+	 */
 	private function _replace($file, array $replaces, $output) {
 		if (is_file($output) && !$this->replace) {
 			echo $output,' 路径已经存在！未使用强制模式！<br>';

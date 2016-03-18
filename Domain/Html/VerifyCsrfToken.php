@@ -27,6 +27,10 @@ class VerifyCsrfToken {
 		Error::out('Csrf验证失败！', __FILE__, __LINE__);
 	}
 
+	/**
+	 * 获取已经生成的Csrf
+	 * @return string
+	 */
 	public static function get() {
 		return Session::getInstance()->get('csrf');
 	}

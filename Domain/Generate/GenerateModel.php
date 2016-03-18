@@ -15,6 +15,11 @@ class GenerateModel extends Model {
         return $this->prefix;
     }
 
+    /**
+     * 根据文件路径导入数据库
+     * @param string $file
+     * @param null $db
+     */
     public function importSql($file, $db = null) {
         if (!is_file($file)) {
             return;

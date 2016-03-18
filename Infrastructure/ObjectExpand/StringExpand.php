@@ -50,6 +50,31 @@ class StringExpand {
 	}
 
 	/**
+	 * 合并多个获取完整的路径
+	 * @param string $baseDir
+	 * @param string $other
+	 */
+	public static function getFile($baseDir, $other) {
+		return preg_replace('#[\\/]{2,}#', '/', implode('/', func_get_args()));
+	}
+
+	/**
+	 * 获取两个路径的相对路径
+	 * @param string $a1
+	 * @param string $b1
+	 * @return string
+	 */
+	public static function getRelationPath($a1, $b1) {
+		$a1 = explode('/', ltrim($a1, '/'));
+		$b1 = explode('/', ltrim($b1, '/'));
+		for($i = 0; isset($b1[$i], $a1[$i]); $i++){
+			if($a1[$i] == $b1[$i]) $a1[$i] = "..";
+			else break;
+		}
+		return implode("/", $a1);
+	}
+
+	/**
 	 * 生成简单的随机字符串
 	 * @param  int  $length
 	 * @return string
@@ -67,7 +92,12 @@ class StringExpand {
 	{
 		return mb_strlen($string, '8bit');
 	}
-	
+
+	/**
+	 * 过滤html元素
+	 * @param string $content
+	 * @return string
+	 */
 	public static function filterHtml($content) {
 		return preg_replace('/<(.*?)>/', '', htmlspecialchars_decode($content));
 	}
@@ -112,8 +142,13 @@ class StringExpand {
 	public static function firstReplace($arg, $search, $replace = null) {
 		return preg_replace('/^'.$search.'/', $replace, $arg, 1);
 	}
-	
-	public static function abslength($str) {
+
+	/**
+	 * UTF8字符串的长度
+	 * @param string $str
+	 * @return int
+	 */
+	public static function absLength($str) {
 		if (empty($str)) {
 			return 0;
 		}
@@ -124,8 +159,15 @@ class StringExpand {
 			return count($ar[0]);
 		}
 	}
-	
-	public static function utf8_substr($str, $start = 0, $length = 0) {
+
+	/**
+	 * UTF8字符串截取
+	 * @param string $str
+	 * @param int $start
+	 * @param int $length
+	 * @return bool|string
+	 */
+	public static function subString($str, $start = 0, $length = 0) {
 		if (empty($str)) {
 			return false;
 		}
@@ -160,7 +202,7 @@ class StringExpand {
 	 * @param $suffix 是否加尾缀
 	 */
 	
-	public static function csubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = true) {
+	public static function subStr($str, $start = 0, $length, $charset = "utf-8", $suffix = true) {
 		if (function_exists("mb_substr")) {
 			if (mb_strlen($str, $charset) <= $length) return $str;
 			$slice = mb_substr($str, $start, $length, $charset);
@@ -176,9 +218,14 @@ class StringExpand {
 		if ($suffix) return $slice."…";
 		return $slice;
 	}
-	
-	//字符串的无乱码截取
-	function sub ($str,$len) {
+
+	/**
+	 * 字符串的无乱码截取
+	 * @param string $str
+	 * @param int $len
+	 * @return string
+	 */
+	function sub($str,$len) {
 		$string = '';
 		for( $i=0; $i < $len; $i++ ){
 			if( ord(substr($str, $i,1)) > 0xa0 ){

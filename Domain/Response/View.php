@@ -6,10 +6,11 @@ namespace Zodream\Domain\Response;
 * @author Jason
 * @time 2015-12-19
 */
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
-use Zodream\Infrastructure\FileSystem;
 use Zodream\Domain\Html\Script;
 use Zodream\Domain\Routing\UrlGenerator;
 use Zodream\Domain\Routing\Router;
@@ -17,25 +18,65 @@ use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\Traits\ConditionTrait;
 use Zodream\Infrastructure\EventManager\EventManger;
 
-defined('VIEW_DIR') or define('VIEW_DIR', '/');
-
 class View extends MagicObject {
 	use SingletonPattern,ConditionTrait;
 	
-	protected $_asset = 'assets/';
+	protected $assetDir = 'assets/';
+
+	protected $viewDir = APP_DIR.'/UserInterface/'.APP_MODULE;
+
+	protected $suffix = '.php';
+
+	protected function __construct() {
+		$config = Config::getInstance()->get('view');
+		$this->setView($config['directory']);
+		$this->setSuffix($config['suffix']);
+	}
+
+	/**
+	 * 设置后缀
+	 * @param string $arg
+	 */
+	public function setSuffix($arg) {
+		$this->suffix = '.'.ltrim($arg, '.');
+	}
+
+	/**
+	 * 获取后缀
+	 * @return string
+	 */
+	public function getSuffix() {
+		return $this->suffix;
+	}
+
+	/**
+	 * 设置视图的路径
+	 * @param string $dir
+	 */
+	public function setView($dir) {
+		$this->viewDir = $dir;
+	}
+
+	/**
+	 * 获取视图的路径
+	 * @return string
+	 */
+	public function getView($file = null) {
+		return StringExpand::getFile($this->viewDir, str_replace('.', '/', $file));
+	}
 
 	/**
 	 * 设置资源路径
 	 * @param string $arg
 	 */
 	public function setAsset($arg) {
-		$this->_asset = trim($arg, '/').'/';
+		$this->assetDir = $arg.'/';
 	}
 	/**
 	 * 获取资源路径
 	 */
-	public function getAsset() {
-		return $this->_asset;
+	public function getAsset($file = null) {
+		return StringExpand::getFile($this->assetDir, $file);
 	}
 	
 	/**
@@ -50,7 +91,7 @@ class View extends MagicObject {
 		}
 		$this->set('_extra', $param);
 		foreach (ArrayExpand::toFile((array)$names, '.') as $value) {
-			$file = FileSystem::view($value);
+			$file = $this->getView($value).$this->getSuffix();
 			if (file_exists($file)) {
 				include($file);
 			} else {
@@ -73,13 +114,8 @@ class View extends MagicObject {
 	 * @param string $file
 	 * @param string $isView
 	 */
-	public function asset($file, $isView = TRUE) {
-		if ($isView) {
-			$file = $this->getAsset().ltrim(VIEW_DIR.ltrim($file, '/'), '/');
-		} else {
-			$file = $this->getAsset().ltrim($file, '/');
-		}
-		echo UrlGenerator::toAsset($file);
+	public function asset($file) {
+		echo UrlGenerator::toAsset($this->getAsset($file));
 	}
 	
 	public function url($url = null, $extra = null) {
@@ -164,7 +200,7 @@ class View extends MagicObject {
 	 */
 	public function showWithFile($file, $status = 200) {
 		ob_start();
-		include(FileSystem::view($file));
+		include($this->getView($file).$this->getSuffix());
 		$content = ob_get_contents();
 		ob_end_clean();
 		EventManger::getInstance()->run('show', $content);

@@ -40,7 +40,7 @@ class PageLink {
 	/**
 	 * 数字分页显示
 	 */
-	private $_listnum = 8;
+	private $_listNum = 8;
 	/**
 	 * 分页显示模板
 	 * 可用变量参数
@@ -87,7 +87,7 @@ class PageLink {
 		$this->_pageParam = $pageParam;
 		$this->_pageNum = ceil($this->_total / $this->_pageSize);
 		$this->_setPage();
-		$this->_setlimit();
+		$this->_setLimit();
 	}
 	
 	public function getTotal() {
@@ -152,7 +152,7 @@ class PageLink {
 	 
 	/**
 	 * 获取limit起始数
-	 * @return type
+	 * @return int
 	 */
 	public function getOffset() {
 		return ($this->_page - 1) * $this->_pageSize;
@@ -160,9 +160,9 @@ class PageLink {
 	 
 	/**
 	 * 设置LIMIT
-	 * @return type
+	 * @return string 
 	 */
-	private function _setlimit() {
+	private function _setLimit() {
 		$this->_limit = ($this->_page - 1) * $this->_pageSize . ','.$this->_pageSize;
 	}
 
@@ -197,7 +197,7 @@ class PageLink {
 
 	/**
 	 * 本页结束条数
-	 * @return type
+	 * @return int
 	 */
 	private function _end() {
 		return min($this->_page * $this->_pageSize, $this->_total);
@@ -205,7 +205,7 @@ class PageLink {
 
 	/**
 	 * 设置当前页大小
-	 * @return type
+	 * @return int
 	 */
 	private function _setPageSize() {
 		return $this->_end() - $this->_star() + 1;
@@ -213,60 +213,62 @@ class PageLink {
 
 	/**
 	 * 上一页
-	 * @return type
+	 * @return string
 	 */
 	private function _prev() {
 		if ($this->_page > 1) {
-			return $this->_replaceLine($this->_page - 1, $this->_config['pre'], false);
+			return $this->_replaceLine($this->_page - 1, $this->_config['pre']);
 		}
 		return null;
 	}
 
 	/**
 	 * 分页数字列表
-	 * @return type
+	 * @return string
 	 */
 	private function _pagelist() {
 		if ($this->_pageNum < 2) {
 			return null;
 		}
-		$linkpage = '';
-		$linkpage .= $this->_replaceLine(1);
-		$lastlist = floor($this->_listnum / 2);
-		if ($this->_pageNum < $this->_listnum || $this->_page - $lastlist < 2 || $this->_pageNum - $this->_listnum < 2) {
+		$linkPage = '';
+		$linkPage .= $this->_replaceLine(1);
+		$lastList= floor($this->_listNum / 2);
+		$i = 0;
+		$length = 0;
+		if ($this->_pageNum < $this->_listNum || $this->_page - $lastList< 2 || $this->_pageNum - $this->_listNum < 2) {
 			$i = 2;
-			if ($this->_pageNum <= $this->_listnum) {
+			if ($this->_pageNum <= $this->_listNum) {
 				$length = $this->_pageNum - 1;
 			} else {
-				$length = $this->_listnum;
+				$length = $this->_listNum;
 			}
-		} elseif ($this->_page - $lastlist >= 2 && $this->_page + $lastlist <= $this->_pageNum) {
-			$i = $this->_page - $lastlist;
-			$length = $this->_page + $lastlist - 1;
-		} elseif ($this->_page + $lastlist > $this->_pageNum) {
-			$i = $this->_pageNum - $this->_listnum + 1;
+		} elseif ($this->_page - $lastList>= 2 && $this->_page + $lastList<= $this->_pageNum) {
+			$i = $this->_page - $lastList;
+			$length = $this->_page + $lastList- 1;
+		} elseif ($this->_page + $lastList> $this->_pageNum) {
+			$i = $this->_pageNum - $this->_listNum + 1;
 			$length = $this->_pageNum - 1;
 		}
-		if ($this->_page > $lastlist + 1 && $i > 2) {
-			$linkpage .= $this->_replace(null, '...');
+		if ($this->_page > $lastList+ 1 && $i > 2) {
+			$linkPage .= $this->_replace(null, '...');
 		}
 		for (; $i <= $length; $i ++) {
-			$linkpage .= $this->_replaceLine($i);
+			$linkPage .= $this->_replaceLine($i);
 		}
-		if ($this->_page < $this->_pageNum - $lastlist && $length < $this->_pageNum - 1) {
-			$linkpage .= $this->_replace(null, '...');
+		if ($this->_page < $this->_pageNum - $lastList&& $length < $this->_pageNum - 1) {
+			$linkPage .= $this->_replace(null, '...');
 		}
-		$linkpage .= $this->_replaceLine($this->_pageNum);
-		return $linkpage;
+		$linkPage .= $this->_replaceLine($this->_pageNum);
+		return $linkPage;
 	}
 
 	/**
 	 * 下一页
-	 * @return type
+	 * @return string
 	 */
 	private function _next() {
 		if ($this->_page < $this->_pageNum) {
-			return $this->_replaceLine($this->_page + 1, $this->_config['next'], false);
+			return $this->_replaceLine($this->_page + 1, $this->_config['next']);
 		}
 		return null;
 	}
@@ -275,7 +277,7 @@ class PageLink {
 	 * 跳转按钮
 	 * @return string
 	 */
-	private function _gopage() {
+	private function _goPage() {
 		return '&nbsp;<input type="text" value="' . $this->_page . '" onkeydown="javascript:if(event.keyCode==13){var page=(this.value>' . $this->_pageNum . ')?' . $this->_pageNum . ':this.value;location=\'' . UrlGenerator::to(null) . '&page=\'+page+\'\'}" style="width:25px;"/><input type="button" onclick="javascript:var page=(this.previousSibling.value>' . $this->_pageNum . ')?' . $this->_pageNum . ':this.previousSibling.value;location=\'' . UrlGenerator::to() . '&page=\'+page+\'\'" value="GO"/>';
 	}
 	
@@ -289,9 +291,9 @@ class PageLink {
 
 	/**
 	 * 模板替换
-	 * @param type $replace     替换内容
-	 * @param type $result      条件
-	 * @return type
+	 * @param string $replace     替换内容
+	 * @param string $result      条件
+	 * @return string
 	 */
 	private function _replace($url, $text, $result = TRUE) {
 		$template = ($result ? $this->_activeTemplate : $this->_notActiveTemplate);

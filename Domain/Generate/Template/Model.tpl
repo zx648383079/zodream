@@ -2,10 +2,11 @@
 namespace Domain\Model\{module};
 
 use Zodream\Domain\Model;
+use Zodream\Domain\Html\Page;
 class {model} extends Model {
-	protected $table = '{name}';
+	protected $table = '{table}';
 	
-	protected $fillable = array(
+	protected $fillAble = array(
 {data}
 	);
 	

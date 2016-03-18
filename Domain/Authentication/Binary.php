@@ -23,7 +23,6 @@ class Binary implements RoleObject {
 		foreach ($arr as $value) {
 			$roles += intval($value);
 		}
-		
 		return $roles;
 	}
 }
