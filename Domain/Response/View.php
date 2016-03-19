@@ -203,7 +203,7 @@ class View extends MagicObject {
 		include($this->getView($file).$this->getSuffix());
 		$content = ob_get_contents();
 		ob_end_clean();
-		EventManger::getInstance()->run('show', $content);
+		EventManger::getInstance()->run('showView', $content);
 		ResponseResult::make($content, 'html', $status);
 	}
 }

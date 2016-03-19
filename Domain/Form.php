@@ -5,7 +5,14 @@ use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Traits\ViewTrait;
 abstract class Form {
-	
+
+	protected $status = array(
+		'操作成功完成！',
+		'验证失败！',
+		'服务器错误！',
+		'其他错误！'
+	);
+
 	use ViewTrait;
 	/**
 	 * 验证POST数据
@@ -30,7 +37,11 @@ abstract class Form {
 			return false;
 		}
 		$args = func_get_args();
-		unset($action[0]);
+		unset($args[0]);
 		return call_user_func_array(array($this, $action), $args);
+	}
+
+	public function sendMessage($status = 0) {
+		$this->send('message', isset($this->status[$status]) ? $this->status[$status] : '未知错误！');
 	}
 }
