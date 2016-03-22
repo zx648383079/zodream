@@ -283,7 +283,9 @@ class PageLink {
 	
 	private function _replaceLine($page, $text = null) {
 		return $this->_replace(
-				UrlGenerator::to(null, array($this->_pageParam => $page)), 
+				UrlGenerator::to(null, array(
+					$this->_pageParam => $page
+				)),
 				$text == null ? $page : $text, 
 				$page == $this->_page
 		);

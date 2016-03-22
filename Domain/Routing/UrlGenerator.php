@@ -99,12 +99,13 @@ class UrlGenerator {
 	 */
 	public static function setValue($url, $key , $value = null) {
 		$arr  = explode('?', $url, 2);
+		$arr = str_replace('&amp;', '&', $arr);      //解决 & 被转义
 		$data = array();
 		if (count($arr) > 1) {
-			parse_str( $arr[1], $data );
+			parse_str($arr[1], $data);
 		}
 		if (!is_null($value)) {
-			$data[ $key ] = $value;
+			$data[$key] = $value;
 		} else {
 			if (is_array($key)) {
 				$data = array_merge($data, $key);
