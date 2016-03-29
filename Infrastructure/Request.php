@@ -122,14 +122,12 @@ final class Request {
 	
 	/**
 	 * PHP://INPUT
-	 * @param string $name
-	 * @param string $default
 	 */
-	public function input($name = null, $default = null) {
+	public function input() {
 		if (empty($this->_input)) {
 			$this->_input = $this->_clean(file_get_contents('php://input'));
 		}
-		return $this->_getValue($name, $this->_input , $default);
+		return $this->_input;
 	}
 	
 	/**

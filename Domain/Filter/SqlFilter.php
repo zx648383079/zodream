@@ -25,7 +25,7 @@ class SqlFilter {
 	 *
 	 * @access public
 	 *
-	 * @param boolen $sort 是否先进行排序.
+	 * @param string $prefix 前缀.
 	 *
 	 */
 	public function __construct($prefix = NULL) {
@@ -158,8 +158,8 @@ class SqlFilter {
 	
 	/**
 	 * 当长度为null是，把第一个参数作为长度
-	 * @param unknown $start
-	 * @param unknown $length
+	 * @param int $start
+	 * @param int $length
 	 */
 	public function limit($start, $length = null) {
 		$this->limit = $start;
@@ -184,6 +184,9 @@ class SqlFilter {
 	 * @return string 返回拼接后的SQL语句,
 	 */
 	private function sqlJoin($key, $value) {
+		if (empty($value)) {
+			return null;
+		}
 		$result = ' ';
 		switch ($key) {
 			/*case 'show':

@@ -258,7 +258,9 @@ abstract class Model {
 	 */
 	public function count($param = array(), $field = 'id') {
 		$where = '';
-		if (is_array($param) && !empty($param)) {
+		if (empty($param)) {
+
+		} elseif (is_array($param)) {
 			foreach ($param as $value) {
 				$where .= $value.' AND ';
 			}
