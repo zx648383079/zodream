@@ -46,7 +46,7 @@ abstract class Model {
 		if (is_numeric($param)) {
 			$param = 'id = '.$param;
 		}
-		return $this->update($data, $param);
+		return $this->updateValues($data, $param);
 	}
 	
 	/**
@@ -57,17 +57,10 @@ abstract class Model {
 	 * @param array $addData 需要添加的集合
 	 * @return int 返回最后插入的ID,
 	 */
-	public function add($addData) {
-		$addFields = array();
-		$addValues = array();
-		foreach ($addData as $key => $value) {
-			$addFields[] = $key;
-			$addValues[] = $value;
-		}
-		$addFields = implode('`,`', $addFields);
-		$addValues = implode("','", $addValues);
-		$sql       = "INSERT INTO {$this->table} (`$addFields`) VALUES ('$addValues')";
-		return $this->db->insert($sql);
+	public function add(array $addData) {
+		$addFields = implode('`,`', array_keys($addData));
+		$addValues = implode("','", array_values($addData));
+		return $this->insert("`{$addFields}`", "'{$addValues}'");
 	}
 	 
 	/**
@@ -75,26 +68,17 @@ abstract class Model {
 	 *
 	 * @access public
 	 *
-	 * @param array $param 条件
+	 * @param array $param 条件 默认使用AND 连接
 	 * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-	public function update($updateData , $param) {
-		$where = $setData = '';
-		if (is_array($param)) {
-			foreach ($param as $key => $value) {
-				$where .= $value.' AND ';
-			}
-			$where = 'WHERE '.substr($where, 0, -4);
-		} else {
-			$where = 'WHERE '.$param;
-		}
+	public function updateValues($updateData, $param) {
+		$setData = '';
 		foreach ($updateData as $key => $value) {
 			$setData .= "`$key` = '$value',";
 		}
 		$setData = substr($setData, 0, -1);
-		$sql     = "UPDATE {$this->table} SET {$setData} {$where}";
-		return $this->db->update($sql);
+		return $this->update($setData, $this->getWhere($param));
 	}
 	
 	/**
@@ -103,7 +87,7 @@ abstract class Model {
 	 * @param array $data
 	 */
 	public function updateById($id, $data) {
-		return $this->update($data, 'id = '.$id);
+		return $this->updateValues($data, 'id = '.$id);
 	}
 	 
 	/**
@@ -114,9 +98,7 @@ abstract class Model {
 	 * @return int
 	 */
 	public function updateBool($filed, $where) {
-		$sql =  "UPDATE {$this->table} SET {$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END WHERE ";
-		$sql .= $where;
-		return $this->db->update($sql);
+		return $this->update("{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END", $where);
 	}
 	
 	/**
@@ -131,10 +113,9 @@ abstract class Model {
 		if ($num >= 0) {
 			$num = '+'.$num;
 		}
-		$sql = "UPDATE {$this->table} SET {$filed} = {$filed} {$num} WHERE $where";
-		return $this->db->update($sql);
+		return $this->update("{$filed} = {$filed} {$num}", $where);
 	}
-	
+
 	/**
 	 * 查询一条数据
 	 *
@@ -144,21 +125,7 @@ abstract class Model {
 	 * @return array,
 	 */
 	public function findOne($param, $filed = '*') {
-		$where = '';
-		if ( is_array($param) ) {
-			foreach ($param as $key => $value) {
-				if (is_numeric($key)) {
-					$where .= $value.' AND ';
-				} else {
-					$where .= $key." = '{$value}' AND ";
-				}
-			}
-			$where = 'WHERE '.substr($where, 0, -4);
-		} else if (is_string($param)) {
-			$where = 'WHERE '.$param;
-		}
-		$sql    = "SELECT {$filed} FROM {$this->table} {$where} LIMIT 1";
-		$result = $this->db->select($sql);
+		$result = $this->select("{$this->getWhere($param)} LIMIT 1", $filed);
 		return array_shift($result);
 	}
 	
@@ -169,8 +136,7 @@ abstract class Model {
 	 * @return array
 	 */
 	public function findById($id, $filed = '*') {
-		$sql = "SELECT {$filed} FROM {$this->table} WHERE id = {$id} LIMIT 1";
-		$result = $this->db->select($sql);
+		$result = $this->select("WHERE id = {$id} LIMIT 1", $filed);
 		return array_shift($result);
 	}
 	 
@@ -182,18 +148,8 @@ abstract class Model {
 	 * @param array|string $param 条件
 	 * @return int 返回影响的行数,
 	 */
-	public function delete($param) {
-		$where = '';
-		if(is_array($param)) {
-			foreach ($param as $key => $value) {
-				$where .= $value.' AND ';
-			}
-			$where = 'WHERE '.substr($where, 0, -4);
-		} else {
-			$where = 'WHERE '.$param;
-		}
-		$sql = "DELETE FROM {$this->table} $where";
-		return $this->db->delete($sql);
+	public function deleteValues($param) {
+		return $this->delete($this->getWhere($param));
 	}
 
 	/** 根据id删除数据
@@ -201,7 +157,7 @@ abstract class Model {
 	 * @return int
 	 */
 	public function deleteById($id) {
-		return $this->delete('id = '.$id);
+		return $this->deleteValues('id = '.$id);
 	}
 	 
 	/**
@@ -214,38 +170,141 @@ abstract class Model {
 	 * @return array 返回查询结果,
 	 */
 	public function find($param = array(), $field = array()) {
-		$limit = $order = $group = $where = $like = '';
-		if (is_array($param) && !empty($param)) {
-			$limit = isset($param['limit']) ? 'LIMIT '.$param['limit'] : '';
-			$order = isset($param['order']) ? 'ORDER BY '.$param['order'] : '';
-			$group = isset($param['group']) ? 'GROUP BY '.$param['group'] : '';
-			if (isset($param['where'])) {
-				foreach ((array)$param['where'] as $value) {
-					if (empty($where)) {
-						$where = 'WHERE '.$value;
-					} else {
-						if (is_array($value)) {
-							switch ($value[1]) {
-								case 'or':
-									$where .= ' OR '.$value[0];
-									break;
-								case 'and':
-									$where .= ' AND '.$value[0];
-									break;
-							}
-						} else {
-							$where .= ' AND '.$value;
-						}
-					}
-				}
-			}
-		}
-		$selectFields = empty($field) ? '*' : implode(',', (array)$field);
-		$sql    = "SELECT $selectFields FROM {$this->table} $where $group $order $limit";
-		$this->db->execute($sql);
-		return $this->db->select($sql);
+		//$offset = $limit = $order = $group = $where = $having = $left = $right = $inner = $join = '';
+		$sequence = array('join', 'left', 'inner', 'right', 'where', 'group', 'having', 'order', 'limit', 'offset');
+		return $this->select($this->getBySort($sequence, $param), $this->getField($field));
 	}
 
+	/**
+	 * 根据关键字顺序组合
+	 * @param array $sequence
+	 * @param array|string $param
+	 * @return string
+	 */
+	protected function getBySort(array $sequence, $param) {
+		if (!is_array($param) || empty($param)) {
+			return $param;
+		}
+		$sql = '';
+		foreach ($sequence as $item) {
+			if (!isset($param[$item]) || empty($param[$item])) {
+				continue;
+			}
+			$method = 'get'.ucfirst($item);
+			$sql .= ' '.$this->$method($param[$item]);
+		}
+		return $sql;
+	}
+
+	/**
+	 * @param string $param ALL|null
+	 * @return string
+	 */
+	protected function getUnion($param) {
+		return 'UNION '.$param;
+	}
+
+	protected function getHaving($param) {
+		return 'Having '.$this->getCondition($param);
+	}
+
+	/**
+	 * 合并where 或 having 的条件
+	 * @param array|string $param
+	 */
+	protected function getCondition($param) {
+		if (is_string($param)) {
+			return $param;
+		}
+		$sql = '';
+		foreach ($param as $value) {
+			if (is_array($value)) {
+				switch ($value[1]) {
+					case 'or':
+						$sql .= ' OR '.$value[0];
+						break;
+					case 'and':
+						$sql .= ' AND '.$value[0];
+						break;
+				}
+			} else {
+				$sql .= ' AND '.$value;
+			}
+		}
+		return substr($sql, 4);
+	}
+
+	protected function getWhere($param) {
+		return 'WHERE '.$this->getCondition($param);
+	}
+
+	protected function getLeft(array $param) {
+		return 'LEFT '.$this->getJoin($param);
+	}
+
+	protected function getInner(array $param) {
+		return 'INNER '.$this->getJoin($param);
+	}
+
+	protected function getRight(array $param) {
+		return 'RIGHT '.$this->getJoin($param);
+	}
+
+	protected function getJoin(array $param) {
+		return "JOIN {$param[0]} ON {$param[1]}";
+	}
+
+	/**
+	 * @param array|string $param
+	 * 关键字 DISTINCT 唯一 AVG() COUNT() FIRST() LAST() MAX()  MIN() SUM() UCASE() 大写  LCASE()
+	 * MID(column_name,start[,length]) 提取字符串 LEN() ROUND() 舍入 NOW() FORMAT() 格式化
+	 * @return string
+	 */
+	protected function getField($param) {
+		if (empty($param)) {
+			return '*';
+		}
+		$result = '';
+		foreach ((array)$param as $key => $item) {
+			if (is_integer($key)) {
+				$result .= $item .',';
+			} else {
+				$result .= "{$item} AS {$key},";
+			}
+		}
+		return substr($result, 0, -1);
+	}
+
+	protected function getGroup($param) {
+		return 'GROUP BY '.implode(',', (array)$param);
+	}
+
+	protected function getOrder($param) {
+		if (is_string($param)) {
+			return 'ORDER BY '.$param;
+		}
+		$result = 'ORDER BY ';
+		foreach ($param as $item) {
+			if (is_array($item)) {
+				$result .= $item[0] .' '.strtoupper($item[1]).',';
+			} else {
+				$result .= $item.',';
+			}
+		}
+		return substr($result, 0, -1);
+	}
+
+	protected function getLimit($param) {
+		$param = (array)$param;
+		if (count($param) == 1) {
+			return "LIMIT {$param[0]}";
+		}
+		return "LIMIT {$param[0]},{$param[1]}";
+	}
+
+	protected function getOffset($param) {
+		return "OFFSET {$param}";
+	}
 	 
 	/**
 	 * 总记录
@@ -257,33 +316,8 @@ abstract class Model {
 	 * @return int 返回总数,
 	 */
 	public function count($param = array(), $field = 'id') {
-		$where = '';
-		if (empty($param)) {
-
-		} elseif (is_array($param)) {
-			foreach ($param as $value) {
-				$where .= $value.' AND ';
-			}
-			$where = 'WHERE '.substr($where, 0, -4);
-		} elseif(is_string($param)) {
-			$where = 'WHERE '.$param;
-		}
-		$sql  = "SELECT COUNT({$field}) as count FROM {$this->table} $where";
-		$result = $this->db->select($sql);
+		$result = $this->select($this->getWhere($param), "COUNT({$field}) AS count");
 		return $result[0]['count'];
-	}
-	 
-	/**
-	 * 得到下一个id
-	 *
-	 * @access public
-	 *
-	 * @return string 返回id,
-	 */
-	public function nextId() {
-		$sql  = "SHOW TABLE STATUS LIKE '{$this->table}'";
-		$stmt = $this->db->execute($sql);
-		return $stmt->fetchObject()->Auto_increment;
 	}
 	
 	/**
@@ -305,7 +339,36 @@ abstract class Model {
 		}
 		return $this->db->getObject($sql);
 	}
-	
+
+	/**
+	 * 拷贝（未实现）
+	 */
+	public function copy() {
+		return $this->select(null, '* INTO table in db');
+	}
+
+	/**
+	 * @param $sql
+	 * @param string $field
+	 * @param array $parameters
+	 * @return mixed
+	 */
+	public function select($sql, $field = '*', $parameters = array()) {
+		return $this->db->getArray("SELECT {$field} FROM {$this->table} {$sql}", $parameters);
+	}
+
+	public function insert($columns, $tags, $parameters = array()) {
+		return $this->db->insert("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
+	}
+
+	public function update($columns, $where, $parameters = array()) {
+		return $this->db->update("UPDATE {$this->table} SET {$columns} WHERE {$where}", $parameters);
+	}
+
+	public function delete($where, $parameters = array()) {
+		return $this->db->delete("DELETE FROM {$this->table} WHERE {$where}", $parameters);
+	}
+
 	/**
 	 * 获取错误信息
 	 */

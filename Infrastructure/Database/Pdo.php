@@ -9,7 +9,17 @@ use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\EventManager\EventManger;
 
 class Pdo extends Database {
-	
+
+	/**
+	 * @var \PDO
+	 */
+	protected $driver = null;
+
+	/**
+	 * @var \PDOStatement
+	 */
+	protected $result;
+
 	protected function connect() {
 		try {
 			//$this->driver = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
@@ -59,13 +69,13 @@ class Pdo extends Database {
 	public function bind(array $param) {
 		foreach ($param as $key => $value) {
 			if (is_null($value)) {
-				$type = PDO::PARAM_NULL;
+				$type = \PDO::PARAM_NULL;
 			} else if (is_bool($value)) {
-				$type = PDO::PARAM_BOOL;
+				$type = \PDO::PARAM_BOOL;
 			} else if (is_int($value)) {
-				$type = PDO::PARAM_INT;
+				$type = \PDO::PARAM_INT;
 			} else {
-				$type = PDO::PARAM_STR;
+				$type = \PDO::PARAM_STR;
 			}
 			$this->result->bindParam(is_int($key) ? ++$key : $key, $value, $type);
 		}
@@ -112,8 +122,8 @@ class Pdo extends Database {
 	 * @param string $sql
 	 * @return object
 	 */
-	public function getObject($sql = null) {
-		$this->execute($sql);
+	public function getObject($sql = null, $parameters = array()) {
+		$this->execute($sql, $parameters);
 		$result = array();
 		while (!!$objs = $this->result->fetchObject()) {
 			$result[] = $objs;
@@ -125,8 +135,8 @@ class Pdo extends Database {
 	 * 获取关联数组
 	 * @param string $sql
 	 */
-	public function getArray($sql = null) {
-		$this->execute($sql);
+	public function getArray($sql = null, $parameters = array()) {
+		$this->execute($sql, $parameters);
 		return $this->result->fetchAll(\PDO::FETCH_ASSOC);
 	}
 }

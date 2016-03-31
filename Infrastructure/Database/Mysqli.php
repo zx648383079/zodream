@@ -7,7 +7,17 @@ namespace Zodream\Infrastructure\Database;
 */
 
 class Mysqli extends Database {
-	
+
+	/**
+	 * @var \mysqli
+	 */
+	protected $driver = null;
+
+	/**
+	 * @var \mysqli_stmt
+	 */
+	protected $result;
+
 	/**
 	 * 连接数据库
 	 *
@@ -36,39 +46,28 @@ class Mysqli extends Database {
 	
 	/**
 	 * 预处理
-	 * @param unknown $sql
-	 */
+	 * @param string $sql
+*/
 	public function prepare($sql) {
 		$this->result = $this->driver->prepare($sql);
 	}
 	
 	/**
-	 * 绑定值
-	 * @param unknown $param
+	 * 绑定值 只支持 ？ 绑定
+	 * @param array $param
 	 */
-	public function bind($param) {
-		foreach ($param as $key => $value) {
-			$this->result->bindParam($key, $value);
-		}
-	}
-	
-	/**
-	 * 得到当前执行语句的错误信息
-	 *
-	 * @access public
-	 *
-	 * @return string 返回错误信息,
-	 */
-	public function getError() {
-		return $this->error;
+	public function bind(array $param) {
+		$ref    = new \ReflectionClass('mysqli_stmt');
+		$method = $ref->getMethod("bind_param");
+		$method->invokeArgs($this->result, $param);
 	}
 	
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
-	 * @return multitype:mixed
+	 * @return object
 	 */
-	public function getObject($sql = null) {
+	public function getObject($sql = null, $parameters = array()) {
 		$this->execute($sql);
 		$result = array();
 		while (!!$objs = mysqli_fetch_object($this->result) ) {
@@ -81,7 +80,7 @@ class Mysqli extends Database {
 	 * 获取关联数组
 	 * @param string $sql
 	 */
-	public function getArray($sql = null) {
+	public function getArray($sql = null, $parameters = array()) {
 		$this->execute($sql);
 		$result = array();
 		while (!!$objs = mysqli_fetch_assoc($this->result) ) {
@@ -117,31 +116,13 @@ class Mysqli extends Database {
 	 *
 	 * @param string $sql 多行查询语句
 	 */
-	public function execute($sql) {
+	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {
-			return;
+			return null;
 		}
-		$this->result = $this->driver->query($sql);
-		return $this->result;
-	}
-	
-	/**
-	 * 预执行SQL语句，并绑定值  ？
-	 *
-	 * @access public
-	 *
-	 * @param string $sql SQL语句
-	 * @param array $param 参数
-	 */
-	public function prepare($sql, $param) {
-		$this->result = mysqli_prepare($this->driver, $sql);
-		mysqli_stmt_bind_param($this->result, $param );
-		mysqli_stmt_execute($this->result);
-		mysqli_stmt_bind_result($this->result, $district);
-		mysqli_stmt_fetch($this->result);
-		printf("%s is in district %s\n", $city, $district);
-		mysqli_stmt_close($this->result);
-		$this->close();
+		$this->prepare($sql);
+		$this->bind($parameters);
+		return $this->result->execute();
 	}
 	
 	/**

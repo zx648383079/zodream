@@ -1,5 +1,7 @@
 <?php 
 namespace Zodream\Infrastructure\Database;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+
 /**
 * mysql 
 * 
@@ -36,9 +38,9 @@ class Mysql extends Database {
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
-	 * @return multitype:mixed
+	 * @return object
 	 */
-	public function getObject($sql = null) {
+	public function getObject($sql = null, $parameters = array()) {
 		$this->execute($sql);
 		$result = array();
 		while (!!$objs = mysql_fetch_object($this->result) ) {
@@ -51,7 +53,7 @@ class Mysql extends Database {
 	 * 获取关联数组
 	 * @param string $sql
 	 */
-	public function getArray($sql = null) {
+	public function getArray($sql = null, $parameters = array()) {
 		$this->execute($sql);
 		$result = array();
 		while (!!$objs = mysql_fetch_assoc($this->result) ) {
@@ -77,10 +79,12 @@ class Mysql extends Database {
 	 *
 	 * @param string $sql 多行查询语句
 	 */
-	public function execute($sql)
-	{
+	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {
-			return;
+			return null;
+		}
+		foreach ($parameters as $key => $item) {
+			StringExpand::bindParam($sql, $key + 1, $item, is_numeric($item) ? 'INT' : 'STR');
 		}
 		$this->result = mysql_query($sql, $this->driver);
 		return $this->result;

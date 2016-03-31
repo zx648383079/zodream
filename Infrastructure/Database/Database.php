@@ -49,15 +49,14 @@ abstract class Database {
 	public function getDriver() {
 		return $this->driver;
 	}
-	
 
 	/**
 	 * 查询
 	 * @param string $sql
 	 * @return array
 	 */
-	public function select($sql) {
-		return $this->getArray($sql);
+	public function select($sql, $parameters = array()) {
+		return $this->getArray($sql, $parameters);
 	}
 	
 	/**
@@ -65,8 +64,8 @@ abstract class Database {
 	 * @param string $sql
 	 * @return integer id
 	 */
-	public function insert($sql) {
-		$this->execute($sql);
+	public function insert($sql, $parameters = array()) {
+		$this->execute($sql, $parameters);
 		return $this->lastInsertId();
 	}
 	
@@ -75,8 +74,8 @@ abstract class Database {
 	 * @param string $sql
 	 * @return integer 改变的行数
 	 */
-	public function update($sql){
-		$this->execute($sql);
+	public function update($sql, $parameters = array()){
+		$this->execute($sql, $parameters);
 		return $this->rowCount();
 	}
 	
@@ -85,8 +84,8 @@ abstract class Database {
 	 * @param string $sql
 	 * @return integer 删除的行数
 	 */
-	public function delete($sql) {
-		$this->execute($sql);
+	public function delete($sql, $parameters = array()) {
+		$this->execute($sql, $parameters);
 		return $this->rowCount();
 	}
 	
@@ -106,13 +105,13 @@ abstract class Database {
 	 * @param string $sql
 	 * @return mixed
 	 */
-	abstract public function getObject($sql);
+	abstract public function getObject($sql, $parameters = array());
 	
 	/**
 	 * 获取关联数组
 	 * @param string $sql
 	 */
-	abstract public function getArray($sql);
+	abstract public function getArray($sql, $parameters = array());
 	
 	abstract public function execute($sql = null, $parameters = array());
 	

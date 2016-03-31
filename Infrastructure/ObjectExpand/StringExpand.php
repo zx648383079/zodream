@@ -10,6 +10,43 @@ use Zodream\Infrastructure\Error;
 class StringExpand {
 
 	/**
+	 * 绑定值
+	 * @param string $sql
+	 * @param int $location ? 的位置
+	 * @param string|int $var 值
+	 * @param string $type 值得类型
+	 */
+	public static function bindParam(&$sql, $location, $var, $type) {
+		switch (strtoupper($type)) {
+			//字符串
+			default:                    //默认使用字符串类型
+			case 'ENUM':
+			case 'TEXT':
+			case 'STR':
+			case 'STRING' :
+				$var = "'".addslashes($var)."'";      //加上单引号.SQL语句中字符串插入必须加单引号
+				break;
+			case 'INTEGER' :
+			case 'INT' :
+				$var = (int)$var;         //强制转换成int
+				break;
+			case 'BOOL':
+			case 'BOOLEAN':
+				$var = $var ? 1 : 0;
+				break;
+			case 'NULL':
+				$var = 'NULL';
+				break;
+		}
+		//寻找问号的位置
+		for ($i=1, $pos = 0; $i<= $location; $i++) {
+			$pos = strpos($sql, '?', $pos+1);
+		}
+		//替换问号
+		$sql = substr($sql, 0, $pos) . $var . substr($sql, $pos + 1);
+	}
+
+	/**
 	 * 生成更加真实的随机字符串
 	 *
 	 * @param  int  $length
