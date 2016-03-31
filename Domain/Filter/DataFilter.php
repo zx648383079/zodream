@@ -81,6 +81,7 @@ class DataFilter {
     		foreach ($value as $val) {
     			$result = $val->validate(isset($args[$key]) ? $args[$key] : null, $args) ? $result : false;
     		}
+
     		$results[$key] = $result;
     	}
     	return $results;
@@ -97,7 +98,7 @@ class DataFilter {
     }
     
     private static function _sqlitKeyAndFilters($option) {
-    	$option = explode(';', $option);
+    	$options = explode(';', $option);
     	$results = array();
     	foreach ($options as $key => $value) {
     		$temp = explode(',', $value, 2);

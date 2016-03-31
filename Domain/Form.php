@@ -3,6 +3,7 @@ namespace Zodream\Domain;
 
 use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Traits\AjaxTrait;
 use Zodream\Infrastructure\Traits\ViewTrait;
 abstract class Form {
 
@@ -13,7 +14,7 @@ abstract class Form {
 		'其他错误！'
 	);
 
-	use ViewTrait;
+	use ViewTrait, AjaxTrait;
 	/**
 	 * 验证POST数据
 	 * @param string $args

@@ -8,11 +8,8 @@
 namespace Zodream\Domain\Filter\Filters;
 
 use Zodream\Infrastructure\DomainObject\FilterObject;
-
 class RequiredFilter extends FilterObject {
-
-    public function validate($arg)
-    {
-        return $arg !== null || trim($arg) !== '';
+    public function validate($arg) {
+        return $arg !== null && trim($arg) !== '';
     }
 }

@@ -182,7 +182,10 @@ abstract class Model {
 	 * @return string
 	 */
 	protected function getBySort(array $sequence, $param) {
-		if (!is_array($param) || empty($param)) {
+		if (empty($param)) {
+			return null;
+		}
+		if (!is_array($param)) {
 			return $param;
 		}
 		$sql = '';
@@ -205,6 +208,9 @@ abstract class Model {
 	}
 
 	protected function getHaving($param) {
+		if (empty($param)) {
+			return null;
+		}
 		return 'Having '.$this->getCondition($param);
 	}
 
@@ -235,6 +241,9 @@ abstract class Model {
 	}
 
 	protected function getWhere($param) {
+		if (empty($param)) {
+			return null;
+		}
 		return 'WHERE '.$this->getCondition($param);
 	}
 
