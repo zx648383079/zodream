@@ -126,12 +126,12 @@ class Route {
 		if ($class !== false) {
 			return array($class, $action);
 		}
-		
-		if (count($args) == 1 && $action = 'index') {
+
+		if (count($args) == 1 && 'index' == $action) {
 			$this->_class[0] = 'Home';
 			return array('Service\\'.APP_MODULE.'\\Home'.APP_CONTROLLER, strtolower($args[0]));
 		}
-		
+
 		$args[] = $action;
 		$class = $this->existController($args);
 		if ($class !== false) {

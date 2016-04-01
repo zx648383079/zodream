@@ -12,7 +12,9 @@ use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 class Error{
 
 	public static function outByError($errno, $errstr, $errfile, $errline) {
-		error_clear_last();
+		if (function_exists('error_clear_last')) {
+			error_clear_last();
+		}
 		self::out($errstr, $errfile, $errline);
 	}
 

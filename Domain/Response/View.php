@@ -23,7 +23,8 @@ class View extends MagicObject {
 	
 	protected $assetDir = 'assets/';
 
-	protected $viewDir = APP_DIR.'/UserInterface/'.APP_MODULE;
+	//APP_DIR . '/UserInterface/' . APP_MODULE
+	protected $viewDir;
 
 	protected $suffix = '.php';
 

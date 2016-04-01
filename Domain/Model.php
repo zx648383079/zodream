@@ -8,6 +8,7 @@ namespace Zodream\Domain;
 use Zodream\Domain\Filter\SqlFilter;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 abstract class Model {
 	/**
@@ -20,14 +21,22 @@ abstract class Model {
 	protected $fillAble = array();
 	
 	protected $prefix;
+
+	protected $sequence = array('join', 'left', 'inner', 'right', 'where', 'group', 'having', 'order', 'limit', 'offset');
 	
 	public function __construct() {
 		$configs = Config::getInstance()->get('db');
 		$this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);
 		$this->prefix = $configs['prefix'];
 		if (isset($this->table)) {
-			$this->table = $this->prefix. $this->table;
+			$this->setTable($this->table);
 		}
+	}
+
+	public function setTable($table) {
+		$table = StringExpand::firstReplace($table, $this->prefix, null);
+		$this->table = $this->prefix. $table;
+		return $this;
 	}
 
 	/**
@@ -170,9 +179,7 @@ abstract class Model {
 	 * @return array 返回查询结果,
 	 */
 	public function find($param = array(), $field = array()) {
-		//$offset = $limit = $order = $group = $where = $having = $left = $right = $inner = $join = '';
-		$sequence = array('join', 'left', 'inner', 'right', 'where', 'group', 'having', 'order', 'limit', 'offset');
-		return $this->select($this->getBySort($sequence, $param), $this->getField($field));
+		return $this->select($this->getBySort($param), $this->getField($field));
 	}
 
 	/**
@@ -181,7 +188,7 @@ abstract class Model {
 	 * @param array|string $param
 	 * @return string
 	 */
-	protected function getBySort(array $sequence, $param) {
+	protected function getBySort($param) {
 		if (empty($param)) {
 			return null;
 		}
@@ -189,7 +196,7 @@ abstract class Model {
 			return $param;
 		}
 		$sql = '';
-		foreach ($sequence as $item) {
+		foreach ($this->sequence as $item) {
 			if (!isset($param[$item]) || empty($param[$item])) {
 				continue;
 			}
@@ -325,8 +332,25 @@ abstract class Model {
 	 * @return int 返回总数,
 	 */
 	public function count($param = array(), $field = 'id') {
-		$result = $this->select($this->getWhere($param), "COUNT({$field}) AS count");
+		$result = $this->select($this->getWhere($param). ' LIMIT 1', "COUNT({$field}) AS count");
+		if (empty($result)) {
+			return null;
+		}
 		return $result[0]['count'];
+	}
+
+	/**
+	 * 获取第一行第一列
+	 * @param array|string $param
+	 * @param string $filed
+	 * @return bool|mixed
+	 */
+	public function scalar($param, $filed = '*') {
+		$result = $this->select($this->getBySort($param), $filed);
+		if (empty($result)) {
+			return false;
+		}
+		return current($result[0]);
 	}
 	
 	/**
