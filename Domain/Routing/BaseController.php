@@ -53,7 +53,7 @@ abstract class BaseController {
 			if ( isset( $vars[ $param->getName() ] ) ) {
 				$arguments[] = $vars[ $param->getName() ];
 			} else {
-				$arguments[] = Request::getInstance()->get($param->getName());
+				$arguments[] = Request::get($param->getName());
 			}
 		}
 		EventManger::getInstance()->run('runController', $arguments);

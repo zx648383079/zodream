@@ -67,7 +67,7 @@ class Language {
 	 */
 	public static function getLang() {
 		if (empty(self::$language)) {
-			$language = Request::getInstance()->server('HTTP_ACCEPT_LANGUAGE', 'ZH-CN');
+			$language = Request::server('HTTP_ACCEPT_LANGUAGE', 'ZH-CN');
 			preg_match_all ( "/[\w-]+/", $language, $language );
 			self::$language = $language [0] [0];
 		}

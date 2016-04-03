@@ -21,7 +21,7 @@ class MagicObject implements \ArrayAccess {
 		if (empty($key)) {
 			return $this->_data;
 		}
-		if (array_key_exists($key, $this->_data)) {
+		if ($this->has($key)) {
 			return $this->_data[$key];
 		}
 		$result = ArrayExpand::getChild($key, $this->_data, is_object($default) ? null : $default);
@@ -63,7 +63,7 @@ class MagicObject implements \ArrayAccess {
 	 * @param string $key
 	 */
 	public function has($key) {
-		return isset($this->_data[$key]);
+		return array_key_exists($key, $this->_data);
 	}
 	
 	public function __get($key) {

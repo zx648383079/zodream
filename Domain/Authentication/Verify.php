@@ -48,7 +48,7 @@ class Verify {
 				}
 				break;
 			case 'p':
-				if (!Request::getInstance()->isPost()) {
+				if (!Request::isPost()) {
 					Redirect::to('/', 4, '您不能直接访问此页面！', '400');
 					return false;
 				}

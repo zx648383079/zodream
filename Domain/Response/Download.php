@@ -28,7 +28,7 @@ class Download {
 		}
 		ResponseResult::sendContentDisposition($iefilename);
 		ResponseResult::sendAcceptRanges();
-		$range = Request::getInstance()->server('HTTP_RANGE');
+		$range = Request::server('HTTP_RANGE');
 		$value = 0;
 		//如果有$_SERVER['HTTP_RANGE']参数
 		if(null !== $range) {

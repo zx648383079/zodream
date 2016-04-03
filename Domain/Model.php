@@ -33,9 +33,17 @@ abstract class Model {
 		}
 	}
 
+	protected function addPrefix($table) {
+		return $this->prefix. StringExpand::firstReplace($table, $this->prefix, null);
+	}
+
 	public function setTable($table) {
-		$table = StringExpand::firstReplace($table, $this->prefix, null);
-		$this->table = $this->prefix. $table;
+		$this->table = $this->addPrefix($table);
+		return $this;
+	}
+
+	public function changedDatabase($database) {
+		$this->db->execute('use '.$database);
 		return $this;
 	}
 
@@ -135,7 +143,7 @@ abstract class Model {
 	 */
 	public function findOne($param, $filed = '*') {
 		$result = $this->select("{$this->getWhere($param)} LIMIT 1", $filed);
-		return array_shift($result);
+		return current($result);
 	}
 	
 	/**
@@ -146,7 +154,7 @@ abstract class Model {
 	 */
 	public function findById($id, $filed = '*') {
 		$result = $this->select("WHERE id = {$id} LIMIT 1", $filed);
-		return array_shift($result);
+		return current($result);
 	}
 	 
 	/**
@@ -267,7 +275,7 @@ abstract class Model {
 	}
 
 	protected function getJoin(array $param) {
-		return "JOIN {$param[0]} ON {$param[1]}";
+		return 'JOIN '.$this->addPrefix($param[0]).' ON '.$param[1];
 	}
 
 	/**

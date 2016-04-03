@@ -31,7 +31,7 @@ abstract class Form {
 	 * @return bool|mixed
 	 */
 	public function runAction($action) {
-		if (!Request::getInstance()->isPost()) {
+		if (!Request::isPost()) {
 			return false;
 		}
 		if (!method_exists($this, $action)) {

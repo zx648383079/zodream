@@ -13,7 +13,7 @@ class Cookie {
 	 * @param string $default
 	 */
 	public static function get($key, $default = NULL) {
-		 return Request::getInstance()->cookie($key, $default);
+		 return Request::cookie($key, $default);
 	}
 	
 	/**

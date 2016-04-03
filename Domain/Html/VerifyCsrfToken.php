@@ -21,7 +21,7 @@ class VerifyCsrfToken {
 	 * 验证
 	 */
 	public static function verify() {
-		if (self::get() === Request::getInstance()->input('csrf')) {
+		if (self::get() === Request::request('csrf')) {
 			return;
 		}
 		Error::out('Csrf验证失败！', __FILE__, __LINE__);

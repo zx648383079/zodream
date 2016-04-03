@@ -75,6 +75,16 @@ class Config extends MagicObject {
 	}
 
 	/**
+	 * 静态方法获取
+	 * @param null $key
+	 * @param null $default
+	 * @return array|string
+	 */
+	public static function getValue($key = null, $default = null) {
+		return static::getInstance()->get($key, $default);
+	}
+
+	/**
 	 *
 	 * @param string $method
 	 * @param array $value

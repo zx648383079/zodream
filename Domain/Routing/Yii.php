@@ -6,7 +6,7 @@ use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\Request;
 class Yii implements RouteObject {
 	public static function get() {
-		return Request::getInstance()->get('r', 'home/index');
+		return Request::get('r', 'home/index');
 	}
 	
 	public static function to($file) {

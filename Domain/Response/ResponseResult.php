@@ -10,7 +10,7 @@ class ResponseResult {
 	 */
 	public static function prepare($type = 'html', $status = 200) {
 		if ((!defined('DEBUG') || !DEBUG) &&(!defined('APP_GZIP') || APP_GZIP) && extension_loaded('zlib')) {
-			if (!headers_sent() && strpos(Request::getInstance()->server('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== FALSE) {
+			if (!headers_sent() && strpos(Request::server('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== FALSE) {
 				ob_start('ob_gzhandler');
 			} else {
 				ob_start();
@@ -172,7 +172,7 @@ class ResponseResult {
 	 * @param unknown $filename
 	 */
 	public static function sendContentDisposition($filename) {
-		if (strstr(Request::getInstance()->server('HTTP_USER_AGENT'), 'MSIE')) {     //如果是IE浏览器
+		if (strstr(Request::server('HTTP_USER_AGENT'), 'MSIE')) {     //如果是IE浏览器
 			$filename = preg_replace('/\./', '%2e', $filename, substr_count($filename, '.') - 1);
 		}
 		header('Content-Disposition: attachment; filename="'.$filename.'"');

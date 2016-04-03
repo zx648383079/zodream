@@ -175,7 +175,7 @@ class PageLink {
 	 * @return int
 	 */
 	private function _setPage() {
-		$this->_page = Request::getInstance()->get($this->_pageParam, 1);
+		$this->_page = Request::get($this->_pageParam, 1);
 		if ($this->_page < 0) {
 			$this->_page = 1;
 		}

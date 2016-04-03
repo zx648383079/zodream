@@ -94,7 +94,7 @@ class Route {
 			if ( isset( $vars[ $param->getName() ] ) ) {
 				$arguments[] = $vars[ $param->getName() ];
 			} else {
-				$arguments[] = Request::getInstance()->get($param->getName());
+				$arguments[] = Request::get($param->getName());
 			}
 		}
 		return call_user_func_array(array(new $class, $action), $arguments);

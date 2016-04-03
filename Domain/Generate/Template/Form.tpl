@@ -11,10 +11,10 @@ class {form} extends Form {
 	}
 	
 	public function set() {
-		if (!Request::getInstance()->isPost()) {
+		if (!Request::isPost()) {
 			return ;
 		}
-		$data = Request::getInstance()->post('{colums}');
+		$data = Request::post('{colums}');
 		if (!$this->validate($data, array(
 {data}
 		))) {

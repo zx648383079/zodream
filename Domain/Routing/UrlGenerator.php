@@ -11,7 +11,7 @@ class UrlGenerator {
 	 * @return string|bool 网址
 	 */
 	public static function referer() {
-		return Request::getInstance()->server('HTTP_REFERER');
+		return Request::server('HTTP_REFERER');
 	}
 	
 	/**
@@ -73,19 +73,19 @@ class UrlGenerator {
 	public static function getRoot($withScript = TRUE) {
 		$args = parse_url(self::getUri());
 		$root = '';
-		$secret = Request::getInstance()->server('HTTPS');
+		$secret = Request::server('HTTPS');
 		if (empty($secret) || 'off' === strtolower($secret)) {
 			$root = 'http';
 		} else {
 			$root = 'https';
 		}
-		$root .= '://'.Request::getInstance()->server('HTTP_HOST');
-		$port = Request::getInstance()->server('SERVER_PORT');
+		$root .= '://'.Request::server('HTTP_HOST');
+		$port = Request::server('SERVER_PORT');
 		if (!empty($port) && $port != 80) {
 			$root .= ':'.$port;
 		}
 		$root .= '/';
-		$self = Request::getInstance()->server('script_name');
+		$self = Request::server('script_name');
 		if ($self !== '/index.php' && $withScript) {
 			$root .= ltrim($self, '/');
 		}
@@ -140,16 +140,16 @@ class UrlGenerator {
 	 */
 	public static function getUri() {
 		$uri         = '';
-		$requestUri = Request::getInstance()->server('REQUEST_URI');
+		$requestUri = Request::server('REQUEST_URI');
 		if (!is_null($requestUri)) {
 			$uri = $requestUri;
 		} else {
-			$argv = Request::getInstance()->server('argv');
-			$self = Request::getInstance()->server('PHP_SELF');
+			$argv = Request::server('argv');
+			$self = Request::server('PHP_SELF');
 			if (!is_null($argv)) {
 				$uri = $self .'?'. $argv[0];
 			} else {
-				$uri = $self .'?'. Request::getInstance()->server('QUERY_STRING');
+				$uri = $self .'?'. Request::server('QUERY_STRING');
 			}
 		}
 		return $uri;
