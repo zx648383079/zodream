@@ -8,10 +8,11 @@ namespace Zodream\Domain\Image;
 class ThumbImage extends Image {
 	/**
 	 * 缩率图
-	 * @param string  $output     缩率之后存储的图片
-	 * @param int     $thumbWidth  缩率图宽度
-	 * @param int     $thumbHeight 缩率图高度
-	 * @param int     $auto   那种方式进行缩略处理
+	 * @param string $output 缩率之后存储的图片
+	 * @param int $thumbWidth 缩率图宽度
+	 * @param int $thumbHeight 缩率图高度
+	 * @param bool|int $auto 那种方式进行缩略处理
+	 * @return string
 	 */
 	public function thumb($output, $thumbWidth = 0, $thumbHeight = 0, $auto = TRUE){
 		$width = $this->getWidth();

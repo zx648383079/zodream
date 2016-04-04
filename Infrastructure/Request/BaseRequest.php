@@ -11,6 +11,7 @@ abstract class BaseRequest extends MagicObject {
     /**
      * 格式化
      * @param array|string $data
+     * @return array|string
      */
     protected function _clean($data) {
         if (is_array($data)) {

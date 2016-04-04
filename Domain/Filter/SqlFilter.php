@@ -31,12 +31,13 @@ class SqlFilter {
 	public function __construct($prefix = NULL) {
 		$this->prefix = $prefix;
 	}
+
 	/**
 	 * 根据数组获取SQL语句
 	 *
 	 * @access public
 	 *
-	 * @param array $arr 要操作的数组.
+	 * @param array $param 要操作的数组.
 	 * @param boolean $sort 是否先进行排序.
 	 * @return array 返回排序的数组,
 	 */
@@ -155,11 +156,12 @@ class SqlFilter {
 		}
 		return $this;
 	}
-	
+
 	/**
 	 * 当长度为null是，把第一个参数作为长度
 	 * @param int $start
 	 * @param int $length
+	 * @return $this
 	 */
 	public function limit($start, $length = null) {
 		$this->limit = $start;
@@ -259,7 +261,7 @@ class SqlFilter {
 	
 		return $result;
 	}
-	
+
 	/**
 	 * SQL关键字检测
 	 *
@@ -267,6 +269,8 @@ class SqlFilter {
 	 *
 	 * @param string|array $value 要检查的语句或数组.
 	 * @param string $link 数组之间的连接符.
+	 * @param string $pre
+	 * @param string $end
 	 * @return string 返回拼接的语句,
 	 */
 	private function sqlCheck($value, $link = ' ', $pre = null, $end = null) {

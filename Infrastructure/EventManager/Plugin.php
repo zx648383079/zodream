@@ -56,13 +56,13 @@ class Plugin extends MagicObject{
 			}
 		} while ( next($plugins) !== false );
 	}
-	
+
 	/**
 	 * 添加插件
 	 * @param string $key 关键字
 	 * @param string|object $arg 方法
-	 * @param boolean $before 是否放到最前 默认false 
-	 * @param number $accept 接受的值
+	 * @param boolean $before 是否放到最前 默认false
+	 * @param integer $accept 接受的值
 	 */
 	public function add($key, $arg, $before = FALSE, $accept = 1) {
 		$plugin = array(

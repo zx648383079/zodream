@@ -32,7 +32,10 @@ class Image{
 	protected $type;
 	
 	protected $realType;
-	
+
+	/**
+	 * @var resource
+	 */
 	public $image;
 	
 	public function __construct($file = null) {
@@ -100,14 +103,14 @@ class Image{
 				$this->getHeight()
 		);
 	}
-	
+
 	/**
 	 * 获取文字转化成图片的尺寸
-	 * @param unknown $text
-	 * @param number $fontSize
-	 * @param number $angle 角度
-	 * @param unknown $fontFamily
-	 * @return number[] [宽, 高]
+	 * @param string $text
+	 * @param int $fontSize
+	 * @param int $angle 角度
+	 * @param int|string $fontFamily
+	 * @return \number[] [宽, 高]
 	 */
 	public function getTextSize($text, $fontSize = 16, $angle = 0, $fontFamily = 5) {
 		$textInfo = imagettfbbox($fontSize, $angle, $fontFamily, $text);
@@ -175,16 +178,16 @@ class Image{
 		}
 		return $hash;
 	}
-	
+
 	/**
 	 * 复制图片的一部分
 	 * @param Image $srcImage
-	 * @param number $srcX
-	 * @param number $srcY
-	 * @param number $x
-	 * @param number $y
-	 * @param number $srcWidth 如果是0则取原图的宽
-	 * @param number $srcHeight 如果是0则取原图的高
+	 * @param int $srcX
+	 * @param int $srcY
+	 * @param int $x
+	 * @param int $y
+	 * @param int $srcWidth 如果是0则取原图的宽
+	 * @param int $srcHeight 如果是0则取原图的高
 	 */
 	public function copyFrom(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0) {
 		if (empty($srcWidth)) {
@@ -195,17 +198,17 @@ class Image{
 		}
 		imagecopy($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight);
 	}
-	
+
 	/**
 	 * 从。。。复制一部分图片并融入本图片
 	 * @param Image $srcImage
-	 * @param number $x
-	 * @param number $y
-	 * @param number $opacity 透明度 0-100
-	 * @param number $srcX
-	 * @param number $srcY
-	 * @param number $srcWidth
-	 * @param number $srcHeight
+	 * @param int $x
+	 * @param int $y
+	 * @param int $opacity 透明度 0-100
+	 * @param int $srcX
+	 * @param int $srcY
+	 * @param int $srcWidth
+	 * @param int $srcHeight
 	 */
 	public function copyAndMergeFrom(Image $srcImage, $x = 0, $y = 0, $opacity = 50, $srcX = 0, $srcY = 0, $srcWidth = 0, $srcHeight = 0) {
 		if (empty($srcWidth)) {
@@ -216,17 +219,17 @@ class Image{
 		}
 		imagecopymerge($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight, $opacity);
 	}
-	
+
 	/**
 	 * 用灰度从。。。复制一部分图片并融入本图片
 	 * @param Image $srcImage
-	 * @param number $x
-	 * @param number $y
-	 * @param number $opacity 透明度 0-100
-	 * @param number $srcX
-	 * @param number $srcY
-	 * @param number $srcWidth
-	 * @param number $srcHeight
+	 * @param int $x
+	 * @param int $y
+	 * @param int $opacity 透明度 0-100
+	 * @param int $srcX
+	 * @param int $srcY
+	 * @param int $srcWidth
+	 * @param int $srcHeight
 	 */
 	public function copyAndMergeFromWithGray(Image $srcImage, $x = 0, $y = 0, $opacity = 50, $srcX = 0, $srcY = 0, $srcWidth = 0, $srcHeight = 0) {
 		if (empty($srcWidth)) {
@@ -237,18 +240,18 @@ class Image{
 		}
 		imagecopymergegray($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight, $opacity);
 	}
-	
+
 	/**
 	 * 使用重绘复制并调整图片的一部分
-	 * @param Image $srcImage  本图
-	 * @param number $srcX
-	 * @param number $srcY
-	 * @param number $x
-	 * @param number $y
-	 * @param number $srcWidth 如果是0则取原图的宽
-	 * @param number $srcHeight 如果是0则取原图的高
-	 * @param number $width 如果是0则取本图的宽
-	 * @param number $height 如果是0则取本图的高
+	 * @param Image $srcImage 本图
+	 * @param int $srcX
+	 * @param int $srcY
+	 * @param int $x
+	 * @param int $y
+	 * @param int $srcWidth 如果是0则取原图的宽
+	 * @param int $srcHeight 如果是0则取原图的高
+	 * @param int $width 如果是0则取本图的宽
+	 * @param int $height 如果是0则取本图的高
 	 */
 	public function copyFromWithResampling(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0, $width = 0, $height = 0) {
 		if (empty($srcWidth)) {
@@ -265,18 +268,18 @@ class Image{
 		}
 		imagecopyresampled($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
 	}
-	
+
 	/**
 	 * 复制并调整图片的一部分
-	 * @param Image $srcImage  本图
-	 * @param number $srcX
-	 * @param number $srcY
-	 * @param number $x
-	 * @param number $y
-	 * @param number $srcWidth 如果是0则取原图的宽
-	 * @param number $srcHeight 如果是0则取原图的高
-	 * @param number $width 如果是0则取本图的宽
-	 * @param number $height 如果是0则取本图的高
+	 * @param Image $srcImage 本图
+	 * @param int $srcX
+	 * @param int $srcY
+	 * @param int $x
+	 * @param int $y
+	 * @param int $srcWidth 如果是0则取原图的宽
+	 * @param int $srcHeight 如果是0则取原图的高
+	 * @param int $width 如果是0则取本图的宽
+	 * @param int $height 如果是0则取本图的高
 	 */
 	public function copyFromWithResize(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0, $width = 0, $height = 0) {
 		if (empty($srcWidth)) {
@@ -317,9 +320,11 @@ class Image{
 		}
 		unset($this);
 	}
-	
+
 	/**
 	 * 验证图片是否合法
+	 * @param string $file
+	 * @return bool
 	 */
 	protected function check($file) {
 		return is_file($file) && getimagesize($file) && extension_loaded('gd');

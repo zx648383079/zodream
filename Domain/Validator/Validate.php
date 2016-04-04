@@ -25,7 +25,7 @@ class Validate {
 		$this->request = $request;
 		foreach ($pattern as $key => $val) {
 			$arr = explode('|', $val);
-			if (isset($request[$key]) && !$this->isNull($request[$key])) {
+			if (isset($request[$key]) && !$this->_isNullOrEmpty($request[$key])) {
 				foreach ($arr as $v) {
 					$result = $this -> check($key, $v);
 					if (!is_bool($result)) {
@@ -109,63 +109,6 @@ class Validate {
 	}
 
 	/**
-	 * 验证一条
-	 * @param string $value
-	 * @param string $filter
-	 */
-	private function _validateOne($value, $filters) {
-
-	}
-
-	private function _validate($value, $filter) {
-		$args = explode(':', $filter);
-		switch (strtolower($args[0])) {
-			case 'required':
-				return $this->setError($value, 'required', $this->_isNullOrEmpty($value));
-			case 'number':
-				return $this->setError($value, 'number', $this->_isIntOrFloat($value));
-			case 'float':
-				return $this->setError($value, 'float', $this->_isIntOrFloat($value , false));
-			case 'email':
-				return $this->setError($value, 'email', $this->_isEmail($value));
-			case 'phone':
-				return $this->setError($value, 'phone', $this->_isTelephoneNumber($value));
-			case 'url':
-				return $this->setError($value, 'url', $this->_isUrl($value));
-			case 'datetime':
-				return $this->setError($value, 'datetime',$this->_isUrl($value));
-			case 'length':
-				$length = explode('-', $args[1]);
-				return $this->setError($value, 'length',$this->_isLengthBetweenMinAndMax($value, intval($length[0]), intval($length[1])));
-			case 'min':
-				return $this->_isMinLength($value, intval($arr[1])) ? TRUE : ' min length is '.$arr[1];
-				break;
-			case 'max':
-				return $this->_isMaxLength($value, intval($arr[1])) ? TRUE : ' max length is '.$arr[1];
-				break;
-			case 'regular':
-				return $this->_isrRegularMatch($value, $arr[1]) ? TRUE : ' is not match';
-				break;
-			case 'confirm':
-				return $this->_isConfirmWithOtherKey($value, $arr[1]) ? TRUE : ' is not the same as '.$arr[1];
-				break;
-			case 'conform':
-				return ($value === $arr[1]) ? TRUE : ' is not equal '.$arr[1];
-				break;
-			case 'unique':
-				$tables = explode('.', $arr[1], 2);
-				$column  = $key;
-				if (!empty($tables[1])) {
-					$column = $tables[1];
-				}
-				return $this->_isUniqueOnTable($tables[0], $column, $value) ? TRUE : ' is exist.';
-				break;
-			default:
-				return TRUE;
-		}
-	}
-
-	/**
 	 * 判断是null 或 是空白字符
 	 * @param string $value
 	 * @return bool
@@ -182,27 +125,16 @@ class Validate {
 	private function _isDateTime($value) {
 		return strtotime($value) !== false;
 	}
-	
+
 	/**
 	 * 对比确认
-	 *
-	 * @param string $table  不带前缀的表名
-	 * @param string $value  要验证的列
-	 * @param string $value  要验证的值
-	 * @return boolean
+	 * @return bool
+	 * @internal param string $table 不带前缀的表名
+	 * @internal param string $value 要验证的列
+	 * @internal param string $value 要验证的值
 	 */
-	private function _isUniqueOnTable($table, $column, $value) {
-		$db  = new Model();
-		$data = $db->findByHelper(array (
-				'select' => 'COUNT(*) as num',
-				'from'   => $table,
-				'where'  => "$column = '$value'"
-		), false);
-		if (empty($data) || $data[0]->num != '0') {
-			return false;
-		} else {
-			return true;
-		}
+	private function _isUniqueOnTable() {
+		return false;
 	}
 	
 	/**

@@ -6,7 +6,7 @@ class ResponseResult {
 	/**
 	 * 准备 必须有结束
 	 * @param string $type
-	 * @param number $status
+	 * @param int|number $status
 	 */
 	public static function prepare($type = 'html', $status = 200) {
 		if ((!defined('DEBUG') || !DEBUG) &&(!defined('APP_GZIP') || APP_GZIP) && extension_loaded('zlib')) {
@@ -35,12 +35,12 @@ class ResponseResult {
 		ob_end_flush();
 		exit;
 	}
-	
+
 	/**
 	 * 释放指定内容
 	 * @param string $result
 	 * @param string $type
-	 * @param number $status
+	 * @param int|string $status
 	 */
 	public static function make($result, $type = 'html', $status = 200) {
 		self::prepare($type, $status);
@@ -63,7 +63,7 @@ class ResponseResult {
 		$data['status'] = $status;
 		$data['title'] = $title;
 		View::getInstance()->set($data);
-		View::getInstance()->showWithFile($status, $status);
+		View::getInstance()->showWithFile('404', $status);
 	}
 	
 	public static function sendRedirect($url, $time = 0) {
@@ -253,10 +253,10 @@ class ResponseResult {
 				break;
 		}
 	}
-	
+
 	/**
 	 * 发送Http状态信息
-	 * @param number $status
+	 * @param int $status
 	 */
 	public static function sendHttpStatus($status = 200)
 	{

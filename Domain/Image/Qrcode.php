@@ -13,9 +13,9 @@ class Qrcode {
 	 * @access public
 	 *
 	 * @param array $value 内容
-	 * @param array $logo 是否放logo
-	 * @param array $level 容错率
-	 * @param array $size 尺寸
+	 * @param array|string $logo 是否放logo
+	 * @param array|int $level 容错率
+	 * @param array|int $size 尺寸
 	 * @return int 返回图片数据,
 	 */
 	public static function show($value , $logo ='',$level = 0 , $size = 6) {

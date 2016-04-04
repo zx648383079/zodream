@@ -12,8 +12,8 @@ trait ConditionTrait {
 	
 	/**
 	 * 拓展switch
-	 * @param unknown $condition 条件或要输出的值
-	 * @param unknown $value 要输出的值
+	 * @param string $condition 条件或要输出的值
+	 * @param string $value 要输出的值
 	 */
 	public function swi($condition, $value = null) {
 		if (null == $value) {
@@ -27,8 +27,8 @@ trait ConditionTrait {
 	
 	/**
 	 * 拓展case
-	 * @param unknown $condition 条件 
-	 * @param unknown $value 可以更改输出的值，不必先用 $this->swi
+	 * @param string|boolean $condition 条件
+	 * @param string $value 可以更改输出的值，不必先用 $this->swi
 	 */
 	public function cas($condition, $value = null) {
 		if (null !== $value) {
@@ -39,21 +39,20 @@ trait ConditionTrait {
 			echo $this->_switchValue;
 		}
 	}
-	
+
 	/**
 	 * 替换标志
-	 * @param unknown $name
-	 * @param unknown $key1
-	 * @param unknown $value1
+	 * @param string $name
+	 * @param string|integer|array $key
 	 */
-	public function tag($name, $key1, $value1 = null) {
+	public function tag($name, $key) {
 		$args = array();
-		if (!is_array($key1)) {
+		if (!is_array($key)) {
 			for ($i = 1; $i < func_num_args(); $i+=2) {
 				$args[func_get_arg($i)] = func_get_arg($i + 1);
 			};
 		} else {
-			$args = $key1;
+			$args = $key;
 		}
 		if (isset($args[$name])) {
 			echo $args[$name];

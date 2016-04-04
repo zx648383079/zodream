@@ -21,104 +21,114 @@ class Mailer {
 		$config = Config::getInstance()->get('mail');
 		$this->setHost($config['host'], $config['port'])->setUser($config['user'], $config['password']);
 	}
-	
+
 	/**
 	 * 设置发送者的信息
 	 * @param string $username
 	 * @param string $password
+	 * @return $this
 	 */
 	public function setUser($username, $password) {
 		$this->_mail->Username = $username;
 		$this->_mail->Password = $password;
 		return $this;
 	}
-	
+
 	/**
 	 * 设置host
 	 * @param string $host
 	 * @param string $port
+	 * @return $this
 	 */
 	public function setHost($host, $port) {
 		$this->_mail->Host = $host;
 		$this->_mail->Port = $port;
 		return $this;
 	}
-	
+
 	/**
 	 * 设置接收者
 	 * @param string $address
 	 * @param string $name
-	 * @param string $auto
+	 * @param bool|string $auto
+	 * @return $this
 	 */
 	public function setFrom($address, $name = '', $auto = TRUE) {
 		$this->_mail->setFrom($address, $name, $auto);
 		return $this;
 	}
-	
+
 	/**
 	 * 添加接收者
 	 * @param string $address
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addAddress($address, $name = '') {
 		$this->_mail->addAddress($address, $name);
 		return $this;
 	}
-	
+
 	/**
 	 * 添加转发
 	 * @param string $address
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addReplyTo($address, $name = '') {
 		$this->_mail->addReplyTo($address, $name);
 		return $this;
 	}
-	
+
 	/**
 	 * 添加抄送
 	 * @param string $address
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addCC($address, $name = '') {
 		$this->_mail->addCC($address, $name);
 		return $this;
 	}
-	
+
 	/**
 	 * 添加
 	 * @param string $address
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addBCC($address, $name = '') {
 		$this->_mail->addBCC($address, $name);
 		return $this;
 	}
-	
+
 	/**
 	 * 添加附件
 	 * @param string $file
 	 * @param string $name
+	 * @return $this
 	 */
 	public function addAttachment($file, $name = '') {
 		$this->_mail->addAttachment($file, $name);
 		return $this;
 	}
-	
+
 	/**
 	 * 发送的内容是否是html 或 plain
-	 * @param string $isHtml
+	 * @param bool $isHtml
+	 * @return $this
 	 */
 	public function isHtml($isHtml = TRUE) {
 		$this->_mail->isHtml($isHtml);
 		return $this;
 	}
-	
+
 	/**
 	 * 发送
 	 * @param string $subject
 	 * @param string $body
 	 * @param string $altBody
+	 * @return bool
 	 */
 	public function send($subject, $body, $altBody = '') {
 		$this->_mail->Subject = $subject;

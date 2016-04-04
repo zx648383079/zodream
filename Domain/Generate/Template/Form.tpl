@@ -14,7 +14,7 @@ class {form} extends Form {
 		if (!Request::isPost()) {
 			return ;
 		}
-		$data = Request::post('{colums}');
+		$data = Request::post('{columns}');
 		if (!$this->validate($data, array(
 {data}
 		))) {

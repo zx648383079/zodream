@@ -96,12 +96,13 @@ abstract class Enum {
 	public function __toString() {
 		return (string) $this->value;
 	}
-	 
+
 	/**
 	 * Checks if two enums are equal. Only value is checked, not class type also.
 	 * If enum was created with $strict = true, then strict comparison applies
 	 * here also.
 	 *
+	 * @param object $object
 	 * @return bool True if enums are equal
 	 */
 	public function equals($object) {

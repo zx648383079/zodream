@@ -99,10 +99,13 @@ class Route {
 		}
 		return call_user_func_array(array(new $class, $action), $arguments);
 	}
-	
-	
+
+
 	/**
 	 * 执行 控制器方法
+	 * @param string $class
+	 * @param string $action
+	 * @return mixed
 	 */
 	protected function runController($class = null, $action = null) {
 		if (empty($class)) {
@@ -111,15 +114,17 @@ class Route {
 		$classes = explode('\\', $class);
 		list($class, $action) = $this->getController($classes, $action);
 		$this->_class[1] = $action;
+		/** @var BaseController $instance */
 		$instance        = new $class;
 		$instance->init();
 		return call_user_func(array($instance, 'runAction'), $action, $this->_param);
 	}
-	
+
 	/**
 	 * 获取控制
 	 * @param array $args
 	 * @param string $action
+	 * @return array|bool
 	 */
 	protected function getController(array $args, $action) {
 		$class = $this->existController($args);

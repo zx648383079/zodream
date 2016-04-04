@@ -32,34 +32,35 @@ class DataFilter {
 		self::$_error[$key][] = $error;
 	}
 
-    /**
-     * 
-     * 
-     * 
-     * 
-     * @param string|array $args
-     * @param string|array $option
-     * example:
-     * 1. 123, int
-     * 2. [
-     *      123,
-     *      44
-     * ], [
-     *      int,
-     *      string
-     * ]
-     * 3. [
-     *      a => 123,
-     *      b => fgff
-     * ], [
-     *      a => int|string,
-     *      b => string
-     * ]
-     * 4. [
-     *      a => 233,
-     *      b => gg
-     * ], a,int:|string;b,string
-     */
+	/**
+	 *
+	 *
+	 *
+	 *
+	 * @param string|array $args
+	 * @param string|array $option
+	 * example:
+	 * 1. 123, int
+	 * 2. [
+	 *      123,
+	 *      44
+	 * ], [
+	 *      int,
+	 *      string
+	 * ]
+	 * 3. [
+	 *      a => 123,
+	 *      b => fgff
+	 * ], [
+	 *      a => int|string,
+	 *      b => string
+	 * ]
+	 * 4. [
+	 *      a => 233,
+	 *      b => gg
+	 * ], a,int:|string;b,string
+	 * @return array|bool
+	 */
     public static function filter($args, $option) {
 		return self::_runFilterOrValidate($args, $option, false);
     }

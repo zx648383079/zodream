@@ -9,8 +9,11 @@ namespace Zodream\Infrastructure\Database;
 abstract class Database {
 	//用于存放实例化的对象
 	protected static $instance = null;
+
 	/**
 	 * 公共静态方法获取实例化的对象
+	 * @param array $config
+	 * @return static
 	 */
 	public static function getInstance(array $config) {
 		if (is_null(static::$instance)) {
@@ -53,36 +56,40 @@ abstract class Database {
 	/**
 	 * 查询
 	 * @param string $sql
+	 * @param array $parameters
 	 * @return array
 	 */
 	public function select($sql, $parameters = array()) {
 		return $this->getArray($sql, $parameters);
 	}
-	
+
 	/**
 	 * 插入
 	 * @param string $sql
-	 * @return integer id
+	 * @param array $parameters
+	 * @return int id
 	 */
 	public function insert($sql, $parameters = array()) {
 		$this->execute($sql, $parameters);
 		return $this->lastInsertId();
 	}
-	
+
 	/**
 	 * 修改
 	 * @param string $sql
-	 * @return integer 改变的行数
+	 * @param array $parameters
+	 * @return int 改变的行数
 	 */
 	public function update($sql, $parameters = array()){
 		$this->execute($sql, $parameters);
 		return $this->rowCount();
 	}
-	
+
 	/**
 	 * 删除
 	 * @param string $sql
-	 * @return integer 删除的行数
+	 * @param array $parameters
+	 * @return int 删除的行数
 	 */
 	public function delete($sql, $parameters = array()) {
 		$this->execute($sql, $parameters);
@@ -99,17 +106,20 @@ abstract class Database {
 	 * 改变的行数
 	 */
 	abstract public function rowCount();
-	
+
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
+	 * @param array $parameters
 	 * @return mixed
 	 */
 	abstract public function getObject($sql, $parameters = array());
-	
+
 	/**
 	 * 获取关联数组
 	 * @param string $sql
+	 * @param array $parameters
+	 * @return
 	 */
 	abstract public function getArray($sql, $parameters = array());
 	

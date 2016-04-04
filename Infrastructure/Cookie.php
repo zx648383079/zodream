@@ -11,16 +11,17 @@ class Cookie {
 	 * $_COOKIE
 	 * @param string $key
 	 * @param string $default
+	 * @return array|string
 	 */
 	public static function get($key, $default = NULL) {
 		 return Request::cookie($key, $default);
 	}
-	
+
 	/**
 	 * set cookie
 	 * @param string $name 名称
 	 * @param string $value 值
-	 * @param number $expire 有效期
+	 * @param int|number $expire 有效期
 	 * @param string $path 服务器路径
 	 * @param string $domain 域名
 	 * @param boolean $secure 是否通过安全的 HTTPS 连接来传输 cookie。

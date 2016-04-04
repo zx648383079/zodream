@@ -60,10 +60,11 @@ class View extends MagicObject {
 
 	/**
 	 * 获取视图的路径
+	 * @param string $file
 	 * @return string
 	 */
-	public function getView($file = null) {
-		return StringExpand::getFile($this->viewDir, str_replace('.', '/', $file));
+	public function getView($file) {
+		return StringExpand::getFile($this->viewDir, str_replace('.', '/', $file)).$this->getSuffix();
 	}
 
 	/**
@@ -73,18 +74,21 @@ class View extends MagicObject {
 	public function setAsset($arg) {
 		$this->assetDir = $arg.'/';
 	}
+
 	/**
 	 * 获取资源路径
+	 * @param string $file
+	 * @return string
 	 */
 	public function getAsset($file = null) {
 		return StringExpand::getFile($this->assetDir, $file);
 	}
-	
+
 	/**
 	 * 在视图中包含其他视图的方法
 	 * @param string|array $names 视图文件名
 	 * @param string|array $param 传给视图的内容
-	 * @param string $replace 是否替换
+	 * @param bool|string $replace 是否替换
 	 */
 	public function extend($names, $param = null, $replace = TRUE) {
 		if (!$replace) {
@@ -92,7 +96,7 @@ class View extends MagicObject {
 		}
 		$this->set('_extra', $param);
 		foreach (ArrayExpand::toFile((array)$names, '.') as $value) {
-			$file = $this->getView($value).$this->getSuffix();
+			$file = $this->getView($value);
 			if (file_exists($file)) {
 				include($file);
 			} else {
@@ -109,11 +113,10 @@ class View extends MagicObject {
 		$args[] = $this->get('_extra', array());
 		Script::make(ArrayExpand::sort($args), $this->getAsset());
 	}
-	
+
 	/**
 	 * 输出资源url
 	 * @param string $file
-	 * @param string $isView
 	 */
 	public function asset($file) {
 		echo UrlGenerator::toAsset($this->getAsset($file));
@@ -201,7 +204,7 @@ class View extends MagicObject {
 	 */
 	public function showWithFile($file, $status = 200) {
 		ob_start();
-		include($this->getView($file).$this->getSuffix());
+		include($this->getView($file));
 		$content = ob_get_contents();
 		ob_end_clean();
 		EventManger::getInstance()->run('showView', $content);

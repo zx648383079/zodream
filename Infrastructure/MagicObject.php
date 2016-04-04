@@ -11,11 +11,12 @@ use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 class MagicObject implements \ArrayAccess {
 	
 	protected $_data = array();
-	
+
 	/**
 	 * 获取值
 	 * @param string $key 关键字
 	 * @param string $default 默认返回值
+	 * @return array|string
 	 */
 	public function get($key = null, $default = null) {
 		if (empty($key)) {
@@ -64,10 +65,11 @@ class MagicObject implements \ArrayAccess {
 	public function clear() {
 		$this->_data = array();
 	}
-	
+
 	/**
 	 * 判断是否有
 	 * @param string $key
+	 * @return bool
 	 */
 	public function has($key) {
 		return array_key_exists($key, $this->_data);

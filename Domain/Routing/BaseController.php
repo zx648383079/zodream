@@ -33,10 +33,12 @@ abstract class BaseController {
 	public function prepare() {  }
 	
 	public function finalize() {  }
+
 	/**
 	 * 执行方法
 	 * @param string $action
-	 * @param array $parameters
+	 * @param array $vars
+	 * @return mixed
 	 */
 	public function runAction($action, array $vars = array()) {
 		if (!$this->canRunAction($action)) {

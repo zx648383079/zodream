@@ -66,10 +66,11 @@ class Verify {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 判断权限是否符合
 	 * @param string $role 权限
+	 * @return bool
 	 */
 	public static function judge($role) {
 		$auth = self::_auth();

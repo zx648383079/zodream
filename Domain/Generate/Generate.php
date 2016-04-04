@@ -4,6 +4,8 @@ namespace Zodream\Domain\Generate;
 
 use Zodream\Domain\Authentication\Binary;
 use Zodream\Domain\Response\Redirect;
+use Zodream\Domain\Response\ResponseResult;
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Template;
@@ -26,9 +28,11 @@ class Generate {
 		if (!defined('DEBUG') || !DEBUG) {
 			Redirect::to('/');
 		}
+		ResponseResult::sendContentType();
 		if (Request::isPost()) {
 			$this->makeConfig(Request::post());
-			Redirect::to('/', 2, '安装完成！');
+			$this->model->importSql(APP_DIR.'/document/zodream.sql', Config::getValue('db.database'));
+			Redirect::to('/', 10, '安装完成！');
 		}
 		$mode = Request::get('mode', 0);
 		if (empty($mode)) {
@@ -136,12 +140,12 @@ class Generate {
 	 * @return bool
 	 */
 	public function makeForm($name, array $columns) {
-		list($column, $datas) = $this->_formColumn($columns);
+		list($column, $data) = $this->_formColumn($columns);
 		$data = array(
 			'model'  => $name.APP_MODEL,
 			'form'   => $name.APP_FORM,
-			'colums' => $column,
-			'data'   => $datas,
+			'columns' => $column,
+			'data'   => $data,
 			'module' => APP_MODULE
 		);
 		return $this->_replace('Form', $data, APP_DIR.'/Domain/Form/'.APP_MODULE.'/'.$data['form'].'.php');

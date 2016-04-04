@@ -43,28 +43,31 @@ class Url {
 		}
 		return $shortUrlList;
 	}
-	
-	
+
+
 	/**
 	 * 将一个URL转换为完整URL
 	 * PHP将相对路径URL转换为绝对路径URL
+	 * @param string $srcUrl
+	 * @param string $baseUrl
+	 * @return string
 	 */
-	function format_url($srcurl, $baseurl) {
-		$srcinfo = parse_url($srcurl);
-		if(isset($srcinfo['scheme'])) {
-			return $srcurl;
+	function formatUrl($srcUrl, $baseUrl) {
+		$srcInfo = parse_url($srcUrl);
+		if(isset($srcInfo['scheme'])) {
+			return $srcUrl;
 		}
-		$baseinfo = parse_url($baseurl);
-		$url = $baseinfo['scheme'].'://'.$baseinfo['host'];
-		if(substr($srcinfo['path'], 0, 1) == '/') {
-			$path = $srcinfo['path'];
+		$baseInfo = parse_url($baseUrl);
+		$url = $baseInfo['scheme'].'://'.$baseInfo['host'];
+		if(substr($srcInfo['path'], 0, 1) == '/') {
+			$path = $srcInfo['path'];
 		}else{
-			$filename=  basename($baseinfo['path']);
+			$filename=  basename($baseInfo['path']);
 			//兼容基础url是列表
 			if(strpos($filename,".")===false){
-				$path = dirname($baseinfo['path']).'/'.$filename.'/'.$srcinfo['path'];
+				$path = dirname($baseInfo['path']).'/'.$filename.'/'.$srcInfo['path'];
 			}else{
-				$path = dirname($baseinfo['path']).'/'.$srcinfo['path'];
+				$path = dirname($baseInfo['path']).'/'.$srcInfo['path'];
 			}
 			 
 		}

@@ -22,7 +22,7 @@ class Action {
 
     public function run($args = array()) {
         if (!class_exists($this->class) || !function_exists($this->function)) {
-            require $this->file;
+            require($this->file);
         }
         if (empty($this->class)) {
             $this->_runWithFunction($args);

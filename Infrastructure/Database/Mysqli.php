@@ -61,10 +61,11 @@ class Mysqli extends Database {
 		$method = $ref->getMethod("bind_param");
 		$method->invokeArgs($this->result, $param);
 	}
-	
+
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
+	 * @param array $parameters
 	 * @return object
 	 */
 	public function getObject($sql = null, $parameters = array()) {
@@ -75,10 +76,12 @@ class Mysqli extends Database {
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * 获取关联数组
 	 * @param string $sql
+	 * @param array $parameters
+	 * @return array
 	 */
 	public function getArray($sql = null, $parameters = array()) {
 		$this->execute($sql);
@@ -108,13 +111,15 @@ class Mysqli extends Database {
 	public function lastInsertId() {
 		return mysqli_insert_id($this->driver);
 	}
-	
+
 	/**
 	 * 执行SQL语句
 	 *
 	 * @access public
 	 *
 	 * @param string $sql 多行查询语句
+	 * @param array $parameters
+	 * @return bool|null
 	 */
 	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {
@@ -124,13 +129,14 @@ class Mysqli extends Database {
 		$this->bind($parameters);
 		return $this->result->execute();
 	}
-	
+
 	/**
 	 * 执行多行SQL语句
 	 *
 	 * @access public
 	 *
 	 * @param string $query 多行查询语句
+	 * @return array
 	 */
 	public function multi_query($query)  {
 		$result = array();

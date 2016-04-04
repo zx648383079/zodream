@@ -12,16 +12,20 @@ class Ajax {
 	public static function ajaxReturn($data, $type = 'json') {
 		switch (strtolower($type)) {
 			case 'json' :
-				return ResponseResult::make(json_encode($data), $type);
+				ResponseResult::make(json_encode($data), $type);
+				break;
 			case 'xml'  :
 				// 返回xml格式数据
-				return ResponseResult::make(self::_xmlEncode($data), $type);
-			case 'JSONP':
+				ResponseResult::make(self::_xmlEncode($data), $type);
+				break;
+			case 'jsonp':
 				// 返回JSON数据格式到客户端 包含状态信息
-				return ResponseResult::make(Request::getInstance()->get('callback', 'jsonpReturn').'('.json_encode($data).');', 'json');
-			case 'EVAL' :
+				ResponseResult::make(Request::get('callback', 'jsonpReturn').'('.json_encode($data).');', 'json');
+				break;
+			case 'eval' :
 				// 返回可执行的js脚本
-				return ResponseResult::make($data);
+				ResponseResult::make($data);
+				break;
 		}
 	}
 	

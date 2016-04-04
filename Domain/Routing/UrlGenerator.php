@@ -13,12 +13,12 @@ class UrlGenerator {
 	public static function referer() {
 		return Request::server('HTTP_REFERER');
 	}
-	
+
 	/**
 	 * 产生完整的网址
 	 * @param string $file
 	 * @param string $extra
-	 * @param string $secret
+	 * @param bool $secret
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null, $secret = FALSE) {
@@ -91,10 +91,13 @@ class UrlGenerator {
 		}
 		return $root;
 	}
-	
+
 	/**
 	 * 替换url中的参数
 	 *
+	 * @param $url
+	 * @param $key
+	 * @param null $value
 	 * @return string 真实显示的网址
 	 */
 	public static function setValue($url, $key , $value = null) {

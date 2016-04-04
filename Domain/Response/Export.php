@@ -18,9 +18,11 @@ class Export {
 	
 	public static $readerObj;
 	public static $charset = 'utf-8';
-	
+
 	/**
 	 * 输出切换编码
+	 * @param string $output
+	 * @return string
 	 */
 	public static function excelExportIconv($output){
 	

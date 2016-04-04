@@ -22,8 +22,9 @@ class CacheSession extends Session {
         return $data === false ? '' : $data;
     }
 
+
     public function writeSession($id, $data) {
-        return $this->_cache->set($this->calculateKey($id), $data, $this->getTimeout());
+        $this->_cache->set($this->calculateKey($id), $data, $this->getTimeout());
     }
 
     public function destroySession($id) {

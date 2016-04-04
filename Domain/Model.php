@@ -54,6 +54,9 @@ abstract class Model {
 	 * 关联数组参数不需要一一对应，自东根据 fillAble 取需要的
 	 */
 	public function fill() {
+		if (func_num_args() === 0) {
+			return false;
+		}
 		$args = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 		$data = ArrayExpand::combine($this->fillAble, $args, false);
 		if (func_num_args() == 1 || !is_array(func_get_arg(0))) {

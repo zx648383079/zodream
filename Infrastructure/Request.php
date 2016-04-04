@@ -48,38 +48,42 @@ final class Request {
 	public static function get($name = null, $default = null) {
 		return self::_getInstance(__FUNCTION__)->get($name, $default);
 	}
-	
+
 	/**
 	 * $_POST
 	 * @param string $name
 	 * @param string $default
+	 * @return array|string
 	 */
 	public static function post($name = null, $default = null) {
 		return self::_getInstance(__FUNCTION__)->get($name, $default);
 	}
-	
+
 	/**
 	 * $_FILES
 	 * @param string $name
 	 * @param string $default
+	 * @return array|string
 	 */
 	public static function files($name = null, $default = null) {
 		return self::_getInstance(__FUNCTION__)->get($name, $default);
 	}
-	
+
 	/**
 	 * $_REQUEST
 	 * @param string $name
 	 * @param string $default
+	 * @return array|string
 	 */
 	public static function request($name = null, $default = null) {
 		return self::_getInstance(__FUNCTION__)->get($name, $default);
 	}
-	
+
 	/**
 	 * $_COOKIE
 	 * @param string $name
 	 * @param string $default
+	 * @return array|string
 	 */
 	public static function cookie($name = null, $default = null) {
 		return self::_getInstance(__FUNCTION__)->get($name, $default);
@@ -91,11 +95,12 @@ final class Request {
 	public static function input() {
 		return self::_getInstance(__FUNCTION__)->get();
 	}
-	
+
 	/**
 	 * $_SERVER
 	 * @param string $name
 	 * @param string $default
+	 * @return array|string
 	 */
 	public static function server($name = null, $default = null) {
 		return self::_getInstance(__FUNCTION__)->get($name, $default);

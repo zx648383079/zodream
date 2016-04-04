@@ -272,11 +272,12 @@ class ArrayExpand {
 		}
 		return $results;
 	}
-	
+
 	/**
 	 * 判断是否在二维数组中 if no return false; or return $key
 	 * @param string $needle
 	 * @param array $args
+	 * @return bool|int|string
 	 */
 	public static function inArray($needle,array $args) {
 		foreach ($args as $key => $value) {
@@ -286,12 +287,12 @@ class ArrayExpand {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 根据关键字排序，不是在关键字上往后移
 	 *
 	 *
-	 * @param array $arr 要排序的数组.
+	 * @param array $args 要排序的数组.
 	 * @param array $keys 关键字数组.
 	 * @return array 返回排序的数组,
 	 */

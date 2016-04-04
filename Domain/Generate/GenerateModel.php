@@ -7,6 +7,7 @@ namespace Zodream\Domain\Generate;
  * Time: 22:49
  */
 use Zodream\Domain\Model;
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 class GenerateModel extends Model {
@@ -29,16 +30,23 @@ class GenerateModel extends Model {
                 '` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
             echo $db.'数据库创建成功！';
         }
-        $content = file_get_contents($file);
-        $sqls = explode(";\n", str_replace("\r", "\n", $content));
-        foreach ($sqls as $sql) {
-            $this->db->execute($sql);
-            $match = array();
-            if (preg_match('/create[^(;]+ table ([\w_]+?) \(/i', $sql, $match)) {
-                echo $match[1].' 表创建成功！<br>';
-            }
+        $tables = $this->getTables(file_get_contents($file));
+        $charset = Config::getValue('db.encoding', 'utf8');
+        foreach ($tables as $key => $value) {
+            $this->db->execute("CREATE TABLE IF NOT EXISTS `{$key}` ({$value}) ENGINE=MYISAM DEFAULT CHARSET={$charset};");
+            echo $key, '表创建成功！<br>';
         }
         echo 'SQL文件执行完成！';
+    }
+
+    private function getTables($sql) {
+        preg_match_all('/CREATE TABLE[^()]+`([\w_]+)`\s*\(\s*([^;]*?)\)[^()]+;/i', $sql, $matches, PREG_SET_ORDER);
+        $result = array();
+        foreach ($matches as $item) {
+            $table = $this->addPrefix($item[1]);
+            $result[$table] = $item[2];
+        }
+        return $result;
     }
 
     /**
@@ -51,6 +59,7 @@ class GenerateModel extends Model {
     /**
      * 获取表明
      * @param string $arg 数据库名 默认是配置文件中的数据库
+     * @return array
      */
     public function getTable($arg = null) {
         if (!empty($arg)) {

@@ -293,8 +293,9 @@ class PageLink {
 
 	/**
 	 * 模板替换
-	 * @param string $replace     替换内容
-	 * @param string $result      条件
+	 * @param string $url 替换内容
+	 * @param string $text
+	 * @param bool|string $result 条件
 	 * @return string
 	 */
 	private function _replace($url, $text, $result = TRUE) {

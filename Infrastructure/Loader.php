@@ -9,14 +9,19 @@ namespace Zodream\Infrastructure;
 class Loader extends MagicObject {
 	/**
 	 * 添加数据类
-	 * @param string $model
+	 * @param string $models
+	 * @param string $action
 	 */
 	public function model($models, $action = null) {
 		$this->_add($models, $action, 'Domain\\Model\\', APP_MODEL);
 	}
-	
+
+	/**
+	 * @param string $forms
+	 * @param string $action
+	 */
 	public function form($forms, $action = null) {
-		$this->_data($forms, $action, 'Domain\\Form\\', APP_FORM);
+		$this->_add($forms, $action, 'Domain\\Form\\', APP_FORM);
 	}
 	
 	/**
@@ -31,21 +36,23 @@ class Loader extends MagicObject {
 			exit('Error: Could not load plugin ' . $plugin . '!');
 		}
 	}
-	
+
 	/**
 	 * 添加类
 	 * @param string $library
+	 * @param string $action
 	 */
 	public function library($library, $action = null) {
 		$this->_add($library, $action, 'Domain\\');
 	}
-	
+
 	/**
 	 * 添加控件
 	 * @param string|array $names 名字
+	 * @param string $action
 	 * @param string $pre 前缀
 	 * @param string $after 后缀
-	 * @param string $up 是否大写首字母 默认 true
+	 * @param bool|string $up 是否大写首字母 默认 true
 	 */
 	private function _add($names, $action = null, $pre = '', $after = '', $up = true) {
 		if (is_string($names)) {

@@ -19,10 +19,10 @@ class Socket {
 	public function create() {
 		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 	}
-	
+
 	/**
 	 * 服务端
-	 * @param number $backlog
+	 * @param int|number $backlog
 	 */
 	public function listen($backlog = 4) {
 		socket_bind($this->socket, $this->ip, $this->port);
@@ -42,10 +42,11 @@ class Socket {
 	public function accept() {
 		socket_accept($this->socket);
 	}
-	
+
 	/**
 	 * 取出信息
-	 * @param number $length
+	 * @param int|string $length
+	 * @return string
 	 */
 	public function read($length = 8192) {
 		$content = '';

@@ -8,63 +8,64 @@ class Regex extends MagicObject {
 	public function function_name($param = array()) {
 		$this->set($param);
 	}
-	
+
 	/**
 	 * 取得的值
-	 array (size=6)
-	 0 => string '{extend:hh}' (length=11)
-	 1 => string '' (length=0)
-	 2 => string '' (length=0)
-	 3 => string '' (length=0)
-	 4 => string 'extend' (length=6)
-	 5 => string 'hh' (length=2)
-	
-	 array (size=8)
-	 0 => string '{a?b:c}' (length=7)
-	 1 => string '' (length=0)
-	 2 => string '' (length=0)
-	 3 => string '' (length=0)
-	 4 => string '' (length=0)
-	 5 => string '' (length=0)
-	 6 => string 'a' (length=1)
-	 7 => string 'b:c' (length=3)
-	
-	 array (size=10)
-	 0 => string '{c,v=d}' (length=7)
-	 1 => string '' (length=0)
-	 2 => string '' (length=0)
-	 3 => string '' (length=0)
-	 4 => string '' (length=0)
-	 5 => string '' (length=0)
-	 6 => string '' (length=0)
-	 7 => string '' (length=0)
-	 8 => string 'c,v' (length=3)
-	 9 => string 'd' (length=1)
-	
-	 array (size=11)
-	  0 => string '{nnn.v}' (length=7)
-	  1 => string '' (length=0)
-	  2 => string '' (length=0)
-	  3 => string '' (length=0)
-	  4 => string '' (length=0)
-	  5 => string '' (length=0)
-	  6 => string '' (length=0)
-	  7 => string '' (length=0)
-	  8 => string '' (length=0)
-	  9 => string '' (length=0)
-	  10 => string 'nnn.v' (length=5)
-	
-	 array (size=4)
-	 0 => string '{if:aa:bb:vvv}fffb{tttt:hh}bbb{if:4=5:7}888{/if}hh{/if}' (length=55)
-	 1 => string 'if' (length=2)
-	 2 => string 'aa:bb:vvv' (length=9)
-	 3 => string 'fffb{tttt:hh}bbb{if:4=5:7}888{/if}hh' (length=36)
-	
+	 * array (size=6)
+	 * 0 => string '{extend:hh}' (length=11)
+	 * 1 => string '' (length=0)
+	 * 2 => string '' (length=0)
+	 * 3 => string '' (length=0)
+	 * 4 => string 'extend' (length=6)
+	 * 5 => string 'hh' (length=2)
 	 *
-	 * @param unknown $subject
+	 * array (size=8)
+	 * 0 => string '{a?b:c}' (length=7)
+	 * 1 => string '' (length=0)
+	 * 2 => string '' (length=0)
+	 * 3 => string '' (length=0)
+	 * 4 => string '' (length=0)
+	 * 5 => string '' (length=0)
+	 * 6 => string 'a' (length=1)
+	 * 7 => string 'b:c' (length=3)
+	 *
+	 * array (size=10)
+	 * 0 => string '{c,v=d}' (length=7)
+	 * 1 => string '' (length=0)
+	 * 2 => string '' (length=0)
+	 * 3 => string '' (length=0)
+	 * 4 => string '' (length=0)
+	 * 5 => string '' (length=0)
+	 * 6 => string '' (length=0)
+	 * 7 => string '' (length=0)
+	 * 8 => string 'c,v' (length=3)
+	 * 9 => string 'd' (length=1)
+	 *
+	 * array (size=11)
+	 * 0 => string '{nnn.v}' (length=7)
+	 * 1 => string '' (length=0)
+	 * 2 => string '' (length=0)
+	 * 3 => string '' (length=0)
+	 * 4 => string '' (length=0)
+	 * 5 => string '' (length=0)
+	 * 6 => string '' (length=0)
+	 * 7 => string '' (length=0)
+	 * 8 => string '' (length=0)
+	 * 9 => string '' (length=0)
+	 * 10 => string 'nnn.v' (length=5)
+	 *
+	 * array (size=4)
+	 * 0 => string '{if:aa:bb:vvv}fffb{tttt:hh}bbb{if:4=5:7}888{/if}hh{/if}' (length=55)
+	 * 1 => string 'if' (length=2)
+	 * 2 => string 'aa:bb:vvv' (length=9)
+	 * 3 => string 'fffb{tttt:hh}bbb{if:4=5:7}888{/if}hh' (length=36)
+	 *
+	 * @param string $subject
+	 * @param array $param
+	 * @return string
 	 */
-	public function init($subject, $paramers = array()) {
-		$this->set($paramers);
+	public function init($subject, $param = array()) {
+		$this->set($param);
 		$matches = array();
 		return preg_replace_callback('#
 				{(if|for|switch):([^{}]*)}((?:[^{}]*|(?R))*){/\1}
@@ -231,11 +232,12 @@ class Regex extends MagicObject {
 				return false;
 		}
 	}
-	
+
 	/**
 	 * 获取值
 	 * @param string $arg
 	 * @param string $default
+	 * @return array|bool|string
 	 */
 	private function _toString($arg, $default = null) {
 		if (null == $arg || $arg == '') {

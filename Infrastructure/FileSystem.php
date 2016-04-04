@@ -8,9 +8,11 @@ namespace Zodream\Infrastructure;
  */
 
 class FileSystem {
-	
+
 	/**
 	 * 遍历文件夹
+	 * @param string $dir
+	 * @return array
 	 */
 	public static function findDir($dir) {
 		$files    = array();

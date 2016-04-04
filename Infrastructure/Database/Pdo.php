@@ -80,14 +80,16 @@ class Pdo extends Database {
 			$this->result->bindParam(is_int($key) ? ++$key : $key, $value, $type);
 		}
 	}
-	 
+
 	/**
 	 * 执行SQL语句
 	 *
 	 * @access public
 	 *
-	 * @param array|null $param 条件
+	 * @param null $sql
+	 * @param array $parameters
 	 * @return array 返回查询结果,
+	 * @internal param array|null $param 条件
 	 */
 	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {
@@ -116,10 +118,11 @@ class Pdo extends Database {
 	public function getError() {
 		return $this->error;
 	}
-	
+
 	/**
 	 * 获取Object结果集
 	 * @param string $sql
+	 * @param array $parameters
 	 * @return object
 	 */
 	public function getObject($sql = null, $parameters = array()) {
@@ -130,10 +133,12 @@ class Pdo extends Database {
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * 获取关联数组
 	 * @param string $sql
+	 * @param array $parameters
+	 * @return array
 	 */
 	public function getArray($sql = null, $parameters = array()) {
 		$this->execute($sql, $parameters);

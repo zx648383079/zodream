@@ -62,26 +62,28 @@ abstract class Cache implements \ArrayAccess {
 	public function offsetExists ($key) {
 		return $this->has($key);
 	}
-	
+
 	/**
-	 * @param offset
+	 * @param string $key
+	 * @return array|string
 	 */
 	public function offsetGet ($key) {
 		return $this->get($key);
 	}
-	
+
 	/**
-	 * @param offset
-	 * @param value
+	 * @param string $key
+	 * @param string|array $value
 	 */
 	public function offsetSet ($key, $value) {
 		$this->set($key, $value);
 	}
-	
+
 	/**
-	 * @param offset
+	 * @param string $key
+	 * @internal param $offset
 	 */
 	public function offsetUnset ($key) {
-		$this->delete();
+		$this->delete($key);
 	}
 }

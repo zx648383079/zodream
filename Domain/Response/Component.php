@@ -1,9 +1,8 @@
 <?php
 namespace Zodream\Domain\Response;
 
-use Zodream\Infrastructure\FileSystem;
-class Component {
-	protected static $components;
+class Component extends View {
+	protected $components;
 	
 	/**
 	 * 按部件加载视图
@@ -11,19 +10,19 @@ class Component {
 	 * @param string $data
 	 * @return self
 	 */
-	public static function view($name = 'index', $data = null) {
+	public function view($name = 'index', $data = null) {
 		extract($data);
 		ob_start();
-		include(FileSystem::view($name));
-		self::$components .= ob_get_contents();
+		include($this->getView($name));
+		$this->components .= ob_get_contents();
 		ob_end_clean();
-		return self;
+		return $this;
 	}
 	
 	/**
 	 * 结束并释放视图
 	 */
-	public static function render() {
-		ResponseResult::make(self::$components);
+	public function render() {
+		ResponseResult::make($this->components);
 	}
 }

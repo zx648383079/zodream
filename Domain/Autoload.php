@@ -28,10 +28,11 @@ class Autoload extends MagicObject {
 		}
 		return $this;
 	}
-	
+
 	/**
 	 * 设置别名
 	 * @param string $alias
+	 * @return bool
 	 */
 	protected function _load($alias) {
 		if (!class_exists($alias)) {
@@ -42,9 +43,11 @@ class Autoload extends MagicObject {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 自定义错误输出
+	 * @param int $level
+	 * @return $this
 	 */
 	public function setError($level = E_ALL) {
 		error_reporting($level);
