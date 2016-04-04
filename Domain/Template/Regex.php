@@ -5,8 +5,8 @@ use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 class Regex extends MagicObject {
 	
-	public function function_name($paramers = array()) {
-		$this->set($paramers);
+	public function function_name($param = array()) {
+		$this->set($param);
 	}
 	
 	/**
@@ -94,7 +94,7 @@ class Regex extends MagicObject {
 	private function _systemFunction($condition, $content, $tag = 'if') {
 		switch ($tag) {
 			case 'if':
-				;
+				return '';
 			case 'for':
 				return $this->_for($condition, $content);
 			case 'switch':
@@ -107,9 +107,9 @@ class Regex extends MagicObject {
 	private function _switch($condition, $content) {
 		$args = explode(',', $condition);
 		if (count($args) == 2) {
-			return preg_replace_callback('/{case:([^{}]+)}/i', , $content);
-			
+			return preg_replace_callback('/{case:([^{}]+)}/i', 'hhh', $content);
 		}
+		return null;
 	}
 	
 	private function _for($arg, $content) {
@@ -190,7 +190,7 @@ class Regex extends MagicObject {
 		if ($this->_toCondition($condition)) {
 			return $this->_toString($args[0]);
 		}
-		if (count($args >= 2)) {
+		if (count($args) >= 2) {
 			return $this->_toString($args[1]);
 		}
 		return null;
@@ -234,8 +234,8 @@ class Regex extends MagicObject {
 	
 	/**
 	 * 获取值
-	 * @param unknown $arg
-	 * @param unknown $default
+	 * @param string $arg
+	 * @param string $default
 	 */
 	private function _toString($arg, $default = null) {
 		if (null == $arg || $arg == '') {
@@ -256,6 +256,6 @@ class Regex extends MagicObject {
 		if ($this->has($arg)) {
 			return $this->get($arg);
 		}
-		$this->_toString($default);
+		return $this->_toString($default);
 	}
 }

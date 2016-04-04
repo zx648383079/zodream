@@ -17,20 +17,18 @@ class Redirect {
 	 * @param string $msg 显示的消息.
 	 * @param string $code 显示的代码标志.
 	 */
-	public static function to($urls = '', $time = 0, $msg = '', $code = '') {
+	public static function to($urls = null, $time = 0, $msg = null) {
 		$url = '';
 		foreach ((array)$urls as $value) {
 			$url .= UrlGenerator::to($value);
 		}
-		if (empty($msg)) {
-			$msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
-		}
 		if (!headers_sent()) {
 			ResponseResult::sendRedirect($url, $time);
-		} else {
-			$str = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-			//self::$response->set('meta', $str);
 		}
-		exit();
+
+		ResponseResult::sendError(array(
+			'_extra' => '<meta http-equiv=\'Refresh\' content=\'{$time};URL={$url}\'>',
+			'message' => "系统将在{$time}秒之后自动跳转到{$url}！"
+		), 200, '跳转');
 	}
 }

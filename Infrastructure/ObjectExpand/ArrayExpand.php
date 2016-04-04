@@ -117,9 +117,9 @@ class ArrayExpand {
      * @param string $link
      * @return array|string
      */
-	public static function getVal($name, array $args, $default = null, $link = ',') {
-		$names       = explode($link, $name);
-        if (strstr($name, $link) === false ) {
+	public static function getValues($name, array $args, $default = null, $link = ',') {
+		$names = explode($link, $name);
+        if (strpos($name, $link) === false ) {
             list($newKey, $arg, $oldKey) = self::_getValueByKeyWithDefault($name, $args, $default);
             if ($newKey == $oldKey) {
                 return $arg;
@@ -212,7 +212,8 @@ class ArrayExpand {
 		return self::getChildWithStar($keys[1], $results, $default, $link);
 	}
 
-    /** 扩展 array_combine 能够用于不同数目
+    /**
+	 * 扩展 array_combine 能够用于不同数目
      * @param array $keys
      * @param array $values
      * @param bool $complete
@@ -244,11 +245,11 @@ class ArrayExpand {
 		return array_keys($args) !== range(0, count($args) - 1);
 	}
 
-    /**
-     * 把数组的值的首字母大写
-     * @param array $arr
-     * @return array
-     */
+	/**
+	 * 把数组的值的首字母大写
+	 * @param array $arguments
+	 * @return array
+	 */
 	public static function ucFirst(array $arguments) {
 		return array_map('ucfirst', $arguments);
 	}
@@ -295,17 +296,17 @@ class ArrayExpand {
 	 * @return array 返回排序的数组,
 	 */
 	public static function sortByKey(array $args, array $keys) {
-		$keyarr = $noarr = array();
+		$keyArray = $noArray = array();
 		foreach ($keys as $value) {
 			if (isset( $args[$value] )) {
-				$keyarr[$value] = $args[$value];
+				$keyArray[$value] = $args[$value];
 			}
 		}
 		foreach ($args as $key => $value) {
 			if (!in_array($key, $keys)) {
-				$noarr[$key] = $value;
+				$noArray[$key] = $value;
 			}
 		}
-		return array_merge($keyarr, $noarr);
+		return array_merge($keyArray, $noArray);
 	}
 }

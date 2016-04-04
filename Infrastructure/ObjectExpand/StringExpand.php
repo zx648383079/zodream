@@ -15,6 +15,7 @@ class StringExpand {
 	 * @param int $location ? 的位置
 	 * @param string|int $var 值
 	 * @param string $type 值得类型
+	 * @return string
 	 */
 	public static function bindParam(&$sql, $location, $var, $type) {
 		switch (strtoupper($type)) {
@@ -44,6 +45,17 @@ class StringExpand {
 		}
 		//替换问号
 		$sql = substr($sql, 0, $pos) . $var . substr($sql, $pos + 1);
+	}
+
+	/**
+	 * 拓展str_repeat 重复字符并用字符连接
+	 * @param string $str
+	 * @param integer $count
+	 * @param string $line
+	 * @return string
+	 */
+	public static function repeat($str, $count, $line = ',') {
+		return substr(str_repeat($str.$line, $count), 0, - strlen($line));
 	}
 
 	/**
@@ -90,6 +102,7 @@ class StringExpand {
 	 * 合并多个获取完整的路径
 	 * @param string $baseDir
 	 * @param string $other
+	 * @return string
 	 */
 	public static function getFile($baseDir, $other) {
 		return preg_replace('#[\\/]{2,}#', '/', implode('/', func_get_args()));
@@ -124,9 +137,9 @@ class StringExpand {
 	/**
 	 * 字节长度
 	 * @param string $string
+	 * @return integer
 	 */
-	public static function byteLength($string)
-	{
+	public static function byteLength($string) {
 		return mb_strlen($string, '8bit');
 	}
 
@@ -138,9 +151,14 @@ class StringExpand {
 	public static function filterHtml($content) {
 		return preg_replace('/<(.*?)>/', '', htmlspecialchars_decode($content));
 	}
-	
+
 	/**
 	 * 截取字符串为数组，补充explode函数，不建议过长数组
+	 * @param $str
+	 * @param string $link
+	 * @param int $num
+	 * @param null $default
+	 * @return array
 	 */
 	public static function explode($str, $link = ' ', $num = 1, $default = null) {
 		$arr = explode($link, $str, $num);
@@ -155,11 +173,12 @@ class StringExpand {
 		}
 		return $arr;
 	}
-	
+
 	/**
 	 * 判断字符串是否以$needles开头
 	 * @param string $haystack
 	 * @param string|array $needles
+	 * @return bool
 	 */
 	public static function startsWith($haystack, $needles) {
 		foreach ((array) $needles as $needle) {
@@ -169,12 +188,13 @@ class StringExpand {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 首字符替换
 	 * @param string $search
 	 * @param string $arg
 	 * @param string $replace
+	 * @return string
 	 */
 	public static function firstReplace($arg, $search, $replace = null) {
 		return preg_replace('/^'.$search.'/', $replace, $arg, 1);

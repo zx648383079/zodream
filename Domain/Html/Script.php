@@ -13,7 +13,9 @@ class Script {
 		$dir = rtrim($dir, '/').'/';
 		foreach ($files as $file) {
 			if (is_string($file) && !empty($file)) {
-				if (!strstr($file,'//')) {
+				if (strpos($file, '<') !== false) { // 带有 < 表示是html标签
+					echo $file;
+				} elseif (strpos($file, '//') === false) {
 					self::makeWithRelative($file, $dir);
 				} else {
 					self::makeWithUrl($file);
@@ -31,9 +33,9 @@ class Script {
 			$file = substr($file, 1);
 		}
 		$file = ltrim($file, '/');
-		if (stristr($file, '.css')) {
+		if (strpos($file, '.css') !== false) {
 			self::makeCss(UrlGenerator::to($dir.($needDeal ? 'css/' : '').$file));
-		} elseif (stristr($file, '.js')) {
+		} elseif (strpos($file, '.js') !== false) {
 			self::makeJs(UrlGenerator::to($dir.($needDeal ? 'js/' : '').$file));
 		} else {
 			self::makeJs(UrlGenerator::to($dir.($needDeal ? 'js/' : '').$file. '.js'));
@@ -41,9 +43,9 @@ class Script {
 	}
 	
 	private static function makeWithUrl($file) {
-		if (stristr($file, '.css')) {
+		if (strpos($file, '.css') !== false) {
 			self::makeCss($file);
-		} elseif (stristr($file, '.js')) {
+		} elseif (strpos($file, '.js') !== false) {
 			self::makeJs($file);
 		} else {
 			self::makeJs($file.'.js');

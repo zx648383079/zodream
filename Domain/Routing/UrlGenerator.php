@@ -39,8 +39,8 @@ class UrlGenerator {
 	}
 	
 	protected static function toByFile($file = null) {
-		if (strstr($file, '//')) {
-			if (strstr($file, '://') || ltrim($file, '/') === substr($file, 2)) {
+		if (strpos($file, '//') !== false) {
+			if (strpos($file, '://') !== false || ltrim($file, '/') === substr($file, 2)) {
 				return $file;
 			}
 			$file = str_replace('//', '/', $file);
@@ -123,7 +123,7 @@ class UrlGenerator {
 		if (is_null($search) && $url == '/') {
 			return true;
 		}
-		if (strstr($url, '/'.trim($search, '/')) !== false) {
+		if (strpos($url, '/'.trim($search, '/')) !== false) {
 			return true;
 		}
 		return false;

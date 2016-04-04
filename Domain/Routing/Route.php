@@ -30,10 +30,10 @@ class Route {
 		if (!is_string($this->_action)) {
 			return $this->runCallback();
 		}
-		if (strstr($this->_action, '::') !== false) {
+		if (strpos($this->_action, '::') !== false) {
 			return $this->runStatic();
 		}
-		if (strstr($this->_action, '@') === false) {
+		if (strpos($this->_action, '@') === false) {
 			return $this->runClassWithConstruct();
 		}
 		return $this->runClassAndAction();

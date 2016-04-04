@@ -9,6 +9,8 @@ namespace Zodream\Domain\Filter\Filters;
 
 use Zodream\Infrastructure\DomainObject\FilterObject;
 class FloatFilter extends FilterObject {
+    protected $error = '不是浮点类型！';
+
     protected $_defaultOption = array(
         'min' => null,
         'max' => null,

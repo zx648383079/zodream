@@ -8,6 +8,8 @@
 namespace Zodream\Domain\Filter\Filters;
 
 class RegexFilter extends StringFilter {
+    protected $error = '验证失败！';
+
     protected $_defaultOption = array(
         'regex' => '/.+/',
         'min' => 0,

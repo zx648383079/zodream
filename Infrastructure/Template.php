@@ -7,16 +7,17 @@ namespace Zodream\Infrastructure;
  * Time: 21:28
  */
 class Template extends  MagicObject {
-    protected $baseDir = APP_DIR.'/UserInterface/Template';
+    protected $baseDir;
 
     protected $beginTag = '{';
 
     protected $endTag = '}';
 
     public function __construct($baseDir = null) {
-        if (is_dir($baseDir)) {
-            $this->setBase($baseDir);
+        if (!is_dir($baseDir)) {
+            $baseDir = APP_DIR.'/UserInterface/Template';
         }
+        $this->setBase($baseDir);
     }
 
     /**

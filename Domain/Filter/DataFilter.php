@@ -8,6 +8,7 @@
 namespace Zodream\Domain\Filter;
 
 use Zodream\Domain\Filter\Filters\NoneFilter;
+use Zodream\Infrastructure\DomainObject\FilterObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 defined('PHP_INT_MIN') or define('PHP_INT_MIN', 0);
@@ -17,6 +18,19 @@ class DataFilter {
     private static $_filtersInstance = array(
         'confirm', 'email', 'float', 'int', 'number', 'ip', 'phone', 'raw', 'required', 'same', 'string', 'time', 'unique', 'url'
     );
+
+	private static $_error = array();
+
+	public static function getError() {
+		return self::$_error;
+	}
+
+	private static function _setError($key, $error) {
+		if (!array_key_exists($key, self::$_error)) {
+			self::$_error[$key] = array();
+		}
+		self::$_error[$key][] = $error;
+	}
 
     /**
      * 
@@ -50,18 +64,29 @@ class DataFilter {
 		return self::_runFilterOrValidate($args, $option, false);
     }
 
+	/**
+	 * @param array $args
+	 * @param array $option
+	 * @return bool
+	 */
     public static function validate($args, $option) {
     	return self::_runFilterOrValidate($args, $option, true);
     }
     
-    private static function _runFilterOrValidate($args, $option, $isValidater = true) {
+    private static function _runFilterOrValidate($args, $option, $isValidate = true) {
+		self::$_error = array();
     	$filters = self::_getFilters($option);
-    	if ($isValidater) {
+    	if ($isValidate) {
     		return self::_runValidate($filters, $args);
     	}
     	return self::_runFilter($filters, $args);
     }
-    
+
+	/**
+	 * @param array $filters
+	 * @param array $args
+	 * @return array
+	 */
     private static function _runFilter(array $filters, array $args) {
     	$results = array();
     	foreach ($filters as $key => $value) {
@@ -73,23 +98,30 @@ class DataFilter {
     	}
     	return $results;
     }
-    
+
+	/**
+	 * @param array $filters
+	 * @param array $args
+	 * @return bool
+	 */
     private static function _runValidate(array $filters, array $args) {
     	$results = array();
     	foreach ($filters as $key => $value) {
     		$result = true;
     		foreach ($value as $val) {
-    			$result = $val->validate(isset($args[$key]) ? $args[$key] : null, $args) ? $result : false;
+				if (!$val->validate(isset($args[$key]) ? $args[$key] : null, $args)) {
+					self::_setError($key, $val->getError());
+					$result = false;
+				}
     		}
-
     		$results[$key] = $result;
     	}
-    	return $results;
+    	return !in_array(false, $results);
     }
     
     private static function _getFilters($options) {
     	if (is_string($options)) {
-    		$options = self::_sqlitKeyAndFilters($options);
+    		$options = self::_splitKeyAndFilters($options);
     	}
     	foreach ($options as $key => &$value) {
     		$value = self::_getFiltersFromOne($value);
@@ -97,7 +129,7 @@ class DataFilter {
     	return $options;
     }
     
-    private static function _sqlitKeyAndFilters($option) {
+    private static function _splitKeyAndFilters($option) {
     	$options = explode(';', $option);
     	$results = array();
     	foreach ($options as $key => $value) {
@@ -110,7 +142,7 @@ class DataFilter {
     	}
     	return $results;
     }
-    
+
     private static function _getFiltersFromOne($option) {
     	if (is_string($option)) {
     		$option = explode('|', $option);
@@ -121,6 +153,10 @@ class DataFilter {
     	return $option;
     }
 
+	/**
+	 * @param string $value
+	 * @return FilterObject
+	 */
     private static function _splitFilter($value) {
         list($filter, $option) = StringExpand::explode($value, ':', 2);
         $filter = strtolower($filter);

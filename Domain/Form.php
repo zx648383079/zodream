@@ -2,10 +2,14 @@
 namespace Zodream\Domain;
 
 use Zodream\Domain\Filter\DataFilter;
+use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Traits\AjaxTrait;
 use Zodream\Infrastructure\Traits\ViewTrait;
-abstract class Form {
+abstract class Form extends MagicObject{
+
+	protected $rules = array();
 
 	protected $status = array(
 		'操作成功完成！',
@@ -15,14 +19,34 @@ abstract class Form {
 	);
 
 	use ViewTrait, AjaxTrait;
+
+	/**
+	 * 填充表单数据
+	 * @param array $data
+	 */
+	public function __construct($data = array()) {
+		$fill = implode(',', array_keys($this->rules));
+		$this->set(empty($data) ? Request::post($fill) : ArrayExpand::getValues($fill, $data));
+	}
+
 	/**
 	 * 验证POST数据
-	 * @param string $args
-	 * @return NULL[]
+	 * @param array $request
+	 * @param array $args
+	 * @return bool
 	 */
-	public function validate($request, $args) {
-		$result = DataFilter::validate($request, $args);
-		return !in_array(false, $result);
+	public function validate($request = array(), $args = array()) {
+		if (empty($request) || empty($args)) {
+			$request = $this->get();
+			$args = $this->rules;
+		}
+		return DataFilter::validate($request, $args);
+	}
+
+	public function save($id = null) {
+		if (!is_null($id)) {
+			$this->set('id', intval($id));
+		}
 	}
 
 	/**

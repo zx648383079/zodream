@@ -10,6 +10,8 @@ namespace Zodream\Domain\Filter\Filters;
 use Zodream\Infrastructure\DomainObject\FilterObject;
 
 class UrlFilter extends FilterObject {
+    protected $error = '不是合法的网址！';
+
     protected $_defaultOption = array(
         'path'  => false,
         'query' => false

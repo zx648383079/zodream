@@ -10,6 +10,7 @@ namespace Zodream\Domain\Filter\Filters;
 use Zodream\Infrastructure\DomainObject\FilterObject;
 
 class IntFilter extends FilterObject {
+    protected $error = '不是整型！';
 
     protected $_defaultOption = array(
         'min' => PHP_INT_MIN,

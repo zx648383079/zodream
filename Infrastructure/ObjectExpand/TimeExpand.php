@@ -6,9 +6,12 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 class TimeExpand {
-	/***
-	 返回当前时间
-	 ***/
+	/**
+	 * 返回当前时间
+	 * @param null $format
+	 * @param null $time
+	 * @return int|string
+	 */
 	public static function now($format = null, $time = null) {
 		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
 		if (empty($time)) {
@@ -19,7 +22,13 @@ class TimeExpand {
 		}
 		return $time;
 	}
-	
+
+	/**
+	 * 将时间转换成字符串格式
+	 * @param null $time
+	 * @param string $format
+	 * @return string
+	 */
 	public static function format($time = null, $format = 'Y-m-d H:i:s') {
 		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
 		if ($time == null) {
@@ -66,7 +75,12 @@ class TimeExpand {
 			time()
 		);
 	}
-	
+
+	/**
+	 * 获取时间是多久以前
+	 * @param $time
+	 * @return int|string
+	 */
 	public static function isTimeAgo($time){
 		$time   = time() - $time; // to get the time since that moment
 		$time   = ($time<1)? 1 : $time;

@@ -24,12 +24,15 @@ class MagicObject implements \ArrayAccess {
 		if ($this->has($key)) {
 			return $this->_data[$key];
 		}
-		$result = ArrayExpand::getChild($key, $this->_data, is_object($default) ? null : $default);
+		if (strpos($key, ',') !== false) {
+			$result = ArrayExpand::getValues($key, $this->_data, $default);
+		} else {
+			$result = ArrayExpand::getChild($key, $this->_data, is_object($default) ? null : $default);
+		}
 		if (is_object($default)) {
 			return $default($result);
-		} else {
-			return $result;
 		}
+		return $result;
 	}
 	
 	/**
@@ -56,6 +59,10 @@ class MagicObject implements \ArrayAccess {
 		foreach (func_get_args() as $value) {
 			unset($this->_data[$value]);
 		}
+	}
+
+	public function clear() {
+		$this->_data = array();
 	}
 	
 	/**

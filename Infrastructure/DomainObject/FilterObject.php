@@ -8,9 +8,10 @@
 namespace Zodream\Infrastructure\DomainObject;
 
 abstract class FilterObject {
-    protected $_error         = 'ERROR！';
     protected $_defaultOption = array();
-    protected $_option        = array();
+    protected $_option = array();
+
+    protected $error = '验证失败！';
 
     public function __construct($option = null) {
         $this->setOption($option);
@@ -33,11 +34,7 @@ abstract class FilterObject {
         return !is_null($filtered) && $filtered == $arg;
     }
 
-    public function setError($error) {
-        $this->_error = $error;
-    }
-
     public function getError() {
-        return $this->_error;
+        return $this->error;
     }
 }

@@ -26,6 +26,10 @@ class Generate {
 		if (!defined('DEBUG') || !DEBUG) {
 			Redirect::to('/');
 		}
+		if (Request::isPost()) {
+			$this->makeConfig(Request::post());
+			Redirect::to('/', 2, '安装完成！');
+		}
 		$mode = Request::get('mode', 0);
 		if (empty($mode)) {
 			exit('table:指定表,为空时表示所以表； mode:二进制标志1111，从左至右1代表视图、表单、模型、控制器！');

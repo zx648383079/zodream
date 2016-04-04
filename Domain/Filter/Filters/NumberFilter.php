@@ -10,6 +10,7 @@ namespace Zodream\Domain\Filter\Filters;
 use Zodream\Infrastructure\DomainObject\FilterObject;
 
 class NumberFilter extends FilterObject {
+    protected $error = '不是有效的数字！';
 
     protected $_defaultOption = array(
         'min' => PHP_INT_MIN,

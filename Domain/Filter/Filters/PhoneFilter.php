@@ -8,6 +8,8 @@
 namespace Zodream\Domain\Filter\Filters;
 
 class PhoneFilter extends RegexFilter {
+    protected $error = '手机号码错误！';
+
     public function filter($arg) {
         $arg = parent::filter($arg);
         $matches = array();

@@ -76,35 +76,33 @@ abstract class Model {
 	 */
 	public function add(array $addData) {
 		$addFields = implode('`,`', array_keys($addData));
-		$addValues = implode("','", array_values($addData));
-		return $this->insert("`{$addFields}`", "'{$addValues}'");
+		return $this->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), array_values($addData));
 	}
 	 
 	/**
 	 * 修改记录
 	 *
-	 * @access public
-	 *
-	 * @param array $param 条件 默认使用AND 连接
+	 * @param array|string $param 条件 默认使用AND 连接
 	 * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-	public function updateValues($updateData, $param) {
+	public function updateValues(array $updateData, $param) {
 		$setData = '';
 		foreach ($updateData as $key => $value) {
-			$setData .= "`$key` = '$value',";
+			$setData .= "`$key` = ?,";
 		}
 		$setData = substr($setData, 0, -1);
-		return $this->update($setData, $this->getWhere($param));
+		return $this->update($setData, $this->getCondition($param), array_values($updateData));
 	}
-	
+
 	/**
 	 * 更具id 修改记录
 	 * @param string|integer $id
 	 * @param array $data
+	 * @return int
 	 */
-	public function updateById($id, $data) {
-		return $this->updateValues($data, 'id = '.$id);
+	public function updateById($id, array $data) {
+		return $this->updateValues($data, 'id = '.intval($id));
 	}
 	 
 	/**
@@ -115,22 +113,39 @@ abstract class Model {
 	 * @return int
 	 */
 	public function updateBool($filed, $where) {
-		return $this->update("{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END", $where);
+		return $this->update("{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END", $this->getCondition($where));
 	}
 	
 	/**
 	 * int加减
 	 *
-	 * @param string $filed
+	 * @param string|string $filed
 	 * @param string $where
-	 * @param string $num
+	 * @param integer $num
 	 * @return int
 	 */
 	public function updateOne($filed, $where, $num = 1) {
+		$sql[] = array();
+		foreach ((array)$filed as $key => $item) {
+			if (is_numeric($key)) {
+				$sql[] = "`$item` = `$item` ".$this->getNumber($num);
+			} else {
+				$sql[] = "`$key` = `$key` ".$item;
+			}
+		}
+		return $this->update(implode(',', $sql), $this->getCondition($where));
+	}
+
+	/**
+	 * 获取加或减
+	 * @param string|int $num
+	 * @return string
+	 */
+	protected function getNumber($num) {
 		if ($num >= 0) {
 			$num = '+'.$num;
 		}
-		return $this->update("{$filed} = {$filed} {$num}", $where);
+		return $num;
 	}
 
 	/**
@@ -139,10 +154,12 @@ abstract class Model {
 	 * @access public
 	 *
 	 * @param array|string $param 条件
-	 * @return array,
+	 * @param string $filed
+	 * @param array $parameters
+	 * @return array ,
 	 */
-	public function findOne($param, $filed = '*') {
-		$result = $this->select("{$this->getWhere($param)} LIMIT 1", $filed);
+	public function findOne($param, $filed = '*', $parameters = array()) {
+		$result = $this->select("{$this->getWhere($param)} LIMIT 1", $filed, $parameters);
 		return current($result);
 	}
 	
@@ -153,20 +170,22 @@ abstract class Model {
 	 * @return array
 	 */
 	public function findById($id, $filed = '*') {
-		$result = $this->select("WHERE id = {$id} LIMIT 1", $filed);
+		$result = $this->select('WHERE id = '.intval($id).' LIMIT 1', $filed);
 		return current($result);
 	}
-	 
+
 	/**
 	 * 删除第一条数据
 	 *
 	 * @access public
 	 *
-	 * @param array|string $param 条件
+	 * @param string|array $where
+	 * @param array $parameters
 	 * @return int 返回影响的行数,
+	 * @internal param array|string $param 条件
 	 */
-	public function deleteValues($param) {
-		return $this->delete($this->getWhere($param));
+	public function deleteValues($where, $parameters = array()) {
+		return $this->delete($this->getCondition($where), $parameters);
 	}
 
 	/** 根据id删除数据
@@ -174,25 +193,25 @@ abstract class Model {
 	 * @return int
 	 */
 	public function deleteById($id) {
-		return $this->deleteValues('id = '.$id);
+		return $this->deleteValues('id = '.intval($id));
 	}
-	 
+
 	/**
 	 * 查询数据
 	 *
 	 * @access public
 	 *
-	 * @param array $field 要显示的字段
 	 * @param array|null $param 条件
+	 * @param array $field 要显示的字段
+	 * @param array $parameters
 	 * @return array 返回查询结果,
 	 */
-	public function find($param = array(), $field = array()) {
-		return $this->select($this->getBySort($param), $this->getField($field));
+	public function find($param = array(), $field = array(), $parameters = array()) {
+		return $this->select($this->getBySort($param), $this->getField($field), $parameters);
 	}
 
 	/**
 	 * 根据关键字顺序组合
-	 * @param array $sequence
 	 * @param array|string $param
 	 * @return string
 	 */
@@ -232,6 +251,7 @@ abstract class Model {
 	/**
 	 * 合并where 或 having 的条件
 	 * @param array|string $param
+	 * @return string
 	 */
 	protected function getCondition($param) {
 		if (is_string($param)) {
@@ -329,7 +349,7 @@ abstract class Model {
 	protected function getOffset($param) {
 		return "OFFSET {$param}";
 	}
-	 
+
 	/**
 	 * 总记录
 	 *
@@ -337,10 +357,11 @@ abstract class Model {
 	 *
 	 * @param array|null $param 条件
 	 * @param string $field 默认为id
+	 * @param array $parameters
 	 * @return int 返回总数,
 	 */
-	public function count($param = array(), $field = 'id') {
-		$result = $this->select($this->getWhere($param). ' LIMIT 1', "COUNT({$field}) AS count");
+	public function count($param = array(), $field = 'id', $parameters = array()) {
+		$result = $this->select($this->getWhere($param). ' LIMIT 1', "COUNT({$field}) AS count", $parameters);
 		if (empty($result)) {
 			return null;
 		}
@@ -351,10 +372,11 @@ abstract class Model {
 	 * 获取第一行第一列
 	 * @param array|string $param
 	 * @param string $filed
-	 * @return bool|mixed
+	 * @param array $parameters
+	 * @return string
 	 */
-	public function scalar($param, $filed = '*') {
-		$result = $this->select($this->getBySort($param), $filed);
+	public function scalar($param, $filed = '*', $parameters = array()) {
+		$result = $this->select($this->getBySort($param), $filed, $parameters);
 		if (empty($result)) {
 			return false;
 		}

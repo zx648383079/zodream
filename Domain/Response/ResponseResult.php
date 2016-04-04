@@ -50,16 +50,20 @@ class ResponseResult {
 	
 	/**
 	 * 显示错误页面
-	 * @param array $data
-	 * @param number $stauts
+	 * @param array|string $data
+	 * @param integer $status
+	 * @param string $title
 	 */
-	public static function sendError($data = '', $status = 404) {
-		View::getInstance()->set(array(
-				'error' => $data,
-				'status' => $status,
-				'title' => '出错了！'
-		));
-		view::getInstance()->showWithFile($status, $status);
+	public static function sendError($data = '', $status = 404, $title = '出错了！') {
+		if (!is_array($data)) {
+			$data = array(
+				'message' => $data
+			);
+		}
+		$data['status'] = $status;
+		$data['title'] = $title;
+		View::getInstance()->set($data);
+		View::getInstance()->showWithFile($status, $status);
 	}
 	
 	public static function sendRedirect($url, $time = 0) {
@@ -88,7 +92,7 @@ class ResponseResult {
 	
 	/**
 	 * md5校验值
-	 * @param unknown $md5
+	 * @param string $md5
 	 */
 	public static function sendContentMD5($md5) {
 		header('Content-MD5:'.$md5);
@@ -104,7 +108,7 @@ class ResponseResult {
 	
 	/**
 	 * 实现特定指令
-	 * @param unknown $option
+	 * @param string $option
 	 */
 	public static function sendPragma($option) {
 		header('Pragma: '.$option);
@@ -112,7 +116,7 @@ class ResponseResult {
 	
 	/**
 	 * 如果实体不可取，指定时间重试
-	 * @param unknown $time
+	 * @param integer $time
 	 */
 	public static function sendRetryAfter($time) {
 		header('Retry-After: '.$time);
@@ -120,7 +124,7 @@ class ResponseResult {
 	
 	/**
 	 * 原始服务器发出时间
-	 * @param unknown $time
+	 * @param integer $time
 	 */
 	public static function sendDate($time) {
 		header('Date: '.gmdate('D, d M Y H:i:s', $time).' GMT');
@@ -128,7 +132,7 @@ class ResponseResult {
 	
 	/**
 	 * 响应过期的时间
-	 * @param unknown $time
+	 * @param integer $time
 	 */
 	public static function sendExpires($time) {
 		header('Expires: '.gmdate('D, d M Y H:i:s', $time).' GMT');
@@ -136,7 +140,7 @@ class ResponseResult {
 	
 	/**
 	 * 最后修改时间
-	 * @param unknown $time
+	 * @param integer $time
 	 */
 	public static function sendLastModified($time) {
 		header('Last-Modified: '.gmdate('D, d M Y H:i:s', $time).' GMT');
@@ -144,7 +148,7 @@ class ResponseResult {
 	
 	/**
 	 * 大小
-	 * @param unknown $length
+	 * @param int|string $length
 	 */
 	public static function sendContentLength($length) {
 		header('Content-Length:'.$length);
@@ -152,7 +156,7 @@ class ResponseResult {
 	
 	/**
 	 * 文件流的范围
-	 * @param unknown $length
+	 * @param integer $length
 	 * @param string $type
 	 */
 	public static function sendContentRange($length, $type = 'bytes') {
@@ -169,10 +173,10 @@ class ResponseResult {
 	
 	/**
 	 * 下载文件的文件名
-	 * @param unknown $filename
+	 * @param string $filename
 	 */
 	public static function sendContentDisposition($filename) {
-		if (strstr(Request::server('HTTP_USER_AGENT'), 'MSIE')) {     //如果是IE浏览器
+		if (strpos(Request::server('HTTP_USER_AGENT'), 'MSIE') !== false) {     //如果是IE浏览器
 			$filename = preg_replace('/\./', '%2e', $filename, substr_count($filename, '.') - 1);
 		}
 		header('Content-Disposition: attachment; filename="'.$filename.'"');
@@ -180,7 +184,7 @@ class ResponseResult {
 	
 	/**
 	 * 文件传输编码
-	 * @param unknown $encoding
+	 * @param string $encoding
 	 */
 	public static function sendTransferEncoding($encoding = 'chunked') {
 		header('Transfer-Encoding: '.$encoding);

@@ -26,7 +26,7 @@ class Download {
 				ResponseResult::sendContentType('application/force-download');
 				break;
 		}
-		ResponseResult::sendContentDisposition($iefilename);
+		ResponseResult::sendContentDisposition($filename);
 		ResponseResult::sendAcceptRanges();
 		$range = Request::server('HTTP_RANGE');
 		$value = 0;

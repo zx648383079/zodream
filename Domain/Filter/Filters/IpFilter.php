@@ -10,6 +10,7 @@ namespace Zodream\Domain\Filter\Filters;
 use Zodream\Infrastructure\DomainObject\FilterObject;
 
 class IpFilter extends FilterObject {
+    protected $error = 'IP格式不正确！';
 
     protected $_defaultOption = array(
         'ipv4' => true,
