@@ -126,7 +126,7 @@ class Route {
 		list($class, $action) = $this->getController($classes, $action);
 		$this->_class[1] = $action;
 		/** @var BaseController $instance */
-		$instance        = new $class;
+		$instance = new $class;
 		$instance->init();
 		return call_user_func(array($instance, 'runAction'), $action, $this->_param);
 	}

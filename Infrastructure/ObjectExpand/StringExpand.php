@@ -200,6 +200,10 @@ class StringExpand {
 		return preg_replace('/^'.$search.'/', $replace, $arg, 1);
 	}
 
+	public static function lastReplace($arg, $search, $replace = null) {
+		return preg_replace('/'.$search.'$/', $replace, $arg, 1);
+	}
+
 	/**
 	 * UTF8字符串的长度
 	 * @param string $str
