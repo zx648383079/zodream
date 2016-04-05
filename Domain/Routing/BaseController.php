@@ -59,18 +59,19 @@ abstract class BaseController {
 		}
 		$this->prepare();
 		EventManger::getInstance()->run('runController', $vars);
-		$result = Request::isPost() ?
-			$this->runPostAction($action, $vars) : $this->runAllAction($action, $vars);
+		if (Request::isPost()) {
+			$this->runPostAction($action, $vars);
+		}
+		$result = $this->runAllAction($action, $vars);
 		$this->finalize();
 		return $result;
 	}
 
 	protected function runPostAction($action, $vars = array()) {
-		if (!method_exists($this, $action.'Post')) {
-			return $this->runAllAction($action, $vars);
+		if (method_exists($this, $action.'Post')) {
+			$action .= 'Post';
+			$this->$action(Request::post(), $vars);
 		}
-		$action .= 'Post';
-		return $this->$action(Request::post(), $vars);
 	}
 
 	protected function runAllAction($action, $vars = array()) {

@@ -24,10 +24,10 @@ class Redirect {
 		}
 		if (!headers_sent()) {
 			ResponseResult::sendRedirect($url, $time);
+			exit();
 		}
-
 		ResponseResult::sendError(array(
-			'_extra' => '<meta http-equiv=\'Refresh\' content=\'{$time};URL={$url}\'>',
+			'_extra' => "<meta http-equiv='Refresh' content='{$time};URL={$url}'>",
 			'message' => empty($msg) ? "系统将在{$time}秒之后自动跳转到{$url}！" : $msg
 		), $status, '跳转');
 	}

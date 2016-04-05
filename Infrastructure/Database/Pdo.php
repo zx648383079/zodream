@@ -77,7 +77,7 @@ class Pdo extends Database {
 			} else {
 				$type = \PDO::PARAM_STR;
 			}
-			$this->result->bindParam(is_int($key) ? ++$key : $key, $value, $type);
+			$this->result->bindValue(is_int($key) ? ++$key : $key, $value, $type);
 		}
 	}
 
