@@ -9,6 +9,7 @@ namespace Zodream\Domain\Response;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Domain\Html\Script;
@@ -121,15 +122,29 @@ class View extends MagicObject {
 	public function asset($file) {
 		echo UrlGenerator::toAsset($this->getAsset($file));
 	}
-	
+
+	/**
+	 * 输出完整的网址
+	 * @param string $url
+	 * @param array|string $extra
+	 */
 	public function url($url = null, $extra = null) {
 		echo UrlGenerator::to($url, $extra);
 	}
-	
+
+	/**
+	 * 判断是否包含url片段
+	 * @param string $search
+	 * @return bool
+	 */
 	public function hasUrl($search = null) {
 		return UrlGenerator::hasUri($search);
 	}
-    
+
+	/**
+	 * 输出执行方法后的数据
+	 * @param string $func
+	 */
     public function call($func) {
        $args = array();
        if (func_get_args() > 1) {
@@ -137,6 +152,17 @@ class View extends MagicObject {
        }
        echo call_user_func_array($func, $args);
     }
+
+	/**
+	 * 输出格式化后的时间
+	 * @param integer|string $time
+	 */
+	public function time($time = null) {
+		if (is_null($time)) {
+			$time = time();
+		}
+		echo TimeExpand::format($time);
+	}
 	
 	/**
 	 * 直接输出
@@ -161,7 +187,7 @@ class View extends MagicObject {
 			$this->set($name);
 			$this->showWithRoute();
 		}
-		if (is_object($name)) {
+		if ($name instanceof \Closure) {
 			$this->showObject($name);
 		}
 		if (!is_null($data)) {

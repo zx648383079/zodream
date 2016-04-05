@@ -93,6 +93,7 @@ class DataFilter {
     	foreach ($filters as $key => $value) {
     		$result = isset($args[$key]) ? $args[$key] : null;
     		foreach ($value as $val) {
+				/**	@param FilterObject $val */
     			$result = $val->filter($result, $args);
     		}
     		$results[$key] = $result;
@@ -110,6 +111,7 @@ class DataFilter {
     	foreach ($filters as $key => $value) {
     		$result = true;
     		foreach ($value as $val) {
+				/** @param FilterObject $val  */
 				if (!$val->validate(isset($args[$key]) ? $args[$key] : null, $args)) {
 					self::_setError($key, $val->getError());
 					$result = false;

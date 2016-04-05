@@ -68,10 +68,13 @@ class MagicObject implements \ArrayAccess {
 
 	/**
 	 * 判断是否有
-	 * @param string $key
+	 * @param string|null $key 如果为null 则判断是否有数据
 	 * @return bool
 	 */
-	public function has($key) {
+	public function has($key = null) {
+		if (is_null($key)) {
+			return !empty($this->_data);
+		}
 		return array_key_exists($key, $this->_data);
 	}
 	

@@ -392,18 +392,15 @@ abstract class Model {
 	 * @access public
 	 *
 	 * @param array $param 条件
-	 * @param bool $isList 返回类型
+	 * @param array $parameters 值
 	 * @return array 返回查询结果,
 	 */
-	public function findByHelper($param, $isList = TRUE) {
+	public function findByHelper($param, $parameters = array()) {
 		if (empty($param)) {
 			return array();
 		}
 		$sql  = (new SqlFilter($this->prefix))->getSQL($param);
-		if ($isList) {
-			return $this->db->getArray($sql);
-		}
-		return $this->db->getObject($sql);
+		return $this->db->getArray($sql, $parameters);
 	}
 
 	/**
