@@ -32,14 +32,6 @@ class Session extends MagicObject {
 		$this->_data = & $_SESSION;
 	}
 	
-	public function setLifeTime($lifeTime) {
-		/*$this->lifeTime = $lifeTime;
-		if (session_id()) {
-			session_abort();
-		}
-		$this->init();*/
-	}
-	
 	/**
 	 * 删除
 	 * @param string $name

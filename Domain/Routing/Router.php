@@ -19,15 +19,35 @@ class Router{
 	 * @var Route
 	 */
 	private static $_route;
+
+	/**
+	 * 获取路由
+	 * @return Route
+	 */
 	public static function getRoute() {
 		return self::$_route;
 	}
+
+	/**
+	 * 设置路由
+	 * @param Route $route
+	 */
 	public static function setRoute($route) {
-		return self::$_route = $route;
+		self::$_route = $route;
 	}
+
+	/**
+	 * 判断是否有路由
+	 * @return bool
+	 */
 	public static function hasRoute() {
 		return !empty(self::$_route);
 	}
+
+	/**
+	 * 获取路由中的执行类和方法
+	 * @return array|null
+	 */
 	public static function getClassAndAction() {
 		if (self::hasRoute()) {
 			return self::getRoute()->getClassAndAction();
@@ -51,37 +71,37 @@ class Router{
 	 * 通过配置的驱动获取路由
 	 */
 	private static function _getRouteByDriver() {
-		return self::_runByRoute(call_user_func(array(RouteConfig::getInstance()->getDriver(), 'get')));
+		self::_runByRoute(call_user_func(array(RouteConfig::getInstance()->getDriver(), 'get')));
 	}
 
 	/**
 	 * 根据路由判断
 	 * @param array|string $routes
-	 * @return bool
 	 */
 	private static function _runByRoute($routes) {
 		if (is_string($routes)) {
 			$routes = trim($routes, '/');
 		}
 		if (is_string($routes)) {
-			return self::_loopConfig($routes, RouteConfig::getInstance()->get());
+			self::_loopConfig($routes, RouteConfig::getInstance()->get());
+			return;
 		}
-		return self::_runByRouteWhenArray($routes);
+		self::_runByRouteWhenArray($routes);
 	}
 
 	/**
 	 * 当获取到的路由是array数组
 	 * @param array $routes
-	 * @return
 	 */
 	private static function _runByRouteWhenArray(array $routes) {
 		list($controller, $action, $values) = $routes;
 		//执行默认的
 		if (empty($controller) && empty($action)) {
-			return self::setRoute(new Route(RouteConfig::getInstance()->getDefault(), $values, false));
+			self::setRoute(new Route(RouteConfig::getInstance()->getDefault(), $values, false));
+			return;
 		}
 		//自动判断
-		return self::_autoload($controller, $action, $values);
+		self::_autoload($controller, $action, $values);
 	}
 
 
@@ -170,10 +190,11 @@ class Router{
 						$values[$k] = $value;
 					}
 				}
-				return self::setRoute(new Route($instance, $values, false));
+				self::setRoute(new Route($instance, $values, false));
+				return;
 			}
 		}
-		return self::_runByRouteWhenArray(self::_getRoutesWhenString($route));
+		self::_runByRouteWhenArray(self::_getRoutesWhenString($route));
 	}
 	
 	/**
@@ -187,7 +208,7 @@ class Router{
 		if (empty($action)) {
 			$action = 'index';
 		}
-		return self::setRoute( new Route($controller.'@'.$action, $values, true));
+		self::setRoute( new Route($controller.'@'.$action, $values, true));
 	}
 	
 	/**

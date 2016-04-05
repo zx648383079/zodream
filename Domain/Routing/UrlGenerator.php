@@ -59,7 +59,12 @@ class UrlGenerator {
 		}
 		return call_user_func(array(RouteConfig::getInstance()->getDriver(), 'to'), $file);
 	}
-	
+
+	/**
+	 * 获取物理路径
+	 * @param string $file
+	 * @return string
+	 */
 	public static function toAsset($file) {
 		return self::getRoot(FALSE).ltrim($file, '/');
 	}
@@ -71,8 +76,6 @@ class UrlGenerator {
 	 * @return string
 	 */
 	public static function getRoot($withScript = TRUE) {
-		$args = parse_url(self::getUri());
-		$root = '';
 		$secret = Request::server('HTTPS');
 		if (empty($secret) || 'off' === strtolower($secret)) {
 			$root = 'http';
@@ -120,7 +123,11 @@ class UrlGenerator {
 		}
 		return $arr[0].'?'.http_build_query($data);
 	}
-	
+
+	/**判断是否带url段
+	 * @param string $search
+	 * @return bool
+	 */
 	public static function hasUri($search = null) {
 		$url = self::getUriWithoutParam();
 		if (is_null($search) && $url == '/') {
@@ -132,6 +139,11 @@ class UrlGenerator {
 		return false;
 	}
 
+	/**
+	 * 判断是否是url
+	 * @param string $url
+	 * @return bool
+	 */
 	public static function isUrl($url) {
 		return trim(self::getUriWithoutParam(), '/') == trim($url, '/');
 	}

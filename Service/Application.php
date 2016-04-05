@@ -22,7 +22,7 @@ class Application {
 	 */
 	public static function main() {
 		Autoload::getInstance()->setError()->shutDown();
-		EventManger::getInstance()->run('app_run');
+		EventManger::getInstance()->run('appRun');
 		if (Config::getInstance()->get('app.safe', false) && !Request::isGet()) {
 			VerifyCsrfToken::verify();
 		}

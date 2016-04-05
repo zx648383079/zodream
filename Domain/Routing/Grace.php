@@ -1,7 +1,8 @@
 <?php
 namespace Zodream\Domain\Routing;
-
-
+/**
+ * 优雅链接
+ */
 use Zodream\Infrastructure\DomainObject\RouteObject;
 class Grace implements RouteObject {
 	public static function get() {

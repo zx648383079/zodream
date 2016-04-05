@@ -12,7 +12,17 @@ use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\EventManager\EventManger;
 
 abstract class BaseController {
-	
+
+	protected $rules = array();
+
+	/**
+	 * 此方法主要是为了继承并附加规则
+	 * @return array
+	 */
+	protected function rules() {
+		return array();
+	}
+
 	public function init() { }
 	
 	/**
@@ -41,14 +51,33 @@ abstract class BaseController {
 	 * @return mixed
 	 */
 	public function runAction($action, array $vars = array()) {
+		//合并过滤规则
+		$this->rules = array_merge($this->rules, $this->rules());
+
 		if (!$this->canRunAction($action)) {
-			Error::out($action .' ACTION CANOT RUN!', __FILE__, __LINE__);
+			Error::out($action .' ACTION CANNOT RUN!', __FILE__, __LINE__);
 		}
 		$this->prepare();
+		EventManger::getInstance()->run('runController', $vars);
+		$result = Request::isPost() ?
+			$this->runPostAction($action, $vars) : $this->runAllAction($action, $vars);
+		$this->finalize();
+		return $result;
+	}
+
+	protected function runPostAction($action, $vars = array()) {
+		if (!$this->hasAction($action.'Post')) {
+			return $this->runAllAction($action, $vars);
+		}
+		$action .= 'Post'.APP_ACTION;
+		return $this->$action(Request::post(), $vars);
+	}
+
+	protected function runAllAction($action, $vars = array()) {
 		$reflectionObject = new \ReflectionObject( $this );
 		$action .= APP_ACTION;
 		$method = $reflectionObject->getMethod($action);
-		
+
 		$parameters = $method->getParameters();
 		$arguments = array();
 		foreach ($parameters as $param) {
@@ -58,20 +87,15 @@ abstract class BaseController {
 				$arguments[] = Request::get($param->getName());
 			}
 		}
-		EventManger::getInstance()->run('runController', $arguments);
-		$ret = call_user_func_array( array($this, $action) , $arguments );
-		
-		$this->finalize();
-		return $ret;
+		return call_user_func_array( array($this, $action) , $arguments );
 	}
 	/**
 	 * 加载其他控制器的方法
-	 * @param string $controller
+	 * @param static|string $controller
 	 * @param string $actionName
 	 * @param array $parameters
 	 */
-	public function forward($controller, $actionName = 'index' , $parameters = array())
-	{
+	public function forward($controller, $actionName = 'index' , $parameters = array()) {
 		if (is_string($controller)) {
 			$controller = new $controller;
 		}

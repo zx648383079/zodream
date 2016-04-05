@@ -1,7 +1,8 @@
 <?php
 namespace Zodream\Domain\Routing;
-
-
+/**
+ * 以 r 参数带链接
+ */
 use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\Request;
 class Yii implements RouteObject {

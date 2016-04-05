@@ -5,21 +5,31 @@ namespace Zodream\Domain\Routing;
  * 单个路由
  * @author Jason
  */
+use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\Request;
-use Zodream\Domain\Response\ResponseResult;
 
 class Route {
 	protected $_action;
 	protected $_param;
 	protected $_isController;
 	protected $_class = array();
-	
+
+	/**
+	 * Route constructor.
+	 * @param string|object $action
+	 * @param array $param
+	 * @param bool $isController
+	 */
 	public function __construct($action, $param = null, $isController = TRUE) {
 		$this->_action = $action;
 		$this->_param  = (array)$param;
 		$this->_isController = $isController;
 	}
-	
+
+	/**
+	 * 执行路由
+	 * @return bool|mixed|null
+	 */
 	public function run() {
 		if (trim($this->_action) === '@') {
 			return false;
@@ -39,7 +49,8 @@ class Route {
 		return $this->runClassAndAction();
 	}
 
-	/** 获取当前的 class 和 action
+	/**
+	 * 获取当前的 class 和 action
 	 * @return array|null (class, action)
 	 */
 	public function getClassAndAction() {
@@ -142,7 +153,7 @@ class Route {
 		if ($class !== false) {
 			return array($class, 'index');
 		}
-		ResponseResult::sendError('CLASS IS NOT FIND!');
+		Error::out('CLASS IS NOT FIND!');
 		return false;
 	}
 	

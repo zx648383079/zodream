@@ -1,7 +1,8 @@
 <?php
 namespace Zodream\Domain\Routing;
-
-
+/**
+ * 普通链接方式 即 c v
+ */
 use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
