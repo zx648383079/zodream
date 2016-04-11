@@ -46,4 +46,12 @@ class Session extends MagicObject {
 	public function clear() {
 		session_destroy();
 	}
+
+	public static function getValue($name, $default = null) {
+		return static::getInstance()->get($name, $default);
+	}
+
+	public static function setValue($name, $value = null) {
+		static::getInstance()->set($name, $value);
+	}
 }

@@ -66,6 +66,7 @@ class DataFilter {
     }
 
 	/**
+	 * 验证
 	 * @param array $args
 	 * @param array $option
 	 * @return bool
@@ -126,10 +127,14 @@ class DataFilter {
     	if (is_string($options)) {
     		$options = self::_splitKeyAndFilters($options);
     	}
-    	foreach ($options as $key => &$value) {
-    		$value = self::_getFiltersFromOne($value);
+		$filters = array();
+    	foreach ($options as $key => $value) {
+    		$filter = self::_getFiltersFromOne($value);
+			if (!empty($filter)) {
+				$filters[$key] = $filter;
+			}
     	}
-    	return $options;
+    	return $filters;
     }
     
     private static function _splitKeyAndFilters($option) {
@@ -150,10 +155,14 @@ class DataFilter {
     	if (is_string($option)) {
     		$option = explode('|', $option);
     	}
-    	foreach ($option as $key => &$value) {
-    		$value = self::_splitFilter($value);
+		$filters = array();
+    	foreach ($option as $value) {
+    		$filter = self::_splitFilter($value);
+			if (!empty($filter)) {
+				$filters[] = $filter;
+			}
     	}
-    	return $option;
+    	return $filters;
     }
 
 	/**
@@ -167,6 +176,6 @@ class DataFilter {
             $class = 'Zodream\\Domain\\Filter\\Filters\\'.ucfirst($filter).'Filter';
             return new $class($option);
         }
-        return new NoneFilter();
+        return null;
     }
 }

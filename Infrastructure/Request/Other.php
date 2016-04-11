@@ -14,6 +14,10 @@ class Other extends BaseRequest {
         ));
     }
 
+    /**
+     * 获取提交的方法
+     * @return string
+     */
     public function getMethod() {
         if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
             return strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
@@ -24,9 +28,6 @@ class Other extends BaseRequest {
 
     /**
      * 获取真实IP
-     *
-     * @access globe
-     *
      * @return string IP,
      */
     public function getIp() {

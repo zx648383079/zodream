@@ -21,8 +21,8 @@ class FileGetContent {
 			'http' => array(
 				'method' => 'POST',
 				'header' => 'Content-type: application/x-www-form-urlencoded'."".
-				'User-Agent : Jimmy\'s POST Example beta'."".
-				'Content-length: '.strlen($args)+8,
+							'User-Agent : Jimmy\'s POST Example beta'."".
+							'Content-length: '.strlen($args)+8,
 				'content' => 'mypost='.$args
 			)
 		);

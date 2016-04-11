@@ -8,23 +8,32 @@ namespace Zodream\Domain\Image;
 use Zodream\Infrastructure\Config;
 
 final class VerifyCode extends WaterMark {
-	const CHARSET     = 'abcdefghkmnprstuvwxyzABCDEFGHKMNPRSTUVWXYZ23456789';//随机因子
+	const CHARSET     = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';//随机因子
 	private $_code;         	//验证码
 	private $_length  = 4;  	    //验证码长度
 	private $_fontFamily;				//指定的字体
-	private $_fontsize = 30 ;	//指定字体大小
-	private $_fontcolor;		    //指定字体颜色
-	
+	private $_fontSize = 30 ;	//指定字体大小
+	private $_fontColor;		    //指定字体颜色
+
+	/**
+	 * 获取验证码
+	 * @return string
+	 */
 	public function getCode() {
+		$this->_createCode();
 		return $this->_code;
 	}
-	
-	public function generate() {
+
+	/**
+	 * 生成
+	 * @param int $level 干扰等级
+	 * @return resource
+	 */
+	public function generate($level = 0) {
 		$this->_loadConfig();
-		$this->_createCode();
 		$this->_createBg();
 		$this->_createText();
-		$this->_createLine();
+		$this->_createLine($level);
 		return $this->image;
 	}
 	
@@ -32,13 +41,12 @@ final class VerifyCode extends WaterMark {
 	 * 载入配置
 	 */
 	private function _loadConfig() {
-		$configs        = array_merge(Config::getInstance()->get('verify', array()));
-		$this->_length  = isset($configs['length']) ? $configs['length'] : 4;
-		$this->width   = isset($configs['width']) ? $configs['width'] : 50 ;
-		$this->height   = isset($configs['height']) ? $configs['height'] : 25 ;
-		$this->_fontsize = isset($configs['fontsize']) ? $configs['fontsize'] : 30 ;
-		$this->_fontFamily     = isset($configs['font']) ? $configs['font'] : 5;
-	
+		$configs = array_merge(Config::getInstance()->get('verify', array()));
+		$this->_length = isset($configs['length']) ? $configs['length'] : 4;
+		$this->width = isset($configs['width']) ? $configs['width'] : 100 ;
+		$this->height = isset($configs['height']) ? $configs['height'] : 30 ;
+		$this->_fontSize = isset($configs['fontsize']) ? $configs['fontsize'] : 30 ;
+		$this->_fontFamily = isset($configs['font']) ? $configs['font'] : 5;
 	}
 	
 	
@@ -75,10 +83,10 @@ final class VerifyCode extends WaterMark {
 		$x = $this->width / $this->_length;
 		for ($i = 0 ; $i < $this->_length; $i ++) {
 			$this->addText(
-					$this->_code[i],
+					$this->_code[$i],
 					$x*$i + mt_rand(1, 5),
-					$this->height / 1.4,
-					$this->_fontsize,
+					($this->height - $this->_fontSize) / 2 ,
+					$this->_fontSize,
 					$this->getColorWithRGB(mt_rand(0, 156), mt_rand(0, 156), mt_rand(0, 156)),
 					$this->_fontFamily,
 					mt_rand(-30, 30)
@@ -89,7 +97,7 @@ final class VerifyCode extends WaterMark {
 	/**
 	 * 生成线条、雪花
 	 */
-	private function _createLine() {
+	private function _createLine($level = 1) {
 		//线条
 		for ($i = 0; $i < 6; $i ++) {
 			imageline(
@@ -102,7 +110,7 @@ final class VerifyCode extends WaterMark {
 			);
 		}
 		//雪花
-		for ($i = 0; $i < 100; $i ++) {
+		for ($i = 0, $length = $level * 20; $i < $length; $i ++) {
 			imagestring(
 					$this->image, 
 					mt_rand(1, 5), 

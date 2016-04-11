@@ -11,12 +11,12 @@ class WaterMark extends Image{
 	/**
 	 * 加文字
 	 * @param string $text
-	 * @param int|number $x
-	 * @param int|number $y
-	 * @param int|number $fontSize
+	 * @param int $x
+	 * @param int $y
+	 * @param int $fontSize
 	 * @param string $color
-	 * @param int|number $fontFamily
-	 * @param int|number $angle 如果 $fontFamily 为 int，则不起作用
+	 * @param int $fontFamily
+	 * @param int $angle 如果 $fontFamily 为 int，则不起作用
 	 */
 	public function addText($text, $x = 0, $y = 0, $fontSize = 16, $color = '#000', $fontFamily = 5, $angle = 0) {
 		$color = $this->getColorWithRGB($color);
@@ -30,9 +30,9 @@ class WaterMark extends Image{
 	/**
 	 * 加水印图片
 	 * @param string $imageFile
-	 * @param int|number $x
-	 * @param int|number $y
-	 * @param int|number $opacity 透明度，对png图片不起作用
+	 * @param int $x
+	 * @param int $y
+	 * @param int $opacity 透明度，对png图片不起作用
 	 */
 	public function addImage($imageFile, $x = 0, $y = 0, $opacity = 50) {
 		$image = new Image($imageFile);

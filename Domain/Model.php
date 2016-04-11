@@ -251,6 +251,16 @@ abstract class Model {
 		return 'Having '.$this->getCondition($param);
 	}
 
+	protected $operators = array(
+		'=', '<', '>', '<=', '>=', '<>', '!=',
+		'in', 'not in', 'is', 'is not',
+		'like', 'like binary', 'not like', 'between', 'not between', 'ilike',
+		'&', '|', '^', '<<', '>>',
+		'rlike', 'regexp', 'not regexp',
+		'~', '~*', '!~', '!~*', 'similar to',
+		'not similar to'
+	);
+
 	/**
 	 * 合并where 或 having 的条件
 	 * @param array|string $param
@@ -261,21 +271,97 @@ abstract class Model {
 			return $param;
 		}
 		$sql = '';
-		foreach ($param as $value) {
-			if (is_array($value)) {
-				switch ($value[1]) {
-					case 'or':
-						$sql .= ' OR '.$value[0];
-						break;
-					case 'and':
-						$sql .= ' AND '.$value[0];
-						break;
-				}
-			} else {
-				$sql .= ' AND '.$value;
+		foreach ($param as $key => $value) {
+			$val = $value;
+			if (!is_numeric($key)) {
+				$val = (array)$val;
+				array_unshift($val, $key);
 			}
+			$sql .= $this->getConditionOne($val);
+		}
+		if (empty($sql)) {
+			return null;
 		}
 		return substr($sql, 4);
+	}
+
+	/**
+	 * 合成一条条件语句
+	 * @param string|array $arg
+	 * @return null|string
+	 */
+	protected function getConditionOne($arg) {
+		if (is_string($arg)) {
+			return $this->getConditionLink($arg);
+		}
+		if (!is_array($arg)) {
+			return null;
+		}
+		$length = count($arg);
+		if ($length == 1) {
+			// 'a = b'
+			return $this->getConditionLink($arg[0]);
+		}
+		if ($length == 2) {
+			if ($this->isOrOrAnd($arg[1])) {
+				// ['a = b', 'or']
+				return $this->getConditionLink($arg[0], $arg[1]);
+			}
+			// ['a', 'b']
+			return $this->getConditionLink("{$arg[0]} = '{$arg[1]}'");
+		}
+		if ($length == 3) {
+			if (in_array($arg[1], $this->operators)) {
+				// ['a', '=', 'b']
+				return $this->getConditionLink(implode(' ', $arg));
+			}
+			// ['a', 'b', 'or']
+			return $this->getConditionLink("{$arg[0]} = '{$arg[1]}'", $arg[2]);
+		}
+		if ($length == 4) {
+			if ($this->isOrOrAnd($arg[3])) {
+				// ['a', '=', 'b', 'or']
+				return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2], $arg[3]);
+			}
+			// ['a', 'between', 'b', 'c']
+			return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' AND '.$arg[3]);
+		}
+
+		if ($length == 5) {
+			if ($this->isOrOrAnd($arg[4])) {
+				//['a', 'between', 'b', 'c', 'or']
+				return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' AND '.$arg[3], $arg[4]);
+			}
+			//['a', 'between', 'b', 'and', 'c']
+			return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' '.$arg[3].' '.$arg[4]);
+		}
+		//['a', 'between', 'b', 'and', 'c', 'or']
+		return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' '.$arg[3].' '.$arg[4], $arg[5]);
+	}
+
+	/**
+	 * 判断是否是or 或 and 连接符
+	 * @param string $arg
+	 * @return bool
+	 */
+	protected function isOrOrAnd($arg) {
+		return in_array(strtolower($arg[1]), array('and', 'or'));
+	}
+
+	/**
+	 * 把连接符换成标准格式
+	 * @param string $arg
+	 * @param string $tag
+	 * @return null|string
+	 */
+	protected function getConditionLink($arg, $tag = 'and') {
+		if (empty($arg)) {
+			return null;
+		}
+		if (strtolower($tag) === 'or') {
+			return ' OR '.$arg;
+		}
+		return ' AND '.$arg;
 	}
 
 	protected function getWhere($param) {

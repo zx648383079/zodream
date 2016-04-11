@@ -109,6 +109,35 @@ class StringExpand {
 	}
 
 	/**
+	 * 替换url中的参数
+	 *
+	 * @param $url
+	 * @param string|array $key
+	 * @param null|string $value
+	 * @return string 合并后的值
+	 */
+	public static function urlBindValue($url, $key , $value = null) {
+		$arr  = explode('?', $url, 2);
+		$arr = str_replace('&amp;', '&', $arr);      //解决 & 被转义
+		$data = array();
+		if (count($arr) > 1) {
+			parse_str($arr[1], $data);
+		}
+		if (!is_null($value)) {
+			$data[$key] = $value;
+		} else {
+			if (is_array($key)) {
+				$data = array_merge($data, $key);
+			} else if (is_string($key)) {
+				$keys = array();
+				parse_str($key, $keys);
+				$data = array_merge($data, $keys);
+			}
+		}
+		return $arr[0].'?'.http_build_query($data);
+	}
+
+	/**
 	 * 获取两个路径的相对路径
 	 * @param string $a1
 	 * @param string $b1

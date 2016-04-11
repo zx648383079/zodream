@@ -2,6 +2,7 @@
 namespace Zodream\Domain\Routing;
 
 use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 defined('APP_URL') or define('APP_URL', UrlGenerator::getRoot());
 class UrlGenerator {
@@ -10,7 +11,7 @@ class UrlGenerator {
 	 *
 	 * @return string|bool 网址
 	 */
-	public static function referer() {
+	public static function referrer() {
 		return Request::server('HTTP_REFERER');
 	}
 
@@ -27,7 +28,7 @@ class UrlGenerator {
 			return $url;
 		}
 		if (is_array($extra)) {
-			return self::setValue($url, $extra);
+			return StringExpand::urlBindValue($url, $extra);
 		}
 		if (is_object($extra)) {
 			return $extra($url);
@@ -35,7 +36,7 @@ class UrlGenerator {
 		if (strpos($url, '?') === false) {
 			return $url.'?'.$extra;
 		}
-		return self::setValue($url, $extra);
+		return StringExpand::urlBindValue($url, $extra);
 	}
 	
 	protected static function toByFile($file = null) {
@@ -95,35 +96,6 @@ class UrlGenerator {
 		return $root;
 	}
 
-	/**
-	 * 替换url中的参数
-	 *
-	 * @param $url
-	 * @param $key
-	 * @param null $value
-	 * @return string 真实显示的网址
-	 */
-	public static function setValue($url, $key , $value = null) {
-		$arr  = explode('?', $url, 2);
-		$arr = str_replace('&amp;', '&', $arr);      //解决 & 被转义
-		$data = array();
-		if (count($arr) > 1) {
-			parse_str($arr[1], $data);
-		}
-		if (!is_null($value)) {
-			$data[$key] = $value;
-		} else {
-			if (is_array($key)) {
-				$data = array_merge($data, $key);
-			} else if (is_string($key)) {
-				$keys = array();
-				parse_str($key, $keys);
-				$data = array_merge($data, $keys);
-			}
-		}
-		return $arr[0].'?'.http_build_query($data);
-	}
-
 	/**判断是否带url段
 	 * @param string $search
 	 * @return bool
@@ -154,7 +126,6 @@ class UrlGenerator {
 	 * @return string 真实显示的网址
 	 */
 	public static function getUri() {
-		$uri         = '';
 		$requestUri = Request::server('REQUEST_URI');
 		if (!is_null($requestUri)) {
 			$uri = $requestUri;

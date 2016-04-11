@@ -47,7 +47,7 @@ class TimeExpand {
 	 * @param int $kind 类型
 	 * @return array 包含开始时间可结束时间
 	 */
-	public static function getBeginAndEndTime($kind = 1) {
+	public static function getBeginAndEndTime($kind = 0) {
 		switch ($kind) {
 			case self::TODAY:
 				return array(
