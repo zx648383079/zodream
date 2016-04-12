@@ -15,6 +15,12 @@ class GenerateModel extends Model {
     public function getPrefix() {
         return $this->prefix;
     }
+    
+    public function createDatabase($db) {
+        $this->db->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
+            '` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
+        echo $db.'数据库创建成功！';
+    }
 
     /**
      * 根据文件路径导入数据库
@@ -26,9 +32,7 @@ class GenerateModel extends Model {
             return;
         }
         if (!empty($db)) {
-            $this->db->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
-                '` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
-            echo $db.'数据库创建成功！';
+            $this->createDatabase($db);
         }
         $tables = $this->getTables(file_get_contents($file));
         $charset = Config::getValue('db.encoding', 'utf8');

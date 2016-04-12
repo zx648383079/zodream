@@ -15,6 +15,9 @@ class Generate {
 	
 	protected $template;
 	protected $replace = FALSE;
+	/**
+	 * @var GenerateModel
+	 */
 	protected $model;
 
 	public function __construct() {
@@ -56,6 +59,14 @@ class Generate {
 			$this->generateOne($value, $mode);
 		}
 		exit('完成！');
+	}
+	
+	public function createDatabase($name) {
+		if (empty($name)) {
+			return;
+		}
+		$this->setModel();
+		$this->model->createDatabase($name);
 	}
 	
 	public function importSql($file) {

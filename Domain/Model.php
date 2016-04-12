@@ -609,6 +609,10 @@ abstract class Model {
 	public function delete($where, $parameters = array()) {
 		return $this->db->delete("DELETE FROM {$this->table} WHERE {$where}", $parameters);
 	}
+	
+	public function execute($sql, $parameters = array()) {
+		return $this->db->execute($sql, $parameters);
+	}
 
 	/**
 	 * 获取错误信息
