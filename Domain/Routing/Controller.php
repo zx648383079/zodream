@@ -18,7 +18,7 @@ abstract class Controller extends BaseController {
 	
 	function __construct($loader = null) {
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
-		if (Config::getInstance()->get('app.safe', false) == true) {
+		if (Config::getInstance()->get('safe.csrf', false) == true) {
 			$this->send('csrf', VerifyCsrfToken::get());
 		}
 	}

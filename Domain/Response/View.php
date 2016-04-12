@@ -230,7 +230,7 @@ class View extends MagicObject {
 	 */
 	public function showWithFile($file, $status = 200) {
 		ob_start();
-		include($this->getView($file));
+		include $this->getView($file);
 		$content = ob_get_contents();
 		ob_end_clean();
 		EventManger::getInstance()->run('showView', $content);

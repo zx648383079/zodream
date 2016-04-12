@@ -3,6 +3,7 @@ namespace Zodream\Domain\Generate;
 
 
 use Zodream\Domain\Authentication\Binary;
+use Zodream\Domain\Model;
 use Zodream\Domain\Response\Redirect;
 use Zodream\Domain\Response\ResponseResult;
 use Zodream\Infrastructure\Config;
@@ -18,7 +19,12 @@ class Generate {
 
 	public function __construct() {
 		$this->template = new Template(__DIR__.'/Template/');
-		$this->model = new GenerateModel();
+	}
+	
+	public function setModel() {
+		if (!$this->model instanceof Model) {
+			$this->model = new GenerateModel();
+		}
 	}
 
 	/**
@@ -28,10 +34,11 @@ class Generate {
 		if (!defined('DEBUG') || !DEBUG) {
 			Redirect::to('/');
 		}
+		$this->setModel();
 		ResponseResult::sendContentType();
 		if (Request::isPost()) {
 			$this->makeConfig(Request::post());
-			$this->model->importSql(APP_DIR.'/document/zodream.sql', Config::getValue('db.database'));
+			$this->importSql(APP_DIR.'/document/zodream.sql');
 			Redirect::to('/', 10, '安装完成！');
 		}
 		$mode = Request::get('mode', 0);
@@ -49,6 +56,15 @@ class Generate {
 			$this->generateOne($value, $mode);
 		}
 		exit('完成！');
+	}
+	
+	public function importSql($file) {
+		if (!is_file($file)) {
+			echo $file. '路径不存在！';
+			return false;
+		}
+		$this->setModel();
+		$this->model->importSql($file, Config::getValue('db.database'));
 	}
 
 	/**

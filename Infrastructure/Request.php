@@ -40,57 +40,72 @@ final class Request {
 	}
 
 	/**
+	 * @param $key
+	 * @param string $name
+	 * @param mixed $default
+	 * @return array|string|BaseRequest
+	 */
+	private static function getValue($key, $name = null, $default = null) {
+		$instance = self::_getInstance($key);
+		if (true === $name) {
+			return $instance;
+		}
+		return $instance->get($name, $default);
+	}
+
+	/**
 	 * $_GET
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string
+	 * @return array|string|BaseRequest
 	 */
 	public static function get($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
 	/**
 	 * $_POST
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string
+	 * @return array|string|BaseRequest
 	 */
 	public static function post($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
 	/**
 	 * $_FILES
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string
+	 * @return array|string|BaseRequest
 	 */
 	public static function files($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
 	/**
 	 * $_REQUEST
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string
+	 * @return array|string|BaseRequest
 	 */
 	public static function request($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
 	/**
 	 * $_COOKIE
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string
+	 * @return array|string|BaseRequest
 	 */
 	public static function cookie($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 	
 	/**
 	 * PHP://INPUT
+	 * @return string
 	 */
 	public static function input() {
 		return self::_getInstance(__FUNCTION__)->get();
@@ -100,14 +115,19 @@ final class Request {
 	 * $_SERVER
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string
+	 * @return array|string|BaseRequest
 	 */
 	public static function server($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
-	
+
+	/**
+	 * @param string $name
+	 * @param string $default
+	 * @return array|string|BaseRequest
+	 */
 	public static function header($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
 	/**
@@ -117,7 +137,7 @@ final class Request {
 	 * @return array|string
 	 */
 	public static function Other($name = null, $default = null) {
-		return self::_getInstance(__FUNCTION__)->get($name, $default);
+		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
 	

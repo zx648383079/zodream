@@ -67,11 +67,15 @@ class ResponseResult {
 	}
 	
 	public static function sendRedirect($url, $time = 0) {
-		if (0 === $time) {
-			header('Location: ' . $url);
+		if (empty($url)) {
+			return;
+		}
+		if (empty($time)) {
+			header('Location:' . $url);
 		} else {
 			header("Refresh:{$time};url={$url}");
 		}
+		exit(); //必须结束才会成功跳转
 	}
 	
 	public static function sendXPoweredBy($name = 'PHP/5.6.12') {

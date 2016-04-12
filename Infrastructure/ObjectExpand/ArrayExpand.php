@@ -58,7 +58,7 @@ class ArrayExpand {
 	}
 
     /*** 合并前缀  把 key 作为前缀 例如 返回一个文件夹下的多个文件路径
-     * array('a'=>arrray(
+     * array('a'=>array(
     * 'b.txt',
     * 'c.txt'
     * ))
@@ -266,7 +266,7 @@ class ArrayExpand {
 		foreach ($results as $key => $value) {
 			$temps = array();
 			foreach ($args as $val) {
-				$temps[] = isset($val[$key]) ? $val[$key] : array();
+				$temps[] = isset($val[$key]) ? (array)$val[$key] : array();
 			}
 			$results[$key] = call_user_func_array('array_merge', $temps);
 		}

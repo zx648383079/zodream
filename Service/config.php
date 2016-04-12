@@ -10,7 +10,6 @@ return array(
 	'app'    => array(                           //网站信息
 		'title'      => 'ZoDream',
 		'host'       => 'http://localhost/',        //主目录
-		'safe'       => true,                       //启动安全模式
 		'model'      => 'Model',                     //后缀
 		'form'       => 'Form',
 		'controller' => 'Controller',
@@ -37,7 +36,7 @@ return array(
 		'database' => 'test',				//数据库
 		'user'     => 'root',						//账号
 		'password' => '',					//密码
-		'prefix'   => 'zodream_',					//前缀
+		'prefix'   => 'zd_',					//前缀
 		'encoding' => 'utf8'					//编码
 	),
 	'mail'   => array(
@@ -60,7 +59,8 @@ return array(
 		'savepath'  => 'upload/'               //文件保存路径
 	),
 	'safe' => array(
-		'log' => ''
+		'log' => '',
+		'csrf' => false						//是否使用csrf防止表单注入攻击
 	),
 	'alias'  => array(
 		'Config' => Zodream\Infrastructure\Config::class,

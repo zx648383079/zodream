@@ -23,7 +23,7 @@ class Application {
 	public static function main() {
 		Autoload::getInstance()->setError()->shutDown();
 		EventManger::getInstance()->run('appRun');
-		if (Config::getInstance()->get('app.safe', false) && !Request::isGet()) {
+		if (Config::getInstance()->get('safe.csrf', false) && !Request::isGet()) {
 			VerifyCsrfToken::verify();
 		}
 		Router::run();

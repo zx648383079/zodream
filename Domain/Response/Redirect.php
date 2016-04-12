@@ -22,9 +22,12 @@ class Redirect {
 		foreach ((array)$urls as $value) {
 			$url .= UrlGenerator::to($value);
 		}
+		// 当 $urls = null 时，防止$url 为空
+		if (empty($url)) {
+			$url = UrlGenerator::to($url);
+		}
 		if (!headers_sent()) {
 			ResponseResult::sendRedirect($url, $time);
-			exit();
 		}
 		ResponseResult::sendError(array(
 			'_extra' => "<meta http-equiv='Refresh' content='{$time};URL={$url}'>",

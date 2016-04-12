@@ -18,11 +18,10 @@ class UrlGenerator {
 	/**
 	 * 产生完整的网址
 	 * @param string $file
-	 * @param string $extra
-	 * @param bool $secret
+	 * @param string|array $extra
 	 * @return string
 	 */
-	public static function to($file = null, $extra = null, $secret = FALSE) {
+	public static function to($file = null, $extra = null) {
 		$url = self::toByFile($file);
 		if ($extra === null) {
 			return $url;
@@ -83,17 +82,33 @@ class UrlGenerator {
 		} else {
 			$root = 'https';
 		}
-		$root .= '://'.Request::server('HTTP_HOST');
-		$port = Request::server('SERVER_PORT');
-		if (!empty($port) && $port != 80) {
-			$root .= ':'.$port;
-		}
-		$root .= '/';
+		$root .= '://'.self::getHost() . '/';
 		$self = Request::server('script_name');
 		if ($self !== '/index.php' && $withScript) {
 			$root .= ltrim($self, '/');
 		}
 		return $root;
+	}
+
+	/**
+	 * 获取host 包括域名和端口 80 隐藏
+	 * @return string
+	 */
+	public static function getHost() {
+		$host = Request::server('HTTP_X_FORWARDED_HOST'); // 防止通过局域网代理取得ip值
+		if (!empty($host)) {
+			return $host;
+		}
+		$host = Request::server('HTTP_HOST');
+		if (!empty($host)) {
+			return $host;
+		}
+		$host = Request::server('SERVER_NAME');
+		$port = Request::server('SERVER_PORT');
+		if (!empty($port) && $port != 80) {
+			$host .= ':'.$port;
+		}
+		return $host;
 	}
 
 	/**判断是否带url段
@@ -157,17 +172,6 @@ class UrlGenerator {
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * 获取host 包括端口
-	 */
-	public static function getHost() {
-		$host = $_SERVER ['HTTP_HOST'];
-		if ($_SERVER['SERVER_PORT'] != 80) {
-			$host .= ':'.$_SERVER['SERVER_PORT'];
-		}
-		return $host;
 	}
 	
 	/**

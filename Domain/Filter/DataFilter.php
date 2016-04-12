@@ -16,7 +16,7 @@ defined('PHP_INT_MAX') or define('PHP_INT_MAX', 99999);
 
 class DataFilter {
     private static $_filtersInstance = array(
-        'confirm', 'email', 'float', 'int', 'number', 'ip', 'phone', 'raw', 'required', 'same', 'string', 'time', 'unique', 'url'
+        'confirm', 'email', 'float', 'enum', 'int', 'number', 'ip', 'phone', 'raw', 'required', 'same', 'string', 'time', 'unique', 'url'
     );
 
 	private static $_error = array();

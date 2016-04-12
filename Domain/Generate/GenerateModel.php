@@ -33,18 +33,25 @@ class GenerateModel extends Model {
         $tables = $this->getTables(file_get_contents($file));
         $charset = Config::getValue('db.encoding', 'utf8');
         foreach ($tables as $key => $value) {
-            $this->db->execute("CREATE TABLE IF NOT EXISTS `{$key}` ({$value}) ENGINE=MYISAM DEFAULT CHARSET={$charset};");
+            $this->db->execute(
+                "CREATE TABLE IF NOT EXISTS `{$key}` {$value[0]} ENGINE={$value[1]} DEFAULT CHARSET={$charset};"
+            );
             echo $key, '表创建成功！<br>';
         }
         echo 'SQL文件执行完成！';
     }
 
     private function getTables($sql) {
-        preg_match_all('/CREATE TABLE[^()]+`([\w_]+)`\s*\(\s*([^;]*?)\)[^()]+;/i', $sql, $matches, PREG_SET_ORDER);
+        preg_match_all(
+            '/CREATE TABLE[^()]+`([\w_]+)`\s*(\([^;]+\))(\s*?ENGINE\s?=\s?(\w+).*?)?;/i',
+            $sql, $matches, PREG_SET_ORDER);
         $result = array();
         foreach ($matches as $item) {
             $table = $this->addPrefix($item[1]);
-            $result[$table] = $item[2];
+            $result[$table] = array(
+                $item[2],
+                strtolower($item[4]) == 'merge' ? $item[4] : 'MYISAM'
+            );
         }
         return $result;
     }

@@ -52,6 +52,7 @@ abstract class Model {
 	 * 添加 有一个数组参数 或 多个 非数组参数（与fillAble字段对应）
 	 * 修改 有两个参数 第一个为数组 第二个为条件,如果第二个参数是数字，则为id
 	 * 关联数组参数不需要一一对应，自东根据 fillAble 取需要的
+	 * @return int
 	 */
 	public function fill() {
 		if (func_num_args() === 0) {
@@ -308,35 +309,82 @@ abstract class Model {
 				return $this->getConditionLink($arg[0], $arg[1]);
 			}
 			// ['a', 'b']
-			return $this->getConditionLink("{$arg[0]} = '{$arg[1]}'");
+			return $this->getConditionLink(
+				"{$arg[0]} = ". $this->getValueByOperator($arg[1]));
 		}
 		if ($length == 3) {
 			if (in_array($arg[1], $this->operators)) {
 				// ['a', '=', 'b']
-				return $this->getConditionLink(implode(' ', $arg));
+				return $this->getConditionLink(
+					"{$arg[0]} {$arg[1]} ". $this->getValueByOperator($arg[2], $arg[1]));
 			}
 			// ['a', 'b', 'or']
-			return $this->getConditionLink("{$arg[0]} = '{$arg[1]}'", $arg[2]);
+			return $this->getConditionLink(
+				"{$arg[0]} = ". $this->getValueByOperator($arg[1]), $arg[2]);
 		}
 		if ($length == 4) {
 			if ($this->isOrOrAnd($arg[3])) {
 				// ['a', '=', 'b', 'or']
-				return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2], $arg[3]);
+				return $this->getConditionLink(
+					$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2], $arg[1]), 
+					$arg[3]);
 			}
 			// ['a', 'between', 'b', 'c']
-			return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' AND '.$arg[3]);
+			return $this->getConditionLink(
+				$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' AND '.$this->getValueByOperator($arg[3]));
 		}
 
 		if ($length == 5) {
 			if ($this->isOrOrAnd($arg[4])) {
 				//['a', 'between', 'b', 'c', 'or']
-				return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' AND '.$arg[3], $arg[4]);
+				return $this->getConditionLink(
+					$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' AND '.$this->getValueByOperator($arg[3]), 
+					$arg[4]);
 			}
 			//['a', 'between', 'b', 'and', 'c']
-			return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' '.$arg[3].' '.$arg[4]);
+			return $this->getConditionLink(
+				$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' '.$arg[3].' '.$this->getValueByOperator($arg[4]));
 		}
 		//['a', 'between', 'b', 'and', 'c', 'or']
-		return $this->getConditionLink($arg[0].' '.$arg[1]. ' '. $arg[2]. ' '.$arg[3].' '.$arg[4], $arg[5]);
+		return $this->getConditionLink(
+			$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' '.$arg[3].' '.$this->getValueByOperator($arg[4]), 
+			$arg[5]);
+	}
+
+	protected function getValueByOperator($value, $operator = null) {
+		if (('is' == $operator || 'is not' == $operator) && is_null($value)) {
+			return 'null';
+		}
+		if (('in' == $operator || 'not in' == $operator) && is_array($value)) {
+			return "('".implode("', '", $value). "')";
+		}
+		// [a, int]
+		if (is_array($value)) {
+			if (count($value) == 1) {
+				$value[] = 'string';
+			}
+			switch ($value[1]) {
+				case 'int':
+				case 'integer':
+				case 'numeric':
+					return intval($value[0]);
+				case 'bool':
+				case 'boolean':
+					return boolval($value[0]);
+				case 'string':
+				default:
+					return "'". addslashes($value[0]). "'";
+			}
+		}
+		// 连接查询
+		if (strpos($value, '.') !== false) {
+			return $value;
+		}
+		// 表内字段关联
+		if (strpos($value, '@') === 0) {
+			return substr($value, 1);
+		}
+		return "'{$value}'";
 	}
 
 	/**
@@ -497,6 +545,7 @@ abstract class Model {
 	}
 
 	/**
+	 * 查询
 	 * @param $sql
 	 * @param string $field
 	 * @param array $parameters
@@ -506,14 +555,57 @@ abstract class Model {
 		return $this->db->getArray("SELECT {$field} FROM {$this->table} {$sql}", $parameters);
 	}
 
+	/**
+	 * 插入
+	 * @param string $columns
+	 * @param string $tags
+	 * @param array $parameters
+	 * @return int
+	 */
 	public function insert($columns, $tags, $parameters = array()) {
 		return $this->db->insert("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
 	}
 
+	/**
+	 * 如果行作为新记录被insert，则受影响行的值为1；如果原有的记录被更新，则受影响行的值为2。 如果有多条存在则只更新最后一条
+	 * @param string $columns
+	 * @param string $tags
+	 * @param string $update
+	 * @param array $parameters
+	 * @return int
+	 */
+	public function insertOrUpdate($columns, $tags, $update, $parameters = array()) {
+		return $this->db->update("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags}) ON DUPLICATE KEY UPDATE {$update}", $parameters);
+	}
+
+	/**
+	 *在执行REPLACE后，系统返回了所影响的行数，如果返回1，说明在表中并没有重复的记录，如果返回2，说明有一条重复记录，系统自动先调用了 DELETE删除这条记录，然后再记录用INSERT来insert这条记录。如果返回的值大于2，那说明有多个唯一索引，有多条记录被删除和insert。
+	 * @param string $columns
+	 * @param string $tags
+	 * @param array $parameters
+	 * @return int
+	 */
+	public function insertOrReplace($columns, $tags, $parameters = array()) {
+		return $this->update("REPLACE INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
+	}
+
+	/**
+	 * 更新
+	 * @param string $columns
+	 * @param string $where
+	 * @param array $parameters
+	 * @return int
+	 */
 	public function update($columns, $where, $parameters = array()) {
 		return $this->db->update("UPDATE {$this->table} SET {$columns} WHERE {$where}", $parameters);
 	}
 
+	/**
+	 * 删除
+	 * @param string $where
+	 * @param array $parameters
+	 * @return int
+	 */
 	public function delete($where, $parameters = array()) {
 		return $this->db->delete("DELETE FROM {$this->table} WHERE {$where}", $parameters);
 	}
