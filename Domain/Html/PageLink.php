@@ -163,7 +163,7 @@ class PageLink {
 	 * @return string 
 	 */
 	private function _setLimit() {
-		$this->_limit = ($this->_page - 1) * $this->_pageSize . ','.$this->_pageSize;
+		$this->_limit = max(($this->_page - 1) * $this->_pageSize, 0) . ','.$this->_pageSize;
 	}
 
 	public function getLimit() {

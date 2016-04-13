@@ -420,19 +420,29 @@ abstract class Model {
 	}
 
 	protected function getLeft(array $param) {
-		return 'LEFT '.$this->getJoin($param);
+		return $this->getJoin($param, 'LEFT ');
 	}
 
 	protected function getInner(array $param) {
-		return 'INNER '.$this->getJoin($param);
+		return $this->getJoin($param, 'INNER ');
 	}
 
 	protected function getRight(array $param) {
-		return 'RIGHT '.$this->getJoin($param);
+		return $this->getJoin($param, 'RIGHT ');
 	}
 
-	protected function getJoin(array $param) {
-		return 'JOIN '.$this->addPrefix($param[0]).' ON '.$param[1];
+	/**
+	 * 支持多个相同的left [$table, $where, ...]
+	 * @param array $param
+	 * @param string $tag
+	 * @return string
+	 */
+	protected function getJoin(array $param, $tag = '') {
+		$sql = '';
+		for ($i = 1, $length = count($param); $i < $length; $i += 2) {
+			$sql .= $tag.'JOIN '.$this->addPrefix($param[$i - 1]).' ON '.$param[$i];
+		}
+		return $sql;
 	}
 
 	/**
@@ -475,16 +485,29 @@ abstract class Model {
 		return substr($result, 0, -1);
 	}
 
+	/**
+	 * @param string|array $param
+	 * @return string
+	 */
 	protected function getLimit($param) {
 		$param = (array)$param;
 		if (count($param) == 1) {
 			return "LIMIT {$param[0]}";
 		}
+		$param[0] = intval($param[0]);
+		$param[1] = intval($param[1]);
+		if ($param[0] < 0) {
+			$param[0] = 0;
+		}
 		return "LIMIT {$param[0]},{$param[1]}";
 	}
 
+	/**
+	 * @param string|int $param
+	 * @return string
+	 */
 	protected function getOffset($param) {
-		return "OFFSET {$param}";
+		return "OFFSET ".intval($param);
 	}
 
 	/**
