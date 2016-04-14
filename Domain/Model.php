@@ -163,7 +163,14 @@ abstract class Model {
 	 * @return array ,
 	 */
 	public function findOne($param, $filed = '*', $parameters = array()) {
-		$result = $this->select("{$this->getWhere($param)} LIMIT 1", $filed, $parameters);
+		$sql = null;
+		if (!is_array($param) || !array_key_exists('where', $param)) {
+			$sql = $this->getWhere($param) . 'LIMIT 1';
+		} else {
+			$param['limit'] = 1;
+			$sql = $this->getBySort($param);
+		}
+		$result = $this->select($sql, $this->getField($filed), $parameters);
 		return current($result);
 	}
 	
@@ -440,7 +447,7 @@ abstract class Model {
 	protected function getJoin(array $param, $tag = '') {
 		$sql = '';
 		for ($i = 1, $length = count($param); $i < $length; $i += 2) {
-			$sql .= $tag.'JOIN '.$this->addPrefix($param[$i - 1]).' ON '.$param[$i];
+			$sql .= $tag.'JOIN '.$this->addPrefix($param[$i - 1]).' ON '.$param[$i].' ';
 		}
 		return $sql;
 	}

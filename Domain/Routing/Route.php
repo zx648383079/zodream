@@ -5,7 +5,9 @@ namespace Zodream\Domain\Routing;
  * 单个路由
  * @author Jason
  */
+use Zodream\Domain\Response\View;
 use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 
 class Route {
@@ -124,6 +126,10 @@ class Route {
 		}
 		$classes = explode('\\', $class);
 		list($class, $action) = $this->getController($classes, $action);
+		// 带后缀的类型
+		list($action, $type) = StringExpand::explode($action, '.', 2, array('index', 'html'));
+		View::getInstance()->setType($type);
+		
 		$this->_class[1] = $action;
 		/** @var BaseController $instance */
 		$instance = new $class;

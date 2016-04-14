@@ -22,6 +22,8 @@ use Zodream\Infrastructure\EventManager\EventManger;
 class View extends MagicObject {
 	use SingletonPattern,ConditionTrait;
 	
+	protected $type = 'html';
+	
 	protected $assetDir = 'assets/';
 
 	//APP_DIR . '/UserInterface/' . APP_MODULE
@@ -41,6 +43,17 @@ class View extends MagicObject {
 	 */
 	public function setSuffix($arg) {
 		$this->suffix = '.'.ltrim($arg, '.');
+	}
+
+	/**
+	 * 设置类型
+	 * @param array|string $type
+	 */
+	public function setType($type) {
+		if (empty($type)) {
+			return;
+		}
+		$this->type = $type;
 	}
 
 	/**
@@ -163,6 +176,14 @@ class View extends MagicObject {
 		}
 		echo TimeExpand::format($time);
 	}
+
+	/**
+	 * 输出是多久以前
+	 * @param int $time
+	 */
+	public function ago($time) {
+		echo TimeExpand::isTimeAgo($time);
+	}
 	
 	/**
 	 * 直接输出
@@ -203,7 +224,7 @@ class View extends MagicObject {
 	 * 如果传的是匿名函数  参数问题未解决
 	 * @param \Closure $func
 	 */
-	protected  function showObject($func) {
+	protected function showObject($func) {
 		ob_start();
 		$data = $func();
 		$content = ob_get_contents();
@@ -234,6 +255,6 @@ class View extends MagicObject {
 		$content = ob_get_contents();
 		ob_end_clean();
 		EventManger::getInstance()->run('showView', $content);
-		ResponseResult::make($content, 'html', $status);
+		ResponseResult::make($content, $this->type, $status);
 	}
 }

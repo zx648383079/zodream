@@ -48,6 +48,41 @@ class StringExpand {
 	}
 
 	/**
+	 * 压缩html，
+	 * @param string $arg
+	 * @param bool $all 如果包含js请用false
+	 * @return string
+	 */
+	public static function compress($arg, $all = true) {
+		if (!$all) {
+			return preg_replace(
+				'/>\s+</',
+				'><',
+				preg_replace(
+					"/>\s+\r\n/",
+					'>', $arg));
+		}
+		return ltrim(rtrim(preg_replace(
+			array('/> *([^ ]*) *</',
+				'//',
+				'#/\*[^*]*\*/#',
+				"/\r\n/",
+				"/\n/",
+				"/\t/",
+				'/>[ ]+</'
+			),
+			array(
+				'>\\1<',
+				'',
+				'',
+				'',
+				'',
+				'',
+				'><'
+			), $arg)));
+	}
+
+	/**
 	 * 拓展str_repeat 重复字符并用字符连接
 	 * @param string $str
 	 * @param integer $count
@@ -186,7 +221,7 @@ class StringExpand {
 	 * @param $str
 	 * @param string $link
 	 * @param int $num
-	 * @param null $default
+	 * @param array|string $default 不存在或为''时使用
 	 * @return array
 	 */
 	public static function explode($str, $link = ' ', $num = 1, $default = null) {
