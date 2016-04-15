@@ -92,11 +92,17 @@ abstract class Model {
 	 */
 	public function updateValues(array $updateData, $param) {
 		$setData = '';
+		$parameters = array();
 		foreach ($updateData as $key => $value) {
+			if (is_numeric($key)) {
+				$setData .= $value .',';
+				continue;
+			}
 			$setData .= "`$key` = ?,";
+			$parameters[] = $value;
 		}
 		$setData = substr($setData, 0, -1);
-		return $this->update($setData, $this->getCondition($param), array_values($updateData));
+		return $this->update($setData, $this->getCondition($param), $parameters);
 	}
 
 	/**
@@ -129,7 +135,7 @@ abstract class Model {
 	 * @return int
 	 */
 	public function updateOne($filed, $where, $num = 1) {
-		$sql[] = array();
+		$sql = array();
 		foreach ((array)$filed as $key => $item) {
 			if (is_numeric($key)) {
 				$sql[] = "`$item` = `$item` ".$this->getNumber($num);
