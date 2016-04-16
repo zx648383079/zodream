@@ -3,6 +3,8 @@ namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\Request;
 class Download {
+	private static $_speed = 512;   // 下载速度
+
 	public static function make($file) {
 		if (!is_file($file)) {
 			ResponseResult::sendError('FILE NOT FIND');
@@ -10,7 +12,7 @@ class Download {
 		
 		$length = filesize($file);//获取文件大小
 		$filename = basename($file);//获取文件名字
-		$file_extension = strtolower(substr(strrchr($filename,"."),1));//获取文件扩展名
+		$file_extension = strtolower(substr(strrchr($filename, '.'), 1));//获取文件扩展名
 		
 		ResponseResult::sendCacheControl('public');
 		//根据扩展名 指出输出浏览器格式
@@ -28,8 +30,9 @@ class Download {
 		}
 		ResponseResult::sendContentDisposition($filename);
 		ResponseResult::sendAcceptRanges();
-		$range = Request::server('HTTP_RANGE');
-		$value = 0;
+		$range = self::getRange($length);
+		//打开文件
+		$fp = fopen($file.'', 'rb');
 		//如果有$_SERVER['HTTP_RANGE']参数
 		if(null !== $range) {
 			/*   ---------------------------
@@ -43,37 +46,62 @@ class Download {
 		
 			 　200 （OK）。
 			 　---------------------------*/
-			 
-		
+
+
 			// 断点后再次连接 $_SERVER['HTTP_RANGE'] 的值 bytes=4390912-
-		
-			list($tag, $value) = explode('=', $range);
-			//if yes, download missing part
-			str_replace($value, '-', $value);//这句干什么的呢。。。。
-			$byteLength = $length - 1;//文件总字节数
-			$newLength = $byteLength - $value;//获取下次下载的长度
 			ResponseResult::sendHttpStatus(206);
-			ResponseResult::sendContentLength($newLength);//输入总长
-			ResponseResult::sendContentRange($value.$byteLength.'/'.$length);
-			//Content-Range: bytes 4908618-4988927/4988928   95%的时候
-		} else {//第一次连接
-			$byteLength = $length - 1;
-			ResponseResult::sendContentRange('0-'.$byteLength.'/'.$length);
+			ResponseResult::sendContentLength($range['end']-$range['start']);//输入剩余长度
+			ResponseResult::sendContentRange(
+				sprintf('%s-%s/%s', $range['start'], $range['end'], $length));
+			//设置指针位置
+			fseek($fp, sprintf('%u', $range['start']));
+		} else {
+			//第一次连接
+			ResponseResult::sendHttpStatus(200);
 			ResponseResult::sendContentLength($length);//输出总长
 		}
-		//打开文件
-		$fp = fopen($file.'', 'rb');
-		//设置指针位置
-		fseek($fp, $value);
 		//虚幻输出
 		while(!feof($fp)){
 			//设置文件最长执行时间
 			set_time_limit(0);
-			print(fread($fp, 1024*8));//输出文件
+			print(fread($fp, round(self::_speed * 1024, 0)));//输出文件
 			flush();//输出缓冲
 			ob_flush();
 		}
 		fclose($fp);
 		exit;
+	}
+
+	/** 设置下载速度
+	 * @param int $speed
+	 */
+	public static function setSpeed($speed){
+		if(is_numeric($speed) && $speed > 16 && $speed < 4096){
+			self::$_speed = $speed;
+		}
+	}
+
+	/** 获取header range信息
+	 * @param int $fileSize 文件大小
+	 * @return array|null
+	 */
+	private static function getRange($fileSize){
+		$range = Request::server('HTTP_RANGE');
+		if (!empty($range)) {
+			$range = preg_replace('/[\s|,].*/', '', $range);
+			$range = explode('-', substr($range, 6));
+			if (count($range) < 2) {
+				$range[1] = $fileSize;
+			}
+			$range = array_combine(array('start','end'), $range);
+			if(empty($range['start'])){
+				$range['start'] = 0;
+			}
+			if(empty($range['end'])){
+				$range['end'] = $fileSize;
+			}
+			return $range;
+		}
+		return null;
 	}
 }

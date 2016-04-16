@@ -122,6 +122,7 @@ abstract class Database {
 	 * @return
 	 */
 	abstract public function getArray($sql, $parameters = array());
+
 	
 	abstract public function execute($sql = null, $parameters = array());
 	

@@ -6,6 +6,21 @@ namespace Zodream\Domain\Generate;
  * Date: 2016/3/17
  * Time: 22:49
  */
+/**
+SHOW DATABASES                                //列出 MySQL Server 数据库。
+SHOW TABLES [FROM db_name]                    //列出数据库数据表。
+SHOW CREATE TABLES tbl_name                    //导出数据表结构。
+SHOW TABLE STATUS [FROM db_name]              //列出数据表及表状态信息。
+SHOW COLUMNS FROM tbl_name [FROM db_name]     //列出资料表字段
+SHOW FIELDS FROM tbl_name [FROM db_name]，DESCRIBE tbl_name [col_name]。
+SHOW FULL COLUMNS FROM tbl_name [FROM db_name]//列出字段及详情
+SHOW FULL FIELDS FROM tbl_name [FROM db_name] //列出字段完整属性
+SHOW INDEX FROM tbl_name [FROM db_name]       //列出表索引。
+SHOW STATUS                                  //列出 DB Server 状态。
+SHOW VARIABLES                               //列出 MySQL 系统环境变量。
+SHOW PROCESSLIST                             //列出执行命令。
+SHOW GRANTS FOR user                         //列出某用户权限
+ */
 use Zodream\Domain\Model;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
@@ -61,7 +76,7 @@ class GenerateModel extends Model {
     }
 
     /**
-     * 获取数据库名
+     * 获取所有数据库名
      */
     public function getDatabase() {
         return $this->_getArrayFormDouble($this->db->getArray('SHOW DATABASES'));
@@ -79,6 +94,10 @@ class GenerateModel extends Model {
         return $this->_getArrayFormDouble($this->db->getArray('SHOW TABLES'));
     }
 
+    /*
+     * 
+     * 
+     */
     private function _getArrayFormDouble(array $args) {
         $result = array();
         foreach ($args as $value) {
@@ -94,10 +113,97 @@ class GenerateModel extends Model {
 
     /**
      * 获取列名
-     * @param string $arg
+     * @param string $arg 表名
+     * @param bool $prefix 是否自动添加前缀
+     * @return
      */
-    public function getColumn($arg) {
-        $arg = $this->prefix.StringExpand::firstReplace($arg, $this->prefix);
+    public function getColumn($arg, $prefix = true) {
+        if ($prefix) {
+            $arg = $this->prefix.StringExpand::firstReplace($arg, $this->prefix);
+        }
         return $this->db->getArray('SHOW COLUMNS FROM '.$arg);
+    }
+
+
+    public function getFullColumn($arg) {
+        return $this->db->getArray('SHOW FULL COLUMNS FROM '.$arg);
+    }
+
+    public function setPrefix($prefix = null) {
+        $this->prefix = $prefix;
+        return $this;
+    }
+
+    /**
+     * 获取数据库下的所有表的属性
+     * @param string $arg
+     * @return mixed
+     */
+    public function getTableStatus($arg = null) {
+        if (!empty($arg)) {
+            $this->db->execute('use '.$arg);
+        }
+        return $this->db->getArray('SHOW TABLE STATUS');
+    }
+
+    /**
+     * 获取创造表的格式
+     * @param array $arg
+     * @return string
+     */
+    public function getCreateTable(array $arg) {
+        $sql = "--创建表开始\r\nCREATE TABLE IF NOT EXISTS `{$arg['Name']}` (\r\n";
+        $columns = array();
+        foreach ($this->getFullColumn($arg['Name']) as $column) {
+            $columns[] = $this->getCreateColumn($column);
+        }
+        $sql .= implode(",\r\n", $columns). ")\r\nENGINE={$arg['Engine']} DEFAULT CHARSET=utf8";
+        if (!empty($arg['Comment'])) {
+            $sql .= " COMMENT '{$arg['Comment']}'";
+        }
+        $sql .= ";\r\n--创建表结束\r\n\r\n";
+        return $sql;
+    }
+
+    public function getCreateColumn(array $args) {
+        $sql = "    `{$args['Field']}` {$args['Type']}";
+        if ($args['Null'] == 'NO') {
+            $sql .= ' NOT NULL';
+        }
+        switch ($args['Key']) {
+            case 'PRI':
+                $sql .= ' PRIMARY KEY';
+                break;
+            case 'UNI':
+                $sql .= ' UNIQUE';
+                break;
+            default:
+                break;
+        }
+        if (!is_null($args['Default'])) {
+            $sql .= ' DEFAULT '.$args['Default'];
+        }
+        if (!empty($args['Extra'])) {
+            $sql .= ' '.$args['Extra'];
+        }
+        if (!empty($args['Comment'])) {
+            $sql .= " COMMENT '{$args['Comment']}'";
+        }
+        return $sql;
+    }
+
+    public function getInsert(array $data, $table) {
+        if (empty($data)) {
+            return null;
+        }
+        $sql = "INSERT INTO `{$table}` (`".implode('`, `', array_keys($data[0]))."`) VALUES \r\n";
+        foreach ($data as $item) {
+            $sql .= "('".implode("', '", array_values($item))."'),\r\n";
+        }
+        return substr($sql, 0, -3).";\r\n";
+    }
+    
+    public function getConnect() {
+        return $this->db;
     }
 }

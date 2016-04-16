@@ -88,8 +88,7 @@ class Pdo extends Database {
 	 *
 	 * @param null $sql
 	 * @param array $parameters
-	 * @return array 返回查询结果,
-	 * @internal param array|null $param 条件
+	 * @return \PDOStatement 返回查询结果,
 	 */
 	public function execute($sql = null, $parameters = array()) {
 		if (empty($sql)) {

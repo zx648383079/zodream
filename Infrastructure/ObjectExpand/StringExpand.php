@@ -152,7 +152,7 @@ class StringExpand {
 	 * @return string 合并后的值
 	 */
 	public static function urlBindValue($url, $key , $value = null) {
-		$arr  = explode('?', $url, 2);
+		$arr = explode('?', $url, 2);
 		$arr = str_replace('&amp;', '&', $arr);      //解决 & 被转义
 		$data = array();
 		if (count($arr) > 1) {

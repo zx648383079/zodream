@@ -48,7 +48,10 @@ class Generate {
 		if (empty($mode)) {
 			exit('table:指定表,为空时表示所以表； mode:二进制标志1111，从左至右1代表视图、表单、模型、控制器！');
 		}
+		set_time_limit(0);
 		echo '自动生成程序启动……<p/>';
+		flush();
+		ob_flush();
 		$table = Request::get('table');
 		if (empty($table)) {
 			$table = $this->model->getTable();
@@ -57,6 +60,8 @@ class Generate {
 		}
 		foreach ($table as $value) {
 			$this->generateOne($value, $mode);
+			flush();
+			ob_flush();
 		}
 		exit('完成！');
 	}

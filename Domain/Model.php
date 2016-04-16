@@ -34,14 +34,27 @@ abstract class Model {
 	}
 
 	protected function addPrefix($table) {
+		if (empty($this->prefix)) {
+			return $table;
+		}
 		return $this->prefix. StringExpand::firstReplace($table, $this->prefix, null);
 	}
 
+	/**
+	 * 设置表
+	 * @param string $table
+	 * @return $this
+	 */
 	public function setTable($table) {
 		$this->table = $this->addPrefix($table);
 		return $this;
 	}
 
+	/**
+	 * 更改数据库
+	 * @param string $database
+	 * @return $this
+	 */
 	public function changedDatabase($database) {
 		$this->db->execute('use '.$database);
 		return $this;

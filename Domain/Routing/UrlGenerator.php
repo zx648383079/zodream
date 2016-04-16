@@ -22,7 +22,11 @@ class UrlGenerator {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null) {
-		$url = self::toByFile($file);
+		list($url, $param) = StringExpand::explode($file, '?', 2);
+		$url = self::toByFile($url);
+		if (!empty($param)) {
+			$url .= '?'.$param;
+		}
 		if ($extra === null) {
 			return $url;
 		}
