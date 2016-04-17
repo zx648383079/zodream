@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Infrastructure\Traits;
 /**
- * 自定义公式
+ * 自定义视图函数
  * @author zx648
  *
  */
@@ -58,6 +58,9 @@ trait ConditionTrait {
 			echo $args[$name];
 		}
 	}
+	
+	
+	
 	
 	
 }

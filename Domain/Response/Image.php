@@ -13,6 +13,4 @@ class Image {
 		imagedestroy($img);
 		ResponseResult::finish();
 	}
-
-
 }

@@ -11,13 +11,23 @@ use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 class Error{
 
-	public static function outByError($errno, $errstr, $errfile, $errline) {
+	/**
+	 * 注册的错误提示
+	 * @param int $errorNo
+	 * @param string $errorStr
+	 * @param string $errorFile
+	 * @param string $errorLine
+	 */
+	public static function outByError($errorNo, $errorStr, $errorFile, $errorLine) {
 		if (function_exists('error_clear_last')) {
 			error_clear_last();
 		}
-		self::out($errstr, $errfile, $errline);
+		self::out("{$errorStr}； 错误级别：{$errorNo} ", $errorFile, $errorLine);
 	}
 
+	/**
+	 * 注册的程序结束事件
+	 */
 	public static function outByShutDown() {
 		$error = error_get_last();
 		if (empty($error)) {
@@ -26,6 +36,12 @@ class Error{
 		self::out($error['message'], $error['file'], $error['line']);
 	}
 
+	/**
+	 * 输出错误信息
+	 * @param string $error
+	 * @param string $file
+	 * @param string $line
+	 */
 	public static function out($error, $file = null, $line = null) {
 		$errorInfo = "ERROR: {$error} , in {$file} on line {$line}, URL:".UrlGenerator::to();
 		Log::out(TimeExpand::now('Y-m-d').'.txt', TimeExpand::format().':'.$errorInfo. "\r\n");

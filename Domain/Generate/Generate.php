@@ -54,7 +54,7 @@ class Generate {
 		ob_flush();
 		$table = Request::get('table');
 		if (empty($table)) {
-			$table = $this->model->getTable();
+			$table = $this->model->getTableByDatabase();
 		} else {
 			$table = array(strtolower($table));
 		}
@@ -65,7 +65,11 @@ class Generate {
 		}
 		exit('完成！');
 	}
-	
+
+	/**
+	 * 新建数据库
+	 * @param string $name
+	 */
 	public function createDatabase($name) {
 		if (empty($name)) {
 			return;
@@ -73,7 +77,12 @@ class Generate {
 		$this->setModel();
 		$this->model->createDatabase($name);
 	}
-	
+
+	/**
+	 * 导入SQL文件
+	 * @param string $file
+	 * @return bool
+	 */
 	public function importSql($file) {
 		if (!is_file($file)) {
 			echo $file. '路径不存在！';
@@ -81,6 +90,7 @@ class Generate {
 		}
 		$this->setModel();
 		$this->model->importSql($file, Config::getValue('db.database'));
+		return true;
 	}
 
 	/**

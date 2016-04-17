@@ -27,10 +27,18 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 class GenerateModel extends Model {
 
+    /**
+     * 获取表前缀
+     * @return string
+     */
     public function getPrefix() {
         return $this->prefix;
     }
-    
+
+    /**
+     * 新建数据库
+     * @param string $db
+     */
     public function createDatabase($db) {
         $this->db->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
             '` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
@@ -83,21 +91,17 @@ class GenerateModel extends Model {
     }
 
     /**
-     * 获取表明
+     * 获取表名
      * @param string $arg 数据库名 默认是配置文件中的数据库
      * @return array
      */
-    public function getTable($arg = null) {
+    public function getTableByDatabase($arg = null) {
         if (!empty($arg)) {
             $this->db->execute('use '.$arg);
         }
         return $this->_getArrayFormDouble($this->db->getArray('SHOW TABLES'));
     }
 
-    /*
-     * 
-     * 
-     */
     private function _getArrayFormDouble(array $args) {
         $result = array();
         foreach ($args as $value) {
@@ -124,11 +128,20 @@ class GenerateModel extends Model {
         return $this->db->getArray('SHOW COLUMNS FROM '.$arg);
     }
 
-
+    /**
+     * 获取表所有列的完整信息
+     * @param $arg
+     * @return array
+     */
     public function getFullColumn($arg) {
         return $this->db->getArray('SHOW FULL COLUMNS FROM '.$arg);
     }
 
+    /**
+     * 设置表前缀
+     * @param string $prefix
+     * @return $this
+     */
     public function setPrefix($prefix = null) {
         $this->prefix = $prefix;
         return $this;
@@ -144,6 +157,23 @@ class GenerateModel extends Model {
             $this->db->execute('use '.$arg);
         }
         return $this->db->getArray('SHOW TABLE STATUS');
+    }
+
+    /**
+     * 系统生成的创建表的语句
+     * @param string $table
+     * @return string
+     */
+    public function getCreateTableSql($table) {
+        $data = $this->db->getArray("SHOW CREATE TABLE `{$table}`");
+        if (empty($data)) {
+            return null;
+        }
+        $sql = $data[0]['Create Table'];
+        return str_replace(
+            'CREATE TABLE', 
+            "--创建表开始\r\nCREATE TABLE IF NOT EXISTS", 
+            $sql). ";\r\n--创建表结束\r\n\r\n";
     }
 
     /**
@@ -165,6 +195,11 @@ class GenerateModel extends Model {
         return $sql;
     }
 
+    /**
+     * 获取表中一列的语句
+     * @param array $args
+     * @return string
+     */
     public function getCreateColumn(array $args) {
         $sql = "    `{$args['Field']}` {$args['Type']}";
         if ($args['Null'] == 'NO') {
@@ -192,6 +227,12 @@ class GenerateModel extends Model {
         return $sql;
     }
 
+    /**
+     * 获取插入语句
+     * @param array $data
+     * @param $table
+     * @return string
+     */
     public function getInsert(array $data, $table) {
         if (empty($data)) {
             return null;
@@ -202,7 +243,11 @@ class GenerateModel extends Model {
         }
         return substr($sql, 0, -3).";\r\n";
     }
-    
+
+    /**
+     * 获取连接
+     * @return \Zodream\infrastructure\Database\Database
+     */
     public function getConnect() {
         return $this->db;
     }

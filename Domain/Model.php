@@ -49,6 +49,10 @@ abstract class Model {
 		$this->table = $this->addPrefix($table);
 		return $this;
 	}
+	
+	public function getTable() {
+		return $this->table;
+	}
 
 	/**
 	 * 更改数据库
@@ -205,14 +209,11 @@ abstract class Model {
 	}
 
 	/**
-	 * 删除第一条数据
-	 *
-	 * @access public
-	 *
-	 * @param string|array $where
+	 * 删除数据
+	 * 
+	 * @param string|array $where 条件
 	 * @param array $parameters
 	 * @return int 返回影响的行数,
-	 * @internal param array|string $param 条件
 	 */
 	public function deleteValues($where, $parameters = array()) {
 		return $this->delete($this->getCondition($where), $parameters);
@@ -419,7 +420,7 @@ abstract class Model {
 	 * @return bool
 	 */
 	protected function isOrOrAnd($arg) {
-		return in_array(strtolower($arg[1]), array('and', 'or'));
+		return in_array(strtolower($arg), array('and', 'or'));
 	}
 
 	/**

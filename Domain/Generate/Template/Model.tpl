@@ -1,7 +1,7 @@
 <?php
 namespace Domain\Model\{module};
 
-use Domain\Model;
+use Domain\Model\Model;
 class {model} extends Model {
 	protected $table = '{table}';
 	

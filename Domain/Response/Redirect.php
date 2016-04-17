@@ -26,7 +26,7 @@ class Redirect {
 		if (empty($url)) {
 			$url = UrlGenerator::to($url);
 		}
-		if (!headers_sent()) {
+		if (!headers_sent() && empty($msg)) {
 			ResponseResult::sendRedirect($url, $time);
 		}
 		ResponseResult::sendError(array(

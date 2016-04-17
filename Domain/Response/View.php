@@ -97,6 +97,8 @@ class View extends MagicObject {
 	public function getAsset($file = null) {
 		return StringExpand::getFile($this->assetDir, $file);
 	}
+	
+	/******************** ↓ 自定义视图函数 ↓ *******************************/
 
 	/**
 	 * 在视图中包含其他视图的方法
@@ -182,6 +184,9 @@ class View extends MagicObject {
 	 * @param int $time
 	 */
 	public function ago($time) {
+		if (empty($time)) {
+			return;
+		}
 		echo TimeExpand::isTimeAgo($time);
 	}
 	
@@ -193,7 +198,9 @@ class View extends MagicObject {
 	public function ech($key, $default = null) {
 		echo ArrayExpand::tostring($this->get($key, $default));
 	}
-	
+
+	/*********************** ↑ 自定义视图函数 ↑ ***************************************/
+
 	/**
 	 * 加载视图
 	 *

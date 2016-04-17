@@ -1,13 +1,15 @@
 <?php
 namespace Zodream\Domain\Response;
 
+use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 class Download {
 	private static $_speed = 512;   // 下载速度
 
 	public static function make($file) {
 		if (!is_file($file)) {
-			ResponseResult::sendError('FILE NOT FIND');
+			Error::out('FILE NOT FIND', __FILE__, __LINE__);
 		}
 		
 		$length = filesize($file);//获取文件大小
@@ -87,21 +89,14 @@ class Download {
 	 */
 	private static function getRange($fileSize){
 		$range = Request::server('HTTP_RANGE');
-		if (!empty($range)) {
-			$range = preg_replace('/[\s|,].*/', '', $range);
-			$range = explode('-', substr($range, 6));
-			if (count($range) < 2) {
-				$range[1] = $fileSize;
-			}
-			$range = array_combine(array('start','end'), $range);
-			if(empty($range['start'])){
-				$range['start'] = 0;
-			}
-			if(empty($range['end'])){
-				$range['end'] = $fileSize;
-			}
-			return $range;
+		if (empty($range)) {
+			return null;
 		}
-		return null;
+		$range = preg_replace('/[\s|,].*/', '', $range);
+		$range = StringExpand::explode(substr($range, 6), '-', 2, array(0, $fileSize));
+		return array(
+			'start' => $range[0],
+			'end' => $range[1]
+		);
 	}
 }

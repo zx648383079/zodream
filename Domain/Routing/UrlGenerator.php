@@ -1,6 +1,9 @@
 <?php
 namespace Zodream\Domain\Routing;
 
+/**
+ * url生成
+ */
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
@@ -41,19 +44,24 @@ class UrlGenerator {
 		}
 		return StringExpand::urlBindValue($url, $extra);
 	}
-	
+
+	/**
+	 * 根据网址自动补充完整
+	 * @param string $file
+	 * @return string
+	 */
 	protected static function toByFile($file = null) {
+		if ($file === null || 0 === $file || '0' === $file) {
+			return self::getRoot(FALSE).ltrim(self::getUri(), '/');
+		}
+		if ($file === '-' || -1 == $file) {
+			return self::referrer();
+		}
 		if (strpos($file, '//') !== false) {
 			if (strpos($file, '://') !== false || ltrim($file, '/') === substr($file, 2)) {
 				return $file;
 			}
 			$file = str_replace('//', '/', $file);
-		}
-		if ($file === null || $file === 0) {
-			return self::getRoot(FALSE).ltrim(self::getUri(), '/');
-		}
-		if ($file === '-' || $file === -1) {
-			return self::referer();
 		}
 		if ($file === '' || $file === '/') {
 			return APP_URL;
