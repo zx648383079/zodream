@@ -67,5 +67,16 @@ return array(
 		'Request' => Zodream\Infrastructure\Request::class,
 		'Session' => Zodream\infrastructure\Session::class,
 		'Cookie' => Zodream\Infrastructure\Cookie::class
+	), 
+	// 注册事件
+	'event' => array(
+		'canAble' => true,            //是否启动注册事件
+		'appRun' => array(),
+		'getRoute' => array(),
+		'runController' => array(),
+		'showView' => array(),
+		'response' => array(),
+		'download' => array(),
+		'executeSql' => array(),
 	)
 );

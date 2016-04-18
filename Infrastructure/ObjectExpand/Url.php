@@ -1,14 +1,11 @@
 <?php 
-namespace Zodream\Domain;
+namespace Zodream\Infrastructure\ObjectExpand;
 /**
  * url
  *
  * @author Jason
  * @time 2015-12-1
  */
-
-
-
 class Url {
 	
 	#字符表

@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Domain\Response;
 
+use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\Request;
 class ResponseResult {
 	/**
@@ -43,6 +44,7 @@ class ResponseResult {
 	 * @param int|string $status
 	 */
 	public static function make($result, $type = 'html', $status = 200) {
+		EventManger::getInstance()->run('response', array($result, $type, $status));
 		self::prepare($type, $status);
 		echo $result;
 		self::finish();

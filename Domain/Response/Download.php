@@ -2,12 +2,14 @@
 namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 class Download {
 	private static $_speed = 512;   // 下载速度
 
 	public static function make($file) {
+		EventManger::getInstance()->run('download', array($file));
 		if (!is_file($file)) {
 			Error::out('FILE NOT FIND', __FILE__, __LINE__);
 		}

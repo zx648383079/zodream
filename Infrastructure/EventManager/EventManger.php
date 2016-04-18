@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\EventManager;
  * Date: 2016/3/10
  * Time: 9:13
  */
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
 class EventManger {
@@ -17,6 +18,23 @@ class EventManger {
         'showView' => null,     //显示视图
     );
 
+    protected function __construct() {
+        $configs = Config::getValue('event', array());
+        if (!isset($configs['canAble']) || !$configs['canAble']) {
+            $this->canAble = false;
+            return;
+        }
+        unset($configs['canAble']);
+        foreach ($configs as $key => $item) {
+            if (empty($item)) {
+                continue;
+            }
+            foreach ((array)$item as $value) {
+                $this->add($key, $value);
+            }
+        }
+    }
+
     /**
      * 获取已经注册的事件名
      * @return array
@@ -25,7 +43,14 @@ class EventManger {
         return array_keys($this->events);
     }
 
-    public function add($event, $class, $function, $file, $priority = 10) {
+    /**
+     * @param string $event 注册事件
+     * @param string $class
+     * @param int|string|\Closure $function
+     * @param string $file
+     * @param int $priority
+     */
+    public function add($event, $class, $function = 10, $file = null, $priority = 10) {
         if (!$this->canAble) {
             return;
         }
@@ -55,5 +80,14 @@ class EventManger {
             return;
         }
         $this->events[$this->actionNames[$name]]->delete($name);
+    }
+
+    /**
+     * 执行某个事件
+     * @param string $event
+     * @param array $args
+     */
+    public static function runEventAction($event, $args = array()) {
+        static::getInstance()->run($event, $args);
     }
 }

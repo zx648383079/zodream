@@ -6,6 +6,7 @@ namespace Zodream\Domain\Routing;
 * @author Jason
 */
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\EventManager\EventManger;
 
 defined('APP_CONTROLLER') or define('APP_CONTROLLER', Config::getInstance()->get('app.controller'));
 defined('APP_ACTION')     or define('APP_ACTION', Config::getInstance()->get('app.action'));
@@ -60,6 +61,7 @@ class Router{
 	 * @return null
 	 */
 	public static function run() {
+		EventManger::getInstance()->run('getRoute');
 		self::_getRouteByDriver();
 		if (self::hasRoute()) {
 			return self::getRoute()->run();

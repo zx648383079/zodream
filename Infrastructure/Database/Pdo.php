@@ -94,7 +94,7 @@ class Pdo extends Database {
 		if (empty($sql)) {
 			return null;
 		}
-		EventManger::getInstance()->run('excuteSql', $sql);
+		EventManger::getInstance()->run('executeSql', $sql);
 		try {
 			if (!empty($sql)) {
 				$this->prepare($sql);
@@ -127,8 +127,9 @@ class Pdo extends Database {
 	public function getObject($sql = null, $parameters = array()) {
 		$this->execute($sql, $parameters);
 		$result = array();
-		while (!!$objs = $this->result->fetchObject()) {
-			$result[] = $objs;
+		while (!!$objects = $this->result->fetchObject()) {
+			$result[] = $objects;
+			
 		}
 		return $result;
 	}

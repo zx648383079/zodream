@@ -22,7 +22,7 @@ class Event {
     /**
      * @param $class
      * @param int|string|\Closure $function 如果 $class 是 Action 则为优先级
-     * @param null $file
+     * @param string $file
      * @param int $priority 优先级
      */
     public function add($class, $function = 10, $file = null, $priority = 10) {

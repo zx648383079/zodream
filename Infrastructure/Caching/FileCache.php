@@ -71,15 +71,13 @@ class FileCache extends Cache {
 		return APP_DIR.'/'.trim($this->cachePath, '/').'/'.$key.$this->cacheExtension;
 	}
 	
-	public function gc($force = false, $expiredOnly = true)
-    {
+	public function gc($force = false, $expiredOnly = true) {
         if ($force || mt_rand(0, 1000000) < $this->gcChance) {
             $this->gcRecursive($this->cachePath, $expiredOnly);
         }
     }
     
-    protected function gcRecursive($path, $expiredOnly)
-    {
+    protected function gcRecursive($path, $expiredOnly) {
         if (($handle = opendir($path)) !== false) {
             while (($file = readdir($handle)) !== false) {
                 if ($file[0] === '.') {

@@ -21,16 +21,24 @@ class UrlGenerator {
 	/**
 	 * 产生完整的网址
 	 * @param string $file
-	 * @param string|array $extra
+	 * @param array|string|\Closure $extra
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null) {
-		list($url, $param) = StringExpand::explode($file, '?', 2);
-		$url = self::toByFile($url);
-		if (!empty($param)) {
-			$url .= '?'.$param;
-		}
-		if ($extra === null) {
+		$args = explode('?', $file, 2);
+		$args[0] = self::toByFile($args[0]);
+		$url = implode('?', $args);
+		return self::addParam($url, $extra);
+	}
+
+	/**
+	 * 给url 添加值
+	 * @param string $url
+	 * @param array|string|\Closure $extra
+	 * @return string
+	 */
+	protected static function addParam($url, $extra = null) {
+		if (empty($extra)) {
 			return $url;
 		}
 		if (is_array($extra)) {

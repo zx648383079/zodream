@@ -146,7 +146,7 @@ class StringExpand {
 	/**
 	 * 替换url中的参数
 	 *
-	 * @param $url
+	 * @param string $url
 	 * @param string|array $key
 	 * @param null|string $value
 	 * @return string 合并后的值

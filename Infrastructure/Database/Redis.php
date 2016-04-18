@@ -1,10 +1,13 @@
 <?php
 namespace Zodream\Infrastructure\Database;
+
 /**
  * redis
  *
  * @author Jason
  */
+use Zodream\Infrastructure\Error;
+
 class Redis {
 	/**
 	 * @var \Redis
@@ -30,10 +33,10 @@ class Redis {
 	 */
 	public function set($key, $value, $timeOut=0) {
 		$retRes = $this->_redis->set($key, $value);
-		if ($timeOut > 0) {
-			$this->_redis->expire('$key', $timeOut);
+		if ($timeOut <= 0) {
+			return $retRes;
 		}
-		return $retRes;
+		$this->_redis->expire('$key', $timeOut);
 	}
 	
 	/*
@@ -72,7 +75,6 @@ class Redis {
 	 * @return int
 	 */
 	public function lpush($key, $value){
-		echo "$key - $value \n";
 		return $this->_redis->LPUSH($key, $value);
 	}
 
@@ -83,7 +85,6 @@ class Redis {
 	 * @return int
 	 */
 	public function rpush($key, $value){
-		echo "$key - $value \n";
 		return $this->_redis->rpush($key, $value);
 	}
 
@@ -120,17 +121,18 @@ class Redis {
 	 * @param int $timeout 时间
 	 * @return bool|string
 	 */
-	public function sets($keyArray, $timeout) {
-		if (is_array($keyArray)) {
-			$retRes = $this->_redis->mset($keyArray);
-			if ($timeout > 0) {
-				foreach ($keyArray as $key => $value) {
-					$this->_redis->expire($key, $timeout);
-				}
-			}
+	public function sets(array $keyArray, $timeout) {
+		if (!is_array($keyArray)) {
+			Error::out(
+				'Call  ' . __FUNCTION__ . ' method  parameter  Error !', 
+				__FILE__, __LINE__);
+		}
+		$retRes = $this->_redis->mset($keyArray);
+		if ($timeout <= 0) {
 			return $retRes;
-		} else {
-			return 'Call  ' . __FUNCTION__ . ' method  parameter  Error !';
+		}
+		foreach ($keyArray as $key => $value) {
+			$this->_redis->expire($key, $timeout);
 		}
 	}
 
@@ -149,12 +151,13 @@ class Redis {
 	 * @param array $keyArray 获key数值
 	 * @return array|string
 	 */
-	public function gets($keyArray) {
+	public function gets(array $keyArray) {
 		if (is_array($keyArray)) {
 			return $this->_redis->mget($keyArray);
-		} else {
-			return 'Call  ' . __FUNCTION__ . ' method  parameter  Error !';
 		}
+		Error::out(
+			'Call  ' . __FUNCTION__ . ' method  parameter  Error !',
+			__FILE__, __LINE__);
 	}
 	
 	/**
@@ -177,12 +180,13 @@ class Redis {
 	 * @param array $keyArray KEY集合
 	 * @return int|string
 	 */
-	public function dels($keyArray) {
+	public function dels(array $keyArray) {
 		if (is_array($keyArray)) {
 			return $this->_redis->del($keyArray);
-		} else {
-			return 'Call  ' . __FUNCTION__ . ' method  parameter  Error !';
 		}
+		Error::out(
+			'Call  ' . __FUNCTION__ . ' method  parameter  Error !',
+			__FILE__, __LINE__);
 	}
 
 	/**

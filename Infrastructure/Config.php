@@ -40,14 +40,14 @@ class Config extends MagicObject {
 	 * @return array
      */
 	private function _getConfig($file) {
-		if (file_exists($file)) {
-			$config = include($file);
-			if (is_string($config)) {
-				return $this->_getConfig($config);
-			}
-			return $config;
+		if (!file_exists($file)) {
+			return array();
 		}
-		return array();
+		$config = include($file);
+		if (is_string($config)) {
+			return $this->_getConfig($config);
+		}
+		return $config;
 	}
 
 	/**
