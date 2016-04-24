@@ -78,7 +78,9 @@ class View extends MagicObject {
 	 * @return string
 	 */
 	public function getView($file) {
-		return StringExpand::getFile($this->viewDir, str_replace('.', '/', $file)).$this->getSuffix();
+		return StringExpand::getFile(
+			$this->viewDir, 
+			str_replace('.', '/', $file)).$this->getSuffix();
 	}
 
 	/**
@@ -116,7 +118,7 @@ class View extends MagicObject {
 			if (file_exists($file)) {
 				include($file);
 			} else {
-				Error::out($file.' is not excite', __FILE__, __LINE__);
+				Error::out($file.' is not exist', __FILE__, __LINE__);
 			}
 		}
 	}

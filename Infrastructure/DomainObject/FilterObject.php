@@ -31,7 +31,7 @@ abstract class FilterObject {
 
     public function validate($arg) {
         $filtered = $this->filter($arg);
-        return !is_null($filtered) && $filtered == $arg;
+        return is_null($filtered) || $filtered == $arg;
     }
 
     public function getError() {
