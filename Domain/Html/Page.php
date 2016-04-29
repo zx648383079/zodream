@@ -1,22 +1,20 @@
 <?php
 namespace Zodream\Domain\Html;
 
+use Zodream\Infrastructure\Request;
 class Page {
 	private $_total = 0;
+
+	private $_index = 1;
+	
+	private $_pageSize = 20;
 	
 	private $_data = array();
 
-	/**
-	 * @var PageLink
-	 */
-	private $_pageLink;
-	
-	public function __construct($total = null) {
-		if ($total instanceof PageLink) {
-			$this->_pageLink = $total;
-			$total = $this->_pageLink->getTotal();
-		}
+	public function __construct($total, $pageSize = 20, $key = 'page') {
 		$this->setTotal($total);
+		$this->_index = max(1, Request::get($key, 1));
+		$this->_pageSize = $pageSize;
 	}
 
 	/**
@@ -61,21 +59,21 @@ class Page {
 
 	/**
 	 * 获取查询分页的值
-	 * @param int $pageSize
 	 * @return mixed
 	 */
-	public function getLimit($pageSize = 20) {
-		if (empty($this->_pageLink)) {
-			$this->_pageLink = new PageLink();
-			$this->_pageLink->init($this->getTotal(), $pageSize);
-		}
-		return $this->_pageLink->getLimit();
+	public function getLimit() {
+		return max(($this->_index- 1) * $this->_pageSize, 0) . ','.$this->_pageSize;
 	}
 
 	/**
 	 * 显示分页链接
+	 * @param array $option
+	 * @throws \Exception
 	 */
-	public function pageLink() {
-		echo $this->_pageLink->show();
+	public function pageLink($option = array()) {
+		$option['total'] = $this->_total;
+		$option['pageSize'] = $this->_pageSize;
+		$option['index'] = $this->_index;
+		echo PageLink::show($option);
 	}
 }

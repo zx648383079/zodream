@@ -7,7 +7,7 @@ use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 class PathInfo implements RouteObject {
 	public static function get() {
-		$url = UrlGenerator::getUri();
+		$url = Url::getUri();
 		$arr = StringExpand::explode($url, '.php', 2, array('', '/home/index'));
 		return $arr[1];
 	}

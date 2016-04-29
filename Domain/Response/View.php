@@ -13,7 +13,7 @@ use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Domain\Html\Script;
-use Zodream\Domain\Routing\UrlGenerator;
+use Zodream\Domain\Routing\Url;
 use Zodream\Domain\Routing\Router;
 use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\Traits\ConditionTrait;
@@ -137,7 +137,7 @@ class View extends MagicObject {
 	 * @param string $file
 	 */
 	public function asset($file) {
-		echo UrlGenerator::toAsset($this->getAsset($file));
+		echo Url::toAsset($this->getAsset($file));
 	}
 
 	/**
@@ -146,7 +146,7 @@ class View extends MagicObject {
 	 * @param array|string $extra
 	 */
 	public function url($url = null, $extra = null) {
-		echo UrlGenerator::to($url, $extra);
+		echo Url::to($url, $extra);
 	}
 
 	/**
@@ -155,7 +155,7 @@ class View extends MagicObject {
 	 * @return bool
 	 */
 	public function hasUrl($search = null) {
-		return UrlGenerator::hasUri($search);
+		return Url::hasUri($search);
 	}
 
 	/**

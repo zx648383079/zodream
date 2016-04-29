@@ -6,7 +6,7 @@ namespace Zodream\Domain\Html;
  * @author Jason
  * @time 2015-12-1
  */
-use Zodream\Domain\Routing\UrlGenerator;
+use Zodream\Domain\Routing\Url;
 
 class Script {
 	public static function make($files, $dir = 'assets/') {
@@ -34,11 +34,11 @@ class Script {
 		}
 		$file = ltrim($file, '/');
 		if (strpos($file, '.css') !== false) {
-			self::makeCss(UrlGenerator::to($dir.($needDeal ? 'css/' : '').$file));
+			self::makeCss(Url::to($dir.($needDeal ? 'css/' : '').$file));
 		} elseif (strpos($file, '.js') !== false) {
-			self::makeJs(UrlGenerator::to($dir.($needDeal ? 'js/' : '').$file));
+			self::makeJs(Url::to($dir.($needDeal ? 'js/' : '').$file));
 		} else {
-			self::makeJs(UrlGenerator::to($dir.($needDeal ? 'js/' : '').$file. '.js'));
+			self::makeJs(Url::to($dir.($needDeal ? 'js/' : '').$file. '.js'));
 		}
 	}
 	
@@ -53,11 +53,17 @@ class Script {
 	}
 	
 	private static function makeCss($file) {
-		echo '<link rel="stylesheet" type="text/css" href="'.$file.'"/>';
+		echo ScriptWidget::show(array(
+			'kind' => 'css',
+			'file' => $file
+		));
 	}
 	
 	private static function makeJs($file) {
-		echo '<script src="'.$file.'"></script>';
+		echo ScriptWidget::show(array(
+			'kind' => 'js',
+			'file' => $file
+		));
 	}
 	
 }

@@ -21,9 +21,9 @@ class QQ extends BaseOAuth {
     const GET_OPENID_URL = "https://graph.qq.com/oauth2.0/me";
 
     /********
-    配置 appid appkey callback scope
-     * @var string
-     */
+    * 配置 appid appkey callback scope
+    * @var string
+    */
     protected $config = 'qq';
 
     protected $apiMap = array(

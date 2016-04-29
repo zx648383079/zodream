@@ -5,7 +5,6 @@ namespace Zodream\Domain\Routing;
  */
 use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 class Common implements RouteObject {
 	public static function get() {
 		$values = explode('/', Request::get('v' , 'index'));

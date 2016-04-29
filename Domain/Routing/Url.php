@@ -7,8 +7,8 @@ namespace Zodream\Domain\Routing;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-defined('APP_URL') or define('APP_URL', UrlGenerator::getRoot());
-class UrlGenerator {
+defined('APP_URL') or define('APP_URL', Url::getRoot());
+class Url {
 	/**
 	 * 上个页面网址
 	 *

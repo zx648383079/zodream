@@ -4,7 +4,7 @@ namespace Zodream\Domain\Response;
  * 跳转
  * @author Jason
  */
-use Zodream\Domain\Routing\UrlGenerator;
+use Zodream\Domain\Routing\Url;
 
 class Redirect {
 	/**
@@ -20,11 +20,11 @@ class Redirect {
 	public static function to($urls = null, $time = 0, $msg = null, $status = 200) {
 		$url = '';
 		foreach ((array)$urls as $value) {
-			$url .= UrlGenerator::to($value);
+			$url .= Url::to($value);
 		}
 		// 当 $urls = null 时，防止$url 为空
 		if (empty($url)) {
-			$url = UrlGenerator::to($url);
+			$url = Url::to($url);
 		}
 		if (!headers_sent() && empty($msg)) {
 			ResponseResult::sendRedirect($url, $time);

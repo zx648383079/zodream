@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure;
 * @author Jason
 */
 use Zodream\Domain\Response\ResponseResult;
-use Zodream\Domain\Routing\UrlGenerator;
+use Zodream\Domain\Routing\Url;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 class Error{
@@ -43,7 +43,7 @@ class Error{
 	 * @param string $line
 	 */
 	public static function out($error, $file = null, $line = null) {
-		$errorInfo = "ERROR: {$error} , in {$file} on line {$line}, URL:".UrlGenerator::to();
+		$errorInfo = "ERROR: {$error} , in {$file} on line {$line}, URL:".Url::to();
 		Log::out(TimeExpand::now('Y-m-d').'.txt', TimeExpand::format().':'.$errorInfo. "\r\n");
 		if (!defined('DEBUG') || !DEBUG) {
 			ResponseResult::sendError();
