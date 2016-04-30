@@ -34,7 +34,10 @@ class TableWidget extends Widget {
         $content = '';
         foreach ($this->get('columns', array()) as $key => $value) {
             if (is_array($value)) {
-                $content .= Html::tag('th', $value['label']);
+                $content .= Html::tag(
+                    'th',
+                    array_key_exists('label', $value) ? $value['label'] : null
+                );
                 continue;
             }
             $content .= Html::tag('th', $value);
@@ -64,7 +67,7 @@ class TableWidget extends Widget {
                 }
                 $value .= Html::tag('td', $this->format($item[$k], $val['format']));
             }
-            $content .= $value;
+            $content .= Html::tag('tr', $value);
         }
         return Html::tag('tbody', $content);
     }

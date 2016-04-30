@@ -35,6 +35,25 @@ class MagicObject implements \ArrayAccess {
 		}
 		return $result;
 	}
+
+	/**
+	 * 如果$key不存在则继续寻找下一个,默认是作为key寻找，支持 @值
+	 * @param $key
+	 * @param $default
+	 * @return array|string
+	 */
+	public function getWithDefault($key, $default) {
+		$args = func_get_args();
+		foreach ($args as $arg) {
+			if (strpos($arg, '@') !== false) {
+				return substr($arg, 1);
+			}
+			if ($this->has($arg)) {
+				return $this->get($arg);
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * 设置值

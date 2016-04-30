@@ -11,8 +11,11 @@ class Page {
 	
 	private $_data = array();
 
+	private $_key = 'page';
+
 	public function __construct($total, $pageSize = 20, $key = 'page') {
 		$this->setTotal($total);
+		$this->_key = $key;
 		$this->_index = max(1, Request::get($key, 1));
 		$this->_pageSize = $pageSize;
 	}
@@ -84,6 +87,7 @@ class Page {
 		$option['total'] = $this->_total;
 		$option['pageSize'] = $this->_pageSize;
 		$option['index'] = $this->_index;
+		$option['key'] = $this->_key;
 		return PageLink::show($option);
 	}
 }

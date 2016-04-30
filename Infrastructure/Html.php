@@ -7,6 +7,9 @@ namespace Zodream\Infrastructure;
  * Time: 16:50
  */
 class Html {
+    /**
+     * @var array 无内容的标签
+     */
     public static $voidTags = array(
         'area' => 1,
         'base' => 1,
@@ -26,6 +29,9 @@ class Html {
         'wbr' => 1
     );
 
+    /**
+     * @var array 属性的顺序
+     */
     public static $attributeOrder = array(
         'type',
         'id',
@@ -59,15 +65,68 @@ class Html {
 
     public static $dataAttributes = ['data', 'data-ng', 'ng'];
 
+    /**
+     * 标签
+     * @param $name 标签名
+     * @param string $content 内容
+     * @param array $options 属性值
+     * @return string
+     */
     public static function tag($name, $content = '', $options = array()) {
         $html = "<$name" . static::renderTagAttributes($options) . '>';
-        return isset(static::$voidTags[strtolower($name)]) ? $html : "$html$content</$name>";
+        return isset(static::$voidTags[strtolower($name)]) ? $html : "{$html}{$content}</{$name}>";
     }
 
+    /**
+     * 链接
+     * @param $text 显示文字
+     * @param string $href 链接
+     * @param array $option
+     * @return string
+     */
+    public static function a($text, $href = '#', $option = array()) {
+        $option['href'] = $href;
+        return static::tag('a', $text, $option);
+    }
+
+    /**
+     * 图片
+     * @param string $src
+     * @param array $option
+     * @return string
+     */
+    public static function img($src = '#', $option = array()) {
+        $option['src'] = $src;
+        return static::tag('img', '', $option);
+    }
+
+    /**
+     * 表单
+     * @param $type
+     * @param array $option
+     * @return string
+     */
+    public static function input($type, $option = array()) {
+        $option['type'] = $type;
+        return static::tag('input', '', $option);
+    }
+
+    /**
+     * 样式
+     * @param $content
+     * @param array $options
+     * @return string
+     */
     public static function style($content, $options = array()) {
         return static::tag('style', $content, $options);
     }
 
+    /**
+     * 脚本
+     * @param $content
+     * @param array $options
+     * @return string
+     */
     public static function script($content, $options = array()) {
         return static::tag('script', $content, $options);
     }
@@ -117,11 +176,26 @@ class Html {
         return $html;
     }
 
+    /**
+     * 合并css样式
+     * @param array $style
+     * @return null
+     */
     public static function cssStyleFromArray(array $style) {
         $result = '';
         foreach ($style as $name => $value) {
             $result .= "$name: $value; ";
         }
         return $result === '' ? null : rtrim($result);
+    }
+    
+    public static function __callStatic($name, $arguments) {
+        if (array_key_exists($name, static::$voidTags)) {
+            return static::tag($name, '', count($arguments) > 0 ? $arguments[0] : array());
+        }
+        return static::tag($name,
+            count($arguments) > 0 ? $arguments[0] : '',
+            count($arguments) > 1 ? $arguments[1] : array()
+        );
     }
 }

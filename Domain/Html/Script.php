@@ -9,6 +9,12 @@ namespace Zodream\Domain\Html;
 use Zodream\Domain\Routing\Url;
 
 class Script {
+
+	/**
+	 * 生成js css引用
+	 * @param $files
+	 * @param string $dir
+	 */
 	public static function make($files, $dir = 'assets/') {
 		$dir = rtrim($dir, '/').'/';
 		foreach ($files as $file) {

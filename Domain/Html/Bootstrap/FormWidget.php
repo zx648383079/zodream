@@ -6,6 +6,7 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Date: 2016/4/30
  * Time: 9:57
  */
+use Zodream\Domain\Html\VerifyCsrfToken;
 use Zodream\Domain\Html\Widget;
 use Zodream\Domain\Routing\Url;
 use Zodream\Infrastructure\Html;
@@ -19,17 +20,20 @@ class FormWidget extends Widget {
     
     protected function run() {
         $content = '';
-        $data = $this->get('data');
+        $data = (array)$this->get('data');
         foreach ($this->get('fields', array()) as $key => $value) {
             if (!is_integer($key)) {
                 $value['name'] = $key;
             }
-            if (in_array($key, $data)) {
+            if (array_key_exists($key, $data)) {
                 $value['value'] = $data[$key];
             }
             $content .= FieldWidget::show($value);
         }
-        return Html::tag('form', $content, $this->get('id,class form-horizontal,role form,action,method POST'));
+        return Html::tag('form', 
+            $content, 
+            $this->get('id,class form-horizontal,role form,action,method POST')
+        );
     }
 
     public static function begin($data = array(), $option = array()) {
@@ -39,7 +43,18 @@ class FormWidget extends Widget {
             $option['action'] = Url::to();
         }
         $instance->set($option);
+        $instance->csrf();
         return $instance;
+    }
+    
+    public function csrf() {
+        return $this->hidden('csrf', array(
+            'value' => VerifyCsrfToken::get()
+        ));
+    }
+    
+    public function hidden($name, $option = array()) {
+        return $this->input($name, __FUNCTION__, $option);
     }
 
     public function text($name, $option = array()) {

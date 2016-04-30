@@ -24,6 +24,10 @@ class FieldWidget extends Widget {
             $this->set($option);
         }
         $type = $this->get('type');
+        if ($type === 'hidden') {
+            return $this->hidden();
+        }
+        
         if (in_array($type, array('button', 'submit', 'reset'))) {
             return $this->button();
         }
@@ -53,6 +57,14 @@ class FieldWidget extends Widget {
             return $this->select();
         }
         return $this->input($type);
+    }
+    
+    public function hidden() {
+        return Html::tag('input', '', array(
+            'type' => 'hidden',
+            'name' => $this->get('name'),
+            'value' => $this->get('value')
+        ));
     }
 
     public function radio() {
