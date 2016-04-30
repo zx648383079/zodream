@@ -71,9 +71,19 @@ class Page {
 	 * @throws \Exception
 	 */
 	public function pageLink($option = array()) {
+		echo $this->getLink($option);
+	}
+
+	/**
+	 * 获取分页链接
+	 * @param array $option
+	 * @return string
+	 * @throws \Exception
+	 */
+	public function getLink($option = array()) {
 		$option['total'] = $this->_total;
 		$option['pageSize'] = $this->_pageSize;
 		$option['index'] = $this->_index;
-		echo PageLink::show($option);
+		return PageLink::show($option);
 	}
 }

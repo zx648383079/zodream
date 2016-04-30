@@ -40,4 +40,8 @@ abstract class Widget extends MagicObject {
         }
         return ob_get_clean() . $out;
     }
+    
+    public function __toString() {
+        return $this->show();
+    }
 }

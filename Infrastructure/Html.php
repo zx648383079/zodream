@@ -57,6 +57,8 @@ class Html {
         'media'
     );
 
+    public static $dataAttributes = ['data', 'data-ng', 'ng'];
+
     public static function tag($name, $content = '', $options = array()) {
         $html = "<$name" . static::renderTagAttributes($options) . '>';
         return isset(static::$voidTags[strtolower($name)]) ? $html : "$html$content</$name>";

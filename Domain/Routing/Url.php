@@ -25,9 +25,13 @@ class Url {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null) {
-		$args = explode('?', $file, 2);
-		$args[0] = self::toByFile($args[0]);
-		$url = implode('?', $args);
+		if (strpos($file, '?') !== false) {
+			$args = explode('?', $file, 2);
+			$args[0] = self::toByFile($args[0]);
+			$url = implode('?', $args);
+		} else {
+			$url = self::toByFile($file);
+		}
 		return self::addParam($url, $extra);
 	}
 
