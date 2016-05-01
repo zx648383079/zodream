@@ -102,6 +102,10 @@ class Generate {
 		$table = StringExpand::firstReplace($table, $this->model->getPrefix());
 		echo '<h3>Table ',$table,'执行开始……</h3><br>';
 		$columns = $this->model->getColumn($table);
+		if (empty($columns)) {
+			echo '<h3>Table ',$table,'为空或不存在！ </h3><br>';
+			return;
+		}
 		$name = $this->getName($table);
 		if (Binary::judge(1, $mode)) {
 			$this->makeController($name);

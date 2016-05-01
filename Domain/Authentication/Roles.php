@@ -64,6 +64,10 @@ class Roles extends MagicObject {
      * @return bool
      */
     public static function hasRole($names) {
-        return static::getInstance()->has($names);
+        return static::getInstance()->hasKeyOrValue($names);
+    }
+    
+    public static function judge($role) {
+        return static::hasRole($role);
     }
 }

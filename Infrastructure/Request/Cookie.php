@@ -8,6 +8,8 @@ namespace Zodream\Infrastructure\Request;
  */
 class Cookie extends BaseRequest {
     public function __construct() {
-        $this->setValues($_COOKIE);
+        foreach ($_COOKIE as $key => $value) {
+            $this->set(strtolower(str_replace(',_', '', $key)), $this->_clean($value));
+        }
     }
 }

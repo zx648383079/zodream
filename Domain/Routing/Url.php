@@ -25,6 +25,9 @@ class Url {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null) {
+		if ($file === '#' || strpos($file, 'javascrpt:') != false) {
+			return $file;
+		}
 		if (strpos($file, '?') !== false) {
 			$args = explode('?', $file, 2);
 			$args[0] = self::toByFile($args[0]);

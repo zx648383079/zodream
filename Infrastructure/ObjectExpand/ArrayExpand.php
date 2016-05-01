@@ -150,7 +150,7 @@ class ArrayExpand {
         $newKey = end( $temps );
         return array(
             $newKey,
-            isset($args[$oldKey]) ? $args[$oldKey] : $def,
+            array_key_exists($oldKey, $args) ? $args[$oldKey] : $def,
             $oldKey
         );
     }

@@ -22,7 +22,18 @@ abstract class Model {
 	
 	protected $prefix;
 
-	protected $sequence = array('join', 'left', 'inner', 'right', 'where', 'group', 'having', 'order', 'limit', 'offset');
+	protected $sequence =  array(
+			'join',
+			'left',
+			'inner',
+			'right',
+			'where',
+			'group',
+			'having',
+			'order',
+			'limit',
+			'offset'
+		);
 	
 	public function __construct() {
 		$configs = Config::getInstance()->get('db');
@@ -188,7 +199,7 @@ abstract class Model {
 	public function findOne($param, $filed = '*', $parameters = array()) {
 		$sql = null;
 		if (!is_array($param) || !array_key_exists('where', $param)) {
-			$sql = $this->getWhere($param) . 'LIMIT 1';
+			$sql = $this->getWhere($param) . ' LIMIT 1';
 		} else {
 			$param['limit'] = 1;
 			$sql = $this->getBySort($param);
@@ -254,6 +265,16 @@ abstract class Model {
 			return $param;
 		}
 		$sql = '';
+		// join 无固定顺序 的先处理
+		foreach ($param as $key => $value) {
+			if (!in_array($key, array('join', 'left', 'inner', 'right'))) {
+				continue;
+			}
+			$method = 'get'.ucfirst($key);
+			$sql .= ' '.$this->$method($value);
+			unset($param[$key]);
+		}
+
 		foreach ($this->sequence as $item) {
 			if (!isset($param[$item]) || empty($param[$item])) {
 				continue;
@@ -403,8 +424,10 @@ abstract class Model {
 					return "'". addslashes($value[0]). "'";
 			}
 		}
-		// 连接查询
-		if (strpos($value, '.') !== false) {
+		// 连接查询 排除邮箱 排除网址
+		if (strpos($value, '.') !== false 
+			&& substr_count($value, '.') === 1 
+			&& strpos($value, '@') === false) {
 			return $value;
 		}
 		// 表内字段关联

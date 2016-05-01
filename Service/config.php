@@ -15,9 +15,12 @@ return array(
 		'controller' => 'Controller',
 		'action'     => 'Action',
 	),
+	'session' => array(
+		'driver' => \Zodream\Infrastructure\SessionExpand\Session::class
+	),
 	'auth'   => array(
 		'driver' => Zodream\Domain\Authentication\Auth::class,        //用户判断
-		'role'   => Zodream\Domain\Authentication\Verify::class,       //权限判断
+		'role'   => \Zodream\Domain\Authentication\Roles::class,       //权限判断
 		'home'  => 'account'                             //用户登录主页
 	),
 	'view'   => array(                           //视图文件信息

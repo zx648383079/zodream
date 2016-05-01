@@ -22,6 +22,9 @@ class MagicObject implements \ArrayAccess {
 		if (empty($key)) {
 			return $this->_data;
 		}
+		if (!is_array($this->_data)) {
+			$this->_data = (array)$this->_data;
+		}
 		if ($this->has($key)) {
 			return $this->_data[$key];
 		}
@@ -93,6 +96,9 @@ class MagicObject implements \ArrayAccess {
 	public function has($key = null) {
 		if (is_null($key)) {
 			return !empty($this->_data);
+		}
+		if (empty($this->_data)) {
+			return false;
 		}
 		return array_key_exists($key, $this->_data);
 	}

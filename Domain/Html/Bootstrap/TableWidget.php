@@ -9,6 +9,7 @@ namespace Zodream\Domain\Html\Bootstrap;
 use Zodream\Domain\Html\Page;
 use Zodream\Domain\Html\Widget;
 use Zodream\Infrastructure\Html;
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 class TableWidget extends Widget {
@@ -54,33 +55,45 @@ class TableWidget extends Widget {
         }
         $content = '';
         foreach ($data as $item) {
-            $value = '';
-            foreach ($columns as $key => $val) {
-                $k = $key;
-                // 为避免重复键
-                if (is_integer($k)) {
-                    $k = $val['key'];
-                }
-                if (!is_array($val) || !array_key_exists('format', $val)) {
-                    $value .= Html::tag('td', $item[$k]);
-                    continue;
-                }
-                $value .= Html::tag('td', $this->format($item[$k], $val['format']));
-            }
-            $content .= Html::tag('tr', $value);
+            $content .= $this->getBodyOne($item, $columns);
         }
         return Html::tag('tbody', $content);
     }
     
-    protected function format($data, $tag = null) {
+    protected function getBodyOne(array $item, array $columns) {
+        $content = '';
+        foreach ($columns as $key => $value) {
+            $k = $key;
+            // 为避免重复键
+            if (is_array($value) && array_key_exists('key', $value)) {
+                $k = $value['key'];
+            }
+            $format = null;
+            if (is_array($value) && array_key_exists('format', $value)) {
+                $format = $value['format'];
+            }
+            $content .= Html::tag('td', $this->format((array)ArrayExpand::getValues($k, $item), $format));
+        }
+        return Html::tag('tr', $content);
+    }
+    
+    protected function format(array $data, $tag = null) {
+        if ($tag instanceof \Closure) {
+            return call_user_func_array($tag, $data);
+        }
+        $result = array();
+        foreach ($data as $item) {
+            $result[] = $this->formatOne($item, $tag);
+        }
+        return implode(' ', $result);
+    }
+    
+    protected function formatOne($data, $tag = null) {
         if (empty($tag)) {
             return $data;
         }
         if (is_array($tag)) {
             return array_key_exists($data, $tag) ? $tag[$data] : null;
-        }
-        if ($tag instanceof \Closure) {
-            return $tag($data);
         }
         if ($tag === 'date') {
             return TimeExpand::format($data, 'Y-m-d');

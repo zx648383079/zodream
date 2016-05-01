@@ -15,6 +15,7 @@ class Auth extends MagicObject implements AuthObject {
 	protected function __construct() {
 		if (Session::getInstance()->has('user')) {
 			$this->set(Session::getInstance()->get('user'));
+			Roles::setRoles($this->get('roles', array()));
 		}
 	}
 

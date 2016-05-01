@@ -1,13 +1,12 @@
 <?php
-namespace Zodream\Infrastructure\Session;
-use Zodream\Infrastructure\Error;
-
+namespace Zodream\Infrastructure\SessionExpand;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/3/6
  * Time: 9:56
  */
+use Zodream\Infrastructure\Error;
 class DatabaseCache extends Session {
 
     /**

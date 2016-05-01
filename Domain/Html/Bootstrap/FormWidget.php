@@ -19,6 +19,7 @@ class FormWidget extends Widget {
     );
     
     protected function run() {
+        $this->set('action', Url::to($this->get('action')));
         $content = '';
         $data = (array)$this->get('data');
         foreach ($this->get('fields', array()) as $key => $value) {
@@ -39,9 +40,6 @@ class FormWidget extends Widget {
     public static function begin($data = array(), $option = array()) {
         $instance = new static;
         $option['data'] = $data;
-        if (!array_key_exists('action', $option)) {
-            $option['action'] = Url::to();
-        }
         $instance->set($option);
         $instance->csrf();
         return $instance;

@@ -76,12 +76,7 @@ class Verify {
 		$auth = self::_auth();
 		if (call_user_func(array($auth['driver'], 'guest'))) {
 			return empty($role);
-		} else {
-			$model = call_user_func(array($auth['driver'], 'user'));
-			if (!is_null($model)) {
-				return call_user_func(array($auth['role'], 'judge'), $role, $model->role()->roles);
-			}
-			return false;
 		}
+		return call_user_func(array($auth['role'], 'judge'), $role);
 	}
 }

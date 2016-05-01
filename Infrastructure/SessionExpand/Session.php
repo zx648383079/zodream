@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Session;
+namespace Zodream\Infrastructure\SessionExpand;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -7,6 +7,8 @@ namespace Zodream\Infrastructure\Session;
  * Time: 9:56
  */
 class Session implements \ArrayAccess {
+
+    public $flashParam = '__flash';
 
     private $_cookieParams = array(
         'httponly' => true
@@ -28,7 +30,7 @@ class Session implements \ArrayAccess {
         $this->_setCookieParamsInternal();
         $this->useCookie(true);
         $this->useTransparentSessionID(false);
-        $this->savePath(APP_DIR.'/tmp');
+        $this->savePath(APP_DIR.'/temp');
         @session_start();
     }
 
@@ -157,6 +159,70 @@ class Session implements \ArrayAccess {
         $_SESSION[$key] = $value;
     }
 
+    protected function updateFlashCounters() {
+        $counters = $this->get($this->flashParam, []);
+        if (is_array($counters)) {
+            foreach ($counters as $key => $count) {
+                if ($count > 0) {
+                    unset($counters[$key], $_SESSION[$key]);
+                } elseif ($count == 0) {
+                    $counters[$key]++;
+                }
+            }
+            $_SESSION[$this->flashParam] = $counters;
+        } else {
+            // fix the unexpected problem that flashParam doesn't return an array
+            unset($_SESSION[$this->flashParam]);
+        }
+    }
+
+    public function getFlash($key, $defaultValue = null, $delete = false) {
+        $counters = $this->get($this->flashParam, []);
+        if (isset($counters[$key])) {
+            $value = $this->get($key, $defaultValue);
+            if ($delete) {
+                $this->removeFlash($key);
+            } elseif ($counters[$key] < 0) {
+                // mark for deletion in the next request
+                $counters[$key] = 1;
+                $_SESSION[$this->flashParam] = $counters;
+            }
+
+            return $value;
+        } else {
+            return $defaultValue;
+        }
+    }
+
+    public function getAllFlashes($delete = false) {
+        $counters = $this->get($this->flashParam, []);
+        $flashes = [];
+        foreach (array_keys($counters) as $key) {
+            if (array_key_exists($key, $_SESSION)) {
+                $flashes[$key] = $_SESSION[$key];
+                if ($delete) {
+                    unset($counters[$key], $_SESSION[$key]);
+                } elseif ($counters[$key] < 0) {
+                    // mark for deletion in the next request
+                    $counters[$key] = 1;
+                }
+            } else {
+                unset($counters[$key]);
+            }
+        }
+
+        $_SESSION[$this->flashParam] = $counters;
+
+        return $flashes;
+    }
+
+    public function setFlash($key, $value = true, $removeAfterAccess = true) {
+        $counters = $this->get($this->flashParam, []);
+        $counters[$key] = $removeAfterAccess ? -1 : 0;
+        $_SESSION[$key] = $value;
+        $_SESSION[$this->flashParam] = $counters;
+    }
+
     public function delete($key = null) {
         $this->open();
         if (null == $key) {
@@ -173,11 +239,51 @@ class Session implements \ArrayAccess {
         return null;
     }
 
+    public function addFlash($key, $value = true, $removeAfterAccess = true) {
+        $counters = $this->get($this->flashParam, []);
+        $counters[$key] = $removeAfterAccess ? -1 : 0;
+        $_SESSION[$this->flashParam] = $counters;
+        if (empty($_SESSION[$key])) {
+            $_SESSION[$key] = [$value];
+        } else {
+            if (is_array($_SESSION[$key])) {
+                $_SESSION[$key][] = $value;
+            } else {
+                $_SESSION[$key] = [$_SESSION[$key], $value];
+            }
+        }
+    }
+
+    public function removeFlash($key) {
+        $counters = $this->get($this->flashParam, []);
+        $value = isset($_SESSION[$key], $counters[$key]) ? $_SESSION[$key] : null;
+        unset($counters[$key], $_SESSION[$key]);
+        $_SESSION[$this->flashParam] = $counters;
+
+        return $value;
+    }
+
+    public function removeAllFlashes() {
+        $counters = $this->get($this->flashParam, []);
+        foreach (array_keys($counters) as $key) {
+            unset($_SESSION[$key]);
+        }
+        unset($_SESSION[$this->flashParam]);
+    }
+
+    public function hasFlash($key) {
+        return $this->getFlash($key) !== null;
+    }
+
     public function destroy() {
         if ($this->isActive()) {
             @session_unset();
             @session_destroy();
         }
+    }
+    
+    public function clear() {
+        $this->delete();
     }
 
     public function has($key) {

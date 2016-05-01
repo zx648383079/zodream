@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Session;
+namespace Zodream\Infrastructure\SessionExpand;
 /**
  * Created by PhpStorm.
  * User: zx648

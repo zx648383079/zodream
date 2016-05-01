@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Infrastructure;
+use Zodream\Domain\Routing\Url;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -85,7 +87,7 @@ class Html {
      * @return string
      */
     public static function a($text, $href = '#', $option = array()) {
-        $option['href'] = $href;
+        $option['href'] = Url::to($href);
         return static::tag('a', $text, $option);
     }
 
@@ -96,7 +98,7 @@ class Html {
      * @return string
      */
     public static function img($src = '#', $option = array()) {
-        $option['src'] = $src;
+        $option['src'] = Url::to($src);
         return static::tag('img', '', $option);
     }
 
