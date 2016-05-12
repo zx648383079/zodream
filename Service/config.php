@@ -25,7 +25,8 @@ return array(
 	),
 	'view'   => array(                           //视图文件信息
 		'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
-		'suffix' => '.php'
+		'suffix' => '.php',
+		//'mode' => 'common'                        //普通表示 $value 直接取值， 而设为其他值这是 $this->get() 等方法取值
 	),
 	'route'  => array(
 		'driver'  => Zodream\Domain\Routing\Grace::class,

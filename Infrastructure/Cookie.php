@@ -8,6 +8,17 @@ namespace Zodream\Infrastructure;
 
 class Cookie {
 	/**
+	 * 修复客户端传递的 cookie 第一个键名出现异常字符
+	 */
+	public static function restore() {
+		foreach ($_COOKIE as $key => $value) {
+			if (strpos($key, ',_') !== false) {
+				$_COOKIE[str_replace(',_', '', $key)] = $value;
+			}
+		}
+	}
+	
+	/**
 	 * $_COOKIE
 	 * @param string $key
 	 * @param string $default

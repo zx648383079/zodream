@@ -24,13 +24,8 @@ class Application {
 	 */
 	public static function main() {
 		Autoload::getInstance()->setError()->shutDown();
+		Cookie::restore();
 		EventManger::getInstance()->run('appRun');
-		//修复有时候 cookie 的第一个键名出现异常字符
-		foreach ($_COOKIE as $key => $value) {
-			if (strpos($key, ',_') !== false) {
-				$_COOKIE[str_replace(',_', '', $key)] = $value;
-			}
-		}
 		if (Config::getInstance()->get('safe.csrf', false) && !Request::isGet()) {
 			VerifyCsrfToken::verify();
 		}

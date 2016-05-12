@@ -1,13 +1,22 @@
 <?php 
 namespace Zodream\Infrastructure\ObjectExpand;
-use Zodream\Infrastructure\Error;
 
 /**
 * string 的扩展
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Error;
 class StringExpand {
+	
+	public static function formatSize($size) { 
+		$sizes = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB"); 
+		if ($size == 0) {  
+			return('n/a');  
+		} else { 
+		return (round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $sizes[$i]);  
+		} 
+	}
 
 	/**
 	 * 绑定值
@@ -110,6 +119,15 @@ class StringExpand {
 			$string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
 		}
 		return $string;
+	}
+
+	/**
+	 * 生成随机数字字符串
+	 * @param $length
+	 * @return string
+	 */
+	public static function randomNumber($length = 6) {
+		return sprintf('%0'.$length.'d', mt_rand(0, pow(10, $length) - 1));
 	}
 
 	/**

@@ -260,7 +260,12 @@ class View extends MagicObject {
 	 */
 	public function showWithFile($file, $status = 200) {
 		ob_start();
-		include $this->getView($file);
+		if (Config::getValue('view.mode') == 'common') {
+			extract($this->get());
+			include $this->getView($file);
+		} else {
+			include $this->getView($file);
+		}
 		$content = ob_get_contents();
 		ob_end_clean();
 		EventManger::getInstance()->run('showView', $content);

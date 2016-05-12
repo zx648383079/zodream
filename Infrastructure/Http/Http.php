@@ -87,6 +87,7 @@ class Http {
 	 * 设置网址
 	 * @param string $url
 	 * @param array|string $data
+	 * @return $this
 	 */
 	public function setUrl($url, $data = array()) {
 		if (empty($url)) {
