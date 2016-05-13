@@ -25,6 +25,17 @@ class Url {
 	 * @return string
 	 */
 	public static function to($file = null, $extra = null) {
+		if (is_array($file)) {
+			$files = $file;
+			foreach ($files as $key => $item) {
+				if (is_integer($key)) {
+					$file = $item;
+					continue;
+				}
+				$extra[$key] = $item;
+			}
+			unset($files);
+		}
 		if ($file === '#' || strpos($file, 'javascrpt:') != false) {
 			return $file;
 		}

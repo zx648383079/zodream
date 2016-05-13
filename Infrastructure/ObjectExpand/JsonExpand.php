@@ -8,6 +8,9 @@ namespace Zodream\Infrastructure\ObjectExpand;
  */
 class JsonExpand {
     public static function decode($json, $is_array = true) {
+        if (!is_string($json)) {
+            return $xml;
+        }
         if ($is_array === false) {
             return json_decode($json);
         }

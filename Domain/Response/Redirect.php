@@ -12,16 +12,13 @@ class Redirect {
 	 *
 	 * @access globe
 	 *
-	 * @param null $urls 要跳转的网址
+	 * @param string|array $url 要跳转的网址
 	 * @param int $time 停顿的时间 秒
 	 * @param string $msg 显示的消息.
 	 * @param int $status 显示的代码标志.
 	 */
-	public static function to($urls = null, $time = 0, $msg = null, $status = 200) {
-		$url = '';
-		foreach ((array)$urls as $value) {
-			$url .= Url::to($value);
-		}
+	public static function to($url = null, $time = 0, $msg = null, $status = 200) {
+		$url = Url::to($url);
 		// 当 $urls = null 时，防止$url 为空
 		if (empty($url)) {
 			$url = Url::to($url);

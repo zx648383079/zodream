@@ -19,7 +19,11 @@ class Mailer {
 			$this->_mail->SMTPDebug = 1;
 		}
 		$config = Config::getInstance()->get('mail');
-		$this->setHost($config['host'], $config['port'])->setUser($config['user'], $config['password']);
+		$email = empty($config['email']) ? $config['user'] : $config['email'];
+		$name = empty($config['name']) ? $email : $config['name'];
+		$this->setHost($config['host'], $config['port'])
+			->setUser($config['user'], $config['password'])
+			->setFrom($email, $name);
 	}
 
 	/**
@@ -47,7 +51,7 @@ class Mailer {
 	}
 
 	/**
-	 * 设置接收者
+	 * 设置发件人
 	 * @param string $address
 	 * @param string $name
 	 * @param bool|string $auto

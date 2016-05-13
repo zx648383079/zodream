@@ -12,6 +12,9 @@ class XmlExpand {
      * @throws Xml\Exception
      */
     public static function decode($xml, $is_array = true) {
+        if (!is_string($xml)) {
+            return $xml;
+        }
         if ($is_array === false) {
             return simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         }

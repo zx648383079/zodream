@@ -180,7 +180,14 @@ class StringExpand {
 			$data[$key] = $value;
 		} else {
 			if (is_array($key)) {
-				$data = array_merge($data, $key);
+				foreach ($key as $k => $val) {
+					if (!is_integer($k)) {
+						$data[$k] = $val;
+						continue;
+					}
+					$temps = self::explode($val, '=', 2);
+					$data[$temps[0]] = $temps[1];
+				}
 			} else if (is_string($key)) {
 				$keys = array();
 				parse_str($key, $keys);

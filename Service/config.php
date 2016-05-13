@@ -48,7 +48,13 @@ return array(
 		'host'     => 'smtp.zodream.cn',
 		'port'     => 25,
 		'user'     => 'admin@zodream.cn',
+		'name'     => 'ZoDream', //发送者名字
+		'email'    => '',  //发送者邮箱
 		'password' => ''
+	),
+	'wechat' => array(
+		'appid' => 'ZoDream',
+		'secret' => 'ZoDream'
 	),
 	'verify' => array(
 		'length' => 4,

@@ -7,9 +7,6 @@ namespace Zodream\Domain\SMS;
  * Date: 2016/5/12
  * Time: 15:13
  */
-use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Http\Http;
-use Zodream\Infrastructure\MagicObject;
 
 /**
  * Class Ihuyi
@@ -19,38 +16,45 @@ use Zodream\Infrastructure\MagicObject;
  * @property string $account 账户
  * @property string $password 密码 可以是32位md5加密过的
  */
-class Ihuyi extends MagicObject {
+use Zodream\Infrastructure\ThirdParty;
+class Ihuyi extends ThirdParty {
 
-    const Url = 'http://106.ihuyi.cn/webservice/sms.php?format=json&method=';
+    protected $config = 'sms';
+    protected $apiMap = array(
+        'url' => array(
+            array(
+                'http://106.ihuyi.cn/webservice/sms.php',
+                array(
+                    'format' => 'json',
+                    '#method'
+                )
+            ),
+            array(
+                '#account',
+                '#password',
+                'mobile',
+                'content'
+            ), 
+            'post'
+        )
+    );
 
     protected $_data = array(
         'template' => '您的验证码是：{code}。请不要把验证码泄露给其他人。'
     );
 
-    protected $http;
-
-    //protected $errorNo;
-
-    protected $error = null;
-
-    public function __construct() {
-        $this->set(Config::getValue('sms'));
-        $this->http = new Http();
-    }
-
     /**
-     * 发送验证短信
-     * @param sting|integer $mobile
-     * @param string|integer $code
-     * @return bool|integer false|短信ID
+     * 发送短信
+     * @param $mobile
+     * @param $content
+     * @return bool
      */
-    public function send($mobile, $code) {
-        $data = json_decode($this->http->post(self::Url.'Submit', array(
-            'account' => $this->get('account'),
-            'password' => $this->get('password'),
+    public function send($mobile, $content) {
+        $data = $this->getJson('url', array(
             'mobile' => $mobile,
-            'content' => str_replace('{code}', $code, $this->get('template'))
-        )), true);
+            'content' => $content,
+            'method' => 'Submit'
+        ));
         if ($data['code'] == 2) {
             return $data['smsid'];
         }
@@ -58,16 +62,24 @@ class Ihuyi extends MagicObject {
         $this->error = $data['msg'];
         return false;
     }
+    /**
+     * 发送验证短信
+     * @param sting|integer $mobile
+     * @param string|integer $code
+     * @return bool|integer false|短信ID
+     */
+    public function sendCode($mobile, $code) {
+        return $this->send($mobile, str_replace('{code}', $code, $this->get('template')));
+    }
 
     /**
      * 余额查询
      * @return bool|integer
      */
     public function balance() {
-        $data = json_decode($this->http->post(self::Url.'GetNum', array(
-            'account' => $this->get('account'),
-            'password' => $this->get('password')
-        )), true);
+        $data = $this->getJson('url', array(
+            'method' => 'GetNum'
+        ));
         if ($data['code'] == 2) {
             return $data['num'];
         }
@@ -75,7 +87,5 @@ class Ihuyi extends MagicObject {
         return false;
     }
 
-    public function getError() {
-        return $this->error;
-    }
+
 }
