@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Infrastructure;
-use Zodream\Domain\Routing\Url;
 
 /**
  * Created by PhpStorm.
@@ -8,6 +7,7 @@ use Zodream\Domain\Routing\Url;
  * Date: 2016/4/29
  * Time: 16:50
  */
+use Zodream\Domain\Routing\Url;
 class Html {
     /**
      * @var array 无内容的标签

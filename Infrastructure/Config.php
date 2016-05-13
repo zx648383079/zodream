@@ -5,6 +5,7 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
+use Zodream\Domain\Generate\Generate;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
@@ -72,6 +73,14 @@ class Config extends MagicObject {
 	
 	public function __call($method, $value) {
 		$this->getMultidimensional($method, $value);
+	}
+	
+	public static function save($name = null) {
+		if (empty($name)) {
+			$name = APP_MODULE;
+		}
+		$generate = new Generate();
+		$generate->setReplace(true)->makeConfig(static::getValue(), $name);
 	}
 
 	/**

@@ -24,6 +24,11 @@ class Generate {
 		$this->template = new Template(__DIR__.'/Template/');
 	}
 	
+	public function setReplace($replace = false) {
+		$this->replace = $replace;
+		return $this;
+	}
+	
 	public function setModel() {
 		if (!$this->model instanceof Model) {
 			$this->model = new GenerateModel();
@@ -422,29 +427,8 @@ class Generate {
 		}
 		$this->template->set($replaces);
 		file_put_contents($output, $this->template->getText($file.'.tpl'));
-		echo $output, ' 生成成功！<br>';
+		//echo $output, ' 生成成功！<br>';
 		return true;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
