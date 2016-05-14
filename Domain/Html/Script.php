@@ -33,6 +33,20 @@ class Script {
 	}
 	
 	private static function makeWithRelative($file, $dir) {
+		if (substr($file, 0, 4) === '!css') {
+			echo ScriptWidget::show(array(
+				'kind' => 'css',
+				'source' => substr($file, 4)
+			));
+			return;
+		}
+		if (substr($file, 0, 3) === '!js') {
+			echo ScriptWidget::show(array(
+				'kind' => 'js',
+				'source' => substr($file, 3)
+			));
+			return;
+		}
 		$needDeal = true;
 		if (substr($file, 0, 1) === '@') {
 			$needDeal = false;
