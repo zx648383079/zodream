@@ -5,74 +5,29 @@ namespace Zodream\Domain;
 * 
 * @author Jason
 */
-use Zodream\Domain\Filter\SqlFilter;
-use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Database\Command;
+use Zodream\Infrastructure\Database\Query;
+use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 abstract class Model {
-	/**
-	 * @var \Zodream\infrastructure\Database\Database
-	 */
-	protected $db;
-
-	protected $table;
-
 	protected $fillAble = array();
 	
-	protected $prefix;
+	protected $table;
 
-	protected $sequence =  array(
-			'join',
-			'left',
-			'inner',
-			'right',
-			'where',
-			'group',
-			'having',
-			'order',
-			'limit',
-			'offset'
-		);
+	public function setTable($table) {
+		$this->command->setTable($table);
+		return $this;
+	}
+	/**
+	 * @var Command
+	 */
+	protected $command;
 	
 	public function __construct() {
-		$configs = Config::getInstance()->get('db');
-		$this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);
-		$this->prefix = $configs['prefix'];
-		if (isset($this->table)) {
-			$this->setTable($this->table);
-		}
-	}
-
-	protected function addPrefix($table) {
-		if (empty($this->prefix)) {
-			return $table;
-		}
-		return $this->prefix. StringExpand::firstReplace($table, $this->prefix, null);
-	}
-
-	/**
-	 * 设置表
-	 * @param string $table
-	 * @return $this
-	 */
-	public function setTable($table) {
-		$this->table = $this->addPrefix($table);
-		return $this;
-	}
-	
-	public function getTable() {
-		return $this->table;
-	}
-
-	/**
-	 * 更改数据库
-	 * @param string $database
-	 * @return $this
-	 */
-	public function changedDatabase($database) {
-		$this->db->execute('use '.$database);
-		return $this;
+		$this->command = Command::getInstance();
+		$this->command->setTable($this->table);
 	}
 
 	/**
@@ -95,7 +50,7 @@ abstract class Model {
 		if (is_numeric($param)) {
 			$param = 'id = '.$param;
 		}
-		return $this->updateValues($data, $param);
+		return $this->update($data, $param);
 	}
 	
 	/**
@@ -108,7 +63,7 @@ abstract class Model {
 	 */
 	public function add(array $addData) {
 		$addFields = implode('`,`', array_keys($addData));
-		return $this->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), array_values($addData));
+		return $this->command->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), array_values($addData));
 	}
 	 
 	/**
@@ -118,7 +73,7 @@ abstract class Model {
 	 * @param array $updateData 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-	public function updateValues(array $updateData, $param) {
+	public function update(array $updateData, $param) {
 		$setData = '';
 		$parameters = array();
 		foreach ($updateData as $key => $value) {
@@ -130,7 +85,10 @@ abstract class Model {
 			$parameters[] = $value;
 		}
 		$setData = substr($setData, 0, -1);
-		return $this->update($setData, $this->getCondition($param), $parameters);
+		return $this->command->update($setData, $this->getQuery(
+			array(
+				'where' => $param
+			)), $parameters);
 	}
 
 	/**
@@ -140,7 +98,7 @@ abstract class Model {
 	 * @return int
 	 */
 	public function updateById($id, array $data) {
-		return $this->updateValues($data, 'id = '.intval($id));
+		return $this->update($data, 'id = '.intval($id));
 	}
 	 
 	/**
@@ -151,7 +109,12 @@ abstract class Model {
 	 * @return int
 	 */
 	public function updateBool($filed, $where) {
-		return $this->update("{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END", $this->getCondition($where));
+		return $this->command->update(
+			"{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END",
+			$this->getQuery(
+				array(
+					'where' => $where
+				)));
 	}
 	
 	/**
@@ -171,7 +134,11 @@ abstract class Model {
 				$sql[] = "`$key` = `$key` ".$item;
 			}
 		}
-		return $this->update(implode(',', $sql), $this->getCondition($where));
+		return $this->command->update(implode(',', $sql), 
+			$this->getQuery(
+			array(
+				'where' => $where
+			)));
 	}
 
 	/**
@@ -192,30 +159,33 @@ abstract class Model {
 	 * @access public
 	 *
 	 * @param array|string $param 条件
-	 * @param string $filed
+	 * @param string $field
 	 * @param array $parameters
 	 * @return array ,
 	 */
-	public function findOne($param, $filed = '*', $parameters = array()) {
+	public function findOne($param, $field = '*', $parameters = array()) {
 		$sql = null;
 		if (!is_array($param) || !array_key_exists('where', $param)) {
-			$sql = $this->getWhere($param) . ' LIMIT 1';
+			$sql = $this->getQuery(array(
+				'where' => $param,
+				'limit' => 1
+			));
 		} else {
 			$param['limit'] = 1;
-			$sql = $this->getBySort($param);
+			$sql = $this->getQuery($param);
 		}
-		$result = $this->select($sql, $this->getField($filed), $parameters);
+		$result = $this->command->select($sql, $this->getField($field), $parameters);
 		return current($result);
 	}
 	
 	/**
 	 * 根据id 查找值
 	 * @param string|integer $id
-	 * @param string $filed
+	 * @param string $field
 	 * @return array
 	 */
-	public function findById($id, $filed = '*') {
-		$result = $this->select('WHERE id = '.intval($id).' LIMIT 1', $filed);
+	public function findById($id, $field = '*') {
+		$result = $this->command->select('WHERE id = '.intval($id).' LIMIT 1', $this->getField($field));
 		return current($result);
 	}
 
@@ -226,8 +196,8 @@ abstract class Model {
 	 * @param array $parameters
 	 * @return int 返回影响的行数,
 	 */
-	public function deleteValues($where, $parameters = array()) {
-		return $this->delete($this->getCondition($where), $parameters);
+	public function delete($where, $parameters = array()) {
+		return $this->command->delete($this->getCondition($where), $parameters);
 	}
 
 	/** 根据id删除数据
@@ -235,7 +205,7 @@ abstract class Model {
 	 * @return int
 	 */
 	public function deleteById($id) {
-		return $this->deleteValues('id = '.intval($id));
+		return $this->delete('id = '.intval($id));
 	}
 
 	/**
@@ -243,322 +213,16 @@ abstract class Model {
 	 *
 	 * @access public
 	 *
-	 * @param array|null $param 条件
-	 * @param array $field 要显示的字段
-	 * @param array $parameters
-	 * @return array 返回查询结果,
+	 * @return Query 返回查询结果,
 	 */
-	public function find($param = array(), $field = array(), $parameters = array()) {
-		return $this->select($this->getBySort($param), $this->getField($field), $parameters);
+	public function find() {
+		return new Query();
 	}
 
-	/**
-	 * 根据关键字顺序组合
-	 * @param array|string $param
-	 * @return string
-	 */
-	protected function getBySort($param) {
-		if (empty($param)) {
-			return null;
-		}
-		if (!is_array($param)) {
-			return $param;
-		}
-		$sql = '';
-		// join 无固定顺序 的先处理
-		foreach ($param as $key => $value) {
-			if (!in_array($key, array('join', 'left', 'inner', 'right'))) {
-				continue;
-			}
-			$method = 'get'.ucfirst($key);
-			$sql .= ' '.$this->$method($value);
-			unset($param[$key]);
-		}
-
-		foreach ($this->sequence as $item) {
-			if (!isset($param[$item]) || empty($param[$item])) {
-				continue;
-			}
-			$method = 'get'.ucfirst($item);
-			$sql .= ' '.$this->$method($param[$item]);
-		}
-		return $sql;
+	public function findAll($param = array(), $field = '*', $parameters = array()) {
+		return $this->command->select($this->getQuery($param), $this->getField($field), $parameters);
 	}
-
-	/**
-	 * @param string $param ALL|null
-	 * @return string
-	 */
-	protected function getUnion($param) {
-		return 'UNION '.$param;
-	}
-
-	protected function getHaving($param) {
-		if (empty($param)) {
-			return null;
-		}
-		return 'Having '.$this->getCondition($param);
-	}
-
-	protected $operators = array(
-		'=', '<', '>', '<=', '>=', '<>', '!=',
-		'in', 'not in', 'is', 'is not',
-		'like', 'like binary', 'not like', 'between', 'not between', 'ilike',
-		'&', '|', '^', '<<', '>>',
-		'rlike', 'regexp', 'not regexp',
-		'~', '~*', '!~', '!~*', 'similar to',
-		'not similar to'
-	);
-
-	/**
-	 * 合并where 或 having 的条件
-	 * @param array|string $param
-	 * @return string
-	 */
-	protected function getCondition($param) {
-		if (is_string($param)) {
-			return $param;
-		}
-		$sql = '';
-		foreach ($param as $key => $value) {
-			$val = $value;
-			if (!is_numeric($key)) {
-				$val = (array)$val;
-				array_unshift($val, $key);
-			}
-			$sql .= $this->getConditionOne($val);
-		}
-		if (empty($sql)) {
-			return null;
-		}
-		return substr($sql, 4);
-	}
-
-	/**
-	 * 合成一条条件语句
-	 * @param string|array $arg
-	 * @return null|string
-	 */
-	protected function getConditionOne($arg) {
-		if (is_string($arg)) {
-			return $this->getConditionLink($arg);
-		}
-		if (!is_array($arg)) {
-			return null;
-		}
-		$length = count($arg);
-		if ($length == 1) {
-			// 'a = b'
-			return $this->getConditionLink($arg[0]);
-		}
-		if ($length == 2) {
-			if ($this->isOrOrAnd($arg[1])) {
-				// ['a = b', 'or']
-				return $this->getConditionLink($arg[0], $arg[1]);
-			}
-			// ['a', 'b']
-			return $this->getConditionLink(
-				"{$arg[0]} = ". $this->getValueByOperator($arg[1]));
-		}
-		if ($length == 3) {
-			if (in_array($arg[1], $this->operators)) {
-				// ['a', '=', 'b']
-				return $this->getConditionLink(
-					"{$arg[0]} {$arg[1]} ". $this->getValueByOperator($arg[2], $arg[1]));
-			}
-			// ['a', 'b', 'or']
-			return $this->getConditionLink(
-				"{$arg[0]} = ". $this->getValueByOperator($arg[1]), $arg[2]);
-		}
-		if ($length == 4) {
-			if ($this->isOrOrAnd($arg[3])) {
-				// ['a', '=', 'b', 'or']
-				return $this->getConditionLink(
-					$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2], $arg[1]), 
-					$arg[3]);
-			}
-			// ['a', 'between', 'b', 'c']
-			return $this->getConditionLink(
-				$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' AND '.$this->getValueByOperator($arg[3]));
-		}
-
-		if ($length == 5) {
-			if ($this->isOrOrAnd($arg[4])) {
-				//['a', 'between', 'b', 'c', 'or']
-				return $this->getConditionLink(
-					$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' AND '.$this->getValueByOperator($arg[3]), 
-					$arg[4]);
-			}
-			//['a', 'between', 'b', 'and', 'c']
-			return $this->getConditionLink(
-				$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' '.$arg[3].' '.$this->getValueByOperator($arg[4]));
-		}
-		//['a', 'between', 'b', 'and', 'c', 'or']
-		return $this->getConditionLink(
-			$arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' '.$arg[3].' '.$this->getValueByOperator($arg[4]), 
-			$arg[5]);
-	}
-
-	protected function getValueByOperator($value, $operator = null) {
-		if (('is' == $operator || 'is not' == $operator) && is_null($value)) {
-			return 'null';
-		}
-		if (('in' == $operator || 'not in' == $operator) && is_array($value)) {
-			return "('".implode("', '", $value). "')";
-		}
-		// [a, int]
-		if (is_array($value)) {
-			if (count($value) == 1) {
-				$value[] = 'string';
-			}
-			switch ($value[1]) {
-				case 'int':
-				case 'integer':
-				case 'numeric':
-					return intval($value[0]);
-				case 'bool':
-				case 'boolean':
-					return boolval($value[0]);
-				case 'string':
-				default:
-					return "'". addslashes($value[0]). "'";
-			}
-		}
-		// 连接查询 排除邮箱 排除网址
-		if (strpos($value, '.') !== false 
-			&& substr_count($value, '.') === 1 
-			&& strpos($value, '@') === false) {
-			return $value;
-		}
-		// 表内字段关联
-		if (strpos($value, '@') === 0) {
-			return substr($value, 1);
-		}
-		return "'{$value}'";
-	}
-
-	/**
-	 * 判断是否是or 或 and 连接符
-	 * @param string $arg
-	 * @return bool
-	 */
-	protected function isOrOrAnd($arg) {
-		return in_array(strtolower($arg), array('and', 'or'));
-	}
-
-	/**
-	 * 把连接符换成标准格式
-	 * @param string $arg
-	 * @param string $tag
-	 * @return null|string
-	 */
-	protected function getConditionLink($arg, $tag = 'and') {
-		if (empty($arg)) {
-			return null;
-		}
-		if (strtolower($tag) === 'or') {
-			return ' OR '.$arg;
-		}
-		return ' AND '.$arg;
-	}
-
-	protected function getWhere($param) {
-		if (empty($param)) {
-			return null;
-		}
-		return 'WHERE '.$this->getCondition($param);
-	}
-
-	protected function getLeft(array $param) {
-		return $this->getJoin($param, 'LEFT ');
-	}
-
-	protected function getInner(array $param) {
-		return $this->getJoin($param, 'INNER ');
-	}
-
-	protected function getRight(array $param) {
-		return $this->getJoin($param, 'RIGHT ');
-	}
-
-	/**
-	 * 支持多个相同的left [$table, $where, ...]
-	 * @param array $param
-	 * @param string $tag
-	 * @return string
-	 */
-	protected function getJoin(array $param, $tag = '') {
-		$sql = '';
-		for ($i = 1, $length = count($param); $i < $length; $i += 2) {
-			$sql .= $tag.'JOIN '.$this->addPrefix($param[$i - 1]).' ON '.$param[$i].' ';
-		}
-		return $sql;
-	}
-
-	/**
-	 * @param array|string $param
-	 * 关键字 DISTINCT 唯一 AVG() COUNT() FIRST() LAST() MAX()  MIN() SUM() UCASE() 大写  LCASE()
-	 * MID(column_name,start[,length]) 提取字符串 LEN() ROUND() 舍入 NOW() FORMAT() 格式化
-	 * @return string
-	 */
-	protected function getField($param) {
-		if (empty($param)) {
-			return '*';
-		}
-		$result = '';
-		foreach ((array)$param as $key => $item) {
-			if (is_integer($key)) {
-				$result .= $item .',';
-			} else {
-				$result .= "{$item} AS {$key},";
-			}
-		}
-		return substr($result, 0, -1);
-	}
-
-	protected function getGroup($param) {
-		return 'GROUP BY '.implode(',', (array)$param);
-	}
-
-	protected function getOrder($param) {
-		if (is_string($param)) {
-			return 'ORDER BY '.$param;
-		}
-		$result = 'ORDER BY ';
-		foreach ($param as $item) {
-			if (is_array($item)) {
-				$result .= $item[0] .' '.strtoupper($item[1]).',';
-			} else {
-				$result .= $item.',';
-			}
-		}
-		return substr($result, 0, -1);
-	}
-
-	/**
-	 * @param string|array $param
-	 * @return string
-	 */
-	protected function getLimit($param) {
-		$param = (array)$param;
-		if (count($param) == 1) {
-			return "LIMIT {$param[0]}";
-		}
-		$param[0] = intval($param[0]);
-		$param[1] = intval($param[1]);
-		if ($param[0] < 0) {
-			$param[0] = 0;
-		}
-		return "LIMIT {$param[0]},{$param[1]}";
-	}
-
-	/**
-	 * @param string|int $param
-	 * @return string
-	 */
-	protected function getOffset($param) {
-		return "OFFSET ".intval($param);
-	}
+	
 
 	/**
 	 * 总记录
@@ -571,7 +235,12 @@ abstract class Model {
 	 * @return int 返回总数,
 	 */
 	public function count($param = array(), $field = 'id', $parameters = array()) {
-		$result = $this->select($this->getWhere($param). ' LIMIT 1', "COUNT({$field}) AS count", $parameters);
+		if (!array_key_exists('where', $param)) {
+			$param = array(
+				'where' => $param
+			);
+		}
+		$result = $this->command->select($this->getQuery($param). ' LIMIT 1', "COUNT({$field}) AS count", $parameters);
 		if (empty($result)) {
 			return null;
 		}
@@ -586,111 +255,32 @@ abstract class Model {
 	 * @return string
 	 */
 	public function scalar($param, $filed = '*', $parameters = array()) {
-		$result = $this->select($this->getBySort($param), $filed, $parameters);
+		$result = $this->command->select($this->getQuery($param), $this->getField($filed), $parameters);
 		if (empty($result)) {
 			return false;
 		}
 		return current($result[0]);
 	}
-	
-	/**
-	 * 执行SQL语句
-	 *
-	 * @access public
-	 *
-	 * @param array $param 条件
-	 * @param array $parameters 值
-	 * @return array 返回查询结果,
-	 */
-	public function findByHelper($param, $parameters = array()) {
-		if (empty($param)) {
-			return array();
+
+	protected function getQuery($param) {
+		if (!is_array($param)) {
+			return $param;
 		}
-		$sql  = (new SqlFilter($this->prefix))->getSQL($param);
-		return $this->db->getArray($sql, $parameters);
+		return (new Query($param))->getSql();
 	}
 
-	/**
-	 * 拷贝（未实现）
-	 */
-	public function copy() {
-		return $this->select(null, '* INTO table in db');
-	}
-
-	/**
-	 * 查询
-	 * @param $sql
-	 * @param string $field
-	 * @param array $parameters
-	 * @return mixed
-	 */
-	public function select($sql, $field = '*', $parameters = array()) {
-		return $this->db->getArray("SELECT {$field} FROM {$this->table} {$sql}", $parameters);
-	}
-
-	/**
-	 * 插入
-	 * @param string $columns
-	 * @param string $tags
-	 * @param array $parameters
-	 * @return int
-	 */
-	public function insert($columns, $tags, $parameters = array()) {
-		return $this->db->insert("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
-	}
-
-	/**
-	 * 如果行作为新记录被insert，则受影响行的值为1；如果原有的记录被更新，则受影响行的值为2。 如果有多条存在则只更新最后一条
-	 * @param string $columns
-	 * @param string $tags
-	 * @param string $update
-	 * @param array $parameters
-	 * @return int
-	 */
-	public function insertOrUpdate($columns, $tags, $update, $parameters = array()) {
-		return $this->db->update("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags}) ON DUPLICATE KEY UPDATE {$update}", $parameters);
-	}
-
-	/**
-	 *在执行REPLACE后，系统返回了所影响的行数，如果返回1，说明在表中并没有重复的记录，如果返回2，说明有一条重复记录，系统自动先调用了 DELETE删除这条记录，然后再记录用INSERT来insert这条记录。如果返回的值大于2，那说明有多个唯一索引，有多条记录被删除和insert。
-	 * @param string $columns
-	 * @param string $tags
-	 * @param array $parameters
-	 * @return int
-	 */
-	public function insertOrReplace($columns, $tags, $parameters = array()) {
-		return $this->update("REPLACE INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
-	}
-
-	/**
-	 * 更新
-	 * @param string $columns
-	 * @param string $where
-	 * @param array $parameters
-	 * @return int
-	 */
-	public function update($columns, $where, $parameters = array()) {
-		return $this->db->update("UPDATE {$this->table} SET {$columns} WHERE {$where}", $parameters);
-	}
-
-	/**
-	 * 删除
-	 * @param string $where
-	 * @param array $parameters
-	 * @return int
-	 */
-	public function delete($where, $parameters = array()) {
-		return $this->db->delete("DELETE FROM {$this->table} WHERE {$where}", $parameters);
-	}
-	
-	public function execute($sql, $parameters = array()) {
-		return $this->db->execute($sql, $parameters);
-	}
-
-	/**
-	 * 获取错误信息
-	 */
-	public function getError() {
-		return $this->db->getError();
+	protected function getField($filed) {
+		if (empty($filed)) {
+			return '*';
+		}
+		$result = array();
+		foreach ((array)$filed as $key => $item) {
+			if (is_integer($key)) {
+				$result[] = $item;
+			} else {
+				$result[] = "{$item} AS {$key}";
+			}
+		}
+		return implode($result, ',');
 	}
 }

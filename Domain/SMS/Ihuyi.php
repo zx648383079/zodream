@@ -86,6 +86,4 @@ class Ihuyi extends ThirdParty {
         $this->error = $data['msg'];
         return false;
     }
-
-
 }

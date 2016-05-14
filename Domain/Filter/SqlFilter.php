@@ -64,44 +64,9 @@ class SqlFilter {
 		
 	}
 	
-	public function select($field = '*') {
-		if (!is_array($field)) {
-			$field = func_get_args();
-		}
-		foreach ($field as $key => $value) {
-			if (is_int($key)) {
-				$this->select[] = $value;
-			} else {
-				$this->select[] = $value. ' AS '.$key;
-			}
-		}
-		return $this;
-	}
 	
-	public function count($column = '*') {
-		return $this->_selectFunction(__FUNCTION__, $column);
-	}
 	
-	public function max($column)  {
-		return $this->_selectFunction(__FUNCTION__, $column);
-	}
 	
-	public function min($column)  {
-		return $this->_selectFunction(__FUNCTION__, $column);
-	}
-	
-	public function avg($column)  {
-		return $this->_selectFunction(__FUNCTION__, $column);
-	}
-	
-	public function sum($column)  {
-		return $this->_selectFunction(__FUNCTION__, $column);
-	}
-	
-	private function _selectFunction($name, $column) {
-		$this->select[] = "{$name}({$column}) AS {$name}";
-		return $this;
-	}
 	
 	public function from($table) {
 		if (!is_array($table)) {

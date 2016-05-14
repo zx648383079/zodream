@@ -14,11 +14,31 @@ class Config extends MagicObject {
 	
 	use SingletonPattern;
 	
+	protected static $path;
+	
+	public static function setPath($value = null) {
+		if (!is_dir($value)) {
+			if (defined('APP_DIR')) {
+				$value = APP_DIR.'/Service/config/';
+			} else {
+				$value = dirname(dirname(dirname(dirname(dirname(__FILE__))))). '/Service/config/';
+			}
+		}
+		static::$path = $value;
+	}
+
+	public static function getPath() {
+		if (!is_dir(static::$path)) {
+			static::setPath();
+		}
+		return static::$path;
+	}
+	
 	/**
 	 * 判断配置文件是否存在
 	 */
 	public static function exist() {
-		return file_exists(APP_DIR.'/Service/config/'.APP_MODULE.'.php');
+		return file_exists(static::getPath().APP_MODULE.'.php');
 	}
 	
 	private function __construct() {
@@ -30,8 +50,8 @@ class Config extends MagicObject {
 	 */
 	public function reset() {
 		$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
-		$common  = $this->_getConfig(APP_DIR.'/Service/config/config.php');
-		$personal = $this->_getConfig(APP_DIR.'/Service/config/'.APP_MODULE.'.php');
+		$common  = $this->_getConfig(static::getPath().'config.php');
+		$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
 		$this->set(ArrayExpand::merge2D((array)$configs, (array)$common, (array)$personal));
 	}
 

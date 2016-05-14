@@ -23,9 +23,10 @@ SHOW GRANTS FOR user                         //列出某用户权限
  */
 use Zodream\Domain\Model;
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-class GenerateModel extends Model {
+class GenerateModel extends Command {
 
     /**
      * 获取表前缀
