@@ -108,7 +108,8 @@ class ResponseResult {
 	 * 缓存控制
 	 * @param string $option 默认禁止缓存
 	 */
-	public static function sendCacheControl($option = 'no-cache, no-store, max-age=0, must-revalidate') {
+	public static function sendCacheControl(
+		$option = 'no-cache, no-store, max-age=0, must-revalidate') {
 		header('Cache-Control:'.$option);
 	}
 	
@@ -202,6 +203,9 @@ class ResponseResult {
 	 * @param string $option
 	 */
 	public static function sendContentType($type = 'html', $option = 'utf-8') {
+		if (headers_sent()) {
+			return;
+		}
 		switch (strtolower($type)) {
 			case 'html':
 				header('Content-Type:text/html;charset='.$option);
@@ -264,8 +268,10 @@ class ResponseResult {
 	 * 发送Http状态信息
 	 * @param int $status
 	 */
-	public static function sendHttpStatus($status = 200)
-	{
+	public static function sendHttpStatus($status = 200) {
+		if (headers_sent()) {
+			return;
+		}
 		static $_status = [
 				// Informational 1xx
 				100 => 'Continue',
