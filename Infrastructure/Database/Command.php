@@ -122,7 +122,7 @@ class Command {
      * @return int
      */
     public function update($columns, $where, $parameters = array()) {
-        if (strncasecmp($where, 'where', 5) !== 0) {
+        if (strncasecmp(ltrim($where), 'where', 5) !== 0) {
             $where = 'WHERE '.$where;
         }
         return $this->db->update("UPDATE {$this->table} SET {$columns} {$where}", $parameters);
