@@ -33,9 +33,17 @@ abstract class ThirdParty extends MagicObject {
     
     protected $error;
 
-    public function __construct() {
+    public function __construct($config = array()) {
         $this->http = new Http\Http();
-        $this->set(Config::getValue($this->config));
+        if (empty($config)) {
+            $this->set(Config::getValue($this->config));
+            return;
+        }
+        if (array_key_exists($this->config, $config) && is_array($config[$this->config])) {
+            $this->set($config[$this->config]);
+            return;
+        }
+        $this->set($config);
     }
 
     protected function httpGet($url, $data = array()) {

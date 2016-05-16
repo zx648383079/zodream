@@ -18,7 +18,7 @@ class Config extends MagicObject {
 	
 	public static function setPath($value = null) {
 		if (!is_dir($value)) {
-			if (defined('APP_DIR')) {
+			if (defined('APP_DIR') && is_dir(APP_DIR)) {
 				$value = APP_DIR.'/Service/config/';
 			} else {
 				$value = dirname(dirname(dirname(dirname(dirname(__FILE__))))). '/Service/config/';
@@ -49,9 +49,11 @@ class Config extends MagicObject {
 	 * 重新加载配置
 	 */
 	public function reset() {
-		$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
+		if (defined('APP_MODULE')) {
+			$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
+			$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
+		}
 		$common  = $this->_getConfig(static::getPath().'config.php');
-		$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
 		$this->set(ArrayExpand::merge2D((array)$configs, (array)$common, (array)$personal));
 	}
 
@@ -99,8 +101,11 @@ class Config extends MagicObject {
 		if (empty($name)) {
 			$name = APP_MODULE;
 		}
+		if (!is_file($name)) {
+			$name = static::getPath().$name.'.php';
+		}
 		$generate = new Generate();
-		$generate->setReplace(true)->makeConfig(static::getValue(), $name);
+		return $generate->setReplace(true)->makeConfig(static::getValue(), $name);
 	}
 
 	/**

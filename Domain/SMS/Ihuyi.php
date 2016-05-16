@@ -9,7 +9,7 @@ namespace Zodream\Domain\SMS;
  */
 
 /**
- * Class Ihuyi
+ * Class IHuYi
  * http://www.ihuyi.com/
  * @package Zodream\Domain
  * @property string $template 短信模板 {code} 代替验证码
@@ -17,7 +17,7 @@ namespace Zodream\Domain\SMS;
  * @property string $password 密码 可以是32位md5加密过的
  */
 use Zodream\Infrastructure\ThirdParty;
-class Ihuyi extends ThirdParty {
+class IHuYi extends ThirdParty {
 
     protected $config = 'sms';
     protected $apiMap = array(

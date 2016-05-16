@@ -19,6 +19,8 @@ class Generate {
 	 * @var GenerateModel
 	 */
 	protected $model;
+	
+	protected $error;
 
 	public function __construct() {
 		$this->template = new Template(__DIR__.'/Template/');
@@ -209,6 +211,9 @@ class Generate {
 	 * @return bool
 	 */
 	public function makeConfig(array $configs, $module = APP_MODULE) {
+		if (!is_file($module)) {
+			$module = APP_DIR.'/Service/config/'.$module.'.php';
+		}
 		return $this->_replace('config', array('data' => var_export($configs, true)), APP_DIR.'/Service/config/'.$module.'.php');
 	}
 
@@ -419,16 +424,24 @@ class Generate {
 	 */
 	private function _replace($file, array $replaces, $output) {
 		if (is_file($output) && !$this->replace) {
-			echo $output,' 路径已经存在！未使用强制模式！<br>';
+			$this->error = $output.' 路径已经存在！未使用强制模式！';
 			return false;
 		}
-		if (!is_dir(dirname($output))) {
-			mkdir(dirname($output));
+		if (!is_dir(dirname($output)) && !mkdir(dirname($output))) {
+			$this->error = dirname($output). '创建失败！';
+			return false;
 		}
 		$this->template->set($replaces);
-		file_put_contents($output, $this->template->getText($file.'.tpl'));
-		//echo $output, ' 生成成功！<br>';
+		$size = file_put_contents($output, $this->template->getText($file.'.tpl'));
+		if ($size <= 0) {
+			$this->error = $output. '无法写入!';
+			return false;
+		}
 		return true;
+	}
+	
+	public function getError() {
+		return $this->error;
 	}
 
 }
