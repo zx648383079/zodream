@@ -150,6 +150,10 @@ final class Request {
 		return self::Other(__FUNCTION__);
 	}
 	
+	public static function isMobile() {
+		return self::Other(__FUNCTION__);
+	}
+	
 	public static function isGet() {
 		return self::Other('method') === 'GET';
 	}
