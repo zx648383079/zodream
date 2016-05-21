@@ -140,7 +140,11 @@ class Image{
 				hexdec($blue)
 		);
 	}
-	
+
+	/**
+	 * @param $color
+	 * @return int|false
+	 */
 	public function getColorWithRGB($color) {
 		if (func_num_args() == 1 && is_int($color)) {
 			return $color;
@@ -302,9 +306,73 @@ class Image{
 		}
 		return imagecopyresized($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
 	}
-	
-	public function scale() {
-		
+
+	/**
+	 * 按照宽比缩放
+	 * @param int $width
+	 * @return bool
+	 */
+	public function scaleByWidth($width) {
+		return $this->scale($width, $this->height * $width / $this->width);
+	}
+
+	/**
+	 * 按照高比缩放
+	 * @param int $height
+	 * @return bool
+	 */
+	public function scaleByHeight($height) {
+		return $this->scale($this->width * $height / $this->height, $height);
+	}
+
+	/**
+	 * 缩放图片
+	 * @param int $width
+	 * @param int $height
+	 * @return bool
+	 */
+	public function scale($width, $height) {
+		$image = new Image();
+		$image->create($width, $height);
+		$result = $image->copyFromWithResampling($this);
+		imagedestroy($this->image);
+		$this->image = $image->image;
+		$this->width = $width;
+		$this->height = $height;
+		return $result;
+	}
+
+	/**
+	 * 翻转
+	 * @param bool $isX 是否沿X轴翻转， Y轴
+	 */
+	public function turn($isX = true) {
+		$image = new Image();
+		$image->create($this->width, $this->height);
+		if ($isX) {
+			for($y = 0; $y < $this->height; $y ++){
+				//逐条复制图片本身高度，1个像素宽度的图片到薪资源中
+				$image->copyFrom($this, 0, $y, 0, $this->height - $y - 1, $this->width, 1);
+			}
+		} else {
+			for($x = 0; $x < $this->width; $x ++){
+				$image->copyFrom($this, $x, 0, $this->width - $x - 1, 0, 1, $this->height);
+			}
+		}
+		imagedestroy($this->image);
+		$this->image = $image->image;
+	}
+
+	/**
+	 * 图片旋转
+	 * @param float|int $angle
+	 * @param string|int $background
+	 * @param int $ignore 如果被设为非零值，则透明色会被忽略（否则会被保留）。
+	 * @return bool 失败时返回 FALSE。
+	 */
+	public function rotate($angle = 90, $background = '#fff', $ignore = 0) {
+		$this->image = imagerotate($this->image, $angle, $this->getColorWithRGB($background), $ignore);
+		return $this->image !== false;
 	}
 
 	/**
