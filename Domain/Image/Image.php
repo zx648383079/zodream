@@ -46,6 +46,7 @@ class Image{
 	
 	public function open($file) {
 		if ($this->check($file)) {
+			$this->file = $file;
 			$imageInfo = getimagesize($file);
 			$this->width = $imageInfo[0];
 			$this->height = $imageInfo[1];
@@ -188,6 +189,7 @@ class Image{
 	 * @param int $y
 	 * @param int $srcWidth 如果是0则取原图的宽
 	 * @param int $srcHeight 如果是0则取原图的高
+	 * @return bool
 	 */
 	public function copyFrom(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0) {
 		if (empty($srcWidth)) {
@@ -196,7 +198,7 @@ class Image{
 		if (empty($srcHeight)) {
 			$srcHeight = $srcImage->getHeight();
 		}
-		imagecopy($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight);
+		return imagecopy($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight);
 	}
 
 	/**
@@ -209,6 +211,7 @@ class Image{
 	 * @param int $srcY
 	 * @param int $srcWidth
 	 * @param int $srcHeight
+	 * @return bool
 	 */
 	public function copyAndMergeFrom(Image $srcImage, $x = 0, $y = 0, $opacity = 50, $srcX = 0, $srcY = 0, $srcWidth = 0, $srcHeight = 0) {
 		if (empty($srcWidth)) {
@@ -217,7 +220,7 @@ class Image{
 		if (empty($srcHeight)) {
 			$srcHeight = $srcImage->getHeight();
 		}
-		imagecopymerge($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight, $opacity);
+		return imagecopymerge($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight, $opacity);
 	}
 
 	/**
@@ -230,6 +233,7 @@ class Image{
 	 * @param int $srcY
 	 * @param int $srcWidth
 	 * @param int $srcHeight
+	 * @return bool
 	 */
 	public function copyAndMergeFromWithGray(Image $srcImage, $x = 0, $y = 0, $opacity = 50, $srcX = 0, $srcY = 0, $srcWidth = 0, $srcHeight = 0) {
 		if (empty($srcWidth)) {
@@ -238,7 +242,7 @@ class Image{
 		if (empty($srcHeight)) {
 			$srcHeight = $srcImage->getHeight();
 		}
-		imagecopymergegray($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight, $opacity);
+		return imagecopymergegray($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $srcWidth, $srcHeight, $opacity);
 	}
 
 	/**
@@ -252,6 +256,7 @@ class Image{
 	 * @param int $srcHeight 如果是0则取原图的高
 	 * @param int $width 如果是0则取本图的宽
 	 * @param int $height 如果是0则取本图的高
+	 * @return bool
 	 */
 	public function copyFromWithResampling(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0, $width = 0, $height = 0) {
 		if (empty($srcWidth)) {
@@ -266,7 +271,7 @@ class Image{
 		if (empty($height)) {
 			$height = $this->getHeight();
 		}
-		imagecopyresampled($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
+		return imagecopyresampled($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
 	}
 
 	/**
@@ -280,6 +285,7 @@ class Image{
 	 * @param int $srcHeight 如果是0则取原图的高
 	 * @param int $width 如果是0则取本图的宽
 	 * @param int $height 如果是0则取本图的高
+	 * @return bool
 	 */
 	public function copyFromWithResize(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0, $width = 0, $height = 0) {
 		if (empty($srcWidth)) {
@@ -294,24 +300,34 @@ class Image{
 		if (empty($height)) {
 			$height = $this->getHeight();
 		}
-		imagecopyresized($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
+		return imagecopyresized($this->image, $srcImage->image, $x, $y, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
 	}
 	
 	public function scale() {
 		
 	}
-	
+
+	/**
+	 * @return bool
+	 */
 	public function save() {
 		if (!empty($this->file)) {
-			call_user_func('image'.$this->realType, $this->image, $this->file);
+			return call_user_func('image'.$this->realType, $this->image, $this->file);
 		}
+		return false;
 	}
-	
+
+	/**
+	 * @param string $output
+	 * @param string $type
+	 * @return bool
+	 */
 	public function saveAs($output, $type = null) {
 		$this->setRealType($type);
 		if (!empty($output)) {
-			call_user_func('image'.$this->realType, $this->image, $output);
+			return call_user_func('image'.$this->realType, $this->image, $output);
 		}
+		return false;
 	}
 	
 	public function close() {
@@ -330,4 +346,7 @@ class Image{
 		return is_file($file) && getimagesize($file) && extension_loaded('gd');
 	}
 	
+	public function __destruct() {
+		$this->close();
+	}
 }

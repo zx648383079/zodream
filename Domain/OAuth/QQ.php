@@ -27,11 +27,21 @@ class QQ extends BaseOAuth {
         'access' => array(
             'https://graph.qq.com/oauth2.0/token',
             array(
-                '#grant_type',
+                'grant_type' => 'authorization_code',
                 '#client_id',
                 '#client_secret',
                 '#code',
                 '#redirect_uri'
+            )
+        ),
+        // 自动续期
+        'refresh' => array(
+            'https://graph.qq.com/oauth2.0/token',
+            array(
+                'grant_type' => 'refresh_token',
+                '#client_id',
+                '#client_secret',
+                '#refresh_token'
             )
         ),
         'openid' => array(
@@ -40,6 +50,12 @@ class QQ extends BaseOAuth {
         )
     );
 
+    /**
+     * @param string $name
+     * @param array $args
+     * @param bool $is_array
+     * @return array
+     */
     protected function getJson($name, $args = array(), $is_array = true) {
         $json = $this->getByApi($name, $args);
         if (strpos($json, 'callback') !== false) {
@@ -50,11 +66,21 @@ class QQ extends BaseOAuth {
         return $this->json($json, $is_array);
     }
 
-    public function login() {
-
-    }
-
+    /**
+     * @return array
+     */
     public function callback() {
-        
+        /**
+         * access_token	授权令牌，Access_Token。
+         * expires_in	该access token的有效期，单位为秒。
+         * refresh_token
+         */
+        $access = $this->getJson('access');
+        /**
+         *
+         */
+        $openId = $this->getJson('openid', $access);
+        $access['openid'] = $openId['openid'];
+        return $access;
     }
 }

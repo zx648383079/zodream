@@ -8,13 +8,23 @@ namespace Zodream\Domain\OAuth;
  */
 use Zodream\Domain\Response\Redirect;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Session;
 use Zodream\Infrastructure\ThirdParty;
 
 abstract class BaseOAuth extends ThirdParty {
 
-    abstract public function login();
-
-    abstract public function callback();
+    public function callback() {
+        $state = Request::get('state');
+        if (empty($state) || $state != Session::getValue('state')) {
+            return false;
+        }
+        $code = Request::get('code');
+        if (empty($code)) {
+            return false;
+        }
+        $this->set('code', $code);
+    }
 
     /**
      * 获取url
@@ -30,6 +40,16 @@ abstract class BaseOAuth extends ThirdParty {
             return false;
         }
         return StringExpand::urlBindValue($this->apiMap[$name][0], $data);
+    }
+
+    /**
+     * 重定向到登录页面
+     */
+    public function login() {
+        $state = StringExpand::randomNumber(7);
+        Session::setValue('state', $state);
+        $this->set('state', $state);
+        $this->redirect('login');
     }
     
     public function redirect($name) {
