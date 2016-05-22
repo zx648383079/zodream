@@ -2,6 +2,7 @@
 namespace Zodream\Domain\Authentication;
 
 
+use Zodream\Domain\Routing\Url;
 use Zodream\Infrastructure\Config;
 use Zodream\Domain\Response\Redirect;
 use Zodream\Infrastructure\Request;
@@ -43,7 +44,7 @@ class Verify {
 				break;
 			case '@':
 				if (call_user_func(array($auth['driver'], 'guest'))) {
-					Redirect::to($auth['home']);
+					Redirect::to([$auth['home'], 'ReturnUrl' => Url::to()]);
 					return false;
 				}
 				break;

@@ -115,11 +115,21 @@ abstract class BaseController extends Action {
 		$parameters = $method->getParameters();
 		$arguments = array();
 		foreach ($parameters as $param) {
-			if ( isset( $vars[ $param->getName() ] ) ) {
-				$arguments[] = $vars[ $param->getName() ];
-			} else {
-				$arguments[] = Request::get($param->getName());
+			$name = $param->getName();
+			if (array_key_exists($name, $vars)) {
+				$arguments[] = $vars[$name];
+				continue;
 			}
+			$value = Request::get($name);
+			if (!is_null($value)){
+				$arguments[] = Request::get($name);
+				continue;
+			}
+			if ($param->isDefaultValueAvailable()) {
+				$arguments[] = $param->getDefaultValue();
+				continue;
+			}
+			Error::out($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!', __FILE__, __LINE__);
 		}
 		return call_user_func_array( array($this, $action) , $arguments );
 	}
