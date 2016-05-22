@@ -48,12 +48,52 @@ class FileSystem {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * 获取文件内容
+	 * @param string $file
+	 * @return string
+	 */
 	public static function read($file) {
 		return file_get_contents(self::getFile($file));
 	}
-	
+
+	/**
+	 * 写入文件
+	 * @param string $file
+	 * @param string $data
+	 * @return int|bool
+	 */
 	public static function write($file, $data) {
-		file_put_contents($file, $data);
+		return file_put_contents($file, $data);
+	}
+
+	/**
+	 * 复制文件
+	 * @param string $res
+	 * @param string $des
+	 * @return bool
+	 */
+	public static function copy($res, $des) {
+		if (!file_exists($res)) {
+			return false;
+		}
+		$resOpen = fopen($res, 'r');
+		//定位
+		$dir = dirname($des);
+		if (!file_exists($dir)) {
+			//可创建多级目录 
+			mkdir($dir, 0777, true);
+		}
+		$desOpen = fopen($des, 'w+');
+		//边读边写 
+		$buffer = 1024;
+		while(!feof($resOpen)) {
+			$content = fread($resOpen, $buffer);
+			fwrite($desOpen, $content);
+		}
+		fclose($resOpen);
+		fclose($desOpen);
+		return true;
 	}
 }

@@ -10,6 +10,7 @@ use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
+use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Domain\Html\Script;
@@ -18,9 +19,10 @@ use Zodream\Domain\Routing\Router;
 use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\Traits\ConditionTrait;
 use Zodream\Infrastructure\EventManager\EventManger;
+defined('APP_ROOT') or define('APP_ROOT', Request::server('DOCUMENT_ROOT'));
 
 class View extends MagicObject {
-	use SingletonPattern,ConditionTrait;
+	use SingletonPattern, ConditionTrait;
 	
 	protected $type = 'html';
 	
@@ -31,10 +33,20 @@ class View extends MagicObject {
 
 	protected $suffix = '.php';
 
+	/**
+	 * 公共部件
+	 * @var string
+	 */
+	protected $layout = null;
+
 	protected function __construct() {
 		$config = Config::getInstance()->get('view');
 		$this->setView($config['directory']);
 		$this->setSuffix($config['suffix']);
+	}
+
+	public function setLayout($name) {
+		$this->layout = $name;
 	}
 
 	/**
@@ -133,6 +145,20 @@ class View extends MagicObject {
 	}
 
 	/**
+	 * 添加脚本
+	 */
+	public function script() {
+		$args = func_get_args();
+		if (empty($args)) {
+			return;
+		}
+		if (count($args) == 1 && is_array($args[0])) {
+			$args = $args[0];
+		}
+		$this->set('_extra', array_merge((array)$this->get('_extra'), $args));
+	}
+
+	/**
 	 * 输出资源url
 	 * @param string $file
 	 */
@@ -210,55 +236,73 @@ class View extends MagicObject {
 	 * @param array|null $data 要传的数据 如果$name 为array 则$data = $name
 	 */
 	public function show($name = null, $data = null) {
+		$content = $this->getContent($name, $data);
+		if (!empty($this->layout)) {
+			ob_start();
+			include $this->getView($this->layout);
+			$content = ob_get_contents();
+			ob_end_clean();
+		}
+		EventManger::getInstance()->run('showView', $content);
+		ResponseResult::make($content, $this->type, 200);
+	}
+
+	/**
+	 * @param string|array $name
+	 * @param array $data
+	 * @return string
+	 */
+	protected function getContent($name = null, $data = null) {
 		if (is_null($name)) {
-			$this->showWithRoute();
+			return $this->getContentByRoute();
 		}
 		if (is_array($name)) {
 			$this->set($name);
-			$this->showWithRoute();
+			return $this->getContentByRoute();
 		}
 		if ($name instanceof \Closure) {
-			$this->showObject($name);
+			return $this->getContentByObject($name);
 		}
 		if (!is_null($data)) {
 			$this->set($data);
 		}
 		if (substr($name, 0, 1) === '@') {
-			ResponseResult::make(substr($name, 1));
+			return substr($name, 1);
 		}
-		$this->showWithFile($name);
+		return $this->getContentByFile($name);
 	}
-	
+
 	/**
 	 * 如果传的是匿名函数  参数问题未解决
 	 * @param \Closure $func
+	 * @return string
 	 */
-	protected function showObject($func) {
+	protected function getContentByObject($func) {
 		ob_start();
 		$data = $func();
 		$content = ob_get_contents();
 		ob_end_clean();
 		if (empty($data)) {
-			ResponseResult::make($content);
+			return $content;
 		}
-		ResponseResult::make($data);
+		return $data;
 	}
 	
 	/**
 	 * 根据路由判断
 	 */
-	protected function showWithRoute() {
+	protected function getContentByRoute() {
 		list($class, $action) = Router::getClassAndAction();
 		$name = str_replace('\\', '.', $class).'.'.$action;
-		$this->showWithFile($name);
+		return $this->getContentByFile($name);
 	}
-	
+
 	/**
-	 * 根据路径判断
-	 * @param string $file 路径
-	 * @param integer $status 状态码
+	 * 
+	 * @param $file
+	 * @return string
 	 */
-	public function showWithFile($file, $status = 200) {
+	protected function getContentByFile($file) {
 		ob_start();
 		if (Config::getValue('view.mode') == 'common') {
 			extract($this->get());
@@ -268,7 +312,15 @@ class View extends MagicObject {
 		}
 		$content = ob_get_contents();
 		ob_end_clean();
-		EventManger::getInstance()->run('showView', $content);
-		ResponseResult::make($content, $this->type, $status);
+		return $content;
+	}
+	
+	/**
+	 * 根据路径判断
+	 * @param string $file 路径
+	 * @param integer $status 状态码
+	 */
+	public function showWithFile($file, $status = 200) {
+		ResponseResult::make($this->getContentByFile($file), $this->type, $status);
 	}
 }

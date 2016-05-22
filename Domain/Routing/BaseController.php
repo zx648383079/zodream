@@ -11,7 +11,7 @@ use Zodream\Domain\Authentication\Verify;
 use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\EventManager\EventManger;
 
-abstract class BaseController {
+abstract class BaseController extends Action {
 
 	protected $rules = array();
 
@@ -23,7 +23,11 @@ abstract class BaseController {
 		return array();
 	}
 
-	public function init() { }
+	protected function actions() {
+		return array();
+	}
+
+	
 	
 	/**
 	 * 在执行之前做规则验证
@@ -39,10 +43,6 @@ abstract class BaseController {
 		}
 		return TRUE;
 	}
-	
-	public function prepare() {  }
-	
-	public function finalize() {  }
 
 	/**
 	 * 执行方法
@@ -54,9 +54,15 @@ abstract class BaseController {
 		//合并过滤规则
 		$this->rules = array_merge($this->rules, $this->rules());
 
+		$result = $this->runClassAction($action);
+		if ($result !== false) {
+			return $result;
+		}
+		
 		if (!$this->canRunAction($action)) {
 			Error::out($action .' ACTION CANNOT RUN!', __FILE__, __LINE__);
 		}
+		
 		$this->prepare();
 		EventManger::getInstance()->run('runController', $vars);
 		if (Request::isPost()) {
@@ -66,7 +72,34 @@ abstract class BaseController {
 		$this->finalize();
 		return $result;
 	}
+	
+	protected function runClassAction($action) {
+		$actions = $this->actions();
+		if (!array_key_exists($action, $actions)) {
+			return false;
+		}
+		if (!$this->beforeFilter($action)) {
+			Error::out($action. ' CANNOT RUN!', __FILE__, __LINE__);
+		}
+		$class = $actions[$action];
+		if (!class_exists($class)) {
+			Error::out($action. ' CANNOT RUN CLASS!', __FILE__, __LINE__);
+		}
+		$instance = new $class;
+		if (!$instance instanceof Action) {
+			Error::out($action. ' IS NOT ACTION!', __FILE__, __LINE__);
+		}
+		$instance->init();
+		$instance->prepare();
+		$result = $instance->run();
+		$instance->finalize();
+		return $result;
+	}
 
+	/**
+	 * @param string $action
+	 * @param array $vars
+	 */
 	protected function runPostAction($action, $vars = array()) {
 		if (method_exists($this, $action.'Post')) {
 			$action .= 'Post';

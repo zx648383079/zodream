@@ -120,7 +120,12 @@ class Image{
 				$textInfo[3]-$textInfo[7]
 		);
 	}
-	
+
+	/**
+	 * 转化成[R,G,B]
+	 * @param string $color
+	 * @return array
+	 */
 	public function getRGB($color = '#000000') {
 		if (count_chars($color) == 4) {
 			$red = substr($color, 1, 1);
@@ -142,7 +147,8 @@ class Image{
 	}
 
 	/**
-	 * @param $color
+	 * 转化成颜色
+	 * @param int|string|array $color
 	 * @return int|false
 	 */
 	public function getColorWithRGB($color) {
@@ -155,6 +161,41 @@ class Image{
 			$color = func_get_args();
 		}
 		return imagecolorallocate($this->image, $color[0], $color[1], $color[2]);
+	}
+
+	/**
+	 * 获取图像上的颜色
+	 * @param int $x
+	 * @param int $y
+	 * @return int
+	 */
+	public function getColor($x = 0, $y = 0) {
+		return imagecolorat($this->image, $x, $y);
+	}
+
+	/**
+	 * 图像上的颜色转换成[R,G,B]
+	 * @param int $color
+	 * @return array
+	 */
+	public function getRgbByColor($color) {
+		$result = imagecolorsforindex($color);
+		return array(
+			$result['red'],
+			$result['green'],
+			$result['blue']
+		);
+	}
+
+	/**
+	 * 设置图像上一点的颜色
+	 * @param $x
+	 * @param $y
+	 * @param int|string|array $color
+	 * @return bool
+	 */
+	public function setColor($x, $y, $color) {
+		return imagesetpixel($this->image, $x, $y, $this->getColorWithRGB($color));
 	}
 	
 	public function getHashValue() {
