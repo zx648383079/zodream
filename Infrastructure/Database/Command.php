@@ -143,8 +143,8 @@ class Command {
      * @param array $parameters
      * @return int
      */
-    public function delete($where, $parameters = array()) {
-        if (strncasecmp($where, 'where', 5) !== 0) {
+    public function delete($where = null, $parameters = array()) {
+        if (!empty($where) && strncasecmp($where, 'where', 5) !== 0) {
             $where = 'WHERE '.$where;
         }
         return $this->db->delete("DELETE FROM {$this->table} {$where}", $parameters);

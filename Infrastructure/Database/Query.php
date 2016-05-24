@@ -116,6 +116,10 @@ class Query extends MagicObject {
         return $this;
     }
 
+    /**
+     * @param string|array $tables
+     * @return $this
+     */
     public function from($tables) {
         if (!is_array($tables)) {
             $tables = func_get_args();
