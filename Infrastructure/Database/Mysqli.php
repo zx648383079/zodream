@@ -176,4 +176,36 @@ class Mysqli extends Database {
 	public function __destruct() {
 		$this->close();
 	}
+
+	/**
+	 * 事务开始
+	 * @return bool
+	 */
+	public function begin() {
+		return $this->driver->autocommit(false);
+	}
+
+	/**
+	 * 执行事务
+	 * @param array $args
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function commit($args = array()) {
+		foreach ($args as $item) {
+			$this->driver->query($item);
+		}
+		if ($this->driver->errno > 0) {
+			throw new \Exception('事务执行失败!');
+		}
+		return $this->driver->commit();
+	}
+
+	/**
+	 * 事务回滚
+	 * @return bool
+	 */
+	public function rollBack() {
+		return $this->driver->rollback();
+	}
 }

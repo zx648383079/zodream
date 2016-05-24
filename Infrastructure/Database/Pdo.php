@@ -144,4 +144,33 @@ class Pdo extends Database {
 		$this->execute($sql, $parameters);
 		return $this->result->fetchAll(\PDO::FETCH_ASSOC);
 	}
+
+	/**
+	 * 事务开始
+	 * @return bool
+	 */
+	public function begin() {
+		return $this->driver->beginTransaction();
+	}
+
+	/**
+	 * 执行事务
+	 * @param array $args
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function commit($args = array()) {
+		foreach ($args as $item) {
+			$this->driver->exec($item);
+		}
+		return $this->driver->commit();
+	}
+
+	/**
+	 * 事务回滚
+	 * @return bool
+	 */
+	public function rollBack() {
+		return $this->driver->rollBack();
+	}
 }

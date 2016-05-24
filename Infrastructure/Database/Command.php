@@ -81,6 +81,15 @@ class Command {
     }
 
     /**
+     * 执行事务
+     * @param array $args
+     * @return bool
+     */
+    public function transaction($args = array()) { 
+        return $this->db->transaction($args);
+    }
+
+    /**
      * 插入
      * @param string $columns
      * @param string $tags

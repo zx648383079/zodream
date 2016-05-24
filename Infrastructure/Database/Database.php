@@ -95,6 +95,43 @@ abstract class Database {
 		$this->execute($sql, $parameters);
 		return $this->rowCount();
 	}
+
+	/**
+	 * 事务开始
+	 * @return bool
+	 */
+	abstract public function begin();
+
+	/**
+	 * 执行事务
+	 * @param array $args
+	 * @return bool
+	 */
+	public function transaction($args = array()) {
+		$this->begin();
+		try {
+			$this->commit($args);
+			return true;
+		} catch (\Exception $ex) {
+			$this->rollBack();
+			$this->error = $ex->getMessage();
+			return false;
+		}
+	}
+
+	/**
+	 * 执行事务
+	 * @param array $args
+	 * @return bool
+	 * @throws \Exception
+	 */
+	abstract public function commit($args = array());
+
+	/**
+	 * 事务回滚
+	 * @return bool
+	 */
+	abstract public function rollBack();
 	
 	/**
 	 * 获取最后修改的id

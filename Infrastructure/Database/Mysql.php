@@ -1,12 +1,11 @@
 <?php 
 namespace Zodream\Infrastructure\Database;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
-
 /**
 * mysql 
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 class Mysql extends Database {
 	
@@ -115,5 +114,41 @@ class Mysql extends Database {
 	
 	public function __destruct() {
 		$this->close();
+	}
+
+	/**
+	 * 事务开始
+	 * @return bool
+	 */
+	public function begin() {
+		return empty(mysql_query('START TRANSACTION', $this->driver));
+	}
+
+	/**
+	 * 执行事务
+	 * @param array $args
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function commit($args = array()) {
+		foreach ($args as $item) {
+			$res = mysql_query($item, $this->driver);
+			if (!$res) {
+				throw new \Exception('事务执行失败！');
+			}
+		}
+		$result = empty(mysql_query('COMMIT'));
+		mysql_query('END', $this->driver);
+		return $result;
+	}
+
+	/**
+	 * 事务回滚
+	 * @return bool
+	 */
+	public function rollBack() {
+		$result = empty(mysql_query('ROLLBACK', $this->driver));
+		mysql_query('END', $this->driver);
+		return $result;
 	}
 }
