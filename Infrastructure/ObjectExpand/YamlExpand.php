@@ -90,7 +90,7 @@ class YamlExpand {
      * @return array
      */
     public function load ($input) {
-        return $this->__loadString($input);
+        return $this->_loadString($input);
     }
 
     /**
@@ -99,7 +99,7 @@ class YamlExpand {
      * @return array
      */
     public function loadFile ($file) {
-        return $this->__load($file);
+        return $this->_load($file);
     }
 
     /**
@@ -117,9 +117,9 @@ class YamlExpand {
      * @return array
      * @param string $input Path of YAML file or string containing YAML
      */
-    public static function YAMLLoad($input) {
-        $Spyc = new static;
-        return $Spyc->__load($input);
+    public static function decodeFile($input) {
+        $yaml = new static;
+        return $yaml->loadFile($input);
     }
 
     /**
@@ -141,9 +141,9 @@ class YamlExpand {
      * @return array
      * @param string $input String containing YAML
      */
-    public static function YAMLLoadString($input) {
-        $Spyc = new static;
-        return $Spyc->__loadString($input);
+    public static function decode($input) {
+        $yaml = new static;
+        return $yaml->load($input);
     }
 
     /**
@@ -168,9 +168,9 @@ class YamlExpand {
      * @param bool|int $no_opening_dashes Do not start YAML file with "---\n"
      * @return string
      */
-    public static function YAMLDump($array, $indent = false, $wordwrap = false, $no_opening_dashes = false) {
-        $spyc = new static;
-        return $spyc->dump($array, $indent, $wordwrap, $no_opening_dashes);
+    public static function encode($array, $indent = false, $wordwrap = false, $no_opening_dashes = false) {
+        $yaml = new static;
+        return $yaml->dump($array, $indent, $wordwrap, $no_opening_dashes);
     }
 
 
@@ -459,12 +459,12 @@ class YamlExpand {
 
 // LOADING FUNCTIONS
 
-    private function __load($input) {
+    private function _load($input) {
         $Source = $this->loadFromSource($input);
         return $this->loadWithSource($Source);
     }
 
-    private function __loadString($input) {
+    private function _loadString($input) {
         $Source = $this->loadFromString($input);
         return $this->loadWithSource($Source);
     }
@@ -473,8 +473,8 @@ class YamlExpand {
         if (empty ($Source)) {
             return array();
         }
-        if ($this->setting_use_syck_is_possible && function_exists ('syck_load')) {
-            $array = syck_load (implode ("\n", $Source));
+        if ($this->setting_use_syck_is_possible) {
+            $array = $this->decode(implode ("\n", $Source));
             return is_array($array) ? $array : array();
         }
 
@@ -495,7 +495,6 @@ class YamlExpand {
                 continue;
             }
             $this->path = $tempPath;
-
             $literalBlockStyle = self::startsLiteralBlock($line);
             if ($literalBlockStyle) {
                 $line = rtrim ($line, $literalBlockStyle . " \n");
@@ -512,12 +511,10 @@ class YamlExpand {
             if (strpos ($line, '#')) {
                 $line = preg_replace('/\s*#([^"\']+)$/','',$line);
             }
-
             while (++$i < $cnt && self::greedilyNeedNextLine($line)) {
                 $line = rtrim ($line, " \n\t\r") . ' ' . ltrim ($Source[$i], " \t");
             }
             $i--;
-
             $lineArray = $this->_parseLine($line);
 
             if ($literalBlockStyle) {
@@ -535,16 +532,18 @@ class YamlExpand {
     }
 
     private function loadFromSource ($input) {
-        if (!empty($input) && strpos($input, "\n") === false && file_exists($input)) {
+        if (!empty($input) &&
+            strpos($input, "\n") === false &&
+            file_exists($input)) {
             $input = file_get_contents($input);
         }
         return $this->loadFromString($input);
     }
 
     private function loadFromString ($input) {
-        $lines = explode("\n",$input);
-        foreach ($lines as $k => $_) {
-            $lines[$k] = rtrim ($_, "\r");
+        $lines = explode("\n", $input);
+        foreach ($lines as $key => $value) {
+            $lines[$key] = rtrim ($value, "\r");
         }
         return $lines;
     }
@@ -555,8 +554,7 @@ class YamlExpand {
      * @return array
      * @param string $line A line from the YAML file
      */
-    private function _parseLine($line)
-    {
+    private function _parseLine($line) {
         if (!$line) {
             return array();
         }
@@ -564,8 +562,6 @@ class YamlExpand {
         if (!$line) {
             return array();
         }
-
-        $array = array();
 
         $group = $this->nodeContainsGroup($line);
         if ($group) {
@@ -996,7 +992,7 @@ class YamlExpand {
         if ($line[0] == '[') {
             return true;
         }
-        return preg_match ('#^[^:]+?:\s*\[#', $line) !== false;
+        return !empty(preg_match('#^[^:]+?:\s*\[#', $line));
     }
 
     private function addLiteralLine ($literalBlock, $line, $literalBlockStyle, $indent = -1) {
@@ -1068,7 +1064,7 @@ class YamlExpand {
 
 
     private static function isComment ($line) {
-        if (!$line) {
+        if (empty($line)) {
             return false;
         }
         if ($line[0] == '#') {
@@ -1089,26 +1085,18 @@ class YamlExpand {
         if (substr($line, 0, 2) != '- ') {
             return false;
         }
-        if (strlen ($line) > 3)
-            if (substr($line,0,3) == '---') {
-                return false;
-            }
-
-        return true;
+        return strlen ($line) <= 3 || substr($line, 0, 3) != '---';
     }
 
     private function isHashElement ($line) {
-        return strpos($line, ':');
+        return !empty(strpos($line, ':'));
     }
 
     private function isLiteral ($line) {
         if ($this->isArrayElement($line)) {
             return false;
         }
-        if ($this->isHashElement($line)) {
-            return false;
-        }
-        return true;
+        return !$this->isHashElement($line);
     }
 
 
@@ -1143,7 +1131,7 @@ class YamlExpand {
     private function checkKeysInValue($value) {
         if (strchr('[{"\'', $value[0]) === false) {
             if (strchr($value, ': ') !== false) {
-                throw new Exception('Too many keys: '.$value);
+                throw new \Exception('Too many keys: '.$value);
             }
         }
     }
@@ -1169,30 +1157,29 @@ class YamlExpand {
     }
 
     private function returnKeyValuePair ($line) {
-        $array = array();
-        $key = '';
-        if (strpos ($line, ': ')) {
-            // It's a key/value pair most likely
-            // If the key is in double quotes pull it out
-            if (($line[0] == '"' || $line[0] == "'") && preg_match('/^(["\'](.*)["\'](\s)*:)/',$line,$matches)) {
-                $value = trim(str_replace($matches[1],'',$line));
-                $key   = $matches[2];
-            } else {
-                // Do some guesswork as to the key and the value
-                $explode = explode(': ', $line);
-                $key     = trim(array_shift($explode));
-                $value   = trim(implode(': ', $explode));
-                $this->checkKeysInValue($value);
-            }
-            // Set the type of the value.  Int, string, etc
-            $value = $this->_toType($value);
-            if ($key === '0') {
-                $key = '__!YAMLZero';
-            }
-            $array[$key] = $value;
-        } else {
-            $array = array ($line);
+        if (empty(strpos ($line, ': '))) {
+            return array($line);
         }
+        $array = array();
+        // It's a key/value pair most likely
+        // If the key is in double quotes pull it out
+        if (($line[0] == '"' || $line[0] == "'") &&
+            preg_match('/^(["\'](.*)["\'](\s)*:)/', $line, $matches)) {
+            $value = trim(str_replace($matches[1],'',$line));
+            $key   = $matches[2];
+        } else {
+            // Do some guesswork as to the key and the value
+            $explode = explode(': ', $line);
+            $key     = trim(array_shift($explode));
+            $value   = trim(implode(': ', $explode));
+            $this->checkKeysInValue($value);
+        }
+        // Set the type of the value.  Int, string, etc
+        $value = $this->_toType($value);
+        if ($key === '0') {
+            $key = '__!YAMLZero';
+        }
+        $array[$key] = $value;
         return $array;
 
     }
