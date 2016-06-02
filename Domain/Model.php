@@ -65,6 +65,14 @@ abstract class Model {
 		$addFields = implode('`,`', array_keys($addData));
 		return $this->command->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), array_values($addData));
 	}
+
+	public function addValues(array $columns, array $values) {
+		$results = array();
+		foreach ($values as $value) {
+			$results[] = "'".implode("','", $value)."'";
+		}
+		return $this->command->insert('`'.implode('`,`', $columns).'`', implode('),(', $results));
+	}
 	 
 	/**
 	 * 修改记录

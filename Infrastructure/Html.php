@@ -81,7 +81,7 @@ class Html {
 
     /**
      * 链接
-     * @param $text 显示文字
+     * @param string $text 显示文字
      * @param string $href 链接
      * @param array $option
      * @return string

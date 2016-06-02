@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\OAuth;
+namespace Zodream\Domain\ThirdParty\OAuth;
 /**
  * Created by PhpStorm.
  * User: zx648

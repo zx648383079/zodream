@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\SMS;
+namespace Zodream\Domain\ThirdParty\SMS;
 
 /**
  * Created by PhpStorm.

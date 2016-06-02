@@ -1,22 +1,25 @@
 <?php 
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Mailer;
 /**
 * mail
 * 
 * @author Jason
 * @time 2015-11-29
 */
-class Mailer {
-	private $_mail;
+class Mailer extends BaseMailer {
+	/**
+	 * @var \PHPMailer
+	 */
+	protected $mail;
 	
 	public function __construct() {
-		$this->_mail          = new \PHPMailer;
-		$this->_mail->CharSet = 'UTF-8';
-		$this->_mail->isSMTP();
-		$this->_mail->SMTPAuth = true;
-		$this->_mail->SMTPSecure = 'tls';
+		$this->mail          = new \PHPMailer;
+		$this->mail->CharSet = 'UTF-8';
+		$this->mail->isSMTP();
+		$this->mail->SMTPAuth = true;
+		$this->mail->SMTPSecure = 'tls';
 		if (defined('DEBUG') && DEBUG) {
-			$this->_mail->SMTPDebug = 1;
+			$this->mail->SMTPDebug = 1;
 		}
 		$config = Config::getInstance()->get('mail');
 		$email = empty($config['email']) ? $config['user'] : $config['email'];
@@ -33,8 +36,8 @@ class Mailer {
 	 * @return $this
 	 */
 	public function setUser($username, $password) {
-		$this->_mail->Username = $username;
-		$this->_mail->Password = $password;
+		$this->mail->Username = $username;
+		$this->mail->Password = $password;
 		return $this;
 	}
 
@@ -45,8 +48,8 @@ class Mailer {
 	 * @return $this
 	 */
 	public function setHost($host, $port) {
-		$this->_mail->Host = $host;
-		$this->_mail->Port = $port;
+		$this->mail->Host = $host;
+		$this->mail->Port = $port;
 		return $this;
 	}
 
@@ -58,7 +61,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function setFrom($address, $name = '', $auto = TRUE) {
-		$this->_mail->setFrom($address, $name, $auto);
+		$this->mail->setFrom($address, $name, $auto);
 		return $this;
 	}
 
@@ -69,7 +72,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function addAddress($address, $name = '') {
-		$this->_mail->addAddress($address, $name);
+		$this->mail->addAddress($address, $name);
 		return $this;
 	}
 
@@ -80,7 +83,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function addReplyTo($address, $name = '') {
-		$this->_mail->addReplyTo($address, $name);
+		$this->mail->addReplyTo($address, $name);
 		return $this;
 	}
 
@@ -91,7 +94,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function addCC($address, $name = '') {
-		$this->_mail->addCC($address, $name);
+		$this->mail->addCC($address, $name);
 		return $this;
 	}
 
@@ -102,7 +105,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function addBCC($address, $name = '') {
-		$this->_mail->addBCC($address, $name);
+		$this->mail->addBCC($address, $name);
 		return $this;
 	}
 
@@ -113,7 +116,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function addAttachment($file, $name = '') {
-		$this->_mail->addAttachment($file, $name);
+		$this->mail->addAttachment($file, $name);
 		return $this;
 	}
 
@@ -123,7 +126,7 @@ class Mailer {
 	 * @return $this
 	 */
 	public function isHtml($isHtml = TRUE) {
-		$this->_mail->isHtml($isHtml);
+		$this->mail->isHtml($isHtml);
 		return $this;
 	}
 
@@ -135,22 +138,22 @@ class Mailer {
 	 * @return bool
 	 */
 	public function send($subject, $body, $altBody = '') {
-		$this->_mail->Subject = $subject;
-		$this->_mail->Body    = $body;
-		$this->_mail->AltBody = $altBody;
-		return $this->_mail->send();
+		$this->mail->Subject = $subject;
+		$this->mail->Body    = $body;
+		$this->mail->AltBody = $altBody;
+		return $this->mail->send();
 	}
 	
 	/**
 	 * 获取错误信息
 	 */
 	public function getError() {
-		return $this->_mail->ErrorInfo;
+		return $this->mail->ErrorInfo;
 	}
 	
 	public function __set($name, $value) {
-		if (isset($this->_mail->$name)) {
-			$this->_mail->$name = $value;
+		if (isset($this->mail->$name)) {
+			$this->mail->$name = $value;
 		}
 	}
 }
