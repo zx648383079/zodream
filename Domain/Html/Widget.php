@@ -8,6 +8,7 @@ namespace Zodream\Domain\Html;
  * Time: 16:04
  */
 use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 
 abstract class Widget extends MagicObject {
     protected $default = array();
@@ -39,6 +40,10 @@ abstract class Widget extends MagicObject {
             throw $e;
         }
         return ob_get_clean() . $out;
+    }
+    
+    protected function json(array $args = array()) {
+        return JsonExpand::encode($args);
     }
     
     public function __toString() {
