@@ -6,6 +6,8 @@ namespace Zodream\Infrastructure\Mailer;
 * @author Jason
 * @time 2015-11-29
 */
+use Zodream\Infrastructure\Config;
+
 class Mailer extends BaseMailer {
 	/**
 	 * @var \PHPMailer
