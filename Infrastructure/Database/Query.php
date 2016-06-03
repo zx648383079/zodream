@@ -69,7 +69,7 @@ class Query extends MagicObject {
     public function load(array $args) {
         foreach ($args as $key => $item) {
             $tag = strtolower(is_integer($key) ? array_shift($item) : $key);
-            if (!in_array($tag, $this->sequence)) {
+            if (!in_array($tag, $this->sequence) || empty($item)) {
                 continue;
             }
             $this->$tag($item);

@@ -144,6 +144,7 @@ class Command {
      * @return int
      */
     public function delete($where = null, $parameters = array()) {
+        $where = trim($where);
         if (!empty($where) && strncasecmp($where, 'where', 5) !== 0) {
             $where = 'WHERE '.$where;
         }

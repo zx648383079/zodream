@@ -205,7 +205,7 @@ abstract class Model {
 	 * @return int 返回影响的行数,
 	 */
 	public function delete($where, $parameters = array()) {
-		return $this->command->delete($this->getCondition($where), $parameters);
+		return $this->command->delete($this->getQuery(['where' => $where]), $parameters);
 	}
 
 	/** 根据id删除数据
