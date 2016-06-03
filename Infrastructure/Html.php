@@ -104,13 +104,23 @@ class Html {
 
     /**
      * 表单
-     * @param $type
+     * @param string $type
      * @param array $option
      * @return string
      */
     public static function input($type, $option = array()) {
         $option['type'] = $type;
         return static::tag('input', '', $option);
+    }
+
+    /**
+     * DIV
+     * @param string $content
+     * @param array $option
+     * @return string
+     */
+    public static function div($content, $option = array()) {
+        return static::tag('div', $content, $option);
     }
 
     /**

@@ -10,7 +10,6 @@ use Zodream\Domain\Html\Page;
 use Zodream\Domain\Html\Widget;
 use Zodream\Infrastructure\Html;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
-use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 class TableWidget extends Widget {
     protected $default = array(
@@ -75,44 +74,6 @@ class TableWidget extends Widget {
             $content .= Html::tag('td', $this->format((array)ArrayExpand::getValues($k, $item), $format));
         }
         return Html::tag('tr', $content);
-    }
-    
-    protected function format(array $data, $tag = null) {
-        if ($tag instanceof \Closure) {
-            return call_user_func_array($tag, $data);
-        }
-        $result = array();
-        foreach ($data as $item) {
-            $result[] = $this->formatOne($item, $tag);
-        }
-        return implode(' ', $result);
-    }
-    
-    protected function formatOne($data, $tag = null) {
-        if (empty($tag)) {
-            return $data;
-        }
-        if (is_array($tag)) {
-            return array_key_exists($data, $tag) ? $tag[$data] : null;
-        }
-        if ($tag === 'date') {
-            return TimeExpand::format($data, 'Y-m-d');
-        }
-        if ($tag === 'datetime') {
-            return TimeExpand::format($data);
-        }
-        if ($tag === 'ago') {
-            return TimeExpand::isTimeAgo($data);
-        }
-        if ($tag === 'url') {
-            return Html::tag('a', $data, array(
-                'href' => $data
-            ));
-        }
-        if ($tag === 'int') {
-            return intval($data);
-        }
-        return $data;
     }
     
     protected function getFoot() {
