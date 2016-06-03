@@ -41,20 +41,22 @@ class Config extends MagicObject {
 		return file_exists(static::getPath().APP_MODULE.'.php');
 	}
 	
-	private function __construct() {
-		$this->reset();
+	private function __construct($args = array()) {
+		$this->reset($args);
 	}
-	
+
 	/**
 	 * 重新加载配置
+	 * @param array $args
 	 */
-	public function reset() {
+	public function reset($args = array()) {
 		if (defined('APP_MODULE')) {
 			$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
 			$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
 		}
 		$common  = $this->_getConfig(static::getPath().'config.php');
-		$this->set(ArrayExpand::merge2D((array)$configs, (array)$common, (array)$personal));
+		$this->set(ArrayExpand::merge2D((array)$configs, 
+			(array)$common, (array)$personal), (array)$args);
 	}
 
 	/**

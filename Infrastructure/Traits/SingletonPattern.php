@@ -11,13 +11,15 @@ trait SingletonPattern {
 	 * @var static
 	 */
 	protected static $instance;
+
 	/**
 	 * 单例
+	 * @param array $args
 	 * @return static
 	 */
-	public static function getInstance() {
+	public static function getInstance($args = array()) {
 		if (is_null(static::$instance)) {
-			static::$instance = new static;
+			static::$instance = new static($args);
 		}
 		return static::$instance;
 	}
