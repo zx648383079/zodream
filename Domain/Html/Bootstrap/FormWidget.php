@@ -22,10 +22,21 @@ class FormWidget extends Widget {
         $content = '';
         $data = (array)$this->get('data');
         foreach ($this->get('fields', array()) as $key => $value) {
+            // 支持在表单中加其他代码
+            if (is_string($value)) {
+                $content .= $value;
+                continue;
+            }
+            // 需要传值的匿名方法
+            if ($value instanceof \Closure) {
+                $content .= $value(array_key_exists($key, $data) ? $data[$key] : null);
+                continue;
+            }
             if (!is_integer($key)) {
                 $value['name'] = $key;
             }
-            if (array_key_exists($key, $data)) {
+            // 当value 值已存在时表示不要自动填充值
+            if (array_key_exists($key, $data) && !array_key_exists('value', $value)) {
                 $value['value'] = $data[$key];
             }
             $content .= FieldWidget::show($value);
@@ -48,6 +59,20 @@ class FormWidget extends Widget {
         return $this->hidden('csrf', array(
             'value' => VerifyCsrfToken::get()
         ));
+    }
+
+    /**
+     * 加入原生HTML代码
+     * @param string $content
+     * @return $this
+     */
+    public function html($content) {
+        if (func_num_args() == 1) {
+            $this->_data['fields'][] = $content;
+            return $this;
+        }
+        $this->_data['fields'][$content] = func_get_arg(1);
+        return $this;
     }
     
     public function hidden($name, $option = array()) {
@@ -97,11 +122,23 @@ class FormWidget extends Widget {
         return $this->input($name, __FUNCTION__, $option);
     }
 
+    /**
+     * label 做总标签 text 做标签 value 做值
+     * @param string $name
+     * @param array $option
+     * @return FormWidget
+     */
     public function checkbox($name, $option = array()) {
         return $this->input($name, __FUNCTION__, $option);
     }
 
 
+    /**
+     * label 做总标签 text 做标签 value 做值
+     * @param string $name
+     * @param array $option
+     * @return FormWidget
+     */
     public function radio($name, $option = array()) {
         return $this->input($name, __FUNCTION__, $option);
     }
