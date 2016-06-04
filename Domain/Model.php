@@ -228,6 +228,15 @@ abstract class Model {
 	}
 
 	public function findAll($param = array(), $field = '*', $parameters = array()) {
+		if (is_array($param) && 
+			!array_key_exists('where', $param) &&
+			!array_key_exists('group', $param) &&
+			!array_key_exists('order', $param) &&
+			!array_key_exists('having', $param) ) {
+			$param = array(
+				'where' => $param
+			);
+		}
 		return $this->command->select($this->getQuery($param), $this->getField($field), $parameters);
 	}
 	

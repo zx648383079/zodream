@@ -87,6 +87,9 @@ class Html {
      * @return string
      */
     public static function a($text, $href = '#', $option = array()) {
+        if (array_key_exists('href', $option)) {
+            $href = $option['href'];
+        }
         $option['href'] = Url::to($href);
         return static::tag('a', $text, $option);
     }
@@ -121,6 +124,46 @@ class Html {
      */
     public static function div($content, $option = array()) {
         return static::tag('div', $content, $option);
+    }
+
+    public static function ul($content, $option = array()) {
+        return static::tag('ul',
+            is_array($content) ? static::getLi($content) : $content,
+            $option);
+    }
+
+    public static function ol($content, $option = array()) {
+        return static::tag('ol', 
+            is_array($content) ? static::getLi($content) : $content, 
+            $option);
+    }
+    
+    protected static function getLi(array $args) {
+        $html = null;
+        foreach ($args as $item) {
+            $html .= call_user_func_array(static::li, (array)$item);
+        }
+        return $html;
+    }
+
+    public static function li($content, $option = array()) {
+        return static::tag('li', $content, $option);
+    }
+
+    public static function p($content, $option = array()) {
+        return static::tag('p', $content, $option);
+    }
+
+    public static function span($content, $option = array()) {
+        return static::tag('span', $content, $option);
+    }
+
+    public static function i($content, $option = array()) {
+        return static::tag('i', $content, $option);
+    }
+    
+    public static function form($content, $option = array()) {
+        return static::tag('form', $content, $option);
     }
 
     /**

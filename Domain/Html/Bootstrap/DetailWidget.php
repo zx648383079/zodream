@@ -7,7 +7,6 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 21:04
  */
 use Zodream\Domain\Html\Widget;
-use Zodream\Infrastructure\Html;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 class DetailWidget extends Widget {

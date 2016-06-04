@@ -9,7 +9,6 @@ namespace Zodream\Domain\Html\Bootstrap;
 use Zodream\Domain\Html\VerifyCsrfToken;
 use Zodream\Domain\Html\Widget;
 use Zodream\Domain\Routing\Url;
-use Zodream\Infrastructure\Html;
 
 class FormWidget extends Widget {
     protected $default = array(

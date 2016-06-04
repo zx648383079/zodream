@@ -7,7 +7,6 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 11:12
  */
 use Zodream\Domain\Html\Widget;
-use Zodream\Infrastructure\Html;
 
 class FieldWidget extends Widget {
     protected $default = array(

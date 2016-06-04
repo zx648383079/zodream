@@ -7,7 +7,6 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 14:43
  */
 use Zodream\Domain\Html\Widget;
-use Zodream\Infrastructure\Html;
 
 class PanelWidget extends Widget {
     protected $default = array(

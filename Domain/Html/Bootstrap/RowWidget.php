@@ -7,7 +7,6 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 21:08
  */
 use Zodream\Domain\Html\Widget;
-use Zodream\Infrastructure\Html;
 
 class RowWidget extends Widget {
 
@@ -22,36 +21,8 @@ class RowWidget extends Widget {
         $content = null;
         $size = $this->get('size');
         foreach ($this->get('columns', array()) as $key => $item) {
-            $content .= $this->col($item, $key, $size);
+            $content .= Html::col($item, $key, $size);
         }
-        return $this->row($content);
-    }
-
-    /**
-     * 一行
-     * @param string $content
-     * @return string
-     */
-    public function row($content = null) {
-        return Html::div($content, array(
-            'class' => 'row'
-        ));
-    }
-
-    /**
-     * 一格
-     * @param string $content
-     * @param int $size
-     * @param array $types
-     * @return string
-     */
-    public function col($content, $size = 1, $types = ['md']) {
-        $class = [];
-        foreach ((array)$types as $item) {
-            $class[] = 'col-'.$item.'-'.$size;
-        }
-        return Html::div($content, array(
-            'class' => implode(' ', $class)
-        ));
+        return Html::row($content);
     }
 }
