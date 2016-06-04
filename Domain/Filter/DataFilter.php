@@ -21,8 +21,25 @@ class DataFilter {
 
 	private static $_error = array();
 
-	public static function getError() {
-		return self::$_error;
+	/**
+	 * @param string $key
+	 * @return array
+	 */
+	public static function getError($key = null) {
+		if (empty($key)) {
+			return self::$_error;
+		}
+		if (!array_key_exists($key, self::$_error)) {
+			return array();
+		}
+		return self::$_error[$key];
+	}
+	
+	public static function getFirstError($key) {
+		if (!array_key_exists($key, self::$_error)) {
+			return null;
+		}
+		return current(self::$_error[$key]);
 	}
 
 	private static function _setError($key, $error) {

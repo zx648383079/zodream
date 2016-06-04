@@ -60,14 +60,20 @@ class Template extends  MagicObject {
      * @return string
      */
     public function replaceByArray($content, array $data, $pre = null) {
-        foreach ($data as $key => $item) {
+        /*foreach ($data as $key => $item) {
             if (is_array($item)) {
                 $content = $this->replaceByArray($content, $item, $pre.$key.'.');
             } else {
                 $content = $this->replace($content, $pre.$key, $item);
             }
+        }*/
+        $keys = [];
+        $values = [];
+        foreach ($data as $key => $value) {
+            $keys[] = $this->beginTag.$key.$this->endTag;
+            $values[] = $value;
         }
-        return $content;
+        return str_ireplace($keys, $values, $content);
     }
 
     /**
