@@ -300,4 +300,12 @@ abstract class Model {
 		}
 		return implode($result, ',');
 	}
+
+	/**
+	 * 获取错误信息
+	 * @return string
+	 */
+	public function getError() {
+		return $this->command->getError();
+	}
 }
