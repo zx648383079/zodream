@@ -1,12 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Jason
- * Date: 2015/12/25
- * Time: 12:34
- */
 namespace Zodream\Infrastructure\DomainObject;
-
+/**
+ * Class FilterObject
+ * @package Zodream\Infrastructure\DomainObject
+ */
 abstract class FilterObject {
     protected $_defaultOption = array();
     protected $_option = array();
@@ -17,23 +14,48 @@ abstract class FilterObject {
         $this->setOption($option);
     }
 
+    /**
+     * SET OPTION
+     * @param string|array|object $option
+     */
     public function setOption($option) {
         $this->_option = (array)$option + $this->_defaultOption;
     }
 
+    /**
+     * GET OPTIONS
+     * @return array
+     */
     public function getOption() {
         return $this->_option;
     }
 
+    /**
+     * FILTER VALUE
+     * @param $arg
+     * @return mixed
+     */
     public function filter($arg) {
         return $arg;
     }
 
+    /**
+     * VALIDATE VALUE,IF IS NULL OR EQUAL WHAT AFTER FILTER VALUE,RETURN TRUE, OR FALSE.
+     * @param $arg
+     * @return bool
+     */
     public function validate($arg) {
+        if (is_null($arg) || $arg = '') {
+            return true;
+        }
         $filtered = $this->filter($arg);
-        return is_null($arg) || $filtered == $arg;
+        return $filtered == $arg;
     }
 
+    /**
+     * GET ERROR IF VALIDATE FALSE
+     * @return string
+     */
     public function getError() {
         return $this->error;
     }

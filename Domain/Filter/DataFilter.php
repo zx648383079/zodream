@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Jason
- * Date: 2015/12/25
- * Time: 16:08
- */
 namespace Zodream\Domain\Filter;
 
 use Zodream\Domain\Filter\Filters\NoneFilter;
@@ -22,6 +16,7 @@ class DataFilter {
 	private static $_error = array();
 
 	/**
+	 * GET ERRORS WHO VALIDATE FAIL
 	 * @param string $key
 	 * @return array
 	 */
