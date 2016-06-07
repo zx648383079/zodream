@@ -32,6 +32,6 @@ class RegexFilter extends StringFilter {
                 'regex' => $option
             );
         }
-        parent::setOption($option);
+        $this->_option = (array)$option + $this->_defaultOption;
     }
 }
