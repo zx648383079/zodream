@@ -45,7 +45,7 @@ abstract class FilterObject {
      * @return bool
      */
     public function validate($arg) {
-        if (is_null($arg) || $arg = '') {
+        if (is_null($arg) || $arg == '') {
             return true;
         }
         $filtered = $this->filter($arg);
