@@ -148,6 +148,7 @@ class Generate {
 		$data = array(
 			'module' => APP_MODULE,
 			'model' => $name.APP_MODEL,
+			'name' => $name,
 			'form'   => $name.APP_FORM,
 			'controller' => $name.APP_CONTROLLER,
 			'action' => APP_ACTION,
@@ -248,16 +249,16 @@ class Generate {
 	private function _viewIndex($dir, $name, array $columns) {
 		$column = '';
 		foreach ($columns as $value) {
-			$column .= '<td>'.ucfirst($value['Field']).'</td>';
+			$column .= '			<th>'.ucfirst($value['Field'])."</th>\r\n";
 		}
 		$data = '';
 		foreach ($columns as $value) {
-			$data .= '<td><?php echo $value[\''.$value['Field'].'\'];?></td>';
+			$data .= '				<td><?=$item[\''.$value['Field']."'];?></td>\r\n";
 		}
 		return $this->_replace('index', array(
-				'data'   => $data,
-				'column' => $column,
-				'name'   => $name
+			'data'   => $data,
+			'column' => $column,
+			'name'   => $name
 		), $dir.'/index.php');
 	}
 
@@ -274,15 +275,12 @@ class Generate {
 			if ($value['Extra'] === 'auto_increment') {
 				continue;
 			}
-			$data .= '<div>'.
-					'<lable>'.ucfirst($value['Field']).':</lable>:'.
-					$this->_viewForm($value).
-					'</div>';
+			$data .= '		'.$this->_viewForm($value)."\r\n";
 		}
-		return $this->_replace('edit', array(
-				'data'   => $data,
-				'name'   => $name
-		), $dir.'/edit.php');
+		return $this->_replace('add', array(
+			'data'   => $data,
+			'name'   => $name
+		), $dir.'/add.php');
 	}
 
 	/**
@@ -295,11 +293,11 @@ class Generate {
 	private function _viewView($dir, $name, array $columns) {
 		$data = '';
 		foreach ($columns as $key => $value) {
-			$data .= '<div><lable>'.ucfirst($value['Field']).'</lable>:<?php echo $data[\''.$value['Field'].'\'];?></div>';
+			$data .= '					'.$value['Field'].' => '.ucfirst($value['Field'])."\r\n";
 		}
 		return $this->_replace('view', array(
-				'data'   => $data,
-				'name'   => $name
+			'data'   => $data,
+			'name'   => $name
 		), $dir.'/view.php');
 	}
 
@@ -311,19 +309,19 @@ class Generate {
 	private function _viewForm($value) {
 		$required = null;
 		if ($value['Null'] === 'NO') {
-			$required = ' required';
+			$required = ", 'required' => true";
 		}
 		switch (explode('(', $value['Type'])[0]) {
+			case 'enum':
+				$str = rtrim(substr($value['Type'], strpos($value['Type'], '(')), ')');
+				return "->select('{$value['Field']}', [{$str}])";
+			case 'text':
+				return "->textArea('{$value['Field']}', ['label' => '{$value['Field']}'{$required}])";
 			case 'int':
 			case 'varchar':
 			case 'char':
-				return '<input type="text" name="'.$value['Field'].'" value="<?php $this->ech(\'data.'.$value['Field'].'\', \''.$value['Default'].'\');?>" '.$required.'>';
-				break;
-			case 'text':
-				return '<textarea name="'.$value['Field'].'" '.$required.'><?php $this->ech(\'data.'.$value['Field'].'\', \''.$value['Default'].'\');?></textarea>';
 			default:
-				return '<input type="text" name="'.$value['Field'].'" value="<?php $this->ech(\'data.'.$value['Field'].'\', \''.$value['Default'].'\');?>" '.$required.'>';
-				break;
+				return "->text('{$value['Field']}', ['label' => '{$value['Field']}'{$required}])";
 		}
 	}
 
@@ -377,7 +375,7 @@ class Generate {
 			$column .= $value['Field'];
 			$validate = $this->getValidate($value);
 			if (!empty($value)) {
-				$data .= "\t\t\t'{$value['Field']}' => '{$validate}'";
+				$data .= "			'{$value['Field']}' => '{$validate}'";
 			}
 			if ($key < count($columns)-1) {
 				$column .= ',';

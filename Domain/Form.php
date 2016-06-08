@@ -43,10 +43,15 @@ abstract class Form extends MagicObject{
 		return DataFilter::validate($request, $args);
 	}
 
+	/**
+	 * @param string|integer $id
+	 * @return bool
+	 */
 	public function save($id = null) {
 		if (!is_null($id)) {
 			$this->set('id', intval($id));
 		}
+		return $this->validate();
 	}
 
 	/**
@@ -68,5 +73,13 @@ abstract class Form extends MagicObject{
 
 	public function sendMessage($status = 0) {
 		$this->send('message', isset($this->status[$status]) ? $this->status[$status] : '未知错误！');
+	}
+
+	public static function getError($key = null) {
+		return DataFilter::getError($key);
+	}
+
+	public static function getFirstError($key) {
+		return DataFilter::getFirstError($key);
 	}
 }

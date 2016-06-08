@@ -1,5 +1,7 @@
-<?php $this->jcs(array(
-		'jquery.min'
-));?>
+<?php
+/** @var $this \Zodream\Domain\Response\View */
+$this->jcs([
+	'jquery.min'
+]);?>
 </body>
 </html>

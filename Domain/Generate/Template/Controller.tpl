@@ -5,7 +5,7 @@ use Domain\Model\{model};
 use Domain\Form\{form};
 class {controller} extends Controller {
 	protected $rules = array(
-			'*' => '@'
+		'*' => '@'
 	);
 	
 	function index{action}() {
@@ -16,29 +16,36 @@ class {controller} extends Controller {
 		));
 	}
 	
-	function add{action}() {
-		$form = new {form}();
-		$form->set();
+	function add{action}($id = null) {
+		if (!empty()) {
+			$model = new {model}();
+			$data  = $model->findById($id);
+			$this->send(['data', $data]);
+		}
 		$this->show();
 	}
-	
-	function edit{action}($id) {
+
+	/**
+	* @param Post $post
+	*/
+	function addPost($post) {
 		$form = new {form}();
-		$form->set();
-		$this->show();
+		$form->set($post->get());
+		if (empty($result)) {
+			return;
+		}
+		Redirect::to(['{name}']);
 	}
 	
 	function delete{action}($id) {
-		$model = new {model}();
-		$data  = $model->deleteById($id);
-		$this->ajaxJson(array(
-				'status' => $data
-		));
+		$this->delete(new {model}(), $id);
 	}
 	
-	function view{action}($id = 0) {
+	function view{action}($id) {
 		$model = new {model}();
 		$data  = $model->findById($id);
-		$this->show($data);
+		$this->show([
+			'data' => $data
+		]);
 	}
 }

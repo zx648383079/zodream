@@ -1,4 +1,7 @@
-<?php 
+<?php
+use Zodream\Infrastructure\Html;
+/** @var $this \Zodream\Domain\Response\View */
+/** @var $page \Zodream\Domain\Html\Page */
 $this->extend(array(
 	'layout' => array(
 		'head'
@@ -6,44 +9,39 @@ $this->extend(array(
 ));
 $page = $this->get('page');
 ?>
-<div>
-<form action="<?php $this->url();?>" method="get">
-<input type="text" name="search">
-<button type="submit">搜索</button>
-</form>
+<div class="row">
+	<div class="col-md-3 col-md-offset-2">
+		<a href="<?php $this->url('{name}/add');?>" class="btn btn-primary">新增</a>
+	</div>
 </div>
-<div>
-<a href="<?php $this->url('{name}/add');?>">新增</a>
-</div>
-<div>
+
 <table>
-<thead>
-<tr>
+	<thead>
+		<tr>
 {column}
-<th>Action</th>
-</tr>
-</thead>
-<tbody>
-<?php foreach ($page->getPage() as $value) {?>
-	<tr>
-		{data}
-		<td>
-		<a href="<?php $this->url('{name}/view/id/'.$value['id']);?>">view</a>
-		<a href="<?php $this->url('{name}/edit/id/'.$value['id']);?>">edit</a>
-		<a href="<?php $this->url('{name}/delete/id/'.$value['id']);?>">delete</a>
-		</td>
-	</tr>
-<?php }?>
-</tbody>
-<tfoot>
-<tr>
-<th colspan="3">
-<?php $page->pageLink();?>
-</th>
-</tr>
-</tfoot>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($page->getPage() as $item) :?>
+			<tr>
+{data}
+				<td>
+					<a href="<?php $this->url('{name}/view/id/'.$value['id']);?>">view</a>
+					<a href="<?php $this->url('{name}/edit/id/'.$value['id']);?>">edit</a>
+					<a href="<?php $this->url('{name}/delete/id/'.$value['id']);?>">delete</a>
+				</td>
+			</tr>
+		<?php endforeach;?>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th colspan="5">
+				<?php $page->pageLink();?>
+			</th>
+		</tr>
+	</tfoot>
 </table>
-</div>
 
 
 <?php 

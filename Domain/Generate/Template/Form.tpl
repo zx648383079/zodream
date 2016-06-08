@@ -5,29 +5,16 @@ use Zodream\Domain\Form;
 use Zodream\Infrastructure\Request;
 use Domain\Model\{module}\{model};
 class {form} extends Form {
-	public function get($id) {
-		$model = new {model}();
-		$this->send('data', $model->findById($id));
-	}
-	
-	public function set() {
-		if (!Request::isPost()) {
-			return ;
-		}
-		$data = Request::post('{columns}');
-		if (!$this->validate($data, array(
+	protected $rules = array(
 {data}
-		))) {
-			$this->send($data);
-			$this->send('error', '验证失败！');
-			return;
+	);
+	
+	public function save($id = null) {
+		$result = parent::save($id);
+		if (!$result) {
+			return false;
 		}
 		$model = new {model}();
-		$result = $model->add($data);
-		if (empty($result)) {
-			$this->send($data);
-			$this->send('error', '服务器出错了！');
-			return;
-		}
+		return $model->fill($this->get());
 	}
 }
