@@ -77,6 +77,10 @@ class Query extends MagicObject {
         return $this;
     }
 
+    /**
+     * @param string|array $field
+     * @return $this
+     */
     public function select($field = '*') {
         if (!is_array($field)) {
             $field = func_get_args();
@@ -209,6 +213,18 @@ class Query extends MagicObject {
             $columns = func_get_args();
         }
         $this->group = array_merge($this->group, $columns);
+        return $this;
+    }
+
+    /**
+     * 起别名
+     * @param string $key
+     * @return $this
+     */
+    public function alias($key) {
+        if (count($this->from) == 1) {
+            $this->from = array($key => current($this->from));
+        }
         return $this;
     }
 

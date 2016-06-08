@@ -19,7 +19,11 @@ class BreadcrumbWidget extends Widget {
         $content = null;
         $count = count($links);
         foreach ($links as $key => $link) {
-            if (is_array($links)) {
+            if (!is_integer($key) || $key >= $count) {
+                $link = [$key, $link];
+                $count --;
+            }
+            if (is_array($link)) {
                 $label =
                     array_key_exists('label', $link) ? $link['label'] : $link[0];
                 $url = array_key_exists('url', $link) ?
