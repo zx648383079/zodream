@@ -20,6 +20,13 @@ class Auth extends MagicObject implements AuthObject {
 	}
 
 	/**
+	 * 保存
+	 */
+	public function save() {
+		return Session::getInstance()->set('user', $this->_data);
+	}
+
+	/**
 	 * 获取登录
 	 * @return bool|static
 	 */

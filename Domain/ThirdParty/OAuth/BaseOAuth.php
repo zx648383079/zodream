@@ -7,6 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 14:34
  */
 use Zodream\Domain\Response\Redirect;
+use Zodream\Infrastructure\Error;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Session;
@@ -32,7 +33,7 @@ abstract class BaseOAuth extends ThirdParty {
      * @return bool|string
      */
     protected function getUrl($name) {
-        if (!isset($this->apiMap[$name][2]) || strtolower($this->apiMap[$name][2]) !== 'get') {
+        if (isset($this->apiMap[$name][2]) && strtolower($this->apiMap[$name][2]) !== 'get') {
             return false;
         }
         $data = $this->getData(isset($this->apiMap[$name][1]) ? $this->apiMap[$name][1] : array());
@@ -53,6 +54,10 @@ abstract class BaseOAuth extends ThirdParty {
     }
     
     public function redirect($name) {
-        Redirect::to($this->getUrl($name));
+        $url = $this->getUrl($name);
+        if (!empty($url)) {
+            Redirect::to($url);
+        }
+        Error::out('URL IS ERROR! '.$this->getError(), __FILE__, __LINE__);
     }
 }

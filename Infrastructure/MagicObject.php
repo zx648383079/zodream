@@ -69,9 +69,12 @@ class MagicObject implements \ArrayAccess {
 		}
 		if (is_array($key)) {
 			$this->_data = array_merge($this->_data, $key);
-		} else {
-			$this->_data[$key] = $value;
+			return;
 		}
+		if (empty($key)) {
+			return;
+		}
+		$this->_data[$key] = $value;
 	}
 	
 	/**

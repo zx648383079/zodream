@@ -12,12 +12,17 @@ class Verify {
 		if (is_object($role) && !$role()) {
 			Redirect::to('/');
 			return false;
-		} else if (is_string($role) && !empty($role)) {
-			$roles = explode(',', $role);
-			foreach ($roles as $value) {
-				if (self::_verify($value) === false) {
-					return false;
-				}
+		}
+		if (empty($role)) {
+			return true;
+		}
+
+		if (is_string($role)) {
+			$role = explode(',', $role);
+		}
+		foreach ((array)$role as $value) {
+			if (self::_verify($value) === false) {
+				return false;
 			}
 		}
 		return true;
