@@ -50,6 +50,8 @@ class Config extends MagicObject {
 	 * @param array $args
 	 */
 	public function reset($args = array()) {
+		$configs = array();
+		$personal = array();
 		if (defined('APP_MODULE')) {
 			$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
 			$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
