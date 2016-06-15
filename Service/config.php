@@ -52,10 +52,6 @@ return array(
 		'email'    => '',  //发送者邮箱
 		'password' => ''
 	),
-	'wechat' => array(
-		'appid' => 'ZoDream',
-		'secret' => 'ZoDream'
-	),
 	'verify' => array(
 		'length' => 4,
 		'width' => 100,

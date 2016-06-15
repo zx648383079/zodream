@@ -23,7 +23,9 @@ class Application {
 	 * 程序启动
 	 */
 	public static function main() {
-		Autoload::getInstance()->setError()->shutDown();
+		Autoload::getInstance()
+			->setError()
+			->shutDown();
 		Cookie::restore();
 		EventManger::getInstance()->run('appRun');
 		if (Config::getInstance()->get('safe.csrf', false) && !Request::isGet()) {
