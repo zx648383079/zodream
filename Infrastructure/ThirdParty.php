@@ -102,11 +102,23 @@ abstract class ThirdParty extends MagicObject {
             }
             if (strpos($item, '#') === 0) {
                 $k = substr($item, 1);
-                if (!$this->has($k)) {
-                    $this->error= $k.' 是必须的!';
+                $arg = $this->get($k);
+                if (is_null($arg)) {
+                    $this->error = $k.' 是必须的!';
                     return false;
                 }
-                $data[$k] = $this->get($k);
+                if (!is_array($arg)) {
+                    $data[$k] = $arg;
+                    continue;
+                }
+                // 判断 #n:m 
+                $k = array_keys($arg)[0];
+                $arg = current($arg);
+                if (is_null($arg)) {
+                    $this->error = $k.' 是必须的!';
+                    return false;
+                }
+                $data[$k] = $arg;
                 continue;
             }
             if ($this->has($item)) {
