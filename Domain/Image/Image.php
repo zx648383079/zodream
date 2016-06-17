@@ -2,7 +2,7 @@
 namespace Zodream\Domain\Image;
 
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
-class Image{
+class Image {
 	
 	protected $allowTypes = array(
 		'jpeg' => array(
@@ -39,9 +39,13 @@ class Image{
 	public $image;
 	
 	public function __construct($file = null) {
-		if (null != $file) {
+		if (is_null($file)) {
+			return;
+		}
+		if (is_file($file)) {
 			$this->open($file);
 		}
+		$this->setImage($file);
 	}
 	
 	public function open($file) {
@@ -203,7 +207,7 @@ class Image{
 		$h = 8;
 		$image = new Image();
 		$image->create($w, $h);
-		$image->copyFromWithResampling($this);
+		$image->copyFromWithReSampling($this);
 		$total = 0;
 		$array = array();
 		for( $y = 0; $y < $h; $y++) {
@@ -303,7 +307,7 @@ class Image{
 	 * @param int $height 如果是0则取本图的高
 	 * @return bool
 	 */
-	public function copyFromWithResampling(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0, $width = 0, $height = 0) {
+	public function copyFromWithReSampling(Image $srcImage, $srcX = 0, $srcY = 0, $x = 0, $y = 0, $srcWidth = 0, $srcHeight = 0, $width = 0, $height = 0) {
 		if (empty($srcWidth)) {
 			$srcWidth = $srcImage->getWidth();
 		}
@@ -375,7 +379,7 @@ class Image{
 	public function scale($width, $height) {
 		$image = new Image();
 		$image->create($width, $height);
-		$result = $image->copyFromWithResampling($this);
+		$result = $image->copyFromWithReSampling($this);
 		imagedestroy($this->image);
 		$this->image = $image->image;
 		$this->width = $width;
