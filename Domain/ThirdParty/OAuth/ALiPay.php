@@ -41,6 +41,7 @@ class ALiPay extends BaseOAuth {
      * @return array
      */
     public function callback() {
+        parent::callback();
         /**
          * access_token
          * user_id
@@ -49,6 +50,15 @@ class ALiPay extends BaseOAuth {
          * refresh_token
          */
         $access = $this->getJson('access');
+        $this->set($access);
+        return $access;
+    }
+
+    /**
+     * 获取用户信息
+     * @return array
+     */
+    public function getInfo() {
         /**
          * avatar	用户头像	String	如果没有数据的时候不会返回该数据，请做好容错	可空	https://tfsimg.alipay.com/images/partner/T1k0xiXXRnXXXXXXXX
         nick_name	用户昵称	String	如果没有数据的时候不会返回该数据，请做好容错	可空	张三
@@ -67,7 +77,6 @@ class ALiPay extends BaseOAuth {
         user_status	用户状态（Q/T/B/W）	String	Q代表快速注册用户；T代表已认证用户；B代表被冻结账户；W代表已注册，未激活的账户	不可空	T
         is_id_auth	是否身份证认证	String	T为是身份证认证，F为非身份证认证	不可空	T
          */
-        $info = $this->getJson('info', $access);
-        return array_merge($access, $info);
+        return $this->getJson('info');
     }
 }

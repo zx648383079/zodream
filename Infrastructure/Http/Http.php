@@ -10,13 +10,22 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 
 class Http {
-	private $curl;
+	protected $curl;
 	
-	private $url;
+	protected $url;
 	
-	private $cookie;
+	public $cookieFile;
 	
-	private $data;
+	protected $data;
+
+	protected $headers = [
+		'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+		'Accept-Language' => 'zh-cn',
+		'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
+		'Host' => '',
+		'Connection' => 'Keep-Alive',
+		'Cookie' => ''
+	];
 	
 	public function __construct() {
 		
@@ -30,7 +39,16 @@ class Http {
 		$this->curl = curl_init($this->url);
 		// 不显示header信息
 		$this->setOpt(CURLOPT_HEADER, 0);
-		$this->_setCookie();
+		$this->setHeaders();
+	}
+	
+	public function setHeader($key, $value = null) {
+		if (is_array($key) && is_null($value)) {
+			$this->headers = array_merge($this->headers, $key);
+			return $this;
+		}
+		$this->headers[$key] = $value;
+		return $this;
 	}
 
 	/**
@@ -154,22 +172,26 @@ class Http {
 		$this->_close();
 		fclose($fp);
 	}
-	
-	private function _setCookie() {
-		if (empty($this->cookie)) {
-			return;
+
+	protected function setHeaders() {
+		if (!empty($this->cookieFile) && is_file($this->cookieFile)) {
+			$this->setOpt(CURLOPT_COOKIEJAR, $this->cookieFile); //保存
+			$this->setOpt(CURLOPT_COOKIEFILE, $this->cookieFile); //读取
+			unset($this->headers['Cookie']);
 		}
-		if (true) {
-			$this->setOpt(CURLOPT_COOKIEJAR, 'cookie.txt '); //保存 
-			$this->setOpt(CURLOPT_COOKIEFILE, 'cookie.txt '); //读取  
-		} else {
-			$header[] = 'Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, text/html, * '. '/* '; 
-			$header[] = 'Accept-Language: zh-cn '; 
-			$header[] = 'User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727) '; 
-			$header[] = 'Host: '. parse_url($this->url)['host']; 
-			$header[] = 'Connection: Keep-Alive '; 
-			$header[] = 'Cookie: '. $this->cookie;
-			$this->setOpt(CURLOPT_HTTPHEADER, $header);
+		$header = [];
+		foreach ($this->headers as $key => $item) {
+			if ($key === 'Host' && empty($item)) {
+				$item = parse_url($this->url)['host'];
+			}
+			if (empty($item)) {
+				continue;
+			}
+			if (is_array($item)) {
+				$item = implode(',', $item);
+			}
+			$header[] = $key. ':'. $item;
 		}
+		$this->setOpt(CURLOPT_HTTPHEADER, $header);
 	}
 }

@@ -64,6 +64,7 @@ class BaiDu extends BaseOAuth {
      * @return array
      */
     public function callback() {
+        parent::callback();
         /**
          * access_token：要获取的Access Token；
          * expires_in：Access Token的有效期，以秒为单位；请参考“Access Token生命周期”
@@ -73,6 +74,11 @@ class BaiDu extends BaseOAuth {
          * session_secret：基于http调用Open API时计算参数签名用的签名密钥。
          */
         $access = $this->getJson('access');
+        $this->set($access);
+        return $access;
+    }
+
+    public function getInfo() {
         /**
          * uid 当前登录用户的数字ID。
          * uname
@@ -80,7 +86,6 @@ class BaiDu extends BaseOAuth {
          *      small image: http://tb.himg.baidu.com/sys/portraitn/item/{$portrait}
          *      large image: http://tb.himg.baidu.com/sys/portrait/item/{$portrait}
          */
-        $info = $this->getJson('uid', $access);
-        return array_merge($access, $info);
+        return $this->getJson('uid');
     }
 }

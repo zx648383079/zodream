@@ -35,6 +35,7 @@ class TaoBao extends BaseOAuth {
     );
 
     public function callback() {
+        parent::callback();
         /**
          * access_token
 
@@ -81,7 +82,15 @@ class TaoBao extends BaseOAuth {
         无线端的ssid（对应于view=wap）
          */
         $access = $this->getJson('access');
-        
+        $this->set($access);
         return $access;
+    }
+
+    /**
+     * 获取用户信息
+     * @return array
+     */
+    public function getInfo() {
+        return $this->get();
     }
 }

@@ -60,4 +60,10 @@ abstract class BaseOAuth extends ThirdParty {
         }
         Error::out('URL IS ERROR! '.$this->getError(), __FILE__, __LINE__);
     }
+
+    /**
+     * 获取用户信息
+     * @return array
+     */
+    public abstract function getInfo();
 }
