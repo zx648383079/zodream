@@ -30,11 +30,11 @@ class TabWidget extends Widget {
         }
         unset($data['items']);
         return Html::div(Html::ul($title, [
-            'class' => 'nav nav-tabs',
-            'role' => 'tablist'
-        ].Html::div($content, [
+                'class' => 'nav nav-tabs',
+                'role' => 'tablist'
+            ]).Html::div($content, [
                 'class' => 'tab-content'
-        ])), $data);
+            ]), $data);
     }
 
     protected function getTitle($title, $id, $isActive = false) {
