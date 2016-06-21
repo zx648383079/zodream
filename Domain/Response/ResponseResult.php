@@ -206,62 +206,111 @@ class ResponseResult {
 		if (headers_sent()) {
 			return;
 		}
-		switch (strtolower($type)) {
-			case 'html':
-				header('Content-Type:text/html;charset='.$option);
-				break;
-			case 'atom':
-				header('Content-type:application/atom+xml');
-				break;
-			case 'css':
-				header('Content-type:text/css');
-				break;
-			case 'js':
-				header('Content-type:text/javascript');
-				break;
-			case 'image':
-				header('Content-Type:image/'.$option);
-				break;
-			case 'json':
-				header('Content-type:application/json;charset='.$option);
-				break;
-			case 'pdf':
-				header('Content-type:application/pdf');
-				break;
-			case 'rss':
-				header('Content-Type:application/rss+xml; charset='.$option);
-				break;
-			case 'text':
-				header('Content-type:text/plain');
-				break;
-			case 'xml':
-				header('Content-type:text/xml;charset='.$option);
-				break;
-			case 'csv':
-				header('Content-type:text/csv;');
-				break;
-			case 'flash':
-				header('Content-Type: application/x-shockwave-flash');
-				break;
-			case 'exe':
-				header('Content-type:application/octet-stream');
-				break;
-			case 'zip':
-				header('Content-type:application/zip');
-				break;
-			case 'mp3':
-				header('Content-type:audio/mpeg');
-				break;
-			case 'mpg':
-				header('Content-type:video/mpeg');
-				break;
-			case 'avi':
-				header('Content-type:video/x-msvideo');
-				break;
-			default:
-				header('Content-type:'.$type);
-				break;
+		$type = strtolower($type);
+		if ($type == 'image' || $type == 'img') {
+			header('Content-Type:image/'.$option);
+			return;
 		}
+		static $args = array(
+			'ai'    => 'application/postscript',
+			'aif'   => 'audio/x-aiff',
+			'aifc'  => 'audio/x-aiff',
+			'aiff'  => 'audio/x-aiff',
+			'atom'  => 'application/atom+xml',
+			'avi'   => 'video/x-msvideo',
+			'bin'   => 'application/macbinary',
+			'bmp'   => 'image/bmp',
+			'cpt'   => 'application/mac-compactpro',
+			'css'   => 'text/css',
+			'csv'   => 'text/x-comma-separated-values',
+			'dcr'   => 'application/x-director',
+			'dir'   => 'application/x-director',
+			'doc'   => 'application/msword',
+			'docx'  => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'dvi'   => 'application/x-dvi',
+			'dxr'   => 'application/x-director',
+			'eml'   => 'message/rfc822',
+			'eps'   => 'application/postscript',
+			'exe'   => 'application/octet-stream',
+			'flv'   => 'video/x-flv',
+			'flash' => 'application/x-shockwave-flash',
+			'gif'   => 'image/gif',
+			'gtar'  => 'application/x-gtar',
+			'gz'    => 'application/x-gzip',
+			'hqx'   => 'application/mac-binhex40',
+			'htm'   => 'text/html',
+			'html'  => 'text/html',
+			'jpe'   => 'image/jpeg',
+			'jpeg'  => 'image/jpeg',
+			'jpg'   => 'image/jpeg',
+			'js'    => 'application/x-javascript',
+			'json'  => 'application/json',
+			'log'   => 'text/plain',
+			'mid'   => 'audio/midi',
+			'midi'  => 'audio/midi',
+			'mif'   => 'application/vnd.mif',
+			'mov'   => 'video/quicktime',
+			'movie' => 'video/x-sgi-movie',
+			'mp2'   => 'audio/mpeg',
+			'mp3'   => 'audio/mpeg',
+			'mp4'   => 'video/mpeg',
+			'mpe'   => 'video/mpeg',
+			'mpeg'  => 'video/mpeg',
+			'mpg'   => 'video/mpeg',
+			'mpga'  => 'audio/mpeg',
+			'oda'   => 'application/oda',
+			'pdf'   => 'application/pdf',
+			'php'   => 'application/x-httpd-php',
+			'php3'  => 'application/x-httpd-php',
+			'php4'  => 'application/x-httpd-php',
+			'phps'  => 'application/x-httpd-php-source',
+			'phtml' => 'application/x-httpd-php',
+			'png'   => 'image/png',
+			'ppt'   => 'application/powerpoint',
+			'ps'    => 'application/postscript',
+			'psd'   => 'application/x-photoshop',
+			'qt'    => 'video/quicktime',
+			'ra'    => 'audio/x-realaudio',
+			'ram'   => 'audio/x-pn-realaudio',
+			'rm'    => 'audio/x-pn-realaudio',
+			'rpm'   => 'audio/x-pn-realaudio-plugin',
+			'rss'   => 'application/rss+xml',
+			'rtf'   => 'text/rtf',
+			'rtx'   => 'text/richtext',
+			'rv'    => 'video/vnd.rn-realvideo',
+			'shtml' => 'text/html',
+			'sit'   => 'application/x-stuffit',
+			'smi'   => 'application/smil',
+			'smil'  => 'application/smil',
+			'swf'   => 'application/x-shockwave-flash',
+			'tar'   => 'application/x-tar',
+			'tgz'   => 'application/x-tar',
+			'text'  => 'text/plain',
+			'tif'   => 'image/tiff',
+			'tiff'  => 'image/tiff',
+			'txt'   => 'text/plain',
+			'wav'   => 'audio/x-wav',
+			'wbxml' => 'application/wbxml',
+			'wmlc'  => 'application/wmlc',
+			'word'  => 'application/msword',
+			'xht'   => 'application/xhtml+xml',
+			'xhtml' => 'application/xhtml+xml',
+			'xl'    => 'application/excel',
+			'xls'   => 'application/excel',
+			'xlsx'  => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'xml'   => 'text/xml',
+			'xsl'   => 'text/xml',
+			'zip'   => 'application/x-zip'
+		);
+		if (!array_key_exists($type, $args)) {
+			header('Content-type:'.$type);
+			return;
+		}
+		$content = 'Content-Type:'.$args[$type];
+		if (in_array($type, array('html', 'json', 'rss', 'xml'))) {
+			$content .= ';charset='.$option;
+		}
+		header($content);
 	}
 
 	/**
