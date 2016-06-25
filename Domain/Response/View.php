@@ -127,7 +127,7 @@ class View extends MagicObject {
 		$this->set('_extra', $param);
 		foreach (ArrayExpand::toFile((array)$names, '.') as $value) {
 			$file = $this->getView($value);
-			if (file_exists($file)) {
+			if (is_file($file)) {
 				include($file);
 			} else {
 				Error::out($file.' is not exist', __FILE__, __LINE__);

@@ -334,10 +334,10 @@ class Generate {
 		if (!is_dir($layout_dir)) {
 			mkdir($layout_dir);
 		}
-		if (!file_exists($layout_dir.'head.php')) {
+		if (!is_file($layout_dir.'head.php')) {
 			$this->_replace('head', array(), $layout_dir.'/head.php');
 		}
-		if (!file_exists($layout_dir.'foot.php')) {
+		if (!is_file($layout_dir.'foot.php')) {
 			$this->_replace('foot', array(), $layout_dir.'/foot.php');
 		}
 	}

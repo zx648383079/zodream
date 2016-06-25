@@ -534,7 +534,7 @@ class YamlExpand {
     private function loadFromSource ($input) {
         if (!empty($input) &&
             strpos($input, "\n") === false &&
-            file_exists($input)) {
+            is_file($input)) {
             $input = file_get_contents($input);
         }
         return $this->loadFromString($input);

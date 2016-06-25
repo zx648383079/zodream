@@ -20,6 +20,8 @@ class Command {
     protected $prefix;
 
     protected $allowCache = true;
+    
+    protected $cacheLife = 3600;
 
     /**
      * @var Database
@@ -30,6 +32,8 @@ class Command {
         $configs = Config::getInstance()->get('db');
         $this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);
         $this->prefix = $configs['prefix'];
+        $this->allowCache = $configs['allowCache'];
+        $this->cacheLife = $configs['cacheLife'];
         if (isset($this->table)) {
             $this->setTable($this->table);
         }

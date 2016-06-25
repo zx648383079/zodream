@@ -34,16 +34,16 @@ class FileSystem {
 	 * @return null|string
 	 */
 	public static function getFile($file) {
-		if(file_exists($file)) {
+		if(is_file($file)) {
 			return $file;
 		}
 		$vendor = dirname(dirname(dirname(__FILE__)));
 		$file   = '/'. ltrim($file, '/');
-		if (file_exists($vendor.$file)) {
+		if (is_file($vendor.$file)) {
 			return $vendor.$file;
 		}
 		$app = dirname(APP_DIR);
-		if (file_exists($app.$file)) {
+		if (is_file($app.$file)) {
 			return $app.$file;
 		}
 		return null;
@@ -75,13 +75,13 @@ class FileSystem {
 	 * @return bool
 	 */
 	public static function copy($res, $des) {
-		if (!file_exists($res)) {
+		if (!is_file($res)) {
 			return false;
 		}
 		$resOpen = fopen($res, 'r');
 		//定位
 		$dir = dirname($des);
-		if (!file_exists($dir)) {
+		if (!is_dir($dir)) {
 			//可创建多级目录 
 			mkdir($dir, 0777, true);
 		}

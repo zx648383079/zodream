@@ -38,7 +38,7 @@ class Config extends MagicObject {
 	 * 判断配置文件是否存在
 	 */
 	public static function exist() {
-		return file_exists(static::getPath().APP_MODULE.'.php');
+		return is_file(static::getPath().APP_MODULE.'.php');
 	}
 	
 	private function __construct($args = array()) {
@@ -67,7 +67,7 @@ class Config extends MagicObject {
 	 * @return array
      */
 	private function _getConfig($file) {
-		if (!file_exists($file)) {
+		if (!is_file($file)) {
 			return array();
 		}
 		$config = include($file);

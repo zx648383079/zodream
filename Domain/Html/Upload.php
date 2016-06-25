@@ -263,7 +263,7 @@ class Upload {
 			$this->_errorNum = -5;
 			return false;
 		}
-		if (file_exists($this->path) && is_writable($this->path)) {
+		if (is_file($this->path) && is_writable($this->path)) {
 			return true;
 		}
 		if (@mkdir($this->path, 0755)) {

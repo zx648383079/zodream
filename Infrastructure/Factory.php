@@ -9,6 +9,8 @@ namespace Zodream\Infrastructure;
  */
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
+use Zodream\Infrastructure\I18n\I18n;
+use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
 
 class Factory {
@@ -30,6 +32,7 @@ class Factory {
     }
 
     /**
+     * 会话
      * @return Session
      */
     public static function session() {
@@ -37,9 +40,18 @@ class Factory {
     }
 
     /**
+     * 缓存
      * @return Cache
      */
     public static function cache() {
         return self::getInstance('cache', FileCache::class);
+    }
+
+    /**
+     * 多语言
+     * @return I18n
+     */
+    public static function i18n() {
+        return self::getInstance('i18n', PhpSource::class);
     }
 }

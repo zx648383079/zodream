@@ -30,7 +30,7 @@ class Loader extends MagicObject {
 	 */
 	public function plugin($plugin) {
 		$file = APP_DIR. '/Domain/Plugin/'. $plugin. '.php';
-		if (file_exists($file)) {
+		if (is_file($file)) {
 			include_once($file);
 		} else {
 			exit('Error: Could not load plugin ' . $plugin . '!');

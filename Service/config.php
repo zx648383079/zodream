@@ -37,11 +37,13 @@ return array(
 		'driver'   => Zodream\Infrastructure\Database\Pdo::class,
 		'host'     => 'localhost',                //服务器
 		'port'     => '3306',						//端口
-		'database' => 'test',				//数据库
+		'database' => 'test',					//数据库
 		'user'     => 'root',						//账号
-		'password' => '',					//密码
+		'password' => '',						//密码
 		'prefix'   => 'zd_',					//前缀
-		'encoding' => 'utf8'					//编码
+		'encoding' => 'utf8',					//编码
+		'allowCache' => true,                   //是否开启查询缓存
+		'cacheLife' => 3600                      //缓存时间
 	),
 	'mail'   => array(
 		'driver'   => Zodream\Infrastructure\Mailer::class,
