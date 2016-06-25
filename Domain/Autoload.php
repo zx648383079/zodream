@@ -49,7 +49,10 @@ class Autoload extends MagicObject {
 	 * @param int $level
 	 * @return $this
 	 */
-	public function setError($level = E_ALL) {
+	public function setError($level = null) {
+		if (is_null($level)) {
+			$level = defined('DEBUG') && DEBUG ? E_ALL : 0;
+		}
 		error_reporting($level);
 		set_error_handler('Zodream\Infrastructure\Error::outByError');          //自定义错误输出
 		return $this;

@@ -66,9 +66,13 @@ class FileCache extends Cache {
 		$this->gc(true, false);
 		return true;
 	}
+
+    private function _getCacheDir() {
+        return APP_DIR.'/'.trim($this->cachePath, '/');
+    }
 	
 	private function _getCacheFile($key) {
-        $cache = APP_DIR.'/'.trim($this->cachePath, '/');
+        $cache = $this->_getCacheDir();
         if (!is_dir($cache)) {
             mkdir($cache);
         }
@@ -77,7 +81,7 @@ class FileCache extends Cache {
 	
 	public function gc($force = false, $expiredOnly = true) {
         if ($force || mt_rand(0, 1000000) < $this->gcChance) {
-            $this->gcRecursive($this->cachePath, $expiredOnly);
+            $this->gcRecursive($this->_getCacheDir(), $expiredOnly);
         }
     }
     
@@ -87,7 +91,7 @@ class FileCache extends Cache {
                 if ($file[0] === '.') {
                     continue;
                 }
-                $fullPath = APP_DIR.'/'.trim($this->cachePath, '/').'/' . $file;
+                $fullPath = $path.'/' . $file;
                 if (!$expiredOnly || $expiredOnly && @filemtime($fullPath) < time()) {
                     if (!@unlink($fullPath)) {
                         
