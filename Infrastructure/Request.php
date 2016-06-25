@@ -150,6 +150,14 @@ final class Request {
 		return self::Other(__FUNCTION__);
 	}
 	
+	public static function os() {
+		return self::Other(__FUNCTION__);
+	}
+	
+	public static function browser() {
+		return self::Other(__FUNCTION__);
+	}
+	
 	public static function isMobile() {
 		return self::Other(__FUNCTION__);
 	}

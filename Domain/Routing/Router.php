@@ -176,7 +176,6 @@ class Router{
 	 * 循环匹配已注册路由
 	 * @param string $route
 	 * @param array $config
-	 * @return
 	 */
 	private static function _loopConfig($route, $config) {
 		foreach ($config as $key => $instance) {
@@ -204,7 +203,6 @@ class Router{
 	 * @param string $controller 控制器的名称
 	 * @param string $action 视图所在的方法名
 	 * @param array $values 值
-	 * @return
 	 */
 	private static function _autoload($controller, $action, $values = array()) {
 		if (empty($action)) {

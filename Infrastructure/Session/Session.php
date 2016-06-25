@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\SessionExpand;
+namespace Zodream\Infrastructure\Session;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -114,6 +114,7 @@ class Session implements \ArrayAccess {
     }
 
     public function id($value = null) {
+        $this->open();
         return session_id($value);
     }
 

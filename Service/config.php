@@ -16,7 +16,7 @@ return array(
 		'action'     => 'Action',
 	),
 	'session' => array(
-		'driver' => \Zodream\Infrastructure\SessionExpand\Session::class
+		'driver' => \Zodream\Infrastructure\Session\Session::class
 	),
 	'auth'   => array(
 		'driver' => Zodream\Domain\Authentication\Auth::class,        //用户判断

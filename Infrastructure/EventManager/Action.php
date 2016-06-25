@@ -21,7 +21,8 @@ class Action {
     }
 
     public function run($args = array()) {
-        if (!class_exists($this->class) || !function_exists($this->function)) {
+        if (strpos($this->class, '::') === false &&
+            (!class_exists($this->class) || !function_exists($this->function))) {
             require($this->file);
         }
         if (empty($this->class)) {
@@ -41,6 +42,9 @@ class Action {
     }
 
     private function _runWithClass($args) {
+        if (strpos($this->class, '::') !== false) {
+            return call_user_func_array($this->class, $args);
+        }
         if (!class_exists($this->class)) {
             return;
         }

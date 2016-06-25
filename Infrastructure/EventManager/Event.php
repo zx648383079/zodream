@@ -28,6 +28,10 @@ class Event {
     public function add($class, $function = 10, $file = null, $priority = 10) {
         if ($class instanceof Action) {
             $this->addAction($class, $function);
+            return;
+        }
+        if (is_numeric($function)) {
+            $function = null;
         }
         $this->addAction(new Action($class, $function, $file), $priority);
     }

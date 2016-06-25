@@ -9,7 +9,7 @@ namespace Zodream\Infrastructure;
  */
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
-use Zodream\Infrastructure\SessionExpand\Session;
+use Zodream\Infrastructure\Session\Session;
 
 class Factory {
     

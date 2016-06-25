@@ -80,6 +80,10 @@ class SchemaColumn {
         return $this-$this->addData('PRIMARY KEY');
     }
 
+    public function dateTime() {
+        return $this-$this->addData('DATETIME');
+    }
+
     public function __toString() {
         $sql = implode(' ', $this->data);
         if (!empty($this->name)) {
