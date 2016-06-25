@@ -114,7 +114,10 @@ class Session implements \ArrayAccess {
     }
 
     public function id($value = null) {
-        $this->open();
+        if (empty($value)) {
+            $this->open();
+            return session_id();
+        }
         return session_id($value);
     }
 
