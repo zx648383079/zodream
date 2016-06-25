@@ -29,6 +29,7 @@ abstract class Database {
 	
 	protected $result;
 	
+	
 	protected $configs = array(
 			'host'     => 'localhost',                //服务器
 			'port'     => '3306',						//端口

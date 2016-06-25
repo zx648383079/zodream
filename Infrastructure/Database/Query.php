@@ -6,11 +6,8 @@ namespace Zodream\Infrastructure\Database;
  * Date: 2016/3/19
  * Time: 10:30
  */
-use Zodream\Infrastructure\MagicObject;
 
-class Query extends MagicObject {
-    
-    protected $command;
+class Query extends BaseQuery {
 
     public $select = array();
 
@@ -58,13 +55,10 @@ class Query extends MagicObject {
     );
     
     public function __construct($args = array()) {
-        $this->command = Command::getInstance();
         $this->load($args);
     }
 
-    protected function addPrefix($table) {
-         return $this->command->addPrefix($table);
-    }
+    
 
     public function load(array $args) {
         foreach ($args as $key => $item) {
@@ -321,23 +315,19 @@ class Query extends MagicObject {
         $this->getOffset();
     }
     
-    public function __toString() {
-        return $this->getSql();
-    }
-
     /**
      * @param bool $isArray
      * @return array|object
      */
     public function all($isArray = true) {
         if ($isArray) {
-            return $this->command->getArray($this->getSql(), $this->get());
+            return $this->command()->getArray($this->getSql(), $this->get());
         }
-        return $this->command->getObject($this->getSql(), $this->get());
+        return $this->command()->getObject($this->getSql(), $this->get());
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function one() {
         $this->limit(1);
@@ -663,7 +653,5 @@ class Query extends MagicObject {
         return ' OFFSET '.intval($this->offset);
     }
     
-    public function getError() {
-        return $this->command->getError();
-    }
+    
 }

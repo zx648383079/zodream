@@ -6,15 +6,15 @@ namespace Zodream\Domain\Authentication;
  * @author Jason
  */
 use Zodream\Infrastructure\DomainObject\AuthObject;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\MagicObject;
-use Zodream\Infrastructure\Session;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
 class Auth extends MagicObject implements AuthObject {
 	use SingletonPattern;
 	protected function __construct() {
-		if (Session::getInstance()->has('user')) {
-			$this->set(Session::getInstance()->get('user'));
+		if (Factory::session()->has('user')) {
+			$this->set(Factory::session()->get('user'));
 			Roles::setRoles($this->get('roles', array()));
 		}
 	}
@@ -23,7 +23,7 @@ class Auth extends MagicObject implements AuthObject {
 	 * 保存
 	 */
 	public function save() {
-		return Session::getInstance()->set('user', $this->_data);
+		return Factory::session()->set('user', $this->_data);
 	}
 
 	/**

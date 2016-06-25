@@ -18,7 +18,7 @@ class FileCache extends Cache {
 	
 	protected function getValue($key) {
 		$cacheFile = $this->_getCacheFile($key);
-        if (@filemtime($cacheFile) > time()) {
+        if (is_file($cacheFile) && @filemtime($cacheFile) > time()) {
             $fp = @fopen($cacheFile, 'r');
             if ($fp !== false) {
                 @flock($fp, LOCK_SH);
@@ -68,7 +68,11 @@ class FileCache extends Cache {
 	}
 	
 	private function _getCacheFile($key) {
-		return APP_DIR.'/'.trim($this->cachePath, '/').'/'.$key.$this->cacheExtension;
+        $cache = APP_DIR.'/'.trim($this->cachePath, '/');
+        if (!is_dir($cache)) {
+            mkdir($cache);
+        }
+		return $cache.'/'.$key.$this->cacheExtension;
 	}
 	
 	public function gc($force = false, $expiredOnly = true) {

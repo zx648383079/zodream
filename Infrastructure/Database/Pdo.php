@@ -6,7 +6,6 @@ namespace Zodream\Infrastructure\Database;
 * @author Jason
 */
 use Zodream\Infrastructure\Error;
-use Zodream\Infrastructure\EventManager\EventManger;
 
 class Pdo extends Database {
 
@@ -94,7 +93,6 @@ class Pdo extends Database {
 		if (empty($sql)) {
 			return null;
 		}
-		EventManger::getInstance()->run('executeSql', $sql);
 		try {
 			if (!empty($sql)) {
 				$this->prepare($sql);

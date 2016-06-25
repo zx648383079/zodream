@@ -13,7 +13,6 @@ use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Cookie;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\EventManager\EventManger;
-use Zodream\Infrastructure\Session;
 
 defined('VERSION') or define('VERSION', 2.0);
 defined('APP_DIR') or define('APP_DIR', dirname(dirname(__FILE__)).'/');

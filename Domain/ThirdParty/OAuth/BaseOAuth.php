@@ -8,16 +8,16 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 use Zodream\Domain\Response\Redirect;
 use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\Session;
 use Zodream\Infrastructure\ThirdParty;
 
 abstract class BaseOAuth extends ThirdParty {
 
     public function callback() {
         $state = Request::get('state');
-        if (empty($state) || $state != Session::getValue('state')) {
+        if (empty($state) || $state != Factory::session()->get('state')) {
             return false;
         }
         $code = Request::get('code');
@@ -48,7 +48,7 @@ abstract class BaseOAuth extends ThirdParty {
      */
     public function login() {
         $state = StringExpand::randomNumber(7);
-        Session::setValue('state', $state);
+        Factory::session()->set('state', $state);
         $this->set('state', $state);
         $this->redirect('login');
     }

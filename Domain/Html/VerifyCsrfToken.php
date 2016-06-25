@@ -2,8 +2,8 @@
 namespace Zodream\Domain\Html;
 
 use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
-use  Zodream\Infrastructure\Session;
 use Zodream\Infrastructure\Request;
 
 class VerifyCsrfToken {
@@ -13,7 +13,7 @@ class VerifyCsrfToken {
      */
 	public static function create() {
 		$csrf = StringExpand::random(10);
-		Session::getInstance()->set('csrf', $csrf);
+		Factory::session()->set('csrf', $csrf);
 		return $csrf;
 	}
 
@@ -32,6 +32,6 @@ class VerifyCsrfToken {
 	 * @return string
 	 */
 	public static function get() {
-		return Session::getInstance()->get('csrf');
+		return Factory::session()->get('csrf');
 	}
 }

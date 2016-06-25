@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure\Database;
  * Time: 9:07
  */
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
@@ -17,6 +18,9 @@ class Command {
     protected $table;
     
     protected $prefix;
+
+    protected $allowCache = true;
+
     /**
      * @var Database
      */
@@ -70,14 +74,36 @@ class Command {
     }
 
     /**
+     * @param string $sql
+     * @return array null
+     */
+    public function getCache($sql) {
+        if (!$this->allowCache) {
+            return null;
+        }
+        $cache = Factory::cache()->get(md5($sql));
+        if (empty($cache)) {
+            return null;
+        }
+        return unserialize($cache);
+    }
+
+    public function setCache($sql, $data) {
+        if (!$this->allowCache) {
+            return;
+        }
+        return Factory::cache()->set(md5($sql), serialize($data), 3600);
+    }
+
+    /**
      * 查询
-     * @param $sql
+     * @param string $sql
      * @param string $field
      * @param array $parameters
      * @return mixed
      */
     public function select($sql, $field = '*', $parameters = array()) {
-        return $this->db->getArray("SELECT {$field} FROM {$this->table} {$sql}", $parameters);
+        return $this->getArray("SELECT {$field} FROM {$this->table} {$sql}", $parameters);
     }
 
     /**
@@ -157,23 +183,46 @@ class Command {
      * @return mixed
      */
     public function execute($sql, $parameters = array()) {
-        return $this->db->execute($sql, $parameters);
+        EventManger::getInstance()->run('executeSql', $sql);
+        if (preg_match('/^(insert|delete|update|replace|drop|create)\s+/i', $sql)) {
+            return $this->db->execute($sql, $parameters);
+        }
+        $args = empty($parameters) ? serialize($parameters) : null;
+        if ($cache = $this->getCache($sql.$args)) {
+            return $cache;
+        }
+        $result = $this->db->execute($sql, $parameters);
+        $this->setCache($sql.$args, $result);
+        return $result;
     }
+
     /**
      * @param string $sql
      * @param array $parameters
-     * @return mixed
+     * @return array
      */
     public function getArray($sql, $parameters = array()) {
-        return $this->db->getArray($sql, $parameters);
+        $args = empty($parameters) ? serialize($parameters) : null;
+        if ($cache = $this->getCache($sql.$args)) {
+            return $cache;
+        }
+        $result = $this->db->getArray($sql, $parameters);
+        $this->setCache($sql.$args, $result);
+        return $result;
     }
     /**
      * @param string $sql
      * @param array $parameters
-     * @return mixed
+     * @return object
      */
     public function getObject($sql, $parameters = array()) {
-        return $this->db->getObject($sql, $parameters);
+        $args = empty($parameters) ? serialize($parameters) : null;
+        if ($cache = $this->getCache($sql.$args)) {
+            return $cache;
+        }
+        $result = $this->db->getObject($sql, $parameters);
+        $this->setCache($sql.$args, $result);
+        return $result;
     }
 
     /**

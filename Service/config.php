@@ -71,7 +71,6 @@ return array(
 	'alias'  => array(
 		'Config' => Zodream\Infrastructure\Config::class,
 		'Request' => Zodream\Infrastructure\Request::class,
-		'Session' => Zodream\infrastructure\Session::class,
 		'Cookie' => Zodream\Infrastructure\Cookie::class
 	), 
 	// 注册事件
