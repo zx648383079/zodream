@@ -21,6 +21,10 @@ class Action {
     }
 
     public function run($args = array()) {
+        if ($this->class instanceof \Closure) {
+            call_user_func_array($this->class, (array)$args);
+            return;
+        }
         if (strpos($this->class, '::') === false &&
             (!class_exists($this->class) || !function_exists($this->function))) {
             require($this->file);
