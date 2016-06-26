@@ -6,22 +6,6 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 class TimeExpand {
-	/**
-	 * 返回当前时间
-	 * @param null $format
-	 * @param null $time
-	 * @return int|string
-	 */
-	public static function now($format = null, $time = null) {
-		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
-		if (empty($time)) {
-			$time = time();
-		}
-		if (!empty($format)) {
-			$time = date($format, $time);
-		}
-		return $time;
-	}
 
 	/**
 	 * 将时间转换成字符串格式
@@ -31,6 +15,10 @@ class TimeExpand {
 	 */
 	public static function format($time = null, $format = 'Y-m-d H:i:s') {
 		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
+		if (!is_numeric($time)) {
+			$format = $time;
+			$time = time();
+		}
 		if ($time == null) {
 			$time = time();
 		}
@@ -39,8 +27,12 @@ class TimeExpand {
 
 	const TODAY = 0;
 	const YESTERDAY = 1;
-	const LASTWEEK = 2;
-	const MONTH = 3;
+	const WEEK = 2;
+	const LASTWEEK = 3;
+	const MONTH = 4;
+	const LASTMONTH = 5;
+	const YEAR = 6;
+	const LASTYEAR = 7;
 
 	/**
 	 * 获取开始时间和结束时间
@@ -59,15 +51,44 @@ class TimeExpand {
 					mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')),
 					mktime(0, 0, 0, date('m'), date('d'), date('Y')) - 1
 				);
+			case self::WEEK:
+				// 周一作为第一天
+				$week = date('w');
+				if ($week == 0) {
+					$week = 7;
+				}
+				return [
+					mktime(0, 0, 0, date('m'), date('d') - $week + 1, date('Y')),
+					mktime(0, 0, 0, date('m'), date('d') + 7 - $week, date('Y')),
+				];
 			case self::LASTWEEK:
+				$week = date('w');
+				if ($week == 0) {
+					$week = 7;
+				}
 				return array(
-					mktime(0, 0, 0, date('m'), date('d') - date('w') + 1 - 7, date('Y')),
-					mktime(23, 59, 59, date('m'), date('d') - date('w') + 7 - 7, date('Y'))
+					mktime(0, 0, 0, date('m'), date('d') - $week - 6, date('Y')),
+					mktime(23, 59, 59, date('m'), date('d') - $week, date('Y'))
 				);
 			case self::MONTH:
 				return array(
 					mktime(0, 0, 0, date('m'), 1, date('Y')),
 					mktime(23, 59, 59, date('m'), date('t'), date('Y'))
+				);
+			case self::LASTMONTH:
+				return array(
+					mktime(0, 0, 0, date('m') - 1, 1, date('Y')),
+					mktime(23, 59, 59, date('m'), 0, date('Y'))
+				);
+			case self::YEAR:
+				return array(
+					mktime(0, 0, 0, 1, 1, date('Y')),
+					mktime(23, 59, 59, 12, 31, date('Y'))
+				);
+			case self::LASTYEAR:
+				return array(
+					mktime(0, 0, 0, 1, 1, date('Y') - 1),
+					mktime(23, 59, 59, 12, 31, date('Y') - 1)
 				);
 		}
 		return array(
