@@ -8,6 +8,7 @@ namespace Zodream\Domain\Response;
 */
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 use Zodream\Infrastructure\Request;
@@ -216,6 +217,17 @@ class View extends MagicObject {
 			return;
 		}
 		echo TimeExpand::isTimeAgo($time);
+	}
+
+	/**
+	 * 翻译 {}
+	 * @param string $message
+	 * @param array $param
+	 * @param string $name
+	 * @return mixed
+	 */
+	public function t($message, $param = [], $name = 'app') {
+		return Factory::i18n()->translate($message, $param, $name);
 	}
 	
 	/**

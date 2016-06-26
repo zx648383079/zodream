@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Domain\Response;
 
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\Request;
 class ResponseResult {
@@ -64,8 +65,10 @@ class ResponseResult {
 		}
 		$data['status'] = $status;
 		$data['title'] = $title;
-		View::getInstance()->set($data);
-		View::getInstance()->showWithFile('404', $status);
+		if (defined('DEBUG') && DEBUG) {
+			View::getInstance()->set($data);
+		}
+		View::getInstance()->showWithFile(Config::getValue('error', '404'), $status);
 	}
 	
 	public static function sendRedirect($url, $time = 0) {

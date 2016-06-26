@@ -144,7 +144,7 @@ class FieldWidget extends Widget {
 	</div>
 </div>');
         return $this->replace(Html::tag('button', '{value}', array(
-            'type' => '{type}',
+            'type' => $this->get('type'),
             'class' => $this->get('class', 'btn btn-primary')
         )));
     }
@@ -177,6 +177,10 @@ class FieldWidget extends Widget {
             $this->get('name'),
             $this->get('value')
         ), $inputTemplate);
+        $label = $this->get('label');
+        if (empty($label)) {
+            return $input;
+        }
         return str_replace(array(
             '{name}',
             '{input}',

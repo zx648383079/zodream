@@ -45,11 +45,6 @@ class Error{
 	public static function out($error, $file = null, $line = null) {
 		$errorInfo = "ERROR: {$error} , in {$file} on line {$line}, URL:".Url::to();
 		Log::out(TimeExpand::now('Y-m-d').'.txt', TimeExpand::format().':'.$errorInfo. "\r\n");
-		if (!defined('DEBUG') || !DEBUG) {
-			ResponseResult::sendError();
-		}
-		ResponseResult::make(
-			$errorInfo
-		);
+		ResponseResult::sendError($errorInfo);
 	}
 }

@@ -136,11 +136,25 @@ class Schema extends BaseQuery {
             ' ('. $this->getColumns(). ') ENGINE = '.$engine.' DEFAULT CHARSET=UTF8;');
     }
 
+    /**
+     * 合并多个表， 请保证没有重复字段
+     * @param string $table
+     * @param string|Query $sql
+     * @return mixed
+     */
+    public function mergeTable($table, $sql) {
+        return $this->command()->execute('CREATE TABLE '.$this->addPrefix($table).' AS '.$sql);
+    }
+
     protected function getColumns() {
         return '';
     }
 
     public function getSql() {
         return '';
+    }
+
+    public function __toString() {
+        return $this->getSql();
     }
 }
