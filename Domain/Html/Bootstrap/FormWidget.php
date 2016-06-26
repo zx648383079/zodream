@@ -179,10 +179,18 @@ class FormWidget extends Widget {
     }
 
 
+    /**
+     * @return string|static
+     * @throws \Exception
+     */
     public function end() {
         return $this->show($this->get());
     }
-    
+
+    public function __toString() {
+        return $this->show($this->get());
+    }
+
     public function __call($name, $arguments) {
         return $this->input($arguments[0], $name, isset($arguments[1]) ? $arguments[1] : array());
     }
