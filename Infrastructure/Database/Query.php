@@ -513,12 +513,12 @@ class Query extends BaseQuery {
                         "{$arg[0]} = ". $this->getValueByOperator($arg[1]), $arg[3]);
                 }
                 // ['id', [1, 3], 'or', 'or']
-                $sql = nul;
+                $sql = [];
                 foreach ($arg[1] as $item) {
-                    $sql .= $this->getConditionLink(
-                        "{$arg[0]} = ". $this->getValueByOperator($item), $arg[2]);
+                    $sql[] = "{$arg[0]} = ". $this->getValueByOperator($item);
                 }
-                return ' '.strtoupper($arg[3]) .' ('.$sql.')';
+                return ' '.strtoupper($arg[3]) .' ('.
+                implode(' '. strtoupper($arg[2]).' ', $sql).')';
             }
 
             if ($this->isOrOrAnd($arg[3])) {
