@@ -66,10 +66,35 @@ abstract class Model {
 		return $this->command->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), array_values($addData));
 	}
 
-	public function addValues(array $columns, array $values) {
+	public function addValues(array $columns, array $values = null) {
 		$results = array();
-		foreach ($values as $value) {
-			$results[] = "'".implode("','", $value)."'";
+		if (is_null($values)) {
+			$values = array_values($columns);
+			$columns = array_keys($columns);
+			$count = 1;
+			foreach ($values as &$item) {
+				if (!is_array($item)) {
+					$item = [$item];
+				}
+				if (count($item) > $count) {
+					$count = count($item);
+				}
+			}
+			for ($i = 0; $i < $count; $i ++) {
+				$result = [];
+				foreach ($values as $item) {
+					if (count($item) > $i) {
+						$result[] = $item[$i];
+						continue;
+					}
+					$result[] = $item[count($item) - 1];
+				}
+				$results[] = "'".implode("','", $result)."'";;
+			}
+		} else {
+			foreach ($values as $value) {
+				$results[] = "'".implode("','", $value)."'";
+			}
 		}
 		return $this->command->insert('`'.implode('`,`', $columns).'`', implode('),(', $results));
 	}
