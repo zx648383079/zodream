@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Mailer;
  * Date: 2016/5/27
  * Time: 13:19
  */
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 
 class JMailer extends BaseMailer {
 

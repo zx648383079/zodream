@@ -7,7 +7,7 @@ namespace Zodream\Domain\Response;
 * @time 2015-12-19
 */
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;

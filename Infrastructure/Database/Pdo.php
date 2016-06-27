@@ -5,7 +5,7 @@ namespace Zodream\Infrastructure\Database;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 
 class Pdo extends Database {
 

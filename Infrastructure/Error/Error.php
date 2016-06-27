@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Error;
 /**
 * 错误信息类
 * 

@@ -7,7 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 14:34
  */
 use Zodream\Domain\Response\Redirect;
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;

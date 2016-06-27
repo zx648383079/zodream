@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Html;
 
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;

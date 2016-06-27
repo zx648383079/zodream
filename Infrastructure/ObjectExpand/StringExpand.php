@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 class StringExpand {
 	
 	public static function formatSize($size) { 

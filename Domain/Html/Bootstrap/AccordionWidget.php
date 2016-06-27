@@ -7,7 +7,7 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 18:39
  */
 use Zodream\Domain\Html\Widget;
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 
 class AccordionWidget extends Widget {
 

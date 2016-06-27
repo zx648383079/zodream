@@ -8,7 +8,7 @@ namespace Zodream\Domain\Routing;
  */
 use Zodream\Infrastructure\Request;
 use Zodream\Domain\Authentication\Verify;
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\EventManager\EventManger;
 
 abstract class BaseController extends Action {

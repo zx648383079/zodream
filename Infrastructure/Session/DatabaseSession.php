@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Session;
  * Date: 2016/3/6
  * Time: 9:56
  */
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 class DatabaseCache extends Session {
 
     /**

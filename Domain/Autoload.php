@@ -54,7 +54,7 @@ class Autoload extends MagicObject {
 			$level = defined('DEBUG') && DEBUG ? E_ALL : 0;
 		}
 		error_reporting($level);
-		set_error_handler('Zodream\Infrastructure\Error::outByError');          //自定义错误输出
+		set_error_handler('Zodream\Infrastructure\Error\Error::outByError');          //自定义错误输出
 		return $this;
 	}
 	
@@ -62,7 +62,7 @@ class Autoload extends MagicObject {
 	 * 自定义程序结束时输出
 	 */
 	public function shutDown() {
-		register_shutdown_function('Zodream\Infrastructure\Error::outByShutDown');   //程序结束时输出
+		register_shutdown_function('Zodream\Infrastructure\Error\Error::outByShutDown');   //程序结束时输出
 		return $this;
 	}
 	

@@ -6,7 +6,7 @@ namespace Zodream\Domain\Routing;
  * @author Jason
  */
 use Zodream\Domain\Response\View;
-use Zodream\Infrastructure\Error;
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 

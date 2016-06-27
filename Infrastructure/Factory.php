@@ -9,6 +9,7 @@ namespace Zodream\Infrastructure;
  */
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
