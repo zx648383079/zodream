@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure\Error;
 */
 use Zodream\Domain\Response\ResponseResult;
 use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Log;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 class Error{

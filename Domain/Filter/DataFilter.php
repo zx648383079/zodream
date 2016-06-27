@@ -170,7 +170,7 @@ class DataFilter {
     		$option = explode('|', $option);
     	}
 		$filters = array();
-    	foreach ($option as $value) {
+    	foreach ((array)$option as $value) {
     		$filter = self::_splitFilter($value);
 			if (!empty($filter)) {
 				$filters[] = $filter;
