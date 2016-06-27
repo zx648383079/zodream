@@ -434,6 +434,9 @@ class Query extends BaseQuery {
         if (empty($sql)) {
             return null;
         }
+        if (strpos($sql, 'OR') === 1) {
+            return substr($sql, 3);
+        }
         return substr($sql, 4);
     }
 
@@ -449,6 +452,10 @@ class Query extends BaseQuery {
         if (!is_array($arg)) {
             return null;
         }
+        // [[], 'or']
+        if (is_array($arg[0])) {
+            $arg[0] = '('.$this->getCondition($arg[0]).')';
+        }
         $length = count($arg);
         if ($length == 1) {
             // 'a = b'
@@ -459,11 +466,34 @@ class Query extends BaseQuery {
                 // ['a = b', 'or']
                 return $this->getConditionLink($arg[0], $arg[1]);
             }
+            // ['id', []]
+            if (is_array($arg[1])) {
+                $sql = [];
+                foreach ($arg[1] as $item) {
+                    $sql[] = "{$arg[0]} = ". $this->getValueByOperator($item);
+                }
+                return ' AND ('.implode(' AND ', $sql).')';
+            }
             // ['a', 'b']
             return $this->getConditionLink(
                 "{$arg[0]} = ". $this->getValueByOperator($arg[1]));
         }
         if ($length == 3) {
+            // ['id', [], 'or']
+            if (is_array($arg[1])) {
+                // ['id', ['1', 'int'], '@'] 需要安全检查的
+                if ($arg[2] == '@') {
+                    // ['a', 'b']
+                    return $this->getConditionLink(
+                        "{$arg[0]} = ". $this->getValueByOperator($arg[1]));
+                }
+                $sql = [];
+                foreach ($arg[1] as $item) {
+                    $sql[] = "{$arg[0]} = ". $this->getValueByOperator($item);
+                }
+                return ' '.strtoupper($arg[2]) .' ('.implode(' AND ', $sql).')';
+            }
+
             if (in_array($arg[1], $this->operators)) {
                 // ['a', '=', 'b']
                 return $this->getConditionLink(
@@ -474,6 +504,23 @@ class Query extends BaseQuery {
                 "{$arg[0]} = ". $this->getValueByOperator($arg[1]), $arg[2]);
         }
         if ($length == 4) {
+            // ['id', [], 'or']
+            if (is_array($arg[1])) {
+                // ['id', ['1', 'int'], '@', 'or'] 需要安全检查的
+                if ($arg[2] == '@') {
+                    // ['a', 'b']
+                    return $this->getConditionLink(
+                        "{$arg[0]} = ". $this->getValueByOperator($arg[1]), $arg[3]);
+                }
+                // ['id', [1, 3], 'or', 'or']
+                $sql = nul;
+                foreach ($arg[1] as $item) {
+                    $sql .= $this->getConditionLink(
+                        "{$arg[0]} = ". $this->getValueByOperator($item), $arg[2]);
+                }
+                return ' '.strtoupper($arg[3]) .' ('.$sql.')';
+            }
+
             if ($this->isOrOrAnd($arg[3])) {
                 // ['a', '=', 'b', 'or']
                 return $this->getConditionLink(
@@ -549,7 +596,7 @@ class Query extends BaseQuery {
      * @return bool
      */
     protected function isOrOrAnd($arg) {
-        return in_array(strtolower($arg), array('and', 'or'));
+        return is_string($arg) && in_array(strtolower($arg), array('and', 'or'));
     }
 
     /**
@@ -561,6 +608,9 @@ class Query extends BaseQuery {
     protected function getConditionLink($arg, $tag = 'and') {
         if (empty($arg)) {
             return null;
+        }
+        if (is_array($arg)) {
+            $arg = '('. $this->getCondition($arg).')';
         }
         if (strtolower($tag) === 'or') {
             return ' OR '.$arg;
