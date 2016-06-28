@@ -40,7 +40,7 @@ class UploadFile extends BaseUpload {
         $this->tempName = $tempName;
         $this->size = $size;
         $this->error = $error;
-        $this->type = strtolower(substr(strrchr($name, '.'), 1));
+        $this->setType();
     }
 
 

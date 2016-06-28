@@ -31,6 +31,25 @@ abstract class BaseUpload {
     public function getError() {
         return $this->error;
     }
+    
+    public function getName() {
+        return $this->name;
+    }
+    
+    public function setType($type = null) {
+        if (empty($type)) {
+            $type = strtolower(substr(strrchr($this->name, '.'), 1));
+        }
+        $this->type = $type;
+    }
+    
+    public function getType() {
+        if (empty($this->type)) {
+            $this->setType();
+        }
+        return $this->type;
+    }
+    
 
     /**
      * 保存到指定路径
