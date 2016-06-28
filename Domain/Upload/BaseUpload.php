@@ -50,6 +50,10 @@ abstract class BaseUpload {
         return $this->type;
     }
     
+    public function getSize() {
+        return $this->size;
+    }
+    
 
     /**
      * 保存到指定路径

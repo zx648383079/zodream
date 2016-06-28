@@ -28,7 +28,7 @@ class UploadInput extends BaseUpload {
             $this->setError('INPUT_ERROR');
             return false;
         }
-        if (!$fileOutput = @fwrite($file, 'wb')) {
+        if (!$fileOutput = @fopen($file, 'wb')) {
             $this->setError('WRITE_ERROR');
             return false;
         }
