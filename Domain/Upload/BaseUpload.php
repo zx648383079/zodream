@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Domain\Upload;
+use Zodream\Infrastructure\FileSystem;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -38,7 +40,7 @@ abstract class BaseUpload {
     
     public function setType($type = null) {
         if (empty($type)) {
-            $type = strtolower(substr(strrchr($this->name, '.'), 1));
+            $type = FileSystem::getExtension($this->name);
         }
         $this->type = $type;
     }

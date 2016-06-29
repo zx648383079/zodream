@@ -51,6 +51,20 @@ class FileSystem {
 	}
 
 	/**
+	 * 获取文件的拓展名
+	 * @param string $file
+	 * @param bool $point 是否带点
+	 * @return string
+	 */
+	public static function getExtension($file, $point = false) {
+		$arg = strtolower(substr(strrchr($file, '.'), 1));
+		if (empty($arg) || !$point) {
+			return $arg;
+		}
+		return '.'.$arg;
+	}
+
+	/**
 	 * 获取文件内容
 	 * @param string $file
 	 * @return string

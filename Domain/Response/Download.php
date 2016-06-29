@@ -3,36 +3,44 @@ namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\EventManager\EventManger;
+use Zodream\Infrastructure\FileSystem;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 class Download {
 	private static $_speed = 512;   // 下载速度
 
-	public static function make($file) {
+	/**
+	 * @param string $file
+	 * @param string $fileName 输出文件名
+	 */
+	public static function make($file, $fileName = null) {
 		EventManger::getInstance()->run('download', array($file));
 		if (!is_file($file)) {
 			Error::out('FILE NOT FIND', __FILE__, __LINE__);
 		}
 		
 		$length = filesize($file);//获取文件大小
-		$filename = basename($file);//获取文件名字
-		$file_extension = strtolower(substr(strrchr($filename, '.'), 1));//获取文件扩展名
+		if (empty($fileName)) {
+			$fileName = basename($file);//获取文件名字
+		}
+		
+		$fileExtension = FileSystem::getExtension($fileName);//获取文件扩展名
 		
 		ResponseResult::sendCacheControl('public');
 		//根据扩展名 指出输出浏览器格式
-		switch( $file_extension ) {
+		switch($fileExtension) {
 			case 'exe':
 			case 'zip': 
 			case 'mp3':
 			case 'mpg':
 			case 'avi': 
-				ResponseResult::sendContentType($file_extension); 
+				ResponseResult::sendContentType($fileExtension); 
 				break;
 			default: 
 				ResponseResult::sendContentType('application/force-download');
 				break;
 		}
-		ResponseResult::sendContentDisposition($filename);
+		ResponseResult::sendContentDisposition($fileName);
 		ResponseResult::sendAcceptRanges();
 		$range = self::getRange($length);
 		//打开文件
