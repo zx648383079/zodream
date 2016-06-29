@@ -28,6 +28,7 @@ class FileSystem {
 		}
 		return $files;
 	}
+
 	/**
 	 * 获取完整路径
 	 * @param string $file
@@ -69,31 +70,199 @@ class FileSystem {
 	}
 
 	/**
-	 * 复制文件
-	 * @param string $res
-	 * @param string $des
+	 * 建立文件夹
+	 *
+	 * @param string $aimUrl
 	 * @return bool
 	 */
-	public static function copy($res, $des) {
-		if (!is_file($res)) {
+	public static function createDir($aimUrl) {
+		$aimUrl = str_replace('', '/', $aimUrl);
+		$aimDir = '';
+		$arr = explode('/', $aimUrl);
+		$result = true;
+		foreach ($arr as $str) {
+			$aimDir .= $str . '/';
+			if (!is_dir($aimDir)) {
+				$result = mkdir($aimDir);
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * 建立文件
+	 *
+	 * @param string $aimUrl
+	 * @param boolean $overWrite 该参数控制是否覆盖原文件
+	 * @return boolean
+	 */
+	public static function createFile($aimUrl, $overWrite = false) {
+		if (is_file($aimUrl) && $overWrite == false) {
+			return false;
+		} elseif (is_file($aimUrl) && $overWrite == true) {
+			self::unlinkFile($aimUrl);
+		}
+		$aimDir = dirname($aimUrl);
+		self::createDir($aimDir);
+		touch($aimUrl);
+		return true;
+	}
+
+	/**
+	 * 移动文件夹
+	 *
+	 * @param string $oldDir
+	 * @param string $aimDir
+	 * @param boolean $overWrite 该参数控制是否覆盖原文件
+	 * @return boolean
+	 */
+	public static function moveDir($oldDir, $aimDir, $overWrite = false) {
+		$aimDir = str_replace('', '/', $aimDir);
+		$aimDir = substr($aimDir, -1) == '/' ? $aimDir : $aimDir . '/';
+		$oldDir = str_replace('', '/', $oldDir);
+		$oldDir = substr($oldDir, -1) == '/' ? $oldDir : $oldDir . '/';
+		if (!is_dir($oldDir)) {
 			return false;
 		}
-		$resOpen = fopen($res, 'r');
-		//定位
-		$dir = dirname($des);
-		if (!is_dir($dir)) {
-			//可创建多级目录 
-			mkdir($dir, 0777, true);
+		if (!is_dir($aimDir)) {
+			self::createDir($aimDir);
 		}
-		$desOpen = fopen($des, 'w+');
-		//边读边写 
-		$buffer = 1024;
-		while(!feof($resOpen)) {
-			$content = fread($resOpen, $buffer);
-			fwrite($desOpen, $content);
+		@ $dirHandle = opendir($oldDir);
+		if (!$dirHandle) {
+			return false;
 		}
-		fclose($resOpen);
-		fclose($desOpen);
+		while (false !== ($file = readdir($dirHandle))) {
+			if ($file == '.' || $file == '..') {
+				continue;
+			}
+			if (!is_dir($oldDir . $file)) {
+				self::moveFile($oldDir . $file, $aimDir . $file, $overWrite);
+			} else {
+				self::moveDir($oldDir . $file, $aimDir . $file, $overWrite);
+			}
+		}
+		closedir($dirHandle);
+		return rmdir($oldDir);
+	}
+
+	/**
+	 * 移动文件
+	 *
+	 * @param string $fileUrl
+	 * @param string $aimUrl
+	 * @param boolean $overWrite 该参数控制是否覆盖原文件
+	 * @return boolean
+	 */
+	public static function moveFile($fileUrl, $aimUrl, $overWrite = false) {
+		if (!is_file($fileUrl)) {
+			return false;
+		}
+		if (is_file($aimUrl) && $overWrite = false) {
+			return false;
+		} elseif (is_file($aimUrl) && $overWrite = true) {
+			self::unlinkFile($aimUrl);
+		}
+		$aimDir = dirname($aimUrl);
+		self::createDir($aimDir);
+		rename($fileUrl, $aimUrl);
+		return true;
+	}
+
+	/**
+	 * 删除文件夹
+	 *
+	 * @param string $aimDir
+	 * @return boolean
+	 */
+	public static function unlinkDir($aimDir) {
+		$aimDir = str_replace('', '/', $aimDir);
+		$aimDir = substr($aimDir, -1) == '/' ? $aimDir : $aimDir . '/';
+		if (!is_dir($aimDir)) {
+			return false;
+		}
+		$dirHandle = opendir($aimDir);
+		while (false !== ($file = readdir($dirHandle))) {
+			if ($file == '.' || $file == '..') {
+				continue;
+			}
+			if (!is_dir($aimDir . $file)) {
+				self::unlinkFile($aimDir . $file);
+			} else {
+				self::unlinkDir($aimDir . $file);
+			}
+		}
+		closedir($dirHandle);
+		return rmdir($aimDir);
+	}
+
+	/**
+	 * 删除文件
+	 *
+	 * @param string $aimUrl
+	 * @return boolean
+	 */
+	public static function unlinkFile($aimUrl) {
+		if (file_exists($aimUrl)) {
+			unlink($aimUrl);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 复制文件夹
+	 *
+	 * @param string $oldDir
+	 * @param string $aimDir
+	 * @param boolean $overWrite 该参数控制是否覆盖原文件
+	 * @return boolean
+	 */
+	public static function copyDir($oldDir, $aimDir, $overWrite = false) {
+		$aimDir = str_replace('', '/', $aimDir);
+		$aimDir = substr($aimDir, -1) == '/' ? $aimDir : $aimDir . '/';
+		$oldDir = str_replace('', '/', $oldDir);
+		$oldDir = substr($oldDir, -1) == '/' ? $oldDir : $oldDir . '/';
+		if (!is_dir($oldDir)) {
+			return false;
+		}
+		if (!is_dir($aimDir)) {
+			self::createDir($aimDir);
+		}
+		$dirHandle = opendir($oldDir);
+		while (false !== ($file = readdir($dirHandle))) {
+			if ($file == '.' || $file == '..') {
+				continue;
+			}
+			if (!is_dir($oldDir . $file)) {
+				self::copyFile($oldDir . $file, $aimDir . $file, $overWrite);
+			} else {
+				self:: copyDir($oldDir . $file, $aimDir . $file, $overWrite);
+			}
+		}
+		return closedir($dirHandle);
+	}
+
+	/**
+	 * 复制文件
+	 *
+	 * @param string $fileUrl
+	 * @param string $aimUrl
+	 * @param boolean $overWrite 该参数控制是否覆盖原文件
+	 * @return boolean
+	 */
+	public static function copyFile($fileUrl, $aimUrl, $overWrite = false) {
+		if (!is_file($fileUrl)) {
+			return false;
+		}
+		if (is_file($aimUrl) && $overWrite == false) {
+			return false;
+		} elseif (is_file($aimUrl) && $overWrite == true) {
+			self::unlinkFile($aimUrl);
+		}
+		$aimDir = dirname($aimUrl);
+		self::createDir($aimDir);
+		copy($fileUrl, $aimUrl);
 		return true;
 	}
 }
