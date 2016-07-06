@@ -299,7 +299,11 @@ class Query extends BaseQuery {
         return $this;
     }
 
-    public function limit($limit) {
+    public function limit($limit, $length = null) {
+        if (!empty($length)) {
+            $this->offset($limit);
+            $limit = $length;
+        }
         $this->limit = $limit;
         return $this;
     }
