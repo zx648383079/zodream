@@ -22,27 +22,24 @@ class Action {
 
     public function run($args = array()) {
         if ($this->class instanceof \Closure) {
-            call_user_func_array($this->class, (array)$args);
-            return;
+            return call_user_func_array($this->class, (array)$args);
         }
         if (strpos($this->class, '::') === false &&
             (!class_exists($this->class) || !function_exists($this->function))) {
-            require($this->file);
+            return require($this->file);
         }
         if (empty($this->class)) {
-            $this->_runWithFunction($args);
-            return;
+            return $this->_runWithFunction($args);
         }
         if (empty($this->function)) {
-            $this->_runWithClass($args);
-            return;
+            return $this->_runWithClass($args);
         }
         if (!class_exists($this->class)) {
-            return;
+            return false;
         }
         $class = $this->class;
         $instance = new $class;
-        call_user_func_array(array($instance, $this->function), (array)$args);
+        return call_user_func_array(array($instance, $this->function), (array)$args);
     }
 
     private function _runWithClass($args) {
@@ -50,24 +47,23 @@ class Action {
             return call_user_func_array($this->class, $args);
         }
         if (!class_exists($this->class)) {
-            return;
+            return false;
         }
         $class = $this->class;
-        new $class($args);
+        return new $class($args);
     }
 
     private function _runWithFunction($args) {
         if (empty($this->function)) {
-            return;
+            return false;
         }
         if ($this->function instanceof \Closure) {
             $function = $this->function;
-            $function($args);
-            return ;
+            return $function($args);
         }
         if (!class_exists($this->class)) {
-            return;
+            return false;
         }
-        call_user_func_array($this->function, (array)$args);
+        return call_user_func_array($this->function, (array)$args);
     }
 }

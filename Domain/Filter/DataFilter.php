@@ -88,6 +88,7 @@ class DataFilter {
     }
     
     private static function _runFilterOrValidate($args, $option, $isValidate = true) {
+		static::$_error = [];
 		$args = (array)$args;
 		$option = (array)$option;
 		self::$_error = array();

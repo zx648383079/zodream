@@ -337,7 +337,11 @@ class Query extends BaseQuery {
         }
         return current($result);
     }
-    
+
+    /**
+     * 
+     * @return bool|string|int
+     */
     public function scalar() {
         $result = $this->one();
         if (empty($result)) {

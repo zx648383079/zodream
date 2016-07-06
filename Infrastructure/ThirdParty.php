@@ -48,9 +48,9 @@ abstract class ThirdParty extends MagicObject {
     }
 
     protected function httpGet($url, $data = array()) {
-        if (ini_get("allow_url_fopen") == "1") {
+        /*if (ini_get("allow_url_fopen") == "1") {
             return file_get_contents(StringExpand::urlBindValue($url, $data));
-        }
+        }*/
         return $this->http->get($url, $data);
     }
 

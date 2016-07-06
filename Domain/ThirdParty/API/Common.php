@@ -2,7 +2,7 @@
 namespace Zodream\Domain\ThirdParty\API;
 
 use Zodream\Infrastructure\ThirdParty;
-class Microsoft extends ThirdParty {
+class Common extends ThirdParty {
 
     protected $apiMap = array(
         'weather' => array(
@@ -55,6 +55,31 @@ class Microsoft extends ThirdParty {
                 'muti',  //1:返回多行完整的信息， 0:只返回一行信息。 不填默认返回多行。
                 'order'   //desc：按时间由新到旧排列， asc：按时间由旧到新排列。 不填默认返回倒序（大小写不敏感） 
             )
+        ),
+        'exchange' => array(
+            'http://apis.baidu.com/apistore/currencyservice/currency',
+            array(
+                '#fromCurrency',
+                '#toCurrency',
+                '#amount'
+            )
         )
     );
+
+
+    /**
+     * 汇率查询
+     * @param string $from
+     * @param string $to
+     * @param int $amount
+     * @return array
+     */
+    public function exchange($from, $to, $amount = 1) {
+        $this->http->setHeader('apikey', $this->get('apikey'));
+        return $this->getJson('exchange', array(
+            'fromCurrency' => $from,
+            'toCurrency' => $to,
+            'amount' => $amount
+        ));
+    }
 }
