@@ -5,16 +5,62 @@ namespace Zodream\Domain;
 * 
 * @author Jason
 */
+use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
+use Zodream\Infrastructure\EventManager\Action;
 use Zodream\Infrastructure\MagicObject;
-use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\Request;
 
-abstract class Model {
-	protected $fillAble = array();
+abstract class Model extends MagicObject {
+
+	const BEFORE_SAVE = 'before save';
+	const AFTER_SAVE = 'after save';
+	const BEFORE_INSERT = 'before insert';
+	const AFTER_INSERT = 'after insert';
+	const BEFORE_UPDATE = 'before update';
+	const AFTER_UPDATE = 'after update';
 	
-	protected $table;
+	protected $errors = [];
+
+	/**
+	 * 过滤规则
+	 * @return array
+	 */
+	protected function rules() {
+		return [];
+	}
+
+	/**
+	 * 标签
+	 * @return array
+	 */
+	protected function labels() {
+		return [];
+	}
+
+	/**
+	 * 行为
+	 * @return array
+	 */
+	protected function behaviors() {
+		return [];
+	}
+
+	/**
+	 * 表名
+	 * @var string
+	 */
+	public static $table;
+
+	/**
+	 * 主键
+	 * @var string
+	 */
+	protected $primaryKey = [
+		'id'
+	];
 
 	public function setTable($table) {
 		$this->command->setTable($table);
@@ -27,30 +73,145 @@ abstract class Model {
 	
 	public function __construct() {
 		$this->command = Command::getInstance();
-		$this->command->setTable($this->table);
+		$this->command->setTable(self::$table);
+	}
+	
+	public function load($data = null, $key = null) {
+		if (is_string($data)) {
+			$key = $data;
+		}
+		if (!is_array($data)) {
+			$data = Request::post($key);
+		}
+		if (empty($data)) {
+			return false;
+		}
+		$this->set($data);
+		return true;
+	}
+
+	public function set($key, $value = null){
+		if (empty($key)) {
+			return $this;
+		}
+		if (!is_array($key)) {
+			$key = [$key => $value];
+		}
+		$keys = array_keys($this->rules());
+		$keys = array_merge($keys, $this->primaryKey);
+		foreach ($key as $k => $item) {
+			if (property_exists($this, $k)) {
+				$this->$k = $item;
+				continue;
+			}
+			if (in_array($k, $keys)) {
+				$this->_data[$k] = $item;
+			}
+		}
+		return $this;
+	}
+
+	public function get($key = null, $default = null){
+		if (is_null($key)) {
+			return $this->_data;
+		}
+		if ($this->has($key)) {
+			return $this->_data[$key];
+		}
+		return $default;
 	}
 
 	/**
-	 * 填充数据 自动识别添加或修改
-	 * 添加 有一个数组参数 或 多个 非数组参数（与fillAble字段对应）
-	 * 修改 有两个参数 第一个为数组 第二个为条件,如果第二个参数是数字，则为id
-	 * 关联数组参数不需要一一对应，自东根据 fillAble 取需要的
-	 * @return int
+	 * @param string $key
+	 * @return string
 	 */
-	public function fill() {
-		if (func_num_args() === 0) {
+	public function getLabel($key) {
+		$labels = $this->labels();
+		if (array_key_exists($key, $labels)) {
+			return $labels[$key];
+		}
+		return null;
+	}
+	
+	public function save() {
+		$this->runBehavior(self::BEFORE_SAVE);
+		if ($this->has($this->primaryKey)) {
+			$row = $this->update();
+		} else {
+			$row = $this->insert();
+		}
+		$this->runBehavior(self::BEFORE_SAVE);
+		return $row;
+	}
+
+	protected function runBehavior($key) {
+		if (empty($key)) {
+			return;
+		}
+		$behaviors = $this->behaviors();
+		if (!array_key_exists($key, $behaviors)) {
+			return;
+		}
+		if (!is_array($behaviors[$key])) {
+			$behaviors[$key] = [$behaviors[$key]];
+		}
+		foreach ($behaviors[$key] as $item) {
+			(new Action($item))->run($this);
+		}
+	}
+	
+	protected function validate() {
+		DataFilter::validate($this->get(), $this->rules());
+		$this->errors = DataFilter::getError();
+		foreach ($this->rules() as $key => $item) {
+			if (method_exists($this, $item)) {
+				$this->$item($this->get($key));
+			}
+		}
+		return empty($this->errors);
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $link
+	 * @param string $key
+	 * @return array
+	 */
+	public function hasOne($table, $link, $key = null) {
+		if (!is_null($key)) {
+			$key = $link;
+			$link = 'id';
+		}
+		return (new Query())
+			->from($table)
+			->where([$link => $this->get($key)])
+			->one();
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $link
+	 * @param string $key
+	 * @return array
+	 */
+	public function hasMany($table, $link, $key) {
+		return (new Query())
+			->from($table)
+			->where([$link => $this->get($key)])
+			->all();
+	}
+
+	public function insert() {
+		if (!$this->validate()) {
 			return false;
 		}
-		$args = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
-		$data = ArrayExpand::combine($this->fillAble, $args, false);
-		if (func_num_args() == 1 || !is_array(func_get_arg(0))) {
-			return $this->add($data);
+		$this->runBehavior(self::BEFORE_INSERT);
+		$row = $this->add($this->get());
+		if (!empty($row)) {
+			$this->set('id', $row);
 		}
-		$param = func_get_arg(1);
-		if (is_numeric($param)) {
-			$param = 'id = '.$param;
-		}
-		return $this->update($data, $param);
+		$this->runBehavior(self::AFTER_INSERT);
+		return $row;
 	}
 	
 	/**
@@ -63,7 +224,9 @@ abstract class Model {
 	 */
 	public function add(array $addData) {
 		$addFields = implode('`,`', array_keys($addData));
-		return $this->command->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), array_values($addData));
+		return $this->command
+			->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), 
+				array_values($addData));
 	}
 
 	public function addValues(array $columns, array $values = null) {
@@ -102,36 +265,33 @@ abstract class Model {
 	/**
 	 * 修改记录
 	 *
-	 * @param array|string $param 条件 默认使用AND 连接
-	 * @param array $updateData 需要修改的内容
+	 * @param array|string $where 条件 默认使用AND 连接
+	 * @param array $args 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-	public function update(array $updateData, $param) {
-		$setData = '';
+	public function update($where = null, $args = null) {
+		if (is_null($where)) {
+			$where = [$this->primaryKey[0] => $this->get($this->primaryKey[0])];
+		}
+		if (is_array($args)) {
+			$this->set($args);
+		}
+		if (!$this->validate()) {
+			return false;
+		}
+		$this->runBehavior(self::BEFORE_UPDATE);
+		$data = [];
 		$parameters = array();
-		foreach ($updateData as $key => $value) {
-			if (is_numeric($key)) {
-				$setData .= $value .',';
-				continue;
-			}
-			$setData .= "`$key` = ?,";
+		foreach ($this->get() as $key => $value) {
+			$data[] = ["`$key` = ?"];
 			$parameters[] = $value;
 		}
-		$setData = substr($setData, 0, -1);
-		return $this->command->update($setData, $this->getQuery(
+		$row = $this->command->update(implode(',', $data), $this->getQuery(
 			array(
-				'where' => $param
+				'where' => $where
 			)), $parameters);
-	}
-
-	/**
-	 * 更具id 修改记录
-	 * @param string|integer $id
-	 * @param array $data
-	 * @return int
-	 */
-	public function updateById($id, array $data) {
-		return $this->update($data, 'id = '.intval($id));
+		$this->runBehavior(self::AFTER_UPDATE);
+		return $row;
 	}
 	 
 	/**
@@ -196,30 +356,22 @@ abstract class Model {
 	 * @param array $parameters
 	 * @return array ,
 	 */
-	public function findOne($param, $field = '*', $parameters = array()) {
-		$sql = null;
-		if (!is_array($param) || !array_key_exists('where', $param)) {
-			$sql = $this->getQuery(array(
-				'where' => $param,
-				'limit' => 1
-			));
-		} else {
-			$param['limit'] = 1;
-			$sql = $this->getQuery($param);
+	public static function findOne($param, $field = '*', $parameters = array()) {
+		$model = new static;
+		if (is_numeric($param)) {
+			$param = [$model->primaryKey[0] => $param];
 		}
-		$result = $this->command->select($sql, $this->getField($field), $parameters);
-		return current($result);
-	}
-	
-	/**
-	 * 根据id 查找值
-	 * @param string|integer $id
-	 * @param string $field
-	 * @return array
-	 */
-	public function findById($id, $field = '*') {
-		$result = $this->command->select('WHERE id = '.intval($id).' LIMIT 1', $this->getField($field));
-		return current($result);
+		if (!array_key_exists('where', $param)) {
+			$param = [
+				'where' => $param
+			];
+		}
+		$model->set(static::find()
+			->load($param)
+			->select($field)
+			->addParam($parameters)
+			->one());
+		return $model;
 	}
 
 	/**
@@ -229,16 +381,12 @@ abstract class Model {
 	 * @param array $parameters
 	 * @return int 返回影响的行数,
 	 */
-	public function delete($where, $parameters = array()) {
-		return $this->command->delete($this->getQuery(['where' => $where]), $parameters);
-	}
-
-	/** 根据id删除数据
-	 * @param string|integer $id
-	 * @return int
-	 */
-	public function deleteById($id) {
-		return $this->delete('id = '.intval($id));
+	public function delete($where = null, $parameters = array()) {
+		if (is_null($where)) {
+			$where = [$this->primaryKey[0] => $this->get($this->primaryKey[0])];
+		}
+		return $this->command
+			->delete($this->getQuery(['where' => $where]), $parameters);
 	}
 
 	/**
@@ -248,21 +396,38 @@ abstract class Model {
 	 *
 	 * @return Query 返回查询结果,
 	 */
-	public function find() {
-		return new Query();
+	public static function find() {
+		return (new Query())->from(static::$table);
 	}
 
+	/**
+	 * @param array $param
+	 * @param string $field
+	 * @param array $parameters
+	 * @return static[]
+	 */
 	public function findAll($param = array(), $field = '*', $parameters = array()) {
-		if (is_array($param) && 
-			!array_key_exists('where', $param) &&
+		if (!is_array($param) ||
+			(!array_key_exists('where', $param) &&
 			!array_key_exists('group', $param) &&
 			!array_key_exists('order', $param) &&
-			!array_key_exists('having', $param) ) {
+			!array_key_exists('having', $param)) ) {
 			$param = array(
 				'where' => $param
 			);
 		}
-		return $this->command->select($this->getQuery($param), $this->getField($field), $parameters);
+		$data = static::find()
+			->load($param)
+			->select($field)
+			->addParam($parameters)
+			->all();
+		$args = [];
+		foreach ($data as $item) {
+			$model = new static;
+			$model->set($item);
+			$args[] = $model;
+		}
+		return $args;
 	}
 	
 
@@ -297,7 +462,8 @@ abstract class Model {
 	 * @return string
 	 */
 	public function scalar($param, $filed = '*', $parameters = array()) {
-		$result = $this->command->select($this->getQuery($param), $this->getField($filed), $parameters);
+		$result = $this->command
+			->select($this->getQuery($param), $this->getField($filed), $parameters);
 		if (empty($result)) {
 			return false;
 		}
@@ -326,11 +492,28 @@ abstract class Model {
 		return implode($result, ',');
 	}
 
-	/**
-	 * 获取错误信息
-	 * @return string
-	 */
-	public function getError() {
-		return $this->command->getError();
+	
+	public function getError($key = null) {
+		if (empty($key)) {
+			return self::$_error;
+		}
+		if (!array_key_exists($key, self::$_error)) {
+			return array();
+		}
+		return self::$_error[$key];
+	}
+	
+	public function getFirstError($key) {
+		if (!array_key_exists($key, self::$_error)) {
+			return null;
+		}
+		return current(self::$_error[$key]);
+	}
+
+	protected function setError($key, $error) {
+		if (!array_key_exists($key, self::$_error)) {
+			self::$_error[$key] = array();
+		}
+		self::$_error[$key][] = $error;
 	}
 }
