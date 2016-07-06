@@ -9,25 +9,25 @@ namespace Zodream\Infrastructure\Database;
 
 class Query extends BaseQuery {
 
-    public $select = array();
+    protected $select = array();
 
-    public $from = array();
+    protected $from = array();
 
-    public $where = array();
+    protected $where = array();
 
-    public $join = array();
+    protected $join = array();
 
-    public $group = array();
+    protected $group = array();
 
-    public $having = array();
+    protected $having = array();
 
-    public $order = array();
+    protected $order = array();
 
-    public $union = array();
+    protected $union = array();
 
-    public $limit;
+    protected $limit;
 
-    public $offset;
+    protected $offset;
 
     protected $operators = array(
         '=', '<', '>', '<=', '>=', '<>', '!=',
@@ -127,6 +127,11 @@ class Query extends BaseQuery {
     }
 
     public function where($condition, $params = array()) {
+        $this->where = [$condition];
+        return $this->addParam($params);
+    }
+
+    public function whereMany($condition, $params = array()) {
         $this->where = array_merge($this->where, $this->addCondition($condition));
         return $this->addParam($params);
     }
@@ -223,6 +228,11 @@ class Query extends BaseQuery {
     }
 
     public function having($condition, $params = array()) {
+        $this->having = [$condition];
+        return $this->addParam($params);
+    }
+
+    public function havingMany($condition, $params = array()) {
         $this->having = array_merge($this->having, $this->addCondition($condition));
         return $this->addParam($params);
     }

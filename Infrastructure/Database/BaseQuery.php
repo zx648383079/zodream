@@ -39,6 +39,6 @@ abstract class BaseQuery extends MagicObject {
     }
 
     public function getError() {
-        return $this->command->getError();
+        return $this->command()->getError();
     }
 }
