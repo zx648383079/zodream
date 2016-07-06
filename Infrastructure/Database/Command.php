@@ -40,6 +40,9 @@ class Command {
     }
 
     public function addPrefix($table) {
+        if (strpos($table, '!') === 0) {
+            return substr($table, 1);
+        }
         if (empty($this->prefix)) {
             return $table;
         }

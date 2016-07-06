@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Infrastructure\Database;
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -53,12 +55,12 @@ class Query extends BaseQuery {
         'limit',
         'offset'
     );
-    
+
     public function __construct($args = array()) {
         $this->load($args);
     }
 
-    
+
 
     public function load(array $args) {
         foreach ($args as $key => $item) {
@@ -183,9 +185,17 @@ class Query extends BaseQuery {
     }
 
     public function addJoin($args, $on = '', $tag = 'left') {
+        if (is_array($on)) {
+            if (count($on) == 2) {
+                $on = $on[0].' = '.$on[1];
+            } else {
+                list($key, $value) = ArrayExpand::split($on);
+                $on = $key.' = '.$value;
+            }
+        }
         $tag = strtoupper($tag);
         if (!is_array($args)) {
-            $this->join[] = array( $tag.' JOIN', $args, $on);
+            $this->join[] = array( $tag.' JOIN', $this->addPrefix($args), $on);
             return;
         }
         if ($args[0] instanceof Query) {
@@ -252,7 +262,7 @@ class Query extends BaseQuery {
         );
         return $this->addParam($params);
     }
-    
+
     public function order($args) {
         if (!is_array($args)) {
             $args = func_get_args();
@@ -324,7 +334,7 @@ class Query extends BaseQuery {
         $this->getLimit().
         $this->getOffset();
     }
-    
+
     /**
      * @param bool $isArray
      * @return array|object
@@ -349,7 +359,7 @@ class Query extends BaseQuery {
     }
 
     /**
-     * 
+     *
      * @return bool|string|int
      */
     public function scalar() {
@@ -451,7 +461,10 @@ class Query extends BaseQuery {
         if (strpos($sql, 'OR') === 1) {
             return substr($sql, 3);
         }
-        return substr($sql, 4);
+        if (strpos($sql, 'AND') === 1) {
+            return substr($sql, 4);
+        }
+        return $sql;
     }
 
     /**
@@ -465,6 +478,9 @@ class Query extends BaseQuery {
         }
         if (!is_array($arg)) {
             return null;
+        }
+        if (ArrayExpand::isAssoc($arg)) {
+            return $this->getCondition($arg);
         }
         // [[], 'or']
         if (is_array($arg[0])) {
@@ -570,8 +586,11 @@ class Query extends BaseQuery {
         if (('is' == $operator || 'is not' == $operator) && is_null($value)) {
             return 'null';
         }
-        if (('in' == $operator || 'not in' == $operator) && is_array($value)) {
-            return "('".implode("', '", $value). "')";
+        if (('in' == $operator || 'not in' == $operator)) {
+            if (is_array($value)) {
+                $value = "'".implode("', '", $value)."'";
+            }
+            return '('.$value. ')';
         }
         // [a, int]
         if (is_array($value)) {
@@ -600,6 +619,9 @@ class Query extends BaseQuery {
         // 表内字段关联
         if (strpos($value, '@') === 0) {
             return substr($value, 1);
+        }
+        if (is_numeric($value)) {
+            return $value;
         }
         return "'{$value}'";
     }
@@ -716,6 +738,6 @@ class Query extends BaseQuery {
         }
         return ' OFFSET '.intval($this->offset);
     }
-    
-    
+
+
 }

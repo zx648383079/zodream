@@ -246,6 +246,25 @@ class ArrayExpand {
 	}
 
 	/**
+	 * 取关联数组的第 n 个的键值
+	 * @param array $args
+	 * @param int $index
+	 * @return array
+	 */
+	public static function split(array $args, $index = 0) {
+		if (count($args) <= $index) {
+			return [null, nulll];
+		}
+		$i = 0;
+		foreach ($args as $key => $item) {
+			if ($i == $index) {
+				return [$key, $item];
+			}
+			$i ++ ;
+		}
+	}
+
+	/**
 	 * 把数组的值的首字母大写
 	 * @param array $arguments
 	 * @return array
