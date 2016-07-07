@@ -22,7 +22,7 @@ class Factory {
         if (!array_key_exists($key, static::$_instance)) {
             $class = Config::getValue($key, $default);
             if (is_array($class)) {
-                $class = $class['driver'] ?? current($class);
+                $class = $class['driver'] ?: current($class);
             }
             if (!class_exists($class)) {
                 Error::out($class.'CLASS IS NOT EXCITE!', __FILE__, __LINE__);

@@ -17,14 +17,22 @@ class Mysql extends Database {
 		if (empty($this->configs)) {
 			die ('Mysql host is not set');
 		}
-		$this->driver = mysql_connect(
-				$this->configs['host']. ':'. $this->configs['port'], 
-				$this->configs['user'], 
+		if ($this->configs['persistent'] === true) {
+			$this->driver = mysql_pconnect(
+				$this->configs['host']. ':'. $this->configs['port'],
+				$this->configs['user'],
 				$this->configs['password']
-		)
-		or die('There was a problem connecting to the database');
+			) or die('There was a problem connecting to the database');;
+		} else {
+			$this->driver = mysql_connect(
+				$this->configs['host'] . ':' . $this->configs['port'],
+				$this->configs['user'],
+				$this->configs['password']
+			) or die('There was a problem connecting to the database');
+		}
+		
 		mysql_select_db($this->configs['database'], $this->driver) 
-		or die ("Can\'t use {$this->configs['database']} : " . mysql_error());
+		or die ("Can't use {$this->configs['database']} : " . mysql_error());
 		if (isset($this->configs['encoding'])) {
 			mysql_query('SET NAMES '.$this->configs['encoding'], $this->driver);
 		}
@@ -106,6 +114,7 @@ class Mysql extends Database {
 			mysql_free_result($this->result);
 		}
 		mysql_close($this->driver);
+		parent::close();
 	}
 	
 	public function getError() {

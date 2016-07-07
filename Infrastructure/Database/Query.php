@@ -1,13 +1,12 @@
 <?php
 namespace Zodream\Infrastructure\Database;
-use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
-
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/3/19
  * Time: 10:30
  */
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class Query extends BaseQuery {
 

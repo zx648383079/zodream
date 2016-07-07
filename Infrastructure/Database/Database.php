@@ -31,13 +31,14 @@ abstract class Database {
 	
 	
 	protected $configs = array(
-			'host'     => 'localhost',                //服务器
-			'port'     => '3306',						//端口
-			'database' => 'test',				//数据库
-			'user'     => 'root',						//账号
-			'password' => '',					//密码
-			'prefix'   => '',					//前缀
-			'encoding' => 'utf8'					//编码
+		'host'     => 'localhost',                //服务器
+		'port'     => '3306',						//端口
+		'database' => 'test',				//数据库
+		'user'     => 'root',						//账号
+		'password' => '',					//密码
+		'prefix'   => '',					//前缀
+		'encoding' => 'utf8',					//编码
+		'persistent' => false                   //使用持久化连接
 	);
 	 
 	//私有克隆
@@ -175,6 +176,10 @@ abstract class Database {
 	 */
 	public function getError() {
 		return $this->error;
+	}
+	
+	public function close() {
+		$this->driver = null;
 	}
 	
 }

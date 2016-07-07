@@ -24,11 +24,14 @@ class Pdo extends Database {
 			//$this->driver = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
 			//                     array(\PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES {$coding}"));
 			$this->driver = new \PDO (
-					'mysql:host='. $this->configs['host'].
-					';port='.$this->configs['port'].
-					';dbname='.$this->configs['database'], 
-					$this->configs['user'], 
-					$this->configs['password']
+				'mysql:host='. $this->configs['host'].
+				';port='.$this->configs['port'].
+				';dbname='.$this->configs['database'], 
+				$this->configs['user'], 
+				$this->configs['password'],
+				array(
+					\PDO::ATTR_PERSISTENT => $this->configs['persistent'] === true
+				)
 			);
 			$this->driver->exec ('SET NAMES '.$this->configs['encoding']);
 			$this->driver->query ( "SET character_set_client={$this->configs['encoding']}" );

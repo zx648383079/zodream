@@ -43,7 +43,8 @@ return array(
 		'prefix'   => 'zd_',					//前缀
 		'encoding' => 'utf8',					//编码
 		'allowCache' => true,                   //是否开启查询缓存
-		'cacheLife' => 3600                      //缓存时间
+		'cacheLife' => 3600,                      //缓存时间
+		'persistent' => false                   //使用持久化连接
 	),
 	'mail'   => array(
 		'driver'   => Zodream\Infrastructure\Mailer::class,

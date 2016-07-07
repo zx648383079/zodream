@@ -71,7 +71,7 @@ class Template extends  MagicObject {
         $values = [];
         foreach ($data as $key => $value) {
             $keys[] = $this->beginTag.$key.$this->endTag;
-            $values[] = $value;
+            $values[] = is_array($value) ? var_export($value, true) : $value;
         }
         return str_ireplace($keys, $values, $content);
     }

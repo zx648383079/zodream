@@ -178,13 +178,19 @@ class Generate {
 	 * @return bool
 	 */
 	public function makeModel($name, $table, array $columns) {
+		$data = $this->_modelFill($columns);
 		$data = array(
 			'model' => $name.APP_MODEL,
 			'table' => $table,
-			'data' => $this->_modelFill($columns),
+			'data' => $data[1],
+			'pk' => $data[0],
+			'labels' => $data[2],
 			'module' => APP_MODULE
 		);
-		return $this->_replace('Model', $data, APP_DIR.'/Domain/Model/'.APP_MODULE.'/'.$data['model'].'.php');
+		return $this->_replace(
+			'Model', $data,
+			APP_DIR.'/Domain/Model/'.APP_MODULE.'/'.$data['model'].'.php'
+		);
 	}
 
 	/**
@@ -215,7 +221,11 @@ class Generate {
 		if (!is_file($module)) {
 			$module = APP_DIR.'/Service/config/'.$module.'.php';
 		}
-		return $this->_replace('config', array('data' => var_export($configs, true)), APP_DIR.'/Service/config/'.$module.'.php');
+		return $this->_replace(
+			'config',
+			array('data' => $configs),
+			APP_DIR.'/Service/config/'.$module.'.php'
+		);
 	}
 
 	/**
@@ -348,17 +358,23 @@ class Generate {
 	 * @return string
 	 */
 	private function _modelFill(array $columns) {
-		$data = '';
+		$pk = $data = $labels = [];
 		foreach ($columns as $key => $value) {
+			$labels[$value['Field']] = ucwords(str_replace('_', ' ', $value['Field']));
+			if ($value['Key'] == 'PRI'
+				|| $value['Key'] == 'UNI') {
+				$pk[] = $value['Field'];
+			}
 			if ($value['Extra'] === 'auto_increment') {
 				continue;
 			}
-			$data .= "\t\t'{$value['Field']}'";
-			if ($key < count($columns)-1) {
-				$data .= ",\r\n";
-			}
+			$data[$value['Field']] = $this->getValidate($value);
 		}
-		return $data;
+		return [
+			$pk,
+			$data,
+			$labels
+		];
 	}
 
 	/**
@@ -396,18 +412,19 @@ class Generate {
 		if ($value['Type'] == 'text') {
 			return $result;
 		}
-		if(!preg_match('/(\b+)\((\d+)\)/', $value['Type'], $match)) {
+
+		if(!preg_match('#(.+?)\(([0-9]+)\)#', $value['Type'], $match)) {
 			return $result;
 		}
 		switch ($match[1]) {
 			case 'int':
-				$result .= ',int';
+				$result .= '|int';
 				break;
 			case 'varchar':
-				$result .= ',string:3-'.$match[2];
+				$result .= '|string:3-'.$match[2];
 				break;
 			case 'tinyint':
-				$result .= ',int:0-'.$match[2];
+				$result .= '|int:0-'.$match[2];
 				break;
 		}
 		return $result;

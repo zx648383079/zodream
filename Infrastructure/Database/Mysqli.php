@@ -26,8 +26,12 @@ class Mysqli extends Database {
 		if (empty($this->configs)) {
 			die ('Mysql host is not set');
 		}
+		$host = $this->configs['host'];
+		if ($this->configs['persistent'] === true) {
+			$host = 'p:'.$host;
+		}
 		$this->driver = new \mysqli(
-				$this->configs['host'], 
+				$host,
 				$this->configs['user'], 
 				$this->configs['password'], 
 				$this->configs['database'], 
@@ -167,6 +171,7 @@ class Mysqli extends Database {
 			mysqli_free_result($this->result);
 		}
 		mysqli_close($this->driver);
+		parent::close();
 	}
 	
 	public function getError() {

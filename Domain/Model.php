@@ -130,7 +130,7 @@ abstract class Model extends MagicObject {
 		if (array_key_exists($key, $labels)) {
 			return $labels[$key];
 		}
-		return null;
+		return ucwords(str_replace('_', ' ', $key));
 	}
 	
 	public function save() {

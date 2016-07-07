@@ -3,9 +3,15 @@ namespace Domain\Model\{module};
 
 use Domain\Model\Model;
 class {model} extends Model {
-	protected $table = '{table}';
-	
-	protected $fillAble = array(
-{data}
-	);
+	public static $table = '{table}';
+
+	protected $primaryKey = {pk};
+
+	protected function rules() {
+		return {data};
+	}
+
+	protected function labels() {
+		return {labels};
+	}
 }
