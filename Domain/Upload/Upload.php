@@ -20,7 +20,20 @@ class Upload extends MagicObject {
         }
         $this->folder = rtrim($file, '/\\'). '/';
     }
-    
+
+    /**
+     * 获取
+     * @param integer $key
+     * @param null $default
+     * @return BaseUpload
+     */
+    public function get($key = 0, $default = null) {
+        if (!array_key_exists($key, $this->_data)) {
+            return $default;
+        }
+        return $this->_data[$key];
+    }
+
     public function upload($key) {
         if (!array_key_exists($key, $_FILES)) {
             return false;

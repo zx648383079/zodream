@@ -2,6 +2,10 @@
 namespace Domain\Model\{module};
 
 use Domain\Model\Model;
+/**
+* Class {model}
+{property}
+*/
 class {model} extends Model {
 	public static $table = '{table}';
 

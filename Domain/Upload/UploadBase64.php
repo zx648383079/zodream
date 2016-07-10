@@ -27,7 +27,7 @@ class UploadBase64 extends BaseUpload {
      * @return bool
      */
     public function save($file) {
-        if (!$this->checkFolder(dirname($file))) {
+        if (!parent::save($file)) {
             return false;
         }
         if (!file_put_contents($file, $this->name) ||

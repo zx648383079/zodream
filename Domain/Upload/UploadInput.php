@@ -21,7 +21,7 @@ class UploadInput extends BaseUpload {
      * @return bool
      */
     public function save($file) {
-        if (!$this->checkFolder(dirname($file))) {
+        if (!parent::save($file)) {
             return false;
         }
         if (!$fileOpen = @fopen('php://input', 'rb')) {

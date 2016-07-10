@@ -16,6 +16,8 @@ abstract class BaseUpload {
 
     protected $size;
     
+    protected $file;
+    
     protected $error = null;
     
     protected $errorMap = [];
@@ -28,6 +30,14 @@ abstract class BaseUpload {
             $this->error = $error;
         }
         $this->error = $this->errorMap[$error] || $error;
+    }
+
+    /**
+     * 获取保存后的路径
+     * @return string
+     */
+    public function getFile() {
+        return $this->file;
     }
 
     public function getError() {
@@ -62,7 +72,13 @@ abstract class BaseUpload {
      * @param string $file
      * @return bool
      */
-    abstract public function save($file);
+    public function save($file) {
+        $this->file = $file;
+        if (!$this->checkFolder(dirname($file))) {
+            return false;
+        }
+        return true;
+    }
 
     public function getRandomName($template = null) {
         $randNum = rand(1, 1000000000) .''. rand(1, 1000000000); //如果是32位PHP ，PHP_INT_MAX 有限制报错 int 变为 float

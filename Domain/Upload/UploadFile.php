@@ -50,7 +50,7 @@ class UploadFile extends BaseUpload {
      * @return bool
      */
     public function save($file) {
-        if (!$this->checkFolder(dirname($file))) {
+        if (!parent::save($file)) {
             return false;
         }
         if (!move_uploaded_file($this->tempName, $file) || !is_file($file)) {

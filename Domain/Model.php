@@ -1,10 +1,10 @@
-<?php 
+<?php
 namespace Zodream\Domain;
 /**
-* 数据基类
-* 
-* @author Jason
-*/
+ * 数据基类
+ *
+ * @author Jason
+ */
 use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
@@ -21,7 +21,7 @@ abstract class Model extends MagicObject {
 	const AFTER_INSERT = 'after insert';
 	const BEFORE_UPDATE = 'before update';
 	const AFTER_UPDATE = 'after update';
-	
+
 	protected $errors = [];
 
 	/**
@@ -70,12 +70,12 @@ abstract class Model extends MagicObject {
 	 * @var Command
 	 */
 	protected $command;
-	
+
 	public function __construct() {
 		$this->command = Command::getInstance();
 		$this->command->setTable(self::$table);
 	}
-	
+
 	public function load($data = null, $key = null) {
 		if (is_string($data)) {
 			$key = $data;
@@ -97,16 +97,12 @@ abstract class Model extends MagicObject {
 		if (!is_array($key)) {
 			$key = [$key => $value];
 		}
-		$keys = array_keys($this->rules());
-		$keys = array_merge($keys, $this->primaryKey);
 		foreach ($key as $k => $item) {
 			if (property_exists($this, $k)) {
 				$this->$k = $item;
 				continue;
 			}
-			if (in_array($k, $keys)) {
-				$this->_data[$k] = $item;
-			}
+			$this->_data[$k] = $item;
 		}
 		return $this;
 	}
@@ -132,7 +128,7 @@ abstract class Model extends MagicObject {
 		}
 		return ucwords(str_replace('_', ' ', $key));
 	}
-	
+
 	public function save() {
 		$this->runBehavior(self::BEFORE_SAVE);
 		if ($this->has($this->primaryKey)) {
@@ -159,16 +155,32 @@ abstract class Model extends MagicObject {
 			(new Action($item))->run($this);
 		}
 	}
-	
-	protected function validate() {
-		DataFilter::validate($this->get(), $this->rules());
+
+	protected function validate($rules = array()) {
+		if (empty($rules)) {
+			$rules = $this->rules();
+		}
+		DataFilter::validate($this->get(), $rules);
 		$this->errors = DataFilter::getError();
-		foreach ($this->rules() as $key => $item) {
+		foreach ($rules as $key => $item) {
 			if (method_exists($this, $item)) {
 				$this->$item($this->get($key));
 			}
 		}
 		return empty($this->errors);
+	}
+
+
+	protected function getValues() {
+		$keys = array_keys($this->rules());
+		$keys = array_merge($keys, $this->primaryKey);
+		$data = [];
+		foreach ($this->get() as $k => $item) {
+			if (in_array($k, $keys)) {
+				$data[$k] = $item;
+			}
+		}
+		return $data;
 	}
 
 	/**
@@ -206,14 +218,14 @@ abstract class Model extends MagicObject {
 			return false;
 		}
 		$this->runBehavior(self::BEFORE_INSERT);
-		$row = $this->add($this->get());
+		$row = $this->add($this->getValues());
 		if (!empty($row)) {
 			$this->set('id', $row);
 		}
 		$this->runBehavior(self::AFTER_INSERT);
 		return $row;
 	}
-	
+
 	/**
 	 * 新增记录
 	 *
@@ -225,7 +237,7 @@ abstract class Model extends MagicObject {
 	public function add(array $addData) {
 		$addFields = implode('`,`', array_keys($addData));
 		return $this->command
-			->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)), 
+			->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)),
 				array_values($addData));
 	}
 
@@ -261,7 +273,7 @@ abstract class Model extends MagicObject {
 		}
 		return $this->command->insert('`'.implode('`,`', $columns).'`', implode('),(', $results));
 	}
-	 
+
 	/**
 	 * 修改记录
 	 *
@@ -282,7 +294,7 @@ abstract class Model extends MagicObject {
 		$this->runBehavior(self::BEFORE_UPDATE);
 		$data = [];
 		$parameters = array();
-		foreach ($this->get() as $key => $value) {
+		foreach ($this->getValues() as $key => $value) {
 			$data[] = ["`$key` = ?"];
 			$parameters[] = $value;
 		}
@@ -293,7 +305,7 @@ abstract class Model extends MagicObject {
 		$this->runBehavior(self::AFTER_UPDATE);
 		return $row;
 	}
-	 
+
 	/**
 	 * 设置bool值
 	 *
@@ -309,7 +321,7 @@ abstract class Model extends MagicObject {
 					'where' => $where
 				)));
 	}
-	
+
 	/**
 	 * int加减
 	 *
@@ -327,11 +339,11 @@ abstract class Model extends MagicObject {
 				$sql[] = "`$key` = `$key` ".$item;
 			}
 		}
-		return $this->command->update(implode(',', $sql), 
+		return $this->command->update(implode(',', $sql),
 			$this->getQuery(
-			array(
-				'where' => $where
-			)));
+				array(
+					'where' => $where
+				)));
 	}
 
 	/**
@@ -354,7 +366,7 @@ abstract class Model extends MagicObject {
 	 * @param array|string $param 条件
 	 * @param string $field
 	 * @param array $parameters
-	 * @return array ,
+	 * @return static
 	 */
 	public static function findOne($param, $field = '*', $parameters = array()) {
 		$model = new static;
@@ -366,17 +378,21 @@ abstract class Model extends MagicObject {
 				'where' => $param
 			];
 		}
-		$model->set(static::find()
+		$data = static::find()
 			->load($param)
 			->select($field)
 			->addParam($parameters)
-			->one());
+			->one();
+		if (empty($data)) {
+			return null;
+		}
+		$model->set($data);
 		return $model;
 	}
 
 	/**
 	 * 删除数据
-	 * 
+	 *
 	 * @param string|array $where 条件
 	 * @param array $parameters
 	 * @return int 返回影响的行数,
@@ -409,9 +425,9 @@ abstract class Model extends MagicObject {
 	public function findAll($param = array(), $field = '*', $parameters = array()) {
 		if (!is_array($param) ||
 			(!array_key_exists('where', $param) &&
-			!array_key_exists('group', $param) &&
-			!array_key_exists('order', $param) &&
-			!array_key_exists('having', $param)) ) {
+				!array_key_exists('group', $param) &&
+				!array_key_exists('order', $param) &&
+				!array_key_exists('having', $param)) ) {
 			$param = array(
 				'where' => $param
 			);
@@ -429,7 +445,7 @@ abstract class Model extends MagicObject {
 		}
 		return $args;
 	}
-	
+
 
 	/**
 	 * 总记录
@@ -492,28 +508,32 @@ abstract class Model extends MagicObject {
 		return implode($result, ',');
 	}
 
-	
+
 	public function getError($key = null) {
 		if (empty($key)) {
-			return self::$_error;
+			return $this->errors;
 		}
-		if (!array_key_exists($key, self::$_error)) {
+		if (!array_key_exists($key, $this->errors)) {
 			return array();
 		}
-		return self::$_error[$key];
-	}
-	
-	public function getFirstError($key) {
-		if (!array_key_exists($key, self::$_error)) {
-			return null;
-		}
-		return current(self::$_error[$key]);
+		return $this->errors[$key];
 	}
 
-	protected function setError($key, $error) {
-		if (!array_key_exists($key, self::$_error)) {
-			self::$_error[$key] = array();
+	public function getFirstError($key) {
+		if (!array_key_exists($key, $this->errors)) {
+			return null;
 		}
-		self::$_error[$key][] = $error;
+		return current($this->errors[$key]);
+	}
+
+	protected function setError($key, $error = null) {
+		if (is_array($key) && is_null($error)) {
+			$this->errors = array_merge($this->errors, $key);
+			return;
+		}
+		if (!array_key_exists($key, $this->errors)) {
+			$this->errors[$key] = array();
+		}
+		$this->errors[$key][] = $error;
 	}
 }

@@ -185,6 +185,7 @@ class Generate {
 			'data' => $data[1],
 			'pk' => $data[0],
 			'labels' => $data[2],
+			'property' => $data[3],
 			'module' => APP_MODULE
 		);
 		return $this->_replace(
@@ -358,9 +359,13 @@ class Generate {
 	 * @return string
 	 */
 	private function _modelFill(array $columns) {
-		$pk = $data = $labels = [];
+		$pk = $data = $labels = $property = [];
 		foreach ($columns as $key => $value) {
 			$labels[$value['Field']] = ucwords(str_replace('_', ' ', $value['Field']));
+			$property[] = '* @property '.
+				(stripos($value['Type'], 'int') !== false ||
+				stripos($value['Type'], 'bool') !== false ?
+					'integer' : 'string').' $'.$value['Field'];
 			if ($value['Key'] == 'PRI'
 				|| $value['Key'] == 'UNI') {
 				$pk[] = $value['Field'];
@@ -373,7 +378,8 @@ class Generate {
 		return [
 			$pk,
 			$data,
-			$labels
+			$labels,
+			implode("\r\n", $property)
 		];
 	}
 
@@ -420,11 +426,13 @@ class Generate {
 			case 'int':
 				$result .= '|int';
 				break;
-			case 'varchar':
-				$result .= '|string:3-'.$match[2];
-				break;
 			case 'tinyint':
 				$result .= '|int:0-'.$match[2];
+				break;
+			case 'char':
+			case 'varchar':
+			default:
+				$result .= '|string:3-'.$match[2];
 				break;
 		}
 		return $result;
