@@ -30,14 +30,15 @@ class Pdo extends Database {
 				$this->configs['user'], 
 				$this->configs['password'],
 				array(
-					\PDO::ATTR_PERSISTENT => $this->configs['persistent'] === true
+					\PDO::ATTR_PERSISTENT => $this->configs['persistent'] === true,
+					\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, //默认是PDO::ERRMODE_SILENT, 0, (忽略错误模式)
+    				\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // 默认是PDO::FETCH_BOTH, 4
 				)
 			);
 			$this->driver->exec ('SET NAMES '.$this->configs['encoding']);
 			$this->driver->query ( "SET character_set_client={$this->configs['encoding']}" );
 			$this->driver->query ( "SET character_set_connection={$this->configs['encoding']}" );
 			$this->driver->query ( "SET character_set_results={$this->configs['encoding']}" );
-			$this->driver->setAttribute (\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 		} catch (\PDOException $ex) {
 			Error::out($ex->getMessage(), __FILE__, __LINE__);
 		}
@@ -84,6 +85,16 @@ class Pdo extends Database {
 	}
 
 	/**
+	 * 加上引号
+	 * @param string $arg
+	 * @param int $parameterType
+	 * @return string
+	 */
+	public function quote($arg, $parameterType = \PDO::PARAM_STR) {
+		return $this->driver->quote($arg, $parameterType);
+	}
+
+	/**
 	 * 执行SQL语句
 	 *
 	 * @access public
@@ -101,7 +112,7 @@ class Pdo extends Database {
 				$this->prepare($sql);
 				$this->bind($parameters);
 			}
-			$this ->result->execute();
+			$this->result->execute();
 		} catch (\PDOException  $ex) {
 			$this->error = $ex->getMessage();
 		}
@@ -133,6 +144,29 @@ class Pdo extends Database {
 			
 		}
 		return $result;
+	}
+
+	public function row($isArray = true) {
+		if (is_bool($isArray)) {
+			$isArray = $isArray ? \PDO::FETCH_ASSOC : \PDO::FETCH_CLASS;
+		}
+		return $this->result->fetch($isArray);
+	}
+
+	/**
+	 * @param int $index
+	 * @return string
+	 */
+	public function column($index = 0) {
+		return $this->result->fetchColumn($index);
+	}
+
+	public function next() {
+		$this->result->nextRowset();
+	}
+
+	public function columnCount() {
+		return $this->result->columnCount();
 	}
 
 	/**

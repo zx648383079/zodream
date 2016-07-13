@@ -1,12 +1,12 @@
 <?php 
-namespace Zodream\Domain;
+namespace Zodream\Domain\Attack;
 /**
- * 攻击
+ * 攻击基类
  *
  * @author Jason
  * @time 2015-12-1
  */
-class Attack {
+class BaseAttack {
 	
 	//preg_replace("/[errorpage]/e",@str_rot13('@nffreg($_CBFG[cntr]);'),"saft");
 	

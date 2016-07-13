@@ -409,7 +409,7 @@ abstract class Model extends MagicObject {
 	 * @param array $parameters
 	 * @return static[]
 	 */
-	public function findAll($param = array(), $field = '*', $parameters = array()) {
+	public static function findAll($param = array(), $field = '*', $parameters = array()) {
 		if (!is_array($param) ||
 			(!array_key_exists('where', $param) &&
 				!array_key_exists('group', $param) &&
@@ -444,7 +444,7 @@ abstract class Model extends MagicObject {
 	 * @param array $parameters
 	 * @return int 返回总数,
 	 */
-	public function count(array $param = array(), $field = 'id', $parameters = array()) {
+	public static function count(array $param = array(), $field = 'id', $parameters = array()) {
 		if (!array_key_exists('where', $param)) {
 			$param = array(
 				'where' => $param

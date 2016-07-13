@@ -3,7 +3,7 @@ namespace Zodream\Domain\Generate;
 
 
 use Zodream\Domain\Authentication\Binary;
-use Zodream\Domain\Model;
+use Zodream\Domain\Model\Model;
 use Zodream\Domain\Response\Redirect;
 use Zodream\Domain\Response\ResponseResult;
 use Zodream\Infrastructure\Config;
@@ -53,7 +53,7 @@ class Generate {
 		}
 		$mode = Request::get('mode', 0);
 		if (empty($mode)) {
-			exit('table:指定表,为空时表示所以表； mode:二进制标志1111，从左至右1代表视图、表单、模型、控制器！');
+			exit('table:指定表,为空时表示所以表； mode:二进制标志111，从左至右1代表视图、模型、控制器！');
 		}
 		set_time_limit(0);
 		echo '自动生成程序启动……<p/>';
@@ -121,9 +121,6 @@ class Generate {
 			$this->makeModel($name, $table, $columns);
 		}
 		if (Binary::judge(4, $mode)) {
-			$this->makeForm($name, $columns);
-		}
-		if (Binary::judge(8, $mode)) {
 			$this->makeView($name, $columns);
 		}
 		echo '<h3>Table ',$table,'执行成功！</h3><br>';
@@ -192,24 +189,6 @@ class Generate {
 			'Model', $data,
 			APP_DIR.'/Domain/Model/'.APP_MODULE.'/'.$data['model'].'.php'
 		);
-	}
-
-	/**
-	 * 生成表单模型
-	 * @param string $name
-	 * @param array $columns
-	 * @return bool
-	 */
-	public function makeForm($name, array $columns) {
-		list($column, $data) = $this->_formColumn($columns);
-		$data = array(
-			'model'  => $name.APP_MODEL,
-			'form'   => $name.APP_FORM,
-			'columns' => $column,
-			'data'   => $data,
-			'module' => APP_MODULE
-		);
-		return $this->_replace('Form', $data, APP_DIR.'/Domain/Form/'.APP_MODULE.'/'.$data['form'].'.php');
 	}
 
 	/**
@@ -381,33 +360,6 @@ class Generate {
 			$labels,
 			implode("\r\n", $property)
 		];
-	}
-
-	/**
-	 * 表单模型的列生成
-	 * @param array $columns
-	 * @return array
-	 */
-	private function _formColumn(array $columns) {
-		$column = $data = '';
-		foreach ($columns as $key => $value) {
-			if ($value['Extra'] === 'auto_increment') {
-				continue;
-			}
-			$column .= $value['Field'];
-			$validate = $this->getValidate($value);
-			if (!empty($value)) {
-				$data .= "			'{$value['Field']}' => '{$validate}'";
-			}
-			if ($key < count($columns)-1) {
-				$column .= ',';
-				$data .= ",\r\n";
-			}
-		}
-		return array(
-				$column,
-				$data
-		);
 	}
 
 	protected function getValidate($value) {
