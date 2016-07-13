@@ -6,33 +6,36 @@ namespace Zodream\Domain\Authentication;
  * @author Jason
  */
 use Zodream\Infrastructure\DomainObject\AuthObject;
+use Zodream\Infrastructure\DomainObject\UserObject;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
-class Auth extends MagicObject implements AuthObject {
-	use SingletonPattern;
-	protected function __construct() {
-		if (Factory::session()->has('user')) {
-			$this->set(Factory::session()->get('user'));
-			Roles::setRoles($this->get('roles', array()));
-		}
-	}
+class Auth implements AuthObject {
 
 	/**
-	 * 保存
+	 * @var bool|UserObject
 	 */
-	public function save() {
-		return Factory::session()->set('user', $this->_data);
+	protected static $identity = false;
+
+	/**
+	 * @param bool $refresh
+	 * @return bool|UserObject
+	 */
+	public static function getIdentity($refresh = false) {
+		if (static::$identity === false || $refresh) {
+			static::$identity = Factory::session()->get('user');
+		}
+		return static::$identity;
 	}
 
 	/**
 	 * 获取登录
-	 * @return bool|static
+	 * @return bool|UserObject
 	 */
 	public static function user() {
-		if (static::getInstance()->has()) {
-			return static::getInstance();
+		if (empty(static::getIdentity())) {
+			return static::$identity;
 		}
 		return false;
 	}
@@ -42,6 +45,6 @@ class Auth extends MagicObject implements AuthObject {
 	 * @return bool
 	 */
 	public static function guest() {
-		return !static::getInstance()->has();
+		return empty(static::getIdentity());
 	}
 }

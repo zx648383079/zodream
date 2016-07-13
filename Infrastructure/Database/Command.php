@@ -115,11 +115,20 @@ class Command {
 
     /**
      * 执行事务
-     * @param array $args
+     * @param array $args sql语句的数组
      * @return bool
      */
-    public function transaction($args = array()) { 
+    public function transaction($args) { 
         return $this->db->transaction($args);
+    }
+
+    /**
+     * 开始执行事务
+     * @return Database
+     */
+    public function beginTransaction() {
+        $this->db->begin();
+        return $this->db;
     }
 
     /**
@@ -130,7 +139,14 @@ class Command {
      * @return int
      */
     public function insert($columns, $tags, $parameters = array()) {
-        return $this->db->insert("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
+        if (!empty($columns) && strpos($columns, '(') === false) {
+            $columns = '('.$columns.')';
+        }
+        $tags = trim($tags);
+        if (strpos($tags, '(') !== 0) {
+            $tags = '('.$tags.')';
+        }
+        return $this->db->insert("INSERT INTO {$this->table} {$columns} VALUES {$tags}", $parameters);
     }
 
     /**
@@ -142,7 +158,14 @@ class Command {
      * @return int
      */
     public function insertOrUpdate($columns, $tags, $update, $parameters = array()) {
-        return $this->db->update("INSERT INTO {$this->table} ({$columns}) VALUES ({$tags}) ON DUPLICATE KEY UPDATE {$update}", $parameters);
+        if (!empty($columns) && strpos($columns, '(') === false) {
+            $columns = '('.$columns.')';
+        }
+        $tags = trim($tags);
+        if (strpos($tags, '(') !== 0) {
+            $tags = '('.$tags.')';
+        }
+        return $this->db->update("INSERT INTO {$this->table} {$columns} VALUES {$tags} ON DUPLICATE KEY UPDATE {$update}", $parameters);
     }
 
     /**
@@ -153,7 +176,14 @@ class Command {
      * @return int
      */
     public function insertOrReplace($columns, $tags, $parameters = array()) {
-        return $this->update("REPLACE INTO {$this->table} ({$columns}) VALUES ({$tags})", $parameters);
+        if (!empty($columns) && strpos($columns, '(') === false) {
+            $columns = '('.$columns.')';
+        }
+        $tags = trim($tags);
+        if (strpos($tags, '(') !== 0) {
+            $tags = '('.$tags.')';
+        }
+        return $this->update("REPLACE INTO {$this->table} {$columns} VALUES {$tags}", $parameters);
     }
 
     /**

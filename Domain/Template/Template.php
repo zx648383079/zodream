@@ -2,23 +2,33 @@
 namespace Zodream\Domain\Template;
 
 /**
- * 
- * 
-{name}
-{name.a}
-{name,hh}
+{>}         <?php
+{>css}
+{>js}
+{/>}        ?>
+{> a=b}     <?php a = b?>
+{| a==b}    <?php if (a==b):?>
+{+ a > c}   <?php elseif (a==b):?>
+{+}         <?php else:?>
+{-}         <?php endif;?>
+{~}         <?php for():?>
+{/~}        <?php endfor;?>
 
-{for:name}
-{for:name,value}
-{for:name,key,value}
-{for:name,key,value,length}
-{for:name,key,value,>=h}
-{/for}
+{name}      <?php echo name;?>
+{name.a}    <?php echo name[a];?>
+{name,hh}   <?php echo isset(name) ? name : hh;?>
 
-{name=qq?v}
-{name=qq?v:b}
+{for:name}                      <?php while(name):?>
+{for:name,value}                <?php foreach(name as value):?>
+{for:name,key=>value}           <?php foreach(name as key=>value):?>
+{for:name,key=>value,length}     <?php $i = 0; foreach(name as key=>value): $i ++; if ($i > length): break; endif;?>
+{for:name,key=>value,>=h}        <?php foreach(name as key=>value): if (key >=h):?>
+{/for}                           <?php endforeach;?>
 
-{if:name=qq}
+{name=qq?v}                     <?php name = qq ? qq : v;?>
+{name=qq?v:b}                   <?php name = qq ? v : b;?>
+
+{if:name=qq}                    <?php if (name = qq):?>
 {if:name=qq,hh}
 {if:name>qq,hh,gg}
 {/if}
@@ -32,69 +42,44 @@ namespace Zodream\Domain\Template;
 
 {extend:file,hhh}
 
-{name=value}
-{arg,...=value,...}
+{name=value}                <?php name = value;?>
+{arg,...=value,...}         <?php arg = value;. = .;?>
 
-' string
-t f bool
-0-9 int
-[] array
- *
- *
- */
-use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+' string                    ''
+t f bool                    true false
+0-9 int                     0-9
+[] array                    array()
+ **/
 
 class Template {
-	
 
-	
-	/**
-	 * 提取使用方法 {extend:file,hhh} 必须带 : 
-	 */
-	public function extractFunction() {
-		preg_replace_callback('/{([a-zA-Z0-9_]+):([^\{\}]*)}/is', array($this, '_functionCallback'), $subject);
+	protected $beginTag = '{';
+
+	protected $endTag = '}';
+
+	public function setTag($begin, $end) {
+		$this->beginTag = $begin;
+		$this->endTag = $end;
 	}
-	
-	private function _functionCallback($args) {
-		
+
+	public function make($content) {
+
 	}
-	
-	/**
-	 * 提取lambda表达式 {name=qq?v:b}
-	 */
-	public function extractLambda() {
-		preg_replace_callback('/{([^\{\}\?]+)\?([^\{\}\?]*)}/is', array($this, '_lambdaCallback'), $subject);
+
+	protected function replace($content) {
+		return preg_replace_callback(
+			'/'.$this->beginTag.'\s*([\s\S]+?)\s*'.$this->endTag.'/',
+			array($this, 'replaceCallback'), $content);
 	}
-	
-	private function _lambdaCallback($args) {
-		$values = explode(':', $args[2]);
+
+	protected function replaceCallback($match) {
+		$content = $match[1];
 	}
-	
-	/**
-	 * 提取赋值语句  {arg,...=value,...}
-	 */
-	public function extractAssign() {
-		preg_replace_callback('/{([^\{\}=:]+)=([^\{\}\?=:]*)}/is', array($this, '_assignCallback'), $subject);
+
+	public function makeFile($file) {
+		if (!is_file($file)) {
+			return false;
+		}
+		return $this->make(file_get_contents($file));
 	}
-	
-	private function _assignCallback($args) {
-		array_combine(explode(',', $args[1]), explode(',', $args[2]));
-		$this->set();
-	}
-	
-	/**
-	 * 提取 {name}
-	 * {name.a}
-	 * {name,hh}
-	 */
-	public function extractKey() {
-		preg_replace_callback('/{([^\{\}]+)}/is', array($this, '_keyCallback'), $subject);
-	}
-	
-	private function _keyCallback($args) {
-		$keys = explode(',', $args[1]);
-		return ArrayExpand::getChild($keys[0], $values, isset($keys[1]) ? $keys[1] : null);
-	}
-	
-	
 }

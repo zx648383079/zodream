@@ -109,7 +109,7 @@ abstract class Database {
 	 * @param array $args
 	 * @return bool
 	 */
-	public function transaction($args = array()) {
+	public function transaction($args) {
 		$this->begin();
 		try {
 			$this->commit($args);

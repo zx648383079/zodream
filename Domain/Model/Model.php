@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain;
+namespace Zodream\Domain\Model;
 /**
  * 数据基类
  *
@@ -8,6 +8,7 @@ namespace Zodream\Domain;
 use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
+use Zodream\Infrastructure\Database\Record;
 use Zodream\Infrastructure\EventManager\Action;
 use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
@@ -61,11 +62,6 @@ abstract class Model extends MagicObject {
 	protected $primaryKey = [
 		'id'
 	];
-
-	public function setTable($table) {
-		$this->command->setTable($table);
-		return $this;
-	}
 	/**
 	 * @var Command
 	 */
@@ -74,6 +70,11 @@ abstract class Model extends MagicObject {
 	public function __construct() {
 		$this->command = Command::getInstance();
 		$this->command->setTable(self::$table);
+		$this->init();
+	}
+	
+	public function init() {
+		
 	}
 
 	public function load($data = null, $key = null) {
@@ -115,6 +116,22 @@ abstract class Model extends MagicObject {
 			return $this->_data[$key];
 		}
 		return $default;
+	}
+
+	/**
+	 * @param string|array $key
+	 * @return bool
+	 */
+	public function has($key = null) {
+		if (!is_array($key)) {
+			return parent::has($key);
+		}
+		foreach ($key as $item) {
+			if (array_key_exists($item, $this->_data)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -170,13 +187,18 @@ abstract class Model extends MagicObject {
 		return empty($this->errors);
 	}
 
-
-	protected function getValues() {
+	/**
+	 * @param bool $all 是否包含主键唯一等字段的值
+	 * @return array
+	 */
+	protected function getValues($all = true) {
 		$keys = array_keys($this->rules());
-		$keys = array_merge($keys, $this->primaryKey);
+		if ($all) {
+			$keys = array_merge($keys, $this->primaryKey);
+		}
 		$data = [];
 		foreach ($this->get() as $k => $item) {
-			if (in_array($k, $keys)) {
+			if (in_array($k, $keys) && !property_exists($this, $k)) {
 				$data[$k] = $item;
 			}
 		}
@@ -225,6 +247,10 @@ abstract class Model extends MagicObject {
 		$this->runBehavior(self::AFTER_INSERT);
 		return $row;
 	}
+	
+	protected function getRecord() {
+		return (new Record())->from(static::$table);
+	}
 
 	/**
 	 * 新增记录
@@ -235,43 +261,12 @@ abstract class Model extends MagicObject {
 	 * @return int 返回最后插入的ID,
 	 */
 	public function add(array $addData) {
-		$addFields = implode('`,`', array_keys($addData));
-		return $this->command
-			->insert("`{$addFields}`", StringExpand::repeat('?', count($addData)),
-				array_values($addData));
+		return $this->getRecord()->load($addData)->insert();
 	}
 
 	public function addValues(array $columns, array $values = null) {
-		$results = array();
-		if (is_null($values)) {
-			$values = array_values($columns);
-			$columns = array_keys($columns);
-			$count = 1;
-			foreach ($values as &$item) {
-				if (!is_array($item)) {
-					$item = [$item];
-				}
-				if (count($item) > $count) {
-					$count = count($item);
-				}
-			}
-			for ($i = 0; $i < $count; $i ++) {
-				$result = [];
-				foreach ($values as $item) {
-					if (count($item) > $i) {
-						$result[] = $item[$i];
-						continue;
-					}
-					$result[] = $item[count($item) - 1];
-				}
-				$results[] = "'".implode("','", $result)."'";;
-			}
-		} else {
-			foreach ($values as $value) {
-				$results[] = "'".implode("','", $value)."'";
-			}
-		}
-		return $this->command->insert('`'.implode('`,`', $columns).'`', implode('),(', $results));
+		return $this->getRecord()
+			->batchInsert($columns, $values);
 	}
 
 	/**
@@ -292,16 +287,10 @@ abstract class Model extends MagicObject {
 			return false;
 		}
 		$this->runBehavior(self::BEFORE_UPDATE);
-		$data = [];
-		$parameters = array();
-		foreach ($this->getValues() as $key => $value) {
-			$data[] = ["`$key` = ?"];
-			$parameters[] = $value;
-		}
-		$row = $this->command->update(implode(',', $data), $this->getQuery(
-			array(
-				'where' => $where
-			)), $parameters);
+		$row = $this->getRecord()
+			->load($args)
+			->whereMany($where)
+			->update();
 		$this->runBehavior(self::AFTER_UPDATE);
 		return $row;
 	}
@@ -314,12 +303,9 @@ abstract class Model extends MagicObject {
 	 * @return int
 	 */
 	public function updateBool($filed, $where) {
-		return $this->command->update(
-			"{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END",
-			$this->getQuery(
-				array(
-					'where' => $where
-				)));
+		return $this->getRecord()
+			->set(null, "{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END")
+			->whereMany($where)->update();
 	}
 
 	/**
@@ -339,11 +325,10 @@ abstract class Model extends MagicObject {
 				$sql[] = "`$key` = `$key` ".$item;
 			}
 		}
-		return $this->command->update(implode(',', $sql),
-			$this->getQuery(
-				array(
-					'where' => $where
-				)));
+		return $this->getRecord()
+			->set($sql)
+			->whereMany($where)
+			->update();
 	}
 
 	/**
@@ -401,8 +386,10 @@ abstract class Model extends MagicObject {
 		if (is_null($where)) {
 			$where = [$this->primaryKey[0] => $this->get($this->primaryKey[0])];
 		}
-		return $this->command
-			->delete($this->getQuery(['where' => $where]), $parameters);
+		return $this->getRecord()
+			->whereMany($where)
+			->addParam($parameters)
+			->delete();
 	}
 
 	/**
@@ -457,57 +444,16 @@ abstract class Model extends MagicObject {
 	 * @param array $parameters
 	 * @return int 返回总数,
 	 */
-	public function count($param = array(), $field = 'id', $parameters = array()) {
+	public function count(array $param = array(), $field = 'id', $parameters = array()) {
 		if (!array_key_exists('where', $param)) {
 			$param = array(
 				'where' => $param
 			);
 		}
-		$result = $this->command->select($this->getQuery($param). ' LIMIT 1', "COUNT({$field}) AS count", $parameters);
-		if (empty($result)) {
-			return null;
-		}
-		return $result[0]['count'];
+		return static::find()->load($param)
+			->addParam($parameters)
+			->count($field)->limit(1)->scalar();
 	}
-
-	/**
-	 * 获取第一行第一列
-	 * @param array|string $param
-	 * @param string $filed
-	 * @param array $parameters
-	 * @return string
-	 */
-	public function scalar($param, $filed = '*', $parameters = array()) {
-		$result = $this->command
-			->select($this->getQuery($param), $this->getField($filed), $parameters);
-		if (empty($result)) {
-			return false;
-		}
-		return current($result[0]);
-	}
-
-	protected function getQuery($param) {
-		if (!is_array($param)) {
-			return $param;
-		}
-		return (new Query($param))->getSql();
-	}
-
-	protected function getField($filed) {
-		if (empty($filed)) {
-			return '*';
-		}
-		$result = array();
-		foreach ((array)$filed as $key => $item) {
-			if (is_integer($key)) {
-				$result[] = $item;
-			} else {
-				$result[] = "{$item} AS {$key}";
-			}
-		}
-		return implode($result, ',');
-	}
-
 
 	public function getError($key = null) {
 		if (empty($key)) {

@@ -127,16 +127,26 @@ class Query extends BaseQuery {
         return $this;
     }
 
+    /**
+     * @param $condition
+     * @param array $params
+     * @return $this
+     */
     public function where($condition, $params = array()) {
         $this->where = [$condition];
         return $this->addParam($params);
     }
 
+    /**
+     * @param $condition
+     * @param array $params
+     * @return $this
+     */
     public function whereMany($condition, $params = array()) {
         $this->where = array_merge($this->where, $this->addCondition($condition));
         return $this->addParam($params);
     }
-
+    
     protected function addCondition($condition) {
         if (!is_array($condition)) {
             return array(

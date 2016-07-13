@@ -22,7 +22,7 @@ class Action {
 
     public function run($args = array()) {
         if ($this->class instanceof \Closure) {
-            return call_user_func_array($this->class, (array)$args);
+            return $this->_callFunc($this->class, $args);
         }
         if (strpos($this->class, '::') === false &&
             (!class_exists($this->class) || !function_exists($this->function))) {
@@ -39,12 +39,12 @@ class Action {
         }
         $class = $this->class;
         $instance = new $class;
-        return call_user_func_array(array($instance, $this->function), (array)$args);
+        return $this->_callFunc(array($instance, $this->function), $args);
     }
 
     private function _runWithClass($args) {
         if (strpos($this->class, '::') !== false) {
-            return call_user_func_array($this->class, $args);
+            return $this->_callFunc($this->class, $args);
         }
         if (!class_exists($this->class)) {
             return false;
@@ -64,6 +64,13 @@ class Action {
         if (!class_exists($this->class)) {
             return false;
         }
-        return call_user_func_array($this->function, (array)$args);
+        return $this->_callFunc($this->function, $args);
+    }
+
+    private function _callFunc($func, $args) {
+        if (is_array($args)) {
+            return call_user_func_array($func, $args);
+        }
+        return call_user_func($func, $args);
     }
 }
