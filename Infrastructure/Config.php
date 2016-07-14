@@ -96,7 +96,20 @@ class Config extends MagicObject {
 		}
 		return $this->_data[$method][$value[0]];
 	}
-	
+
+	/**
+	 * 支持根据键合并数组
+	 * @param array|string $key
+	 * @param mixed $value
+	 */
+	public function set($key, $value = null) {
+		if ($this->has($key) && is_array($value)) {
+			$this->_data[$key] = array_merge((array)$this->_data[$key], $value);
+			return;
+		}
+		return parent::set($key, $value);
+	}
+
 	public function __call($method, $value) {
 		$this->getMultidimensional($method, $value);
 	}
