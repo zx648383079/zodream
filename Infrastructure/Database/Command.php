@@ -12,15 +12,15 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
 class Command {
-    
+
     use SingletonPattern;
-    
+
     protected $table;
-    
+
     protected $prefix;
 
     protected $allowCache = true;
-    
+
     protected $cacheLife = 3600;
 
     /**
@@ -30,6 +30,9 @@ class Command {
 
     public function __construct() {
         $configs = Config::getInstance()->get('db');
+        if (!class_exists($configs['driver'])) {
+            $configs['driver'] = Pdo::class;
+        }
         $this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);
         $this->prefix = $configs['prefix'];
         $this->allowCache = $configs['allowCache'];
@@ -118,7 +121,7 @@ class Command {
      * @param array $args sql语句的数组
      * @return bool
      */
-    public function transaction($args) { 
+    public function transaction($args) {
         return $this->db->transaction($args);
     }
 

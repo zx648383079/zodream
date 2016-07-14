@@ -47,7 +47,7 @@ return array(
 		'persistent' => false                   //使用持久化连接
 	),
 	'mail'   => array(
-		'driver'   => Zodream\Infrastructure\Mailer::class,
+		'driver'   => Zodream\Infrastructure\Mailer\Mailer::class,
 		'host'     => 'smtp.zodream.cn',
 		'port'     => 25,
 		'user'     => 'admin@zodream.cn',

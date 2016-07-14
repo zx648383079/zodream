@@ -28,6 +28,8 @@ abstract class Database {
 	protected $error           = null;
 	
 	protected $result;
+
+	protected $version;
 	
 	
 	protected $configs = array(
@@ -53,6 +55,16 @@ abstract class Database {
 	
 	public function getDriver() {
 		return $this->driver;
+	}
+
+	public function getVersion() {
+		if (empty($this->version)) {
+			$args = $this->select('SELECT VERSION();');
+			if (count($args) > 0 && count($args[0]) > 0) {
+				$this->version = current($args[0]);
+			}
+		}
+		return $this->version;
 	}
 
 	/**

@@ -146,6 +146,25 @@ class Schema extends BaseQuery {
         return $this->command()->execute('CREATE TABLE '.$this->addPrefix($table).' AS '.$sql);
     }
 
+    /**
+     * 获取所有数据库名
+     */
+    public function getAllDatabase() {
+        return $this->command()->getArray('SHOW DATABASES');
+    }
+
+    /**
+     * 获取表名
+     * @param string $arg 数据库名 默认是配置文件中的数据库
+     * @return array
+     */
+    public function getAllTable($arg = null) {
+        if (!empty($arg)) {
+            $this->command()->changedDatabase($arg);
+        }
+        return $this->command()->getArray('SHOW TABLES');
+    }
+
     protected function getColumns() {
         return '';
     }
