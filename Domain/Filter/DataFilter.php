@@ -9,11 +9,25 @@ defined('PHP_INT_MIN') or define('PHP_INT_MIN', 0);
 defined('PHP_INT_MAX') or define('PHP_INT_MAX', 99999);
 
 class DataFilter {
-    private static $_filtersInstance = array(
-        'confirm', 'email', 'float', 'enum', 'int', 'number', 'ip', 'phone', 'raw', 'required', 'same', 'string', 'time', 'unique', 'url'
+    protected static $filterMap = array(
+        'confirm', 
+		'email', 
+		'float', 
+		'enum', 
+		'int', 
+		'number', 
+		'ip', 
+		'phone', 
+		'raw', 
+		'required', 
+		'same', 
+		'string', 
+		'time', 
+		'unique', 
+		'url'
     );
 
-	private static $_error = array();
+	protected static $error = array();
 
 	/**
 	 * GET ERRORS WHO VALIDATE FAIL
@@ -22,26 +36,26 @@ class DataFilter {
 	 */
 	public static function getError($key = null) {
 		if (empty($key)) {
-			return self::$_error;
+			return self::$error;
 		}
-		if (!array_key_exists($key, self::$_error)) {
+		if (!array_key_exists($key, self::$error)) {
 			return array();
 		}
-		return self::$_error[$key];
+		return self::$error[$key];
 	}
 	
 	public static function getFirstError($key) {
-		if (!array_key_exists($key, self::$_error)) {
+		if (!array_key_exists($key, self::$error)) {
 			return null;
 		}
-		return current(self::$_error[$key]);
+		return current(self::$error[$key]);
 	}
 
-	private static function _setError($key, $error) {
+	private static function setError($key, $error) {
 		if (!array_key_exists($key, self::$_error)) {
-			self::$_error[$key] = array();
+			self::$error[$key] = array();
 		}
-		self::$_error[$key][] = $error;
+		self::$error[$key][] = $error;
 	}
 
 	/**
@@ -74,7 +88,7 @@ class DataFilter {
 	 * @return array|bool
 	 */
     public static function filter($args, $option) {
-		return self::_runFilterOrValidate($args, $option, false);
+		return self::runFilterOrValidate($args, $option, false);
     }
 
 	/**
@@ -84,19 +98,19 @@ class DataFilter {
 	 * @return bool
 	 */
     public static function validate($args, $option) {
-    	return self::_runFilterOrValidate($args, $option, true);
+    	return self::runFilterOrValidate($args, $option, true);
     }
     
-    private static function _runFilterOrValidate($args, $option, $isValidate = true) {
+    protected static function runFilterOrValidate($args, $option, $isValidate = true) {
 		static::$_error = [];
 		$args = (array)$args;
 		$option = (array)$option;
 		self::$_error = array();
-    	$filters = self::_getFilters($option);
+    	$filters = self::getFilters($option);
     	if ($isValidate) {
-    		return self::_runValidate($filters, $args);
+    		return self::runValidate($filters, $args);
     	}
-    	return self::_runFilter($filters, $args);
+    	return self::runFilter($filters, $args);
     }
 
 	/**
@@ -104,7 +118,7 @@ class DataFilter {
 	 * @param array $args
 	 * @return array
 	 */
-    private static function _runFilter(array $filters, array $args) {
+    protected static function runFilter(array $filters, array $args) {
     	$results = array();
     	foreach ($filters as $key => $value) {
     		$result = isset($args[$key]) ? $args[$key] : null;
@@ -122,14 +136,14 @@ class DataFilter {
 	 * @param array $args
 	 * @return bool
 	 */
-    private static function _runValidate(array $filters, array $args) {
+    protected static function runValidate(array $filters, array $args) {
     	$results = array();
     	foreach ($filters as $key => $value) {
     		$result = true;
     		foreach ($value as $val) {
 				/** @param FilterObject $val  */
 				if (!$val->validate(isset($args[$key]) ? $args[$key] : null, $args)) {
-					self::_setError($key, $val->getError());
+					self::setError($key, $val->getError());
 					$result = false;
 				}
     		}
@@ -138,13 +152,13 @@ class DataFilter {
     	return !in_array(false, $results);
     }
     
-    private static function _getFilters($options) {
+    protected static function getFilters($options) {
     	if (is_string($options)) {
-    		$options = self::_splitKeyAndFilters($options);
+    		$options = self::splitKeyAndFilters($options);
     	}
 		$filters = array();
     	foreach ($options as $key => $value) {
-    		$filter = self::_getFiltersFromOne($value);
+    		$filter = self::getFiltersFromOne($value);
 			if (!empty($filter)) {
 				$filters[$key] = $filter;
 			}
@@ -152,7 +166,7 @@ class DataFilter {
     	return $filters;
     }
     
-    private static function _splitKeyAndFilters($option) {
+    protected static function splitKeyAndFilters($option) {
     	$options = explode(';', $option);
     	$results = array();
     	foreach ($options as $key => $value) {
@@ -166,13 +180,13 @@ class DataFilter {
     	return $results;
     }
 
-    private static function _getFiltersFromOne($option) {
+    protected static function getFiltersFromOne($option) {
     	if (is_string($option)) {
     		$option = explode('|', $option);
     	}
 		$filters = array();
     	foreach ((array)$option as $value) {
-    		$filter = self::_splitFilter($value);
+    		$filter = self::createFilter($value);
 			if (!empty($filter)) {
 				$filters[] = $filter;
 			}
@@ -181,13 +195,13 @@ class DataFilter {
     }
 
 	/**
-	 * @param string $value
+	 * @param string $arg
 	 * @return FilterObject
 	 */
-    private static function _splitFilter($value) {
-        list($filter, $option) = StringExpand::explode($value, ':', 2);
+    public static function createFilter($arg) {
+        list($filter, $option) = StringExpand::explode($arg, ':', 2);
         $filter = strtolower($filter);
-        if (in_array($filter, self::$_filtersInstance)) {
+        if (in_array($filter, self::$filterMap)) {
             $class = 'Zodream\\Domain\\Filter\\Filters\\'.ucfirst($filter).'Filter';
             return new $class($option);
         }

@@ -360,13 +360,13 @@ class Query extends BaseQuery {
     }
 
     /**
-     * @return array|null
+     * @return array|bool
      */
     public function one() {
         $this->limit(1);
         $result = $this->all();
         if (empty($result)) {
-            return null;
+            return false;
         }
         return current($result);
     }

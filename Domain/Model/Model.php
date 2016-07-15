@@ -6,6 +6,7 @@ namespace Zodream\Domain\Model;
  * @author Jason
  */
 use Zodream\Domain\Filter\DataFilter;
+use Zodream\Domain\Filter\ModelFilter;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
 use Zodream\Infrastructure\Database\Record;
@@ -24,6 +25,10 @@ abstract class Model extends MagicObject {
 	const AFTER_UPDATE = 'after update';
 
 	protected $errors = [];
+	
+	public $isNewRecord = true;
+	
+	protected $_oldData = [];
 
 	/**
 	 * 过滤规则
@@ -95,6 +100,7 @@ abstract class Model extends MagicObject {
 		if (empty($key)) {
 			return $this;
 		}
+		$this->setOldData();
 		if (!is_array($key)) {
 			$key = [$key => $value];
 		}
@@ -106,6 +112,13 @@ abstract class Model extends MagicObject {
 			$this->_data[$k] = $item;
 		}
 		return $this;
+	}
+	
+	protected function setOldData() {
+		if ($this->isNewRecord || !empty($this->_oldData)) {
+			return;
+		}
+		$this->_oldData = $this->_data;
 	}
 
 	public function get($key = null, $default = null){
@@ -148,10 +161,10 @@ abstract class Model extends MagicObject {
 
 	public function save() {
 		$this->runBehavior(self::BEFORE_SAVE);
-		if ($this->has($this->primaryKey)) {
-			$row = $this->update();
-		} else {
+		if ($this->isNewRecord) {
 			$row = $this->insert();
+		} else {
+			$row = $this->update();
 		}
 		$this->runBehavior(self::BEFORE_SAVE);
 		return $row;
@@ -173,18 +186,17 @@ abstract class Model extends MagicObject {
 		}
 	}
 
-	protected function validate($rules = array()) {
+	/**
+	 * 验证
+	 * @param array $rules
+	 * @return bool
+	 */
+	public function validate($rules = array()) {
 		if (empty($rules)) {
 			$rules = $this->rules();
 		}
-		DataFilter::validate($this->get(), $rules);
-		$this->errors = DataFilter::getError();
-		foreach ($rules as $key => $item) {
-			if (method_exists($this, $item)) {
-				$this->$item($this->get($key));
-			}
-		}
-		return empty($this->errors);
+		$result = ModelFilter::validate($this, $rules);
+		return $result && empty($this->errors);
 	}
 
 	/**
@@ -270,6 +282,38 @@ abstract class Model extends MagicObject {
 	}
 
 	/**
+	 * 自动获取条件
+	 * @return array
+	 */
+	protected function getWhereKey() {
+		foreach ($this->primaryKey as $item) {
+			if ($this->has($item)) {
+				return [$item => $this->get($item)];
+			}
+		}
+		return fasle;
+	}
+
+	/**
+	 * 获取需要更新的数据
+	 * @return array
+	 */
+	protected function getUpdateData() {
+		if ($this->isNewRecord) {
+			return $this->_data;
+		}
+		$data = [];
+		foreach ($this->_data as $key => $item) {
+			if (array_key_exists($key, $this->_oldData) 
+				&& $item === $this->_oldData[$key]) {
+				continue;
+			}
+			$data[$key] = $item;
+		}
+		return $data;
+	}
+
+	/**
 	 * 修改记录
 	 *
 	 * @param array|string $where 条件 默认使用AND 连接
@@ -278,7 +322,7 @@ abstract class Model extends MagicObject {
 	 */
 	public function update($where = null, $args = null) {
 		if (is_null($where)) {
-			$where = [$this->primaryKey[0] => $this->get($this->primaryKey[0])];
+			$where = $this->getWhereKey();
 		}
 		if (is_array($args)) {
 			$this->set($args);
@@ -288,7 +332,7 @@ abstract class Model extends MagicObject {
 		}
 		$this->runBehavior(self::BEFORE_UPDATE);
 		$row = $this->getRecord()
-			->load($args)
+			->load($this->getUpdateData())
 			->whereMany($where)
 			->update();
 		$this->runBehavior(self::AFTER_UPDATE);
@@ -369,9 +413,10 @@ abstract class Model extends MagicObject {
 			->addParam($parameters)
 			->one();
 		if (empty($data)) {
-			return null;
+			return false;
 		}
 		$model->set($data);
+		$model->isNewRecord = false;
 		return $model;
 	}
 
@@ -384,7 +429,7 @@ abstract class Model extends MagicObject {
 	 */
 	public function delete($where = null, $parameters = array()) {
 		if (is_null($where)) {
-			$where = [$this->primaryKey[0] => $this->get($this->primaryKey[0])];
+			$where = $this->getWhereKey();
 		}
 		return $this->getRecord()
 			->whereMany($where)
@@ -428,6 +473,7 @@ abstract class Model extends MagicObject {
 		foreach ($data as $item) {
 			$model = new static;
 			$model->set($item);
+			$model->isNewRecord = false;
 			$args[] = $model;
 		}
 		return $args;
@@ -472,7 +518,7 @@ abstract class Model extends MagicObject {
 		return current($this->errors[$key]);
 	}
 
-	protected function setError($key, $error = null) {
+	public function setError($key, $error = null) {
 		if (is_array($key) && is_null($error)) {
 			$this->errors = array_merge($this->errors, $key);
 			return;

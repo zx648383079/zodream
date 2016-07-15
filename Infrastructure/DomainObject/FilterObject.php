@@ -59,4 +59,11 @@ abstract class FilterObject {
     public function getError() {
         return $this->error;
     }
+
+    public function setError($error) {
+        if (empty($error)) {
+            return;
+        }
+        $this->error = $error;
+    }
 }
