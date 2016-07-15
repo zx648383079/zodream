@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure\Database;
  * Time: 9:07
  */
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
@@ -30,7 +31,7 @@ class Command {
 
     public function __construct() {
         $configs = Config::getInstance()->get('db');
-        if (!class_exists($configs['driver'])) {
+        if (!array_key_exists('driver', $configs) || !class_exists($configs['driver'])) {
             $configs['driver'] = Pdo::class;
         }
         $this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);

@@ -32,7 +32,9 @@ class Log {
         if (!is_file($filePath)) {
             $filePath = APP_DIR.'/log/'.ltrim($filePath, '/');
         }
-        file_put_contents($filePath, $msg, FILE_APPEND | LOCK_EX);
+        if (is_dir(dirname($filePath))) {
+            file_put_contents($filePath, $msg, FILE_APPEND | LOCK_EX);
+        }
         //return self::internalOut($filePath, $msg);
     }
  

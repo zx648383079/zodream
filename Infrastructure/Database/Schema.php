@@ -112,6 +112,12 @@ class Schema extends BaseQuery {
         return $this->command()->execute(strtoupper($type).' DATABASE '.$name);
     }
 
+    
+    public function createDatabase($name, $charset = 'UTF8') {
+        return $this->command()
+            ->execute('CREATE DATABASE IF NOT EXISTS '.$name.' DEFAULT CHARACTER SET '.$charset);
+    }
+
     /**
      * 删除表
      * @param string|array $name
@@ -132,7 +138,7 @@ class Schema extends BaseQuery {
      * @return mixed
      */
     public function createTable($name, $engine = 'MYISAM') {
-        return $this->command()->execute('CREATE TABLE '.$this->addPrefix($name).
+        return $this->command()->execute('CREATE TABLE IF NOT EXISTS '.$this->addPrefix($name).
             ' ('. $this->getColumns(). ') ENGINE = '.$engine.' DEFAULT CHARSET=UTF8;');
     }
 

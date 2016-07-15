@@ -50,10 +50,9 @@ class Config extends MagicObject {
 	 * @param array $args
 	 */
 	public function reset($args = array()) {
-		$configs = array();
+		$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
 		$personal = array();
 		if (defined('APP_MODULE')) {
-			$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
 			$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
 		}
 		$common  = $this->_getConfig(static::getPath().'config.php');
@@ -95,6 +94,23 @@ class Config extends MagicObject {
 			return null;
 		}
 		return $this->_data[$method][$value[0]];
+	}
+
+	/**
+	 * 支持与默认合并参数
+	 * @param string $key
+	 * @param mixed $default
+	 * @return array|null|string
+	 */
+	public function get($key = null, $default = null) {
+		$args = parent::get($key, $default);
+		if (!is_array($default)) {
+			return $args;
+		}
+		if (empty($args)) {
+			return $default;
+		}
+		return array_merge((array)$args, $default);
 	}
 
 	/**
