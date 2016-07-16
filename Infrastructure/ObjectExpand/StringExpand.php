@@ -8,6 +8,10 @@ namespace Zodream\Infrastructure\ObjectExpand;
 */
 use Zodream\Infrastructure\Error\Error;
 class StringExpand {
+	// 获取值
+	public static function value($value) {
+		return $value instanceof \Closure ? $value() : $value;
+	}
 	
 	public static function formatSize($size) { 
 		$sizes = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB"); 

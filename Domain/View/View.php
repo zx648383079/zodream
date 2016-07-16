@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Domain\Response;
+namespace Zodream\Domain\View;
 /**
 * 响应
 * 

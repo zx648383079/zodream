@@ -15,7 +15,7 @@ abstract class Action {
     /**
      * 其他Action正式执行的入口 允许返回值
      */
-    public function run() { }
+    abstract public function run();
     
     public function finalize() {  }
 }

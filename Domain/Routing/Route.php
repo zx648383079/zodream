@@ -6,6 +6,7 @@ namespace Zodream\Domain\Routing;
  * @author Jason
  */
 use Zodream\Domain\Response\View;
+use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
@@ -30,7 +31,7 @@ class Route {
 
 	/**
 	 * 执行路由
-	 * @return bool|mixed|null
+	 * @return ResponseObject
 	 */
 	public function run() {
 		if (trim($this->_action) === '@') {

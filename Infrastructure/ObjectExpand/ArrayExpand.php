@@ -155,6 +155,27 @@ class ArrayExpand {
         );
     }
 
+	public static function get($array, $key, $default = null) {
+		if (is_null($key)) {
+			return $array;
+		}
+
+		if (isset($array[$key])) {
+			return $array[$key];
+		}
+
+		foreach (explode('.', $key) as $segment) {
+			if ((! is_array($array) || ! array_key_exists($segment, $array)) &&
+				(! $array instanceof ArrayAccess || ! $array->offsetExists($segment))) {
+				return StringExpand::value($default);
+			}
+
+			$array = $array[$segment];
+		}
+
+		return $array;
+	}
+
     /** 根据字符串取一个值，采用递进的方法取值
      * @param string $keys 关键字
      * @param array $values 值

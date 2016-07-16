@@ -6,25 +6,38 @@ use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\FileSystem;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
-class Download {
-	private static $_speed = 512;   // 下载速度
+
+class FileResponse extends BaseResponse {
+	protected $speed = 512;   // 下载速度
+	
+	protected $file;
+	
+	protected $fileName;
 
 	/**
+	 * FileResponse constructor.
 	 * @param string $file
-	 * @param string $fileName 输出文件名
+	 * @param string $fileName
+	 * @param int $speed
 	 */
-	public static function make($file, $fileName = null) {
-		EventManger::getInstance()->run('download', array($file));
-		if (!is_file($file)) {
+	public function __construct($file, $fileName = null, $speed = 512) {
+		$this->file = $file;
+		if (empty($fileName)) {
+			$this->fileName = basename($file);//获取文件名字
+		}
+		$this->setSpeed($speed);
+	}
+
+	/**
+	 * @throws \Zodream\Infrastructure\Error\Exception
+	 */
+	public function sendContent() {
+		if (!is_file($this->file)) {
 			Error::out('FILE NOT FIND', __FILE__, __LINE__);
 		}
 		
-		$length = filesize($file);//获取文件大小
-		if (empty($fileName)) {
-			$fileName = basename($file);//获取文件名字
-		}
-		
-		$fileExtension = FileSystem::getExtension($fileName);//获取文件扩展名
+		$length = filesize($this->file);//获取文件大小
+		$fileExtension = FileSystem::getExtension($this->fileName);//获取文件扩展名
 		
 		ResponseResult::sendCacheControl('public');
 		//根据扩展名 指出输出浏览器格式
@@ -40,11 +53,11 @@ class Download {
 				ResponseResult::sendContentType('application/force-download');
 				break;
 		}
-		ResponseResult::sendContentDisposition($fileName);
+		ResponseResult::sendContentDisposition($this->fileName);
 		ResponseResult::sendAcceptRanges();
 		$range = self::getRange($length);
 		//打开文件
-		$fp = fopen($file.'', 'rb');
+		$fp = fopen($this->file.'', 'rb');
 		//如果有$_SERVER['HTTP_RANGE']参数
 		if(null !== $range) {
 			/*   ---------------------------
@@ -76,7 +89,7 @@ class Download {
 		while(!feof($fp)){
 			//设置文件最长执行时间
 			set_time_limit(0);
-			print(fread($fp, round(self::_speed * 1024, 0)));//输出文件
+			print(fread($fp, round($this->speed * 1024, 0)));//输出文件
 			flush();//输出缓冲
 			ob_flush();
 		}
@@ -87,9 +100,9 @@ class Download {
 	/** 设置下载速度
 	 * @param int $speed
 	 */
-	public static function setSpeed($speed){
+	public function setSpeed($speed){
 		if(is_numeric($speed) && $speed > 16 && $speed < 4096){
-			self::$_speed = $speed;
+			$this->speed = $speed;
 		}
 	}
 
@@ -97,7 +110,7 @@ class Download {
 	 * @param int $fileSize 文件大小
 	 * @return array|null
 	 */
-	private static function getRange($fileSize){
+	protected function getRange($fileSize){
 		$range = Request::server('HTTP_RANGE');
 		if (empty($range)) {
 			return null;

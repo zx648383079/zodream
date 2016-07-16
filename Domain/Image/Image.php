@@ -431,16 +431,14 @@ class Image {
 	}
 
 	/**
-	 * @param string $output
+	 * 另存为
+	 * @param string $output 如果为null 表示输出
 	 * @param string $type
 	 * @return bool
 	 */
-	public function saveAs($output, $type = null) {
+	public function saveAs($output = null, $type = null) {
 		$this->setRealType($type);
-		if (!empty($output)) {
-			return call_user_func('image'.$this->realType, $this->image, $output);
-		}
-		return false;
+		return call_user_func('image'.$this->realType, $this->image, $output);
 	}
 	
 	public function close() {

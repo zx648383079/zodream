@@ -6,6 +6,8 @@ namespace Zodream\Domain\Routing;
 * @author Jason
 */
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\DomainObject\ResponseObject;
+use Zodream\Infrastructure\DomainObject\RouteObject;
 use Zodream\Infrastructure\EventManager\EventManger;
 
 defined('APP_CONTROLLER') or define('APP_CONTROLLER', Config::getInstance()->get('app.controller'));
@@ -42,7 +44,7 @@ class Router{
 	 * @return bool
 	 */
 	public static function hasRoute() {
-		return !empty(self::$_route);
+		return !empty(self::$_route) && self::$_route instanceof RouteObject;
 	}
 
 	/**
@@ -58,7 +60,7 @@ class Router{
 
 	/**
 	 * 路由加载及运行方法
-	 * @return null
+	 * @return ResponseObject
 	 */
 	public static function run() {
 		EventManger::getInstance()->run('getRoute');

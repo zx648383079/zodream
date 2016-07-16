@@ -7,9 +7,12 @@ namespace Zodream\Infrastructure;
  * Date: 2016/6/24
  * Time: 22:57
  */
+use Zodream\Domain\Routing\Grace;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
+use Zodream\Infrastructure\DomainObject\RouterObject;
 use Zodream\Infrastructure\Error\Error;
+use Zodream\Infrastructure\Header\Headers;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
@@ -54,5 +57,21 @@ class Factory {
      */
     public static function i18n() {
         return self::getInstance('i18n', PhpSource::class);
+    }
+
+    /**
+     * 路由
+     * @return RouterObject
+     */
+    public static function router() {
+        return self::getInstance('route', Grace::class);
+    }
+
+    /**
+     * 响应头
+     * @return Headers
+     */
+    public static function header() {
+        return self::getInstance('headers', Headers::class);
     }
 }

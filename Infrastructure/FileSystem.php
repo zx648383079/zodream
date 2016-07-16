@@ -1,5 +1,7 @@
 <?php 
 namespace Zodream\Infrastructure;
+use Zodream\Infrastructure\Error\Exception;
+
 /**
  * 文件操作
  *
@@ -10,23 +12,19 @@ namespace Zodream\Infrastructure;
 class FileSystem {
 
 	/**
-	 * 遍历文件夹
-	 * @param string $dir
+	 * 遍历文件夹获取所有的文件
+	 * @param string $directory
 	 * @return array
 	 */
-	public static function findDir($dir) {
-		$files    = array();
-		$dir_list = @scandir($dir);
-		foreach($dir_list as $file) {
-			if ( $file != ".." && $file != "." ) {
-				if (is_dir($dir . $file)) {
-					$files = array_merge($files, self::findDir($dir. $file. '/'));
-				} else {
-					$files[] = $dir.$file;
-				}
-			}
+	public static function files($directory) {
+		$glob = glob($directory.'/*');
+
+		if ($glob === false) {
+			return [];
 		}
-		return $files;
+		return array_filter($glob, function ($file) {
+			return filetype($file) == 'file';
+		});
 	}
 
 	/**
@@ -64,6 +62,108 @@ class FileSystem {
 		return '.'.$arg;
 	}
 
+
+	/**
+	 * Extract the file name from a file path.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	public static function name($path) {
+		return pathinfo($path, PATHINFO_FILENAME);
+	}
+
+	/**
+	 * 拓展名带 .
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	public static function extension($path) {
+		return pathinfo($path, PATHINFO_EXTENSION);
+	}
+
+	/**
+	 * Get the file type of a given file.
+	 *
+	 * @param  string  $path
+	 * @return string
+	 */
+	public static function type($path) {
+		return filetype($path);
+	}
+
+	/**
+	 * Get the mime-type of a given file.
+	 *
+	 * @param  string  $path
+	 * @return string|false
+	 */
+	public static function mimeType($path) {
+		return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
+	}
+
+	/**
+	 * 文件的尺寸
+	 *
+	 * @param  string  $path
+	 * @return int
+	 */
+	public static function size($path) {
+		return filesize($path);
+	}
+
+	/**
+	 * 最后的更新时间
+	 *
+	 * @param  string  $path
+	 * @return int
+	 */
+	public static function lastModified($path) {
+		return filemtime($path);
+	}
+
+	/**
+	 * 是文件夹
+	 *
+	 * @param  string  $directory
+	 * @return bool
+	 */
+	public static function isDirectory($directory) {
+		return is_dir($directory);
+	}
+
+	/**
+	 * 是否能写
+	 *
+	 * @param  string  $path
+	 * @return bool
+	 */
+	public static function isWritable($path) {
+		return is_writable($path);
+	}
+
+	/**
+	 * 是文件
+	 *
+	 * @param  string  $file
+	 * @return bool
+	 */
+	public static function isFile($file) {
+		return is_file($file);
+	}
+
+	/**
+	 * 正则匹配的文件
+	 *
+	 * @param  string  $pattern
+	 * @param  int     $flags
+	 * @return array
+	 */
+	public static function glob($pattern, $flags = 0) {
+		return glob($pattern, $flags);
+	}
+
 	/**
 	 * 获取文件内容
 	 * @param string $file
@@ -77,10 +177,40 @@ class FileSystem {
 	 * 写入文件
 	 * @param string $file
 	 * @param string $data
-	 * @return int|bool
+	 * @param bool $lock
+	 * @return bool|int
 	 */
-	public static function write($file, $data) {
-		return file_put_contents($file, $data);
+	public static function write($file, $data, $lock = false) {
+		return file_put_contents($file, $data, $lock ? LOCK_EX : 0);
+	}
+
+	public static function exists($path) {
+		return file_exists($path);
+	}
+
+	/**
+	 * 在文件前面追加内容
+	 *
+	 * @param  string  $path
+	 * @param  string  $data
+	 * @return int
+	 */
+	public static function prepend($path, $data) {
+		if (self::exists($path)) {
+			return self::write($path, $data.self::read($path));
+		}
+		return self::write($path, $data);
+	}
+
+	/**
+	 * 追加内容
+	 *
+	 * @param  string  $path
+	 * @param  string  $data
+	 * @return int
+	 */
+	public static function append($path, $data) {
+		return file_put_contents($path, $data, FILE_APPEND);
 	}
 
 	/**
@@ -89,7 +219,7 @@ class FileSystem {
 	 * @param string $aimUrl
 	 * @return bool
 	 */
-	public static function createDir($aimUrl) {
+	public static function createDirectory($aimUrl) {
 		$aimUrl = str_replace('', '/', $aimUrl);
 		$aimDir = '';
 		$arr = explode('/', $aimUrl);
@@ -130,7 +260,7 @@ class FileSystem {
 	 * @param boolean $overWrite 该参数控制是否覆盖原文件
 	 * @return boolean
 	 */
-	public static function moveDir($oldDir, $aimDir, $overWrite = false) {
+	public static function moveDirectory($oldDir, $aimDir, $overWrite = false) {
 		$aimDir = str_replace('', '/', $aimDir);
 		$aimDir = substr($aimDir, -1) == '/' ? $aimDir : $aimDir . '/';
 		$oldDir = str_replace('', '/', $oldDir);
@@ -188,7 +318,7 @@ class FileSystem {
 	 * @param string $aimDir
 	 * @return boolean
 	 */
-	public static function unlinkDir($aimDir) {
+	public static function deleteDirectory($aimDir) {
 		$aimDir = str_replace('', '/', $aimDir);
 		$aimDir = substr($aimDir, -1) == '/' ? $aimDir : $aimDir . '/';
 		if (!is_dir($aimDir)) {
@@ -212,16 +342,23 @@ class FileSystem {
 	/**
 	 * 删除文件
 	 *
-	 * @param string $aimUrl
+	 * @param string|array $paths
 	 * @return boolean
 	 */
-	public static function unlinkFile($aimUrl) {
-		if (file_exists($aimUrl)) {
-			unlink($aimUrl);
-			return true;
-		} else {
-			return false;
+	public function delete($paths) {
+		$paths = is_array($paths) ? $paths : func_get_args();
+		$success = true;
+
+		foreach ($paths as $path) {
+			try {
+				if (! @unlink($path)) {
+					$success = false;
+				}
+			} catch (Exception $e) {
+				$success = false;
+			}
 		}
+		return $success;
 	}
 
 	/**
@@ -232,7 +369,7 @@ class FileSystem {
 	 * @param boolean $overWrite 该参数控制是否覆盖原文件
 	 * @return boolean
 	 */
-	public static function copyDir($oldDir, $aimDir, $overWrite = false) {
+	public static function copyDirectory($oldDir, $aimDir, $overWrite = false) {
 		$aimDir = str_replace('', '/', $aimDir);
 		$aimDir = substr($aimDir, -1) == '/' ? $aimDir : $aimDir . '/';
 		$oldDir = str_replace('', '/', $oldDir);

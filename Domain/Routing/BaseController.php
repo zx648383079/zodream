@@ -103,7 +103,7 @@ abstract class BaseController extends Action {
 	protected function runPostAction($action, $vars = array()) {
 		if (method_exists($this, $action.'Post')) {
 			$action .= 'Post';
-			$this->$action(Request::post(true), $vars);
+			return $this->$action(Request::post(true), $vars);
 		}
 	}
 

@@ -7,10 +7,11 @@ namespace Zodream\Service;
 * @time 2015-12-19
 */
 use Zodream\Domain\Html\VerifyCsrfToken;
-use Zodream\Domain\Routing\Router;
 use Zodream\Domain\Autoload;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Cookie;
+use Zodream\Infrastructure\DomainObject\ResponseObject;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\EventManager\EventManger;
 
@@ -20,6 +21,7 @@ defined('APP_DIR') or define('APP_DIR', dirname(dirname(__FILE__)).'/');
 class Application {
 	/**
 	 * 程序启动
+	 * @return ResponseObject
 	 */
 	public static function main() {
 		Autoload::getInstance()
@@ -30,6 +32,6 @@ class Application {
 		if (Config::getInstance()->get('safe.csrf', false) && !Request::isGet()) {
 			VerifyCsrfToken::verify();
 		}
-		Router::run();
+		return Factory::router()->run();
 	}
 }
