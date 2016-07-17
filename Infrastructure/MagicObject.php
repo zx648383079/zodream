@@ -6,9 +6,12 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
+use ArrayIterator;
+use ArrayAccess;
+use IteratorAggregate;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
-class MagicObject implements \ArrayAccess {
+class MagicObject implements ArrayAccess, IteratorAggregate {
 	
 	protected $_data = array();
 
@@ -128,5 +131,12 @@ class MagicObject implements \ArrayAccess {
 
 	public function offsetUnset($offset) {
 		$this->delete($offset);
+	}
+
+	/**
+	 * 允许使用 foreach 直接执行
+	 */
+	public function getIterator() {
+		return new ArrayIterator($this->get());
 	}
 }

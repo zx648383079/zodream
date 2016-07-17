@@ -1,16 +1,18 @@
 <?php
 namespace Zodream\Infrastructure\DomainObject;
 
+use Zodream\Domain\Routing\Route;
+
 interface RouterObject {
 	/**
 	 * 生成url
 	 * @param string $file
-	 * @return string
+	 * @return string|array
 	 */
 	public function to($file);
 
 	/**
-	 * @return ResponseObject
+	 * @return Route
 	 */
 	public function run();
 

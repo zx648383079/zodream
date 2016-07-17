@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Domain\Response;
 
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\Request;
@@ -50,12 +51,13 @@ class ResponseResult {
 		echo $result;
 		self::finish();
 	}
-	
+
 	/**
 	 * 显示错误页面
 	 * @param array|string $data
 	 * @param integer $status
 	 * @param string $title
+	 * @return BadResponse
 	 */
 	public static function sendError($data = '', $status = 404, $title = '出错了！') {
 		if (!is_array($data)) {
@@ -66,9 +68,9 @@ class ResponseResult {
 		$data['status'] = $status;
 		$data['title'] = $title;
 		if (defined('DEBUG') && DEBUG) {
-			View::getInstance()->set($data);
+			Factory::view()->set($data);
 		}
-		View::getInstance()->showWithFile(Config::getValue('error', '404'), $status);
+		return new BadResponse(Factory::view()->setPath(Config::getValue('error', 404))->render(), $status);
 	}
 	
 	public static function sendRedirect($url, $time = 0) {

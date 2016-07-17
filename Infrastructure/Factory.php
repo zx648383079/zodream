@@ -7,7 +7,8 @@ namespace Zodream\Infrastructure;
  * Date: 2016/6/24
  * Time: 22:57
  */
-use Zodream\Domain\Routing\Grace;
+use Zodream\Domain\Routing\GraceRouter;
+use Zodream\Domain\View\View;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\DomainObject\RouterObject;
@@ -64,7 +65,7 @@ class Factory {
      * @return RouterObject
      */
     public static function router() {
-        return self::getInstance('route', Grace::class);
+        return self::getInstance('route', GraceRouter::class);
     }
 
     /**
@@ -73,5 +74,12 @@ class Factory {
      */
     public static function header() {
         return self::getInstance('headers', Headers::class);
+    }
+
+    /**
+     * @return View
+     */
+    public static function view() {
+        return self::getInstance('______', View::class);
     }
 }

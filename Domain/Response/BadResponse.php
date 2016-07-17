@@ -9,7 +9,7 @@ namespace Zodream\Domain\Response;
 
 class BadResponse extends HtmlResponse {
 
-    public function __construct($message, $status = 404) {
+    public function __construct($message = '/(ㄒoㄒ)/~~PAGE NOT FIND!', $status = 404) {
         parent::__construct($message, $status);
     }
     

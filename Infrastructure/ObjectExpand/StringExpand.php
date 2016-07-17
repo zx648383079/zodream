@@ -246,25 +246,28 @@ class StringExpand {
 	}
 
 	/**
-	 * 截取字符串为数组，补充explode函数，不建议过长数组
+	 * 截取字符串为数组，补充explode函数
 	 * @param $str
 	 * @param string $link
 	 * @param int $num
-	 * @param array|string $default 不存在或为''时使用
+	 * @param array|string $default 不存在时使用
 	 * @return array
 	 */
 	public static function explode($str, $link = ' ', $num = 1, $default = null) {
-		$arr = explode($link, $str, $num);
-		for ($i = 0 ; $i < $num ; $i ++) {
-			if (!isset($arr[$i]) || $arr[$i] === '') {
-				if (is_array($default)) {
-					$arr[$i] = $default[$i];
-				} else {
-					$arr[$i] = $default;
-				}
-			}
+		$args = explode($link, $str, $num);
+		if (count($args) >= $num) {
+			return $args;
 		}
-		return $arr;
+		if (!is_array($default)) {
+			return array_pad($args, $num, $default);
+		}
+		for ($i = $num - 1; $i >= 0 ; $i --) {
+			if (!array_key_exists($i, $args)) {
+				return $args;
+			}
+			$args[$i] = $default[$i];
+		}
+		return $args;
 	}
 
 	/**

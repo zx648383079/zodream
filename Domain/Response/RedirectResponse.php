@@ -20,13 +20,13 @@ class RedirectResponse extends BaseResponse {
 	 * RedirectResponse constructor.
 	 * @param string|array $url 要跳转的网址
 	 * @param int $time 停顿的时间 秒
-	 * @param string $msg 显示的消息.
+	 * @param string $message 显示的消息.
 	 * @param int $status 显示的代码标志.
 	 */
-	public function __construct($url = null, $time = 0, $msg = null, $status = 200) {
+	public function __construct($url = null, $time = 0, $message = null, $status = 200) {
 		$this->url = Url::to($url);
 		$this->time = $time;
-		$this->message = $msg;
+		$this->message = $message;
 		$this->status = $status;
 	}
 
@@ -38,12 +38,12 @@ class RedirectResponse extends BaseResponse {
 	 *
 	 */
 	public function sendContent() {
-		if (!headers_sent() && empty($msg)) {
+		if (!headers_sent() && empty($this->message)) {
 			ResponseResult::sendRedirect($this->url, $this->time);
 		}
-		/*ResponseResult::sendError(array(
-			'_extra' => "<meta http-equiv='Refresh' content='{$time};URL={$url}'>",
-			'message' => empty($msg) ? "系统将在{$time}秒之后自动跳转到{$url}！" : $msg
-		), $status, '跳转');*/
+		ResponseResult::sendError(array(
+			'_extra' => "<meta http-equiv='Refresh' content='{$this->time};URL={$this->url}'>",
+			'message' => empty($this->message) ? "系统将在{$$this->time}秒之后自动跳转到{$this->url}！" : $this->message
+		), $this->status, '跳转')->send();
 	}
 }

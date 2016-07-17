@@ -36,7 +36,7 @@ class Url {
 			}
 			unset($files);
 		}
-		if ($file === '#' || strpos($file, 'javascrpt:') != false) {
+		if ($file === '#' || strpos($file, 'javascript:') != false) {
 			return $file;
 		}
 		if (strpos($file, '?') !== false) {

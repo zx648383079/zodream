@@ -57,6 +57,22 @@ class ArrayExpand {
 		return array_merge(self::$_before, self::$_content, self::$_after);
 	}
 
+	/**
+	 * 寻找第一个符合的
+	 * @param array $array
+	 * @param callable $callback
+	 * @param null $default
+	 * @return mixed
+	 */
+	public static function first(array $array, callable $callback, $default = null) {
+		foreach ($array as $key => $value) {
+			if (call_user_func($callback, $key, $value)) {
+				return $value;
+			}
+		}
+		return StringExpand::value($default);
+	}
+
     /*** 合并前缀  把 key 作为前缀 例如 返回一个文件夹下的多个文件路径
      * array('a'=>array(
     * 'b.txt',

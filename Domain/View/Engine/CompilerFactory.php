@@ -8,6 +8,10 @@ namespace Zodream\Domain\View;
  */
 class Factory {
     protected $shared = [];
+
+    protected $sections = [];
+
+    protected $sectionStack = [];
     
     protected $engine;
 
@@ -38,16 +42,11 @@ class Factory {
         $view = $this->normalizeName($view);
 
         $path = $this->finder->find($view);
-
         $data = array_merge($mergeData, $this->parseData($data));
-
-        $this->callCreator($view = new View($this, $this->getEngineFromPath($path), $view, $path, $data));
-
-        return $view;
+        return new View($this, $this->getEngineFromPath($path), $view, $path, $data);;
     }
 
-    public function renderEach($view, $data, $iterator, $empty = 'raw|')
-    {
+    public function renderEach($view, $data, $iterator, $empty = 'raw|') {
         $result = '';
 
         // If is actually data in the array, we will loop through the data and append
@@ -198,5 +197,23 @@ class Factory {
         return str_replace(
             '--parent--holder--', '@parent', str_replace('@parent', '', $sectionContent)
         );
+    }
+
+    public function flushSections() {
+        $this->renderCount = 0;
+        $this->sections = [];
+        $this->sectionStack = [];
+    }
+
+    /**
+     * Flush all of the section contents if done rendering.
+     *
+     * @return void
+     */
+    public function flushSectionsIfDoneRendering()
+    {
+        if ($this->doneRendering()) {
+            $this->flushSections();
+        }
     }
 }

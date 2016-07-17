@@ -6,6 +6,8 @@ namespace Zodream\Domain\Routing;
  * Date: 2016/5/22
  * Time: 8:55
  */
+use Zodream\Domain\Response\BaseResponse;
+
 abstract class Action {
 
     public function init() { }
@@ -14,8 +16,9 @@ abstract class Action {
 
     /**
      * 其他Action正式执行的入口 允许返回值
+     * @return BaseResponse
      */
-    abstract public function run();
+    public function run() {}
     
     public function finalize() {  }
 }

@@ -136,7 +136,7 @@ final class Request {
 	 * @param null $default
 	 * @return array|string
 	 */
-	public static function Other($name = null, $default = null) {
+	public static function other($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
@@ -162,32 +162,36 @@ final class Request {
 		return self::Other(__FUNCTION__);
 	}
 	
+	public static function method() {
+		return self::other('method');
+	}
+	
 	public static function isGet() {
-		return self::Other('method') === 'GET';
+		return self::method() === 'GET';
 	}
 	
 	public static function isOptions() {
-		return self::Other('method') === 'OPTIONS';
+		return self::method() === 'OPTIONS';
 	}
 	
 	public static function isHead() {
-		return self::Other('method') === 'HEAD';
+		return self::method() === 'HEAD';
 	}
 	
 	public static function isPost() {
-		return self::Other('method') === 'POST';
+		return self::method() === 'POST';
 	}
 	
 	public static function isDelete() {
-		return self::Other('method') === 'DELETE';
+		return self::method() === 'DELETE';
 	}
 	
 	public static function isPut() {
-		return self::Other('method') === 'PUT';
+		return self::method() === 'PUT';
 	}
 	
 	public static function isPatch() {
-		return self::Other('method') === 'PATCH';
+		return self::method() === 'PATCH';
 	}
 	
 	public static function isAjax() {

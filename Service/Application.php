@@ -21,9 +21,11 @@ defined('APP_DIR') or define('APP_DIR', dirname(dirname(__FILE__)).'/');
 class Application {
 	/**
 	 * 程序启动
+	 * @param array $configs
 	 * @return ResponseObject
 	 */
-	public static function main() {
+	public static function main($configs = []) {
+		Config::getInstance($configs);
 		Autoload::getInstance()
 			->setError()
 			->shutDown();
@@ -32,6 +34,7 @@ class Application {
 		if (Config::getInstance()->get('safe.csrf', false) && !Request::isGet()) {
 			VerifyCsrfToken::verify();
 		}
-		return Factory::router()->run();
+		$route = Factory::router()->run();
+		return $route->run();
 	}
 }

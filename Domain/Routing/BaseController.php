@@ -27,8 +27,7 @@ abstract class BaseController extends Action {
 		return array();
 	}
 
-	
-	
+
 	/**
 	 * 在执行之前做规则验证
 	 * @param string $action 方法名
@@ -65,9 +64,6 @@ abstract class BaseController extends Action {
 		
 		$this->prepare();
 		EventManger::getInstance()->run('runController', $vars);
-		if (Request::isPost()) {
-			$this->runPostAction($action, $vars);
-		}
 		$result = $this->runAllAction($action, $vars);
 		$this->finalize();
 		return $result;
@@ -96,17 +92,6 @@ abstract class BaseController extends Action {
 		return $result;
 	}
 
-	/**
-	 * @param string $action
-	 * @param array $vars
-	 */
-	protected function runPostAction($action, $vars = array()) {
-		if (method_exists($this, $action.'Post')) {
-			$action .= 'Post';
-			return $this->$action(Request::post(true), $vars);
-		}
-	}
-
 	protected function runAllAction($action, $vars = array()) {
 		$reflectionObject = new \ReflectionObject( $this );
 		$action .= APP_ACTION;
@@ -131,7 +116,7 @@ abstract class BaseController extends Action {
 			}
 			Error::out($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!', __FILE__, __LINE__);
 		}
-		return call_user_func_array( array($this, $action) , $arguments );
+		return call_user_func_array(array($this, $action), $arguments);
 	}
 	/**
 	 * 加载其他控制器的方法

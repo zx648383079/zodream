@@ -6,6 +6,8 @@ namespace Zodream\Domain\Response;
  * Date: 2016/7/16
  * Time: 15:15
  */
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+
 class HtmlResponse extends BaseResponse {
 
     protected $message;
@@ -18,6 +20,6 @@ class HtmlResponse extends BaseResponse {
     }
 
     public function sendContent() {
-        ResponseResult::make($this->message, 'html', $this->status);
+        ResponseResult::make(StringExpand::value($this->message), 'html', $this->status);
     }
 }
