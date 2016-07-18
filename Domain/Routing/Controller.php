@@ -14,12 +14,9 @@ use Zodream\Infrastructure\Traits\ViewTrait;
 
 abstract class Controller extends BaseController {
 	
-	use LoaderTrait, ViewTrait;
+	use LoaderTrait;
 	
 	function __construct($loader = null) {
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
-		if (Config::getInstance()->get('safe.csrf', false) == true) {
-			$this->send('csrf', VerifyCsrfToken::create());
-		}
 	}
 }

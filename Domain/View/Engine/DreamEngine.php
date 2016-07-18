@@ -61,10 +61,10 @@ class DreamEngine extends PhpEngine {
      */
     public function extend($names, $param = null, $replace = TRUE) {
         if (!$replace) {
-            $param = array_merge((array)$this->g('_extra'), (array)$param);
+            $param = array_merge((array)$this->gain('_extra'), (array)$param);
         }
-        $this->s('_extra', $param);
-        foreach (ArrayExpand::toFile((array)$names, '.') as $value) {
+        $this->set('_extra', $param);
+        foreach (ArrayExpand::toFile((array)$names, '/') as $value) {
             $file = $this->getView($value);
             if (is_file($file)) {
                 include($file);
@@ -79,7 +79,7 @@ class DreamEngine extends PhpEngine {
      */
     public function jcs() {
         $args   = func_get_args();
-        $args[] = $this->g('_extra', array());
+        $args[] = $this->gain('_extra', array());
         Script::make(ArrayExpand::sort($args), $this->getAsset());
     }
 
@@ -94,7 +94,7 @@ class DreamEngine extends PhpEngine {
         if (count($args) == 1 && is_array($args[0])) {
             $args = $args[0];
         }
-        $this->s('_extra', array_merge((array)$this->g('_extra'), $args));
+        $this->set('_extra', array_merge((array)$this->gain('_extra'), $args));
     }
 
     /**
@@ -173,8 +173,8 @@ class DreamEngine extends PhpEngine {
      * @param string $key
      * @param string $default
      */
-    public function o($key, $default = null) {
-        echo ArrayExpand::tostring($this->g($key, $default));
+    public function out($key, $default = null) {
+        echo ArrayExpand::tostring($this->gain($key, $default));
     }
 
     /**
@@ -183,7 +183,7 @@ class DreamEngine extends PhpEngine {
      * @param null $default
      * @return array|mixed|string
      */
-    public function g($key, $default = null) {
+    public function gain($key, $default = null) {
         if (empty($key)) {
             return $this->data;
         }
@@ -209,7 +209,7 @@ class DreamEngine extends PhpEngine {
      * @param string $key
      * @param null $value
      */
-    public function s($key, $value = null) {
+    public function set($key, $value = null) {
         if (is_object($key)) {
             $key = (array)$key;
         }
@@ -244,7 +244,7 @@ class DreamEngine extends PhpEngine {
     }
     
     public function get($path, array $data = []) {
-        $this->s($data);
+        $this->set($data);
         $content = $this->getContent($path);
         if (!empty($this->layout)) {
             ob_start();

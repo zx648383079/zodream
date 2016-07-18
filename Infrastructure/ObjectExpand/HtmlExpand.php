@@ -7,6 +7,12 @@ namespace Zodream\Infrastructure\ObjectExpand;
  * Time: 12:22
  */
 class HtmlExpand {
+
+    public static function shortString($content, $length = 100) {
+        $content = preg_replace('/(\<.+?\>)|(\&nbsp;)+/', '', htmlspecialchars_decode($content));
+        return StringExpand::subString($content, 0, $length);
+    }
+    
     /**
      * 将一个URL转换为完整URL
      * PHP将相对路径URL转换为绝对路径URL

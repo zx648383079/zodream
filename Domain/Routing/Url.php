@@ -4,6 +4,7 @@ namespace Zodream\Domain\Routing;
 /**
  * url生成
  */
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
@@ -95,7 +96,7 @@ class Url {
 		if (strpos($file, '.') !== false) {
 			return self::toAsset($file);
 		}
-		return call_user_func(array(RouteConfig::getInstance()->getDriver(), 'to'), $file);
+		return Factory::router()->to($file);
 	}
 
 	/**

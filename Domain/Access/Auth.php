@@ -1,15 +1,13 @@
 <?php
-namespace Zodream\Domain\Authentication;
+namespace Zodream\Domain\Access;
 /**
- * 二进制法
+ *
  *
  * @author Jason
  */
 use Zodream\Infrastructure\DomainObject\AuthObject;
 use Zodream\Infrastructure\DomainObject\UserObject;
 use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\MagicObject;
-use Zodream\Infrastructure\Traits\SingletonPattern;
 
 class Auth implements AuthObject {
 

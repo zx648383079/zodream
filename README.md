@@ -1,5 +1,8 @@
 # ZoDream
 
+[![DUB](https://img.shields.io/dub/l/vibe-d.svg?maxAge=2592000)]()
+
+
 ## 当前版本 v2.3
 
     相对前面版本变化比较大

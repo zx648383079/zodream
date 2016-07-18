@@ -6,62 +6,36 @@ namespace Zodream\Domain\Routing;
  * @author Jason
  * @time 2015-12-19
  */
+use Zodream\Domain\Response\BaseResponse;
 use Zodream\Infrastructure\Request;
-use Zodream\Domain\Authentication\Verify;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\EventManager\EventManger;
+use Zodream\Infrastructure\Traits\AccessTrait;
 
 abstract class BaseController extends Action {
 
-	protected $rules = array();
-
-	/**
-	 * 此方法主要是为了继承并附加规则
-	 * @return array
-	 */
-	protected function rules() {
-		return array();
-	}
-
+	use AccessTrait;
+	
 	protected function actions() {
-		return array();
-	}
-
-
-	/**
-	 * 在执行之前做规则验证
-	 * @param string $action 方法名
-	 * @return boolean
-	 */
-	protected function beforeFilter($action) {
-		$action = str_replace(APP_ACTION, '', $action);
-		if (isset($this->rules)) {
-			$role = isset($this->rules['*']) ? $this->rules['*'] : '';
-			$role = isset($this->rules[$action]) ? $this->rules[$action] : $role;
-			return Verify::make($role);
-		}
-		return TRUE;
+		return [];
 	}
 
 	/**
 	 * 执行方法
 	 * @param string $action
 	 * @param array $vars
-	 * @return mixed
+	 * @return string|BaseResponse
 	 */
 	public function runAction($action, array $vars = array()) {
-		//合并过滤规则
-		$this->rules = array_merge($this->rules, $this->rules());
-
-		$result = $this->runClassAction($action);
-		if ($result !== false) {
-			return $result;
+		if (!$this->hasAction($action)) {
+			return $this->redirect('/', 4, 'URI ERROR!');
 		}
-		
-		if (!$this->canRunAction($action)) {
-			Error::out($action .' ACTION CANNOT RUN!', __FILE__, __LINE__);
+		if (true !== ($arg = $this->beforeFilter($action))) {
+			return $arg;
 		}
-		
+		if (array_key_exists($action, $this->actions())) {
+			return $this->runClassAction($action);
+		}
 		$this->prepare();
 		EventManger::getInstance()->run('runController', $vars);
 		$result = $this->runAllAction($action, $vars);
@@ -70,14 +44,10 @@ abstract class BaseController extends Action {
 	}
 	
 	protected function runClassAction($action) {
-		$actions = $this->actions();
-		if (!array_key_exists($action, $actions)) {
-			return false;
+		$class = $this->actions()[$action];
+		if (is_callable($class)) {
+			return call_user_func($class);
 		}
-		if (!$this->beforeFilter($action)) {
-			Error::out($action. ' CANNOT RUN!', __FILE__, __LINE__);
-		}
-		$class = $actions[$action];
 		if (!class_exists($class)) {
 			Error::out($action. ' CANNOT RUN CLASS!', __FILE__, __LINE__);
 		}
@@ -137,15 +107,6 @@ abstract class BaseController extends Action {
 	 * @return boolean
 	 */
 	public function hasAction($action) {
-		return method_exists($this, $action.APP_ACTION);
-	}
-	
-	/**
-	 * 判断是否能执行方法
-	 * @param string $action
-	 * @return boolean
-	 */
-	public function canRunAction($action) {
-		return $this->hasAction($action) && $this->beforeFilter($action);
+		return array_key_exists($action, $this->actions()) || method_exists($this, $action.APP_ACTION);
 	}
 }

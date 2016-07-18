@@ -33,7 +33,8 @@ trait ViewTrait {
 			$this->send($data);
 		}
 		if (strpos($name, '/') !== 0) {
-			$name = preg_replace('/^Service\\'.APP_MODULE.'\\(.+)'.APP_CONTROLLER.'$/', '$1', get_called_class()).'/'.$name;
+			$pattern = 'Service.'.APP_MODULE.'.(.+)'.APP_CONTROLLER;
+			$name = preg_replace('/^'.$pattern.'$/', '$1', get_called_class()).'/'.$name;
 		}
 		return new HtmlResponse(Factory::view()->setPath($name)->render());
 	}

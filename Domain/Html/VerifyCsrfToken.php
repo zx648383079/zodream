@@ -13,7 +13,8 @@ class VerifyCsrfToken {
      */
 	public static function create() {
 		$csrf = StringExpand::random(10);
-		Factory::session()->set('csrf', $csrf);
+		Factory::session()->set('_csrf', $csrf);
+		Factory::view()->set('_csrf', $csrf);
 		return $csrf;
 	}
 
@@ -21,7 +22,7 @@ class VerifyCsrfToken {
 	 * 验证
 	 */
 	public static function verify() {
-		if (self::get() === Request::request('csrf')) {
+		if (self::get() === Request::request('_csrf')) {
 			return;
 		}
 		Error::out('Csrf验证失败！', __FILE__, __LINE__);
@@ -32,6 +33,6 @@ class VerifyCsrfToken {
 	 * @return string
 	 */
 	public static function get() {
-		return Factory::session()->get('csrf');
+		return Factory::session()->get('_csrf');
 	}
 }
