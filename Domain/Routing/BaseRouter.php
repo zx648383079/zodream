@@ -41,7 +41,7 @@ class BaseRouter {
 				call_user_func_array([$this, 'addRoute'], $item);
 				continue;
 			}
-			$this->get($key, $item);
+			$this->any($key, $item);
 		}
 		if (is_file($file)) {
 			include $file;

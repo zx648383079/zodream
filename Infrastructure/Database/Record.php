@@ -73,7 +73,13 @@ class Record extends Query {
                 array_values($this->_data));
     }
 
-    public function batchInsert($columns, $data) {
+    /**
+     * INSERT MANY RECORDS
+     * @param array|string $columns
+     * @param array $data
+     * @return int
+     */
+    public function batchInsert($columns, array $data) {
         $args = [];
         foreach ($data as $item) {
             $arg = [];

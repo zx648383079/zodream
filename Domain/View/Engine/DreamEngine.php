@@ -41,6 +41,9 @@ class DreamEngine extends PhpEngine {
      * @return string
      */
     public function getView($file) {
+        if (is_file($file)) {
+            return $file;
+        }
         return StringExpand::getFile($this->viewDir, $file).'.php';
     }
 

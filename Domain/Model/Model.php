@@ -388,6 +388,7 @@ abstract class Model extends MagicObject {
 	}
 
 	/**
+	 * SELECT ONE BY QUERY
 	 * 查询一条数据
 	 *
 	 * @access public
@@ -395,7 +396,7 @@ abstract class Model extends MagicObject {
 	 * @param array|string $param 条件
 	 * @param string $field
 	 * @param array $parameters
-	 * @return static
+	 * @return static|bool
 	 */
 	public static function findOne($param, $field = '*', $parameters = array()) {
 		$model = new static;
@@ -422,6 +423,7 @@ abstract class Model extends MagicObject {
 
 	/**
 	 * 删除数据
+	 * DELETE QUERY
 	 *
 	 * @param string|array $where 条件
 	 * @param array $parameters

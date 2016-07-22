@@ -60,11 +60,12 @@ class MagicObject implements ArrayAccess, IteratorAggregate {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 设置值
 	 * @param string|array $key
 	 * @param string $value
+	 * @return $this
 	 */
 	public function set($key, $value = null) {
 		if (is_object($key)) {
@@ -72,12 +73,13 @@ class MagicObject implements ArrayAccess, IteratorAggregate {
 		}
 		if (is_array($key)) {
 			$this->_data = array_merge($this->_data, $key);
-			return;
+			return $this;
 		}
 		if (empty($key)) {
-			return;
+			return $this;
 		}
 		$this->_data[$key] = $value;
+		return $this;
 	}
 	
 	/**

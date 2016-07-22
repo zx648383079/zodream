@@ -1,12 +1,10 @@
 <?php
 namespace Zodream\Domain\Generate;
 
-
-use Zodream\Domain\Authentication\Binary;
 use Zodream\Domain\Model\Model;
 use Zodream\Domain\Response\Redirect;
-use Zodream\Domain\Response\ResponseResult;
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Template;
@@ -45,32 +43,36 @@ class Generate {
 			Redirect::to('/');
 		}
 		$this->setModel();
-		ResponseResult::sendContentType();
-		if (Request::isPost()) {
+		/*if (Request::isPost()) {
+			ResponseResult::sendContentType();
 			$this->makeConfig(Request::post());
 			$this->importSql(APP_DIR.'/document/zodream.sql');
 			Redirect::to('/', 10, '安装完成！');
-		}
-		$mode = Request::get('mode', 0);
-		if (empty($mode)) {
-			exit('table:指定表,为空时表示所以表； mode:二进制标志111，从左至右1代表视图、模型、控制器！');
+		}*/
+		if (!Request::isPost()) {
+			return $this->show('index', [
+				'table' => $this->model->getTableByDatabase(),
+			]);
 		}
 		set_time_limit(0);
 		echo '自动生成程序启动……<p/>';
 		flush();
 		ob_flush();
-		$table = Request::get('table');
+		$table = Request::post('table');
 		if (empty($table)) {
 			$table = $this->model->getTableByDatabase();
-		} else {
-			$table = array(strtolower($table));
 		}
-		foreach ($table as $value) {
-			$this->generateOne($value, $mode);
+		$mode = Request::post('controller,model,view');
+		foreach ($table as $item) {
+			$this->generateOne($item, $mode);
 			flush();
 			ob_flush();
 		}
 		exit('完成！');
+	}
+
+	protected function show($name, $data = []) {
+		return Factory::view()->set($data)->setPath(__DIR__.'/View/'.$name.'.php')->render();
 	}
 
 	/**
@@ -103,9 +105,9 @@ class Generate {
 	/**
 	 * 生成一个表
 	 * @param string $table
-	 * @param string $mode
+	 * @param array $mode
 	 */
-	protected function generateOne($table, $mode) {
+	protected function generateOne($table, array $mode) {
 		$table = StringExpand::firstReplace($table, $this->model->getPrefix());
 		echo '<h3>Table ',$table,'执行开始……</h3><br>';
 		$columns = $this->model->getColumn($table);
@@ -114,14 +116,14 @@ class Generate {
 			return;
 		}
 		$name = $this->getName($table);
-		if (Binary::judge(1, $mode)) {
-			$this->makeController($name);
+		if (!empty($mode['controller']) && $this->makeController($name)) {
+			echo $name.' MAKE CONTROLLER SUCCESS ！<br>';
 		}
-		if (Binary::judge(2, $mode)) {
-			$this->makeModel($name, $table, $columns);
+		if (!empty($mode['model']) && $this->makeModel($name, $table, $columns)) {
+			echo $name.' MAKE MODEL SUCCESS  ！<br>';
 		}
-		if (Binary::judge(4, $mode)) {
-			$this->makeView($name, $columns);
+		if (!empty($mode['view']) && $this->makeView($name, $columns)) {
+			echo $name.' MAKE VIEW SUCCESS  ！<br>';
 		}
 		echo '<h3>Table ',$table,'执行成功！</h3><br>';
 	}

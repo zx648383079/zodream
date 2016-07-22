@@ -63,7 +63,7 @@ class Query extends BaseQuery {
     /**
      * MAKE LIKE 'SELECT' TO EMPTY ARRAY!
      * @param $tag
-     * @return $this
+     * @return static
      */
     public function flush($tag) {
         $args = func_get_args();
@@ -88,7 +88,7 @@ class Query extends BaseQuery {
 
     /**
      * @param string|array $field
-     * @return $this
+     * @return static
      */
     public function select($field = '*') {
         $this->select = [];
@@ -138,7 +138,7 @@ class Query extends BaseQuery {
 
     /**
      * @param string|array $tables
-     * @return $this
+     * @return static
      */
     public function from($tables) {
         if (!is_array($tables)) {
@@ -151,7 +151,7 @@ class Query extends BaseQuery {
     /**
      * @param $condition
      * @param array $params
-     * @return $this
+     * @return static
      */
     public function where($condition, $params = array()) {
         $this->where = [$condition];
@@ -161,7 +161,7 @@ class Query extends BaseQuery {
     /**
      * @param $condition
      * @param array $params
-     * @return $this
+     * @return static
      */
     public function whereMany($condition, $params = array()) {
         $this->where = array_merge($this->where, $this->addCondition($condition));
@@ -258,7 +258,7 @@ class Query extends BaseQuery {
     /**
      * 起别名
      * @param string $key
-     * @return $this
+     * @return static
      */
     public function alias($key) {
         if (count($this->from) == 1) {
@@ -347,7 +347,7 @@ class Query extends BaseQuery {
      * add build value
      * @param string|array $key
      * @param string $value
-     * @return $this
+     * @return static
      */
     public function addParam($key, $value = null) {
         $this->set($key, $value);
