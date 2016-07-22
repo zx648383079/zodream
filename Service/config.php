@@ -15,11 +15,14 @@ $configs = array(
 		'action'     => 'Action',
 	),
 	'session' => array(
-		'driver' => \Zodream\Infrastructure\Session\Session::class
+		'driver' => Zodream\Infrastructure\Session\Session::class
+	),
+	'cache' => array(
+		'driver' => Zodream\Infrastructure\Caching\FileCache::class,
+		'auto' => false
 	),
 	'auth'   => array(
-		'driver' => Zodream\Domain\Authentication\Auth::class,        //用户判断
-		'role'   => \Zodream\Domain\Authentication\Roles::class,       //权限判断
+		'driver' => Zodream\Domain\Access\Auth::class,        //用户判断
 		'home'  => 'account'                             //用户登录主页
 	),
 	'route'  => array(

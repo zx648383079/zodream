@@ -6,7 +6,6 @@ namespace Zodream\Service;
 * @author Jason
 * @time 2015-12-19
 */
-use Zodream\Domain\Html\VerifyCsrfToken;
 use Zodream\Domain\Autoload;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Cookie;
@@ -31,9 +30,6 @@ class Application {
 			->shutDown();
 		Cookie::restore();
 		EventManger::getInstance()->run('appRun');
-		if (Config::getInstance()->get('safe.csrf', false) && !Request::isGet()) {
-			VerifyCsrfToken::verify();
-		}
 		$route = Factory::router()->run();
 		return $route->run();
 	}
