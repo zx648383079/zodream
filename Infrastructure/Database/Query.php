@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Database;
  * Date: 2016/3/19
  * Time: 10:30
  */
+use Zodream\Domain\Html\Page;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class Query extends BaseQuery {
@@ -59,7 +60,20 @@ class Query extends BaseQuery {
         $this->load($args);
     }
 
-
+    /**
+     * MAKE LIKE 'SELECT' TO EMPTY ARRAY!
+     * @param $tag
+     * @return $this
+     */
+    public function flush($tag) {
+        $args = func_get_args();
+        foreach ($args as $item) {
+            if (in_array($item, $this->sequence)) {
+                $this->$item = [];
+            }
+        }
+        return $this;
+    }
 
     public function load(array $args) {
         foreach ($args as $key => $item) {
@@ -77,14 +91,21 @@ class Query extends BaseQuery {
      * @return $this
      */
     public function select($field = '*') {
+        $this->select = [];
+        return $this->andSelect($field);
+    }
+    
+    public function andSelect($field = '*') {
         if (!is_array($field)) {
             $field = func_get_args();
         }
         foreach ($field as $key => $value) {
-            if (is_int($key)) {
-                $this->select[] = $value;
-            } else {
+            if (!is_int($key)) {
                 $this->select[] = $value. ' AS '.$key;
+                continue;
+            }
+            if (!is_null($value)) {
+                $this->select[] = $value;
             }
         }
         return $this;
@@ -357,6 +378,14 @@ class Query extends BaseQuery {
             return $this->command()->getArray($this->getSql(), $this->get());
         }
         return $this->command()->getObject($this->getSql(), $this->get());
+    }
+    
+    public function page($size = 20, $key = 'page') {
+        $select = $this->select;
+        $this->select = [];
+        $page = new Page($this, $size, $key);
+        $this->select = $select;
+        return $page->setPage($this->limit($page->getLimit())->all());
     }
 
     /**

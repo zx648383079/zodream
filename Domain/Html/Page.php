@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Domain\Html;
 
+use Zodream\Infrastructure\Database\Query;
 use Zodream\Infrastructure\Request;
 class Page {
 	private $_total = 0;
@@ -31,9 +32,15 @@ class Page {
 	/**
 	 * 设置总共的数据
 	 * @param $total
+	 * @return $this
 	 */
 	public function setTotal($total) {
+		if ($total instanceof Query) {
+			$this->_total = $total->count()->scalar();
+			return $this;
+		}
 		$this->_total = $total;
+		return $this;
 	}
 
 	/**
@@ -47,9 +54,11 @@ class Page {
 	/**
 	 * 设置一页的数据
 	 * @param $data
+	 * @return $this
 	 */
 	public function setPage($data) {
 		$this->_data = $data;
+		return $this;
 	}
 
 	/**
@@ -89,5 +98,9 @@ class Page {
 		$option['index'] = $this->_index;
 		$option['key'] = $this->_key;
 		return PageLink::show($option);
+	}
+	
+	public function __toString() {
+		return $this->getLink();
 	}
 }
