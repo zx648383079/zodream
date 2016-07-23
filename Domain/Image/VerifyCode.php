@@ -93,9 +93,10 @@ final class VerifyCode extends WaterMark {
 			);
 		}
 	}
-	
+
 	/**
 	 * 生成线条、雪花
+	 * @param int $level
 	 */
 	private function _createLine($level = 1) {
 		//线条

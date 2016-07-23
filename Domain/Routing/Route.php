@@ -96,7 +96,8 @@ class Route {
 	
 	protected function runAction() {
 		$action = $this->action['uses'];
-		if (is_callable($action)) {
+		// 排除一个的方法
+		if (is_callable($action) && (!is_string($action) || strpos($action, '\\') > 0)) {
 			return call_user_func($action);
 		}
 		if (strpos($action, '@') === false) {

@@ -161,9 +161,12 @@ abstract class BaseController extends Action {
 	 * @param array $data 要传的数据
 	 * @return BaseResponse
 	 */
-	public function show($name, $data = null) {
+	public function show($name = null, $data = null) {
 		if (is_array($name)) {
 			$data = $name;
+			$name = null;
+		}
+		if (is_null($name)) {
 			$name = $this->action;
 		}
 		if (!empty($data)) {

@@ -7,6 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 14:34
  */
 use Zodream\Domain\Response\Redirect;
+use Zodream\Domain\Response\RedirectResponse;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
@@ -50,13 +51,13 @@ abstract class BaseOAuth extends ThirdParty {
         $state = StringExpand::randomNumber(7);
         Factory::session()->set('state', $state);
         $this->set('state', $state);
-        $this->redirect('login');
+        return $this->redirect('login');
     }
     
     public function redirect($name) {
         $url = $this->getUrl($name);
         if (!empty($url)) {
-            Redirect::to($url);
+            return new RedirectResponse($url);
         }
         Error::out('URL IS ERROR! '.$this->getError(), __FILE__, __LINE__);
     }
