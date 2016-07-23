@@ -389,7 +389,7 @@ class Generate {
 				$result .= '|string:3-'.$match[2];
 				break;
 		}
-		return $result;
+		return ltrim($result, '|');
 	}
 
 	/**

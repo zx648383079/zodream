@@ -413,9 +413,6 @@ class Query extends BaseQuery {
     }
 
     protected function getSelect() {
-        if (empty($this->select)) {
-            return null;
-        }
         return 'SELECT '.$this->getField();
     }
 

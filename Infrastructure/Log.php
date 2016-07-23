@@ -1,5 +1,7 @@
 <?php 
 namespace Zodream\Infrastructure;
+use Zodream\Infrastructure\EventManager\Action;
+
 /**
 * 日志类
 * 
@@ -18,8 +20,7 @@ class Log {
 
     public static function save($data, $action) {
         $instance = Config::getInstance()->get('safe.log');
-        $model = new $instance;
-        return call_user_func(array($model, 'addLog'), $data, $action);
+        return (new Action($instance))->run([$data, $action]);
     }
  
     /**

@@ -21,7 +21,7 @@ class Action {
     }
 
     public function run($args = array()) {
-        if ($this->class instanceof \Closure) {
+        if (is_callable($this->class)) {
             return $this->_callFunc($this->class, $args);
         }
         if (strpos($this->class, '::') === false &&
@@ -43,9 +43,6 @@ class Action {
     }
 
     private function _runWithClass($args) {
-        if (strpos($this->class, '::') !== false) {
-            return $this->_callFunc($this->class, $args);
-        }
         if (!class_exists($this->class)) {
             return false;
         }
@@ -57,14 +54,10 @@ class Action {
         if (empty($this->function)) {
             return false;
         }
-        if ($this->function instanceof \Closure) {
-            $function = $this->function;
-            return $function($args);
+        if (is_callable($this->function)) {
+            return $this->_callFunc($this->function, $args);
         }
-        if (!class_exists($this->class)) {
-            return false;
-        }
-        return $this->_callFunc($this->function, $args);
+        return false;
     }
 
     private function _callFunc($func, $args) {

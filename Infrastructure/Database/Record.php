@@ -18,12 +18,13 @@ class Record extends Query {
         }
         if (is_array($key)) {
             $this->parameters = array_merge($this->parameters, $key);
-            return;
+            return $this;
         }
         if (empty($key)) {
-            return;
+            return $this;
         }
         $this->parameters[$key] = $value;
+        return $this;
     }
 
     /**
@@ -118,7 +119,7 @@ class Record extends Query {
                 $data[] = $value;
                 continue;
             }
-            $data[] = ["`$key` = ?"];
+            $data[] = "`{$key}` = ?";
             $parameters[] = $value;
         }
         return $this->setTable()

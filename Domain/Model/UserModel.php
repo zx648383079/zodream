@@ -17,7 +17,7 @@ abstract class UserModel extends Model implements UserObject {
 
     public function login($user) {
         $this->runBehavior(static::BEFORE_LOGIN);
-        Factory::session()->set('user', $this);
+        Factory::session()->set('user', $user);
         $this->runBehavior(static::AFTER_LOGIN);
         return true;
     }

@@ -17,7 +17,10 @@ class ModelFilter extends DataFilter {
      * @param array $rules
      * @return bool
      */
-    public static function validate(Model $model, array $rules) {
+    public static function validate($model, $rules) {
+        if (!$model instanceof Model) {
+            return parent::validate($model, $rules);
+        }
         $result = true;
         foreach ($rules as $key => $item) {
             $result = $result && self::validateOne($model, $item, $key) === true;

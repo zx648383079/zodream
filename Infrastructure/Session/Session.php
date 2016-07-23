@@ -19,7 +19,7 @@ class Session implements \ArrayAccess {
     }
 
     public function isActive() {
-        return session_status() == PHP_SESSION_ACTIVE;
+        return session_status() === PHP_SESSION_ACTIVE;
     }
 
     public function open() {
@@ -118,6 +118,7 @@ class Session implements \ArrayAccess {
             $this->open();
             return session_id();
         }
+        $this->close();
         return session_id($value);
     }
 

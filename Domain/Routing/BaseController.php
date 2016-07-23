@@ -198,7 +198,8 @@ abstract class BaseController extends Action {
 	 */
 	protected function beforeFilter($action) {
 		$action = str_replace(APP_ACTION, '', $action);
-		foreach ($this->rules() as $key => $item) {
+		$rules = $this->rules();
+		foreach ($rules as $key => $item) {
 			if ($action === $key) {
 				return $this->process($item);
 			}
@@ -208,6 +209,9 @@ abstract class BaseController extends Action {
 					return $this->process($item);
 				}
 			}
+		}
+		if (array_key_exists('*', $rules)) {
+			return $this->process($rules['*']);
 		}
 		return true;
 	}

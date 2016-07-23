@@ -67,14 +67,8 @@ abstract class Model extends MagicObject {
 	protected $primaryKey = [
 		'id'
 	];
-	/**
-	 * @var Command
-	 */
-	protected $command;
 
 	public function __construct() {
-		$this->command = Command::getInstance();
-		$this->command->setTable(self::$table);
 		$this->init();
 	}
 	

@@ -32,7 +32,7 @@ class Auth implements AuthObject {
 	 * @return bool|UserObject
 	 */
 	public static function user() {
-		if (empty(static::getIdentity())) {
+		if (!empty(static::getIdentity())) {
 			return static::$identity;
 		}
 		return false;
