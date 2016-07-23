@@ -22,19 +22,17 @@ class GraceRouter extends BaseRouter implements RouterObject {
 	private static function _spiltArrayByNumber(array $routes) {
 		$values = array();
 		for ($i = 0, $len = count($routes); $i < $len; $i++) {
-			if (is_numeric($routes[$i])) {
-				if (($len - $i) % 2 == 0) {
-					// 数字作为分割符,无意义
-					$values = array_splice($routes, $i + 1);
-					unset($routes[$i]);
-				} else {
-					$routes[$i - 1] = strtolower($routes[$i - 1]);
-					$values = array_splice($routes, $i - 1);
-				}
-				break;
-			} else {
-				$routes[$i] = ucfirst($routes[$i]);
+			if (!is_numeric($routes[$i])) {
+				continue;
 			}
+			if (($len - $i) % 2 == 0) {
+				// 数字作为分割符,无意义
+				$values = array_splice($routes, $i + 1);
+				unset($routes[$i]);
+			} else {
+				$values = array_splice($routes, $i - 1);
+			}
+			break;
 		}
 		return array(
 			$routes,

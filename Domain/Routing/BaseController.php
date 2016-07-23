@@ -12,6 +12,7 @@ use Zodream\Domain\Response\AjaxResponse;
 use Zodream\Domain\Response\BaseResponse;
 use Zodream\Domain\Response\HtmlResponse;
 use Zodream\Domain\Response\RedirectResponse;
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Error\Error;
