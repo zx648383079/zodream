@@ -90,6 +90,22 @@ abstract class ThirdParty extends MagicObject {
     }
 
     /**
+     * GET URL THAT METHOD IS GET
+     * @param string $name
+     * @return bool|string
+     */
+    protected function getUrl($name) {
+        if (isset($this->apiMap[$name][2]) && strtolower($this->apiMap[$name][2]) !== 'get') {
+            return false;
+        }
+        $data = $this->getData(isset($this->apiMap[$name][1]) ? $this->apiMap[$name][1] : array());
+        if ($data === false) {
+            return false;
+        }
+        return StringExpand::urlBindValue($this->apiMap[$name][0], $data);
+    }
+
+    /**
      * 获取值 根据 #区分必须  $key => $value 区分默认值
      * @param array $keys
      * @return array

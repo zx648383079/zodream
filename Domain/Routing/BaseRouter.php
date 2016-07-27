@@ -1,7 +1,8 @@
 <?php 
 namespace Zodream\Domain\Routing;
 /**
-* 路由
+* BASE ROUTER
+ * 		IT DON'T KNOW HOW TO JUDGE, BU IT'S CHILD KNOW!
 * 
 * @author Jason
 */

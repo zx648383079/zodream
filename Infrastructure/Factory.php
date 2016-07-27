@@ -1,7 +1,8 @@
 <?php
 namespace Zodream\Infrastructure;
 /**
- * 工厂类分发各种单例模式
+ * FACTORY!
+ *      EVERYWHERE CAN USE,AND NOT CREATE, AND ALL IS SAME,
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/6/24
@@ -21,7 +22,15 @@ use Zodream\Infrastructure\Session\Session;
 class Factory {
     
     private static $_instance = [];
-    
+
+    /**
+     * GET A INSTANCE BY KEY
+     *      IF HAD RETURN HAD, IF NOT CREATE FROM CONFIG OR DEFAULT
+     * @param string $key CONFIG'S KEY
+     * @param string $default
+     * @return object
+     * @throws Error\Exception
+     */
     public static function getInstance($key, $default = null) {
         if (!array_key_exists($key, static::$_instance)) {
             $class = Config::getValue($key, $default);
@@ -37,7 +46,7 @@ class Factory {
     }
 
     /**
-     * 会话
+     * DO YOU NEED A SESSION , HERE!
      * @return Session
      */
     public static function session() {
@@ -45,7 +54,7 @@ class Factory {
     }
 
     /**
-     * 缓存
+     * DO YO WANT TO CACHE MODEL? HERE!
      * @return Cache
      */
     public static function cache() {
@@ -53,7 +62,7 @@ class Factory {
     }
 
     /**
-     * 多语言
+     * DO YOU WANT TO SHOW LOCAL LANGUAGE? HERE!
      * @return I18n
      */
     public static function i18n() {
@@ -61,7 +70,8 @@ class Factory {
     }
 
     /**
-     * 路由
+     * O! IF YOU NEED ROUTE, HERE. 
+     *          IT GO TO DO SOME THING LIKE GO TO CONTROLLER
      * @return RouterObject
      */
     public static function router() {
@@ -69,7 +79,9 @@ class Factory {
     }
 
     /**
-     * 响应头
+     * I WANT TO SEND HEADERS WHEN REQUEST FINISH! 
+     *      BUT NOW IT'S NOT FINISH!
+     *          WOW! PLEASE WAIT A LITTLE TIME.
      * @return Headers
      */
     public static function header() {
@@ -77,6 +89,7 @@ class Factory {
     }
 
     /**
+     * IT IS MAKE VIEW OR HTML FROM ANT FILES,
      * @return View
      */
     public static function view() {

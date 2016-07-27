@@ -29,22 +29,6 @@ abstract class BaseOAuth extends ThirdParty {
     }
 
     /**
-     * 获取url
-     * @param string $name
-     * @return bool|string
-     */
-    protected function getUrl($name) {
-        if (isset($this->apiMap[$name][2]) && strtolower($this->apiMap[$name][2]) !== 'get') {
-            return false;
-        }
-        $data = $this->getData(isset($this->apiMap[$name][1]) ? $this->apiMap[$name][1] : array());
-        if ($data === false) {
-            return false;
-        }
-        return StringExpand::urlBindValue($this->apiMap[$name][0], $data);
-    }
-
-    /**
      * 重定向到登录页面
      */
     public function login() {

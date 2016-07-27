@@ -1,14 +1,16 @@
 <?php 
 namespace Zodream\Infrastructure;
 /**
-* cookie 读写类
+* I LIKE COOKIE, BUT COOKIE IS NOT SAFE, SO YOU TAKE CARE OF YOURSELF
+ *		COOKIE SEND AND GET
 * 
 * @author Jason
 */
 
 class Cookie {
 	/**
-	 * 修复客户端传递的 cookie 第一个键名出现异常字符
+	 * IF YOU FIND YOUR COOKIE IS ALWAYS SET COOKIE, BUT YOU DON'T SET,
+	 * 		YOU NEED UPDATE YOU ROUTER OR USE THIS
 	 */
 	public static function restore() {
 		foreach ($_COOKIE as $key => $value) {
@@ -19,7 +21,7 @@ class Cookie {
 	}
 	
 	/**
-	 * $_COOKIE
+	 * GET A COOKIE BY KEY
 	 * @param string $key
 	 * @param string $default
 	 * @return array|string
@@ -29,7 +31,7 @@ class Cookie {
 	}
 
 	/**
-	 * set cookie
+	 * SET COOKIE, IF HEADER SENT , THIS WILL BE ERROR!
 	 * @param string $name 名称
 	 * @param string $value 值
 	 * @param int|number $expire 有效期
@@ -43,7 +45,9 @@ class Cookie {
 	}
 	
 	/**
-	 * 删除
+	 * DELETE COOKIE NO YOU DELETE. 
+	 * 		MAKE COOKIE EXPIRED ,
+	 * 			THEN BROWSER WILL DELETE IT
 	 * @param string $name 名称
 	 */
 	public static function delete($name) {
