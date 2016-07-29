@@ -16,7 +16,6 @@ class Factory {
     protected $engine;
 
     public function __construct() {
-        
         $this->shared['__env'] = $this;
     }
 

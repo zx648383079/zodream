@@ -1,13 +1,12 @@
 <?php 
 namespace Zodream\Infrastructure;
-use Zodream\Infrastructure\Error\Exception;
-
 /**
  * 文件操作
  *
  * @author Jason
  * @time 2015-12-1
  */
+use Zodream\Infrastructure\Error\Exception;
 
 class FileSystem {
 
