@@ -16,7 +16,7 @@ class RegexRouter extends BaseRouter implements RouterObject {
      * @return string|array
      */
     public function to($file) {
-        // TODO: Implement to() method.
+        return $file;
     }
     
     public function run() {

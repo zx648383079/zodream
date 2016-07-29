@@ -72,7 +72,7 @@ abstract class BaseController extends Action {
 		return $result;
 	}
 	
-	protected function runClassAction($action) {
+	private function runClassAction($action) {
 		$class = $this->actions()[$action];
 		if (is_callable($class)) {
 			return call_user_func($class);
@@ -91,7 +91,7 @@ abstract class BaseController extends Action {
 		return $result;
 	}
 
-	protected function runAllAction($action, $vars = array()) {
+	private function runAllAction($action, $vars = array()) {
 		$reflectionObject = new \ReflectionObject( $this );
 		$action .= APP_ACTION;
 		$method = $reflectionObject->getMethod($action);
@@ -200,7 +200,7 @@ abstract class BaseController extends Action {
 	 * @param string $action 方法名
 	 * @return boolean|BaseResponse
 	 */
-	protected function beforeFilter($action) {
+	private function beforeFilter($action) {
 		$action = str_replace(APP_ACTION, '', $action);
 		$rules = $this->rules();
 		foreach ($rules as $key => $item) {
@@ -224,7 +224,7 @@ abstract class BaseController extends Action {
 	 * @param string|callable $role
 	 * @return bool|RedirectResponse
 	 */
-	protected function process($role) {
+	private function process($role) {
 		if (is_callable($role)) {
 			return call_user_func($role);
 		}
@@ -242,7 +242,7 @@ abstract class BaseController extends Action {
 		return true;
 	}
 
-	protected function processOne($role) {
+	private function processOne($role) {
 		if ($role === '*') {
 			return true;
 		}

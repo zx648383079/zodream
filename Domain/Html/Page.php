@@ -53,10 +53,13 @@ class Page {
 
 	/**
 	 * 设置一页的数据
-	 * @param $data
+	 * @param array|Query $data
 	 * @return $this
 	 */
 	public function setPage($data) {
+		if ($data instanceof Query) {
+			$data = $data->limit($this->getLimit())->all();
+		}
 		$this->_data = $data;
 		return $this;
 	}
