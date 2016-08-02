@@ -271,6 +271,17 @@ class StringExpand {
 	}
 
 	/**
+	 * EXPLODE STRING BY ARRAY
+	 * @param array $delimiters
+	 * @param $string
+	 * @return array
+	 */
+	public static function multiExplode(array $delimiters, $string) {
+		$ready = str_replace($delimiters, $delimiters[0], $string);
+		return explode($delimiters[0], $ready);
+	}
+
+	/**
 	 * 判断字符串是否以$needles开头
 	 * @param string $haystack
 	 * @param string|array $needles
