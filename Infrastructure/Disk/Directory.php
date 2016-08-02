@@ -74,6 +74,22 @@ class Directory extends FileObject {
     }
 
     /**
+     * GET FILE BY NAME IN THIS DIRECTORY
+     * @param string $name
+     * @return bool|FileObject
+     */
+    public function child($name) {
+        $file = $this->fullName . '/'. $name;
+        if (is_dir($file)) {
+            return new static($file);
+        }
+        if (is_file($file)) {
+            return new File($file);
+        }
+        return false;
+    }
+
+    /**
      * EXIST DIRECTORY
      * @return bool
      */

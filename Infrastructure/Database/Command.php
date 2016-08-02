@@ -92,7 +92,7 @@ class Command {
         if (!$this->allowCache) {
             return null;
         }
-        $cache = Factory::cache()->get(md5($sql));
+        $cache = Factory::cache()->get('data/'.md5($sql));
         if (empty($cache)) {
             return null;
         }
@@ -103,7 +103,7 @@ class Command {
         if (!$this->allowCache) {
             return;
         }
-        return Factory::cache()->set(md5($sql), serialize($data), 3600);
+        return Factory::cache()->set('data/'.md5($sql), serialize($data), 3600);
     }
 
     /**

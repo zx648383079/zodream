@@ -1,7 +1,5 @@
 <?php
 namespace Zodream\Domain\Template;
-use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 /**
  *
@@ -11,6 +9,9 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
  * Date: 2016/7/16
  * Time: 11:24
  */
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+
 class BladeCompiler extends Compiler implements CompilerObject {
     /**
      * All of the registered extensions.

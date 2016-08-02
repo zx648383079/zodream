@@ -277,7 +277,7 @@ abstract class BaseController extends Action {
 		if (!is_string($key)) {
 			$key = serialize($key);
 		}
-		$key = md5($key);
+		$key = 'views/'.md5($key);
 		if (empty($update) && ($cache = Factory::cache()->get($key))) {
 			return $cache;
 		}

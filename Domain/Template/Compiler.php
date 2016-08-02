@@ -17,7 +17,7 @@ abstract class Compiler {
      */
     protected $cachePath;
 
-    public function __construct( $cachePath) {
+    public function __construct($cachePath) {
         $this->cachePath = $cachePath;
     }
 

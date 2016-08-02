@@ -397,7 +397,7 @@ abstract class Model extends MagicObject {
 		if (is_numeric($param)) {
 			$param = [$model->primaryKey[0] => $param];
 		}
-		if (!array_key_exists('where', $param)) {
+		if (!is_array($param) || !array_key_exists('where', $param)) {
 			$param = [
 				'where' => $param
 			];
