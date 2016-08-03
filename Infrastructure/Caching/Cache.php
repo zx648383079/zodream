@@ -8,6 +8,17 @@ namespace Zodream\Infrastructure\Caching;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 abstract class Cache implements \ArrayAccess {
+
+	/**
+	 * gc自动执行的几率 0-1000000；
+	 * @var int
+	 */
+	protected $gcChance = 10;
+
+	public function setGCChance($chance) {
+		$this->gcChance = intval($chance);
+		return $this;
+	}
 	
 	public function filterKey($key) {
 		if (is_string($key)) {

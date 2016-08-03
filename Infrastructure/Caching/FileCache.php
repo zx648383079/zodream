@@ -5,20 +5,50 @@ namespace Zodream\Infrastructure\Caching;
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Disk\Directory;
+use Zodream\Infrastructure\Disk\File;
 
 class FileCache extends Cache {
-	
-	public $cachePath = 'cache/';
-	public $cacheExtension = '.cache';
-	/**
-	 * gc自动执行的几率 0-1000000；
-	 * @var int
-	 */
-	public $gcChance = 10;
-	
-	protected function getValue($key) {
-		$cacheFile = $this->_getCacheFile($key);
-        if (is_file($cacheFile) && @filemtime($cacheFile) > time()) {
+
+    /**
+     * @var Directory
+     */
+	protected $directory;
+
+	protected $extension = '.cache';
+
+
+    public function __construct() {
+        $configs = Config::getValue('cache', [
+            'directory' => 'cache/',
+            'extension' => '.cache',
+            'gc' => 10
+        ]);
+        $this->setDirectory($configs['directory'])
+            ->setExtension($configs['extension'])
+            ->setGCChance($configs['gc']);
+    }
+
+    public function setDirectory($directory) {
+        if (!$directory instanceof Directory) {
+            $directory = new Directory(APP_DIR.'/'.trim($this->cachePath, '/'));
+        }
+        $this->directory = $directory;
+        return $this;
+    }
+
+    public function setExtension($arg) {
+        if ($arg[0] !== '.') {
+            $arg = '.'.$arg;
+        }
+        $this->extension = $arg;
+        return $this;
+    }
+
+    protected function getValue($key) {
+		$cacheFile = $this->getCacheFile($key);
+        if ($cacheFile->exist() && $cacheFile->modifyTime() > time()) {
             $fp = @fopen($cacheFile, 'r');
             if ($fp !== false) {
                 @flock($fp, LOCK_SH);
@@ -33,19 +63,19 @@ class FileCache extends Cache {
 	
 	protected function setValue($key, $value, $duration) {
 		$this->gc();
-		$cacheFile = $this->_getCacheFile($key);
-		if (@file_put_contents($cacheFile, $value, LOCK_EX) !== false) {
+		$cacheFile = $this->getCacheFile($key);
+		if ($cacheFile->write($value, LOCK_EX) !== false) {
             if ($duration <= 0) {
                 $duration = 31536000; // 1 year
             }
-            return @touch($cacheFile, $duration + time());
+            return $cacheFile->touch($duration + time());
         }
         return null;
 	}
 	
 	protected function addValue($key, $value, $duration) {
-		$cacheFile = $this->_getCacheFile($key);
-        if (@filemtime($cacheFile) > time()) {
+		$cacheFile = $this->getCacheFile($key);
+        if ($cacheFile->modifyTime() > time()) {
             return false;
         }
 
@@ -53,13 +83,13 @@ class FileCache extends Cache {
 	}
 	
 	protected function hasValue($key) {
-		$cacheFile = $this->_getCacheFile($key);
-        return @filemtime($cacheFile) > time();
+		$cacheFile = $this->getCacheFile($key);
+        return $cacheFile->modifyTime() > time();
 	}
 	
 	protected function deleteValue($key) {
-		$cacheFile = $this->_getCacheFile($key);
-        return @unlink($cacheFile);
+		$cacheFile = $this->getCacheFile($key);
+        return $cacheFile->delete();
 	}
 	
 	protected function clearValue() {
@@ -67,38 +97,28 @@ class FileCache extends Cache {
 		return true;
 	}
 
-    private function _getCacheDir() {
-        return APP_DIR.'/'.trim($this->cachePath, '/');
-    }
-	
-	private function _getCacheFile($key) {
-        $cache = $this->_getCacheDir();
-        if (!is_dir($cache)) {
-            mkdir($cache);
-        }
-		return $cache.'/'.$key.$this->cacheExtension;
+    /**
+     * @param string $key
+     * @return File
+     */
+	public function getCacheFile($key) {
+        $this->directory->create();
+		return $this->directory->childFile($key.$this->cacheExtension);
 	}
 	
 	public function gc($force = false, $expiredOnly = true) {
         if ($force || mt_rand(0, 1000000) < $this->gcChance) {
-            $this->gcRecursive($this->_getCacheDir(), $expiredOnly);
+            $this->gcRecursive($this->directory, $expiredOnly);
         }
     }
     
-    protected function gcRecursive($path, $expiredOnly) {
-        if (($handle = opendir($path)) !== false) {
-            while (($file = readdir($handle)) !== false) {
-                if ($file[0] === '.') {
-                    continue;
-                }
-                $fullPath = $path.'/' . $file;
-                if (!$expiredOnly || $expiredOnly && @filemtime($fullPath) < time()) {
-                    if (!@unlink($fullPath)) {
-                        
-                    }
-                }
+    protected function gcRecursive(Directory $directory, $expiredOnly) {
+        foreach ($directory->children() as $item) {
+            if (!$expiredOnly || $expiredOnly 
+                && $item instanceof File 
+                && $item->modifyTime() < time()) {
+                $item->delete();
             }
-            closedir($handle);
         }
     }
 }

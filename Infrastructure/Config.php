@@ -117,6 +117,7 @@ class Config extends MagicObject {
 	 * 支持根据键合并数组
 	 * @param array|string $key
 	 * @param mixed $value
+	 * @return $this|void
 	 */
 	public function set($key, $value = null) {
 		if ($this->has($key) && is_array($value)) {

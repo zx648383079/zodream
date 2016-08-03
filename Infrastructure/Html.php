@@ -253,4 +253,12 @@ class Html {
             count($arguments) > 1 ? $arguments[1] : array()
         );
     }
+
+    public static function encode($content, $doubleEncode = true) {
+        return htmlspecialchars($content, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+    }
+
+    public static function decode($content) {
+        return htmlspecialchars_decode($content, ENT_QUOTES);
+    }
 }

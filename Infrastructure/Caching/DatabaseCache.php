@@ -24,7 +24,6 @@ class DatabaseCache extends Cache {
 	
 	protected $table = 'cache';
 
-	public $gcProbability = 100;
 
 
 	public function __construct() {
@@ -73,7 +72,7 @@ class DatabaseCache extends Cache {
 	}
 
 	public function gc($force = false) {
-		if ($force || mt_rand(0, 1000000) < $this->gcProbability) {
+		if ($force || mt_rand(0, 1000000) < $this->gcChance) {
 			$this->db->delete('expire > 0 AND expire < ' . time());
 		}
 	}

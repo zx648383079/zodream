@@ -37,7 +37,7 @@ class Directory extends FileObject {
      * @return bool
      */
     public function create() {
-        if (is_dir($this->fullName)) {
+        if ($this->exist()) {
             return true;
         }
         $args = explode('/', str_replace('\\', '/', $this->fullName));
@@ -87,6 +87,32 @@ class Directory extends FileObject {
             return new File($file);
         }
         return false;
+    }
+
+    public function hasFile($name) {
+        return is_file($this->fullName . '/'. $name);
+    }
+
+    public function hasDirectory($name) {
+        return is_dir($this->fullName . '/'. $name);
+    }
+
+    /**
+     * GET FILE BY NAME
+     * @param string $name
+     * @return File
+     */
+    public function childFile($name) {
+        return new File($this->fullName . '/'. $name);
+    }
+
+    /**
+     * GET DIRECTORY BY NAME 
+     * @param $name
+     * @return static
+     */
+    public function childDirectory($name) {
+        return new File($this->fullName . '/'. $name);
     }
 
     /**
