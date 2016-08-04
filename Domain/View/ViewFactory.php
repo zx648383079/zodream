@@ -62,6 +62,7 @@ class ViewFactory extends MagicObject {
             $this->engine = new $class($this);
         }
         $this->cache = new FileCache();
+        $this->setDirectory($this->configs['directory']);
         $this->set('__zd', $this);
     }
     

@@ -32,7 +32,7 @@ class FileCache extends Cache {
 
     public function setDirectory($directory) {
         if (!$directory instanceof Directory) {
-            $directory = new Directory(APP_DIR.'/'.trim($this->cachePath, '/'));
+            $directory = new Directory(APP_DIR.'/'.trim($directory, '/'));
         }
         $this->directory = $directory;
         return $this;
@@ -103,7 +103,7 @@ class FileCache extends Cache {
      */
 	public function getCacheFile($key) {
         $this->directory->create();
-		return $this->directory->childFile($key.$this->cacheExtension);
+		return $this->directory->childFile($key.$this->extension);
 	}
 	
 	public function gc($force = false, $expiredOnly = true) {

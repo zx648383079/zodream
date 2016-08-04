@@ -6,57 +6,7 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 class ArrayExpand {
-	private static $_before  = array();
 	
-	private static $_content = array();
-	
-	private static $_after   = array();
-	
-	private static function _arrayList(array $args) {
-		foreach ($args as $key => $value) {
-			if (is_int($key)) {
-				if (is_array($value)) {
-					self::_arrayList($value);
-				} else {
-					self::$_content[] = $value;
-				}
-			} else {
-				switch ($key) {
-					case 'before':
-					case 'before[]':
-						if (is_array($value)) {
-							self::$_before = array_merge(self::$_before, self::toFile($value, '/'));
-						} else {
-							self::$_before[] = $value;
-						}
-						break;
-					case 'after':
-					case 'after[]':
-						if (is_array($value)) {
-							self::$_after = array_merge(self::$_after, self::toFile($value, '/'));
-						} else {
-							self::$_after[] = $value;
-						}
-						break;
-					default:
-						self::$_content = array_merge(self::$_content, self::toFile((array)$value, '/', $key.'/'));
-						break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * 自定义排序 根据关键词 before after
-	 * @param array $args 要排序的数组
-	 * @return array 数组
-	 */
-	public static function sort(array $args) {
-		self::$_before = self::$_content = self::$_after = array();
-		self::_arraylist($args);
-		return array_merge(self::$_before, self::$_content, self::$_after);
-	}
-
 	/**
 	 * 寻找第一个符合的
 	 * @param array $array

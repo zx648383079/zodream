@@ -7,11 +7,11 @@ namespace Zodream\Infrastructure\ObjectExpand;
  * Time: 17:01
  */
 class JsonExpand {
-    public static function decode($json, $is_array = true) {
+    public static function decode($json, $isArray = true) {
         if (!is_string($json)) {
-            return $xml;
+            return $json;
         }
-        if ($is_array === false) {
+        if ($isArray === false) {
             return json_decode($json);
         }
         return json_decode($json, true);

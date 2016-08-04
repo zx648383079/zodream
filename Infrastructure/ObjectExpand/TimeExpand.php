@@ -28,11 +28,11 @@ class TimeExpand {
 	const TODAY = 0;
 	const YESTERDAY = 1;
 	const WEEK = 2;
-	const LASTWEEK = 3;
+	const LAST_WEEK = 3;
 	const MONTH = 4;
-	const LASTMONTH = 5;
+	const LAST_MONTH = 5;
 	const YEAR = 6;
-	const LASTYEAR = 7;
+	const LAST_YEAR = 7;
 
 	/**
 	 * 获取开始时间和结束时间
@@ -61,7 +61,7 @@ class TimeExpand {
 					mktime(0, 0, 0, date('m'), date('d') - $week + 1, date('Y')),
 					mktime(0, 0, 0, date('m'), date('d') + 7 - $week, date('Y')),
 				];
-			case self::LASTWEEK:
+			case self::LAST_WEEK:
 				$week = date('w');
 				if ($week == 0) {
 					$week = 7;
@@ -75,7 +75,7 @@ class TimeExpand {
 					mktime(0, 0, 0, date('m'), 1, date('Y')),
 					mktime(23, 59, 59, date('m'), date('t'), date('Y'))
 				);
-			case self::LASTMONTH:
+			case self::LAST_MONTH:
 				return array(
 					mktime(0, 0, 0, date('m') - 1, 1, date('Y')),
 					mktime(23, 59, 59, date('m'), 0, date('Y'))
@@ -85,7 +85,7 @@ class TimeExpand {
 					mktime(0, 0, 0, 1, 1, date('Y')),
 					mktime(23, 59, 59, 12, 31, date('Y'))
 				);
-			case self::LASTYEAR:
+			case self::LAST_YEAR:
 				return array(
 					mktime(0, 0, 0, 1, 1, date('Y') - 1),
 					mktime(23, 59, 59, 12, 31, date('Y') - 1)
@@ -126,171 +126,5 @@ class TimeExpand {
 			return $numberOfUnits.' '.$text.'前';
 		}
 		return self::format($time);
-	}
-	
-	/**
-	 * 本周一
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function thisMonday($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//周一的时间
-		$time = $timestamp-86400*(date('N',$timestamp)-1);
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	
-	}
-	
-	/**
-	 * 本周日
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function thisSunday($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//周日
-		$time = $timestamp+86400*(7-date('N',$timestamp));
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	}
-	
-	/**
-	 * 上周一
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function lastMonday($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//上周同一时间
-		$timestamp = $timestamp-86400*7;
-		//周一的时间
-		$time = $timestamp-86400*(date('N',$timestamp)-1);
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	}
-	
-	/**
-	 * 上个星期天
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function lastSunday($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//上周同一时间
-		$timestamp = $timestamp-86400*7;
-		//周日
-		$time = $timestamp+86400*(7-date('N',$timestamp));
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	
-	}
-	
-	/**
-	 * 这个月的第一天
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function monthFirstDay($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//周一的时间
-		$time = mktime(date('H',$timestamp),date('i',$timestamp),date('s',$timestamp),date('m',$timestamp),1,date('Y',$timestamp));
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	}
-	
-	
-	/**
-	 * 这个月的最后一天
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function monthLastDay($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//周一的时间
-		$time = mktime(date('H',$timestamp),date('i',$timestamp),date('s',$timestamp),date('m',$timestamp),date('t',$timestamp),date('Y',$timestamp));
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	}
-	
-	/**
-	 * 上个月的第一天
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function lastMonthFirstDay($timestamp=0,$date='',$zero=true){
-		//如果未设置时间，则使用当前时间
-		$timestamp || $timestamp = time();
-		//周一的时间
-		$time = mktime(date('H',$timestamp),date('i',$timestamp),date('s',$timestamp),date('m',$timestamp)-1,1,date('Y',$timestamp));
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	
-	}
-	
-	/**
-	 * 上个月的最后一天
-	 * @param int $timestamp 某个月的某一个时间戳，默认为当前时间
-	 * @param string $date 日期格式
-	 * @param bool|true $zero 时间是否归零到凌晨零点
-	 * @return bool|int|string
-	 */
-	static public function lastMonthLastDay($timestamp=0,$date='',$zero=true){
-	
-		//如果未设置时间，则使用当前时间
-		!$timestamp || $timestamp = time();
-		//上月第一天的当前时间
-		$timestamp = mktime(date('H',$timestamp),date('i',$timestamp),date('s',$timestamp),date('m',$timestamp)-1,1,date('Y',$timestamp));
-		//取得最后一天时间
-		$time = mktime(date('H',$timestamp),date('i',$timestamp),date('s',$timestamp),date('m',$timestamp),date('t',$timestamp),date('Y',$timestamp));
-		//归零处理
-		$zero && $time = self::_zero($time);
-		//如果设置了日期格式，按格式返回
-		return $date ? date($date,$time) : $time;
-	
-	}
-	
-	/**
-	 * 时间归零，回到当天的00:00:00
-	 * @param $timestamp
-	 * @return int
-	 */
-	static private function _zero($timestamp)
-	{
-		return strtotime(date('Y-m-d',$timestamp));
 	}
 }

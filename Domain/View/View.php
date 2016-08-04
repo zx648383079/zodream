@@ -102,7 +102,7 @@ class View {
         ob_start();
         extract($this->data, EXTR_SKIP);
         try {
-            include $this->file;
+            include $this->file->getFullName();
         } catch (Exception $e) {
             $this->handleViewException($e, $obLevel);
         } catch (Throwable $e) {

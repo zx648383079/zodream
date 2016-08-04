@@ -161,7 +161,7 @@ abstract class BaseController extends Action {
 	 * @param array $data 要传的数据
 	 * @return BaseResponse
 	 */
-	public function show($name = null, $data = null) {
+	public function show($name = null, $data = array()) {
 		if (is_array($name)) {
 			$data = $name;
 			$name = null;
@@ -169,14 +169,11 @@ abstract class BaseController extends Action {
 		if (is_null($name)) {
 			$name = $this->action;
 		}
-		if (!empty($data)) {
-			$this->send($data);
-		}
 		if (strpos($name, '/') !== 0) {
 			$pattern = 'Service.'.APP_MODULE.'.(.+)'.APP_CONTROLLER;
 			$name = preg_replace('/^'.$pattern.'$/', '$1', get_called_class()).'/'.$name;
 		}
-		return new HtmlResponse(Factory::view()->setPath($name)->render());
+		return new HtmlResponse(Factory::view()->render($name, $data));
 	}
 
 	public function ajax($data, $type = AjaxResponse::JSON) {
