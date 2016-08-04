@@ -1,18 +1,21 @@
 <?php
 namespace Zodream\Infrastructure\DomainObject;
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/7/16
  * Time: 15:20
  */
+use Zodream\Infrastructure\Disk\File;
+
 interface EngineObject {
     /**
-     * 获取内容
+     * COMPILER FILE TO CACHE FILE
      *
-     * @param  string  $path
-     * @param  array   $data
-     * @return string
+     * @param File $file
+     * @param File $cacheFile
+     * @return bool
      */
-    public function get($path, array $data = []);
+    public function compile(File $file, File $cacheFile);
 }

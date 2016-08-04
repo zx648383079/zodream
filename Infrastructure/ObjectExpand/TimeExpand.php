@@ -19,7 +19,7 @@ class TimeExpand {
 			$format = $time;
 			$time = time();
 		}
-		if ($time == null) {
+		if (is_null($time)) {
 			$time = time();
 		}
 		return date($format, $time);
@@ -103,6 +103,9 @@ class TimeExpand {
 	 * @return int|string
 	 */
 	public static function isTimeAgo($time){
+		if (empty($time)) {
+			return null;
+		}
 		$differ = time() - $time;
 		if ($differ < 1) {
 			$differ = 1;

@@ -9,7 +9,7 @@ namespace Zodream\Infrastructure;
  * Time: 22:57
  */
 use Zodream\Domain\Routing\GraceRouter;
-use Zodream\Domain\View\View;
+use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\DomainObject\RouterObject;
@@ -90,9 +90,9 @@ class Factory {
 
     /**
      * IT IS MAKE VIEW OR HTML FROM ANT FILES,
-     * @return View
+     * @return ViewFactory
      */
     public static function view() {
-        return self::getInstance('______', View::class);
+        return self::getInstance('______', ViewFactory::class);
     }
 }

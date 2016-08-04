@@ -6,10 +6,10 @@ namespace Zodream\Infrastructure\Traits;
  *
  */
 trait ConditionTrait {
-	
+
 	private $_switchCondition = null;
 	private $_switchValue;
-	
+
 	/**
 	 * 拓展switch
 	 * @param string $condition 条件或要输出的值
@@ -24,11 +24,12 @@ trait ConditionTrait {
 			$this->_switchValue = $value;
 		}
 	}
-	
+
 	/**
 	 * 拓展case
 	 * @param string|boolean $condition 条件
 	 * @param string $value 可以更改输出的值，不必先用 $this->swi
+	 * @return null|string
 	 */
 	public function cas($condition, $value = null) {
 		if (null !== $value) {
@@ -36,14 +37,16 @@ trait ConditionTrait {
 		}
 		if ((null === $this->_switchCondition && true === $condition) ||
 			($this->_switchCondition !== null && $this->_switchCondition == $condition)) {
-			echo $this->_switchValue;
+			return $this->_switchValue;
 		}
+		return null;
 	}
 
 	/**
 	 * 替换标志
 	 * @param string $name
 	 * @param string|integer|array $key
+	 * @return mixed|null
 	 */
 	public function tag($name, $key) {
 		$args = array();
@@ -55,12 +58,8 @@ trait ConditionTrait {
 			$args = $key;
 		}
 		if (isset($args[$name])) {
-			echo $args[$name];
+			return $args[$name];
 		}
+		return null;
 	}
-	
-	
-	
-	
-	
 }

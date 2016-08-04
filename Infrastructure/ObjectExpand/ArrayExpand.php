@@ -226,6 +226,24 @@ class ArrayExpand {
 				return isset($values[$keys[0]]) ? self::getChildByArray(array_slice($keys, 1), $values[$keys[0]], $default) : $default;
 		}
 	}
+
+	/**
+	 * REMOVE KEY IN ARRAY AND RETURN VALUE OR DEFAULT
+	 * @param array $array
+	 * @param string $key
+	 * @param null $default
+	 * @return mixed|null
+	 */
+	public static function remove(&$array, $key, $default = null) {
+		if (is_array($array) && (isset($array[$key]) || array_key_exists($key, $array))) {
+			$value = $array[$key];
+			unset($array[$key]);
+
+			return $value;
+		}
+
+		return $default;
+	}
 	
 	/**
 	 * 根据关键字数组取值(其中包含特殊关键字*)

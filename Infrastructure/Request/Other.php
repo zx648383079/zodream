@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\Request;
 
 /**
  * Created by PhpStorm.
@@ -8,6 +7,8 @@ use Zodream\Infrastructure\Request;
  * Date: 2016/4/3
  * Time: 9:29
  */
+use Zodream\Infrastructure\Request;
+
 class Other extends BaseRequest {
 
     public function get($name = null, $default = null) {
@@ -81,7 +82,7 @@ class Other extends BaseRequest {
         }
         // 如果via信息含有wap则一定是移动设备,部分服务商会屏蔽该信息
         if (isset($_SERVER['HTTP_VIA'])) {
-            // 找不到为flase,否则为true
+            // 找不到为false,否则为true
             return stristr($_SERVER['HTTP_VIA'], "wap") ? true : false;
         }
         // 脑残法，判断手机发送的客户端标志,兼容性有待提高

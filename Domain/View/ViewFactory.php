@@ -7,13 +7,16 @@ namespace Zodream\Domain\View;
  * Date: 2016/8/3
  * Time: 9:48
  */
+use Zodream\Domain\Routing\Url;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\DomainObject\EngineObject;
 use Zodream\Infrastructure\Error\FileException;
+use Zodream\Infrastructure\Html;
 use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class ViewFactory extends MagicObject {
 
@@ -33,6 +36,20 @@ class ViewFactory extends MagicObject {
      * @var FileCache
      */
     protected $cache;
+
+    public $metaTags = [];
+
+    public $linkTags = [];
+
+    public $js = [];
+
+    public $jsFiles = [];
+
+    public $cssFiles = [];
+
+    public $css = [];
+
+    protected $sections = [];
     
     public function __construct() {
         $this->configs = Config::getValue('view', [
@@ -59,27 +76,180 @@ class ViewFactory extends MagicObject {
     /**
      * MAKE VIEW
      * @param string|File $file
-     * @param array $data
-     * @return string
+     * @return View
      * @throws FileException
      * @throws \Exception
      */
-    public function make($file, array $data = array()) {
+    public function make($file) {
         if (!$file instanceof File) {
             $file = $this->directory->childFile($file.$this->configs['suffix']);
         }
         if (!$file->exist()) {
             throw new FileException($file->getName().' FILE NOT FIND!');
         }
-        $data = array_merge($this->get(), $data);
         if (!$this->engine instanceof EngineObject) {
-            return (new View($this, $file, $data))->render();
+            return new View($this, $file);
         }
         /** IF HAS ENGINE*/
         $cacheFile = $this->cache->getCacheFile(sha1($file->getName()).'.php');
         if (!$cacheFile->exist() || $cacheFile->modifyTime() < $file->modifyTime()) {
-            $this->engine->compiler($file, $cacheFile);
+            $this->engine->compile($file, $cacheFile);
         }
-        return (new View($this, $cacheFile, $data))->render();
+        return new View($this, $cacheFile);
+    }
+
+    /**
+     * GET HTML
+     * @param string|File $file
+     * @param array $data
+     * @param callable $callback
+     * @return string
+     * @throws FileException
+     * @throws \Exception
+     */
+    public function render($file, array $data = array(), callable $callback = null) {
+        return $this->make($file)
+            ->setData(array_merge($this->get(), $data))
+            ->render($callback);
+    }
+
+    /**
+     * @param string $content
+     * @param array $options
+     * @param null $key
+     */
+    public function registerMetaTag($content, $options = array(), $key = null) {
+        if ($key === null) {
+            $this->metaTags[] = Html::meta($content, $options);
+        } else {
+            $this->metaTags[$key] = Html::meta($content, $options);
+        }
+    }
+
+    public function registerLinkTag($url, $options = array(), $key = null) {
+        if ($key === null) {
+            $this->linkTags[] = Html::link($url, $options);
+        } else {
+            $this->linkTags[$key] = Html::link($url, $options);
+        }
+    }
+
+    public function registerCss($css, $key = null) {
+        $key = $key ?: md5($css);
+        $this->css[$key] = Html::style($css);
+    }
+
+    public function registerCssFile($url, $options, $key = null) {
+        $key = $key ?: $url;
+        $this->cssFiles[$key] = Html::link($url, $options);
+    }
+
+    public function registerJs($js, $position = View::JQUERY_READY, $key = null) {
+        $key = $key ?: md5($js);
+        $this->js[$position][$key] = $js;
+    }
+
+    public function registerJsFile($url, $options = [], $key = null) {
+        $key = $key ?: $url;
+        $position = ArrayExpand::remove($options, 'position', View::HTML_FOOT);
+        $options['src'] = Url::to($url);
+        $this->jsFiles[$position][$key] = Html::script(null, $options);
+    }
+
+    /**
+     * Start a new section block.
+     * @param  string $name
+     * @return null
+     * @throws LogicException
+     */
+    public function start($name) {
+        if ($name === 'content') {
+            throw new LogicException(
+                'The section name "content" is reserved.'
+            );
+        }
+        $this->sections[$name] = '';
+        ob_start();
+    }
+    /**
+     * Stop the current section block.
+     * @return null
+     */
+    public function stop() {
+        if (empty($this->sections)) {
+            throw new \LogicException(
+                'You must start a section before you can stop it.'
+            );
+        }
+        end($this->sections);
+        $this->sections[key($this->sections)] = ob_get_clean();
+    }
+    /**
+     * Returns the content for a section block.
+     * @param  string      $name    Section name
+     * @param  string      $default Default section content
+     * @return string|null
+     */
+    public function section($name, $default = null) {
+        if (!isset($this->sections[$name])) {
+            return $default;
+        }
+        return $this->sections[$name];
+    }
+
+    public function head() {
+        $lines = [];
+        if (!empty($this->metaTags)) {
+            $lines[] = implode("\n", $this->metaTags);
+        }
+
+        if (!empty($this->linkTags)) {
+            $lines[] = implode("\n", $this->linkTags);
+        }
+        if (!empty($this->cssFiles)) {
+            $lines[] = implode("\n", $this->cssFiles);
+        }
+        if (!empty($this->css)) {
+            $lines[] = implode("\n", $this->css);
+        }
+        if (!empty($this->jsFiles[View::HTML_HEAD])) {
+            $lines[] = implode("\n", $this->jsFiles[View::HTML_HEAD]);
+        }
+        if (!empty($this->js[View::HTML_HEAD])) {
+            $lines[] = Html::script(implode("\n", $this->js[View::HTML_HEAD]), ['type' => 'text/javascript']);
+        }
+
+        return empty($lines) ? '' : implode("\n", $lines);
+    }
+
+    public function foot() {
+        $lines = [];
+        if (!empty($this->jsFiles[View::HTML_FOOT])) {
+            $lines[] = implode("\n", $this->jsFiles[View::HTML_FOOT]);
+        }
+        if (!empty($this->js[View::HTML_FOOT])) {
+            $lines[] = Html::script(implode("\n", $this->js[View::HTML_FOOT]), ['type' => 'text/javascript']);
+        }
+        if (!empty($this->js[View::JQUERY_READY])) {
+            $js = "jQuery(document).ready(function () {\n" . implode("\n", $this->js[View::JQUERY_READY]) . "\n});";
+            $lines[] = Html::script($js, ['type' => 'text/javascript']);
+        }
+        if (!empty($this->js[View::JQUERY_LOAD])) {
+            $js = "jQuery(window).load(function () {\n" . implode("\n", $this->js[View::JQUERY_LOAD]) . "\n});";
+            $lines[] = Html::script($js, ['type' => 'text/javascript']);
+        }
+
+        return empty($lines) ? '' : implode("\n", $lines);
+    }
+
+    public function clear() {
+        parent::clear();
+        $this->metaTags = [];
+        $this->linkTags = [];
+        $this->css = [];
+        $this->cssFiles = [];
+        $this->js = [];
+        $this->jsFiles = [];
+        $this->sections = [];
     }
 }

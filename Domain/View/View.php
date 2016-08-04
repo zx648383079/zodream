@@ -9,13 +9,34 @@ namespace Zodream\Domain\View;
  */
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Error\FileException;
+use Zodream\Infrastructure\Factory;
+use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 /**
  * Class View
  * @package Zodream\Domain\View
  * @property string $title
+ * 
+ * @method registerMetaTag($content, $options = array(), $key = null) 
+ * @method registerLinkTag($url, $options = array(), $key = null)
+ * @method registerCss($css, $key = null)
+ * @method registerCssFile($url, $options, $key = null)
+ * @method registerJs($js, $position = self::JQUERY_READY, $key = null)
+ * @method registerJsFile($url, $options = [], $key = null)
+ * @method string head()
+ * @method string foot()
+ * @method start($name)
+ * @method stop()
+ * @method section($name, $default = null)
  */
 class View {
+
+    const HTML_HEAD = 'html head';
+
+    const HTML_FOOT = 'html body end';
+
+    const JQUERY_LOAD = 'jquery load';
+    const JQUERY_READY = 'jquery ready';
 
     /**
      * @var File
@@ -106,6 +127,42 @@ class View {
         }
         throw $e;
     }
+
+    /**
+     * 输出格式化后的时间
+     * @param integer|string $time
+     * @return string
+     */
+    public function time($time = null) {
+        if (is_null($time)) {
+            return null;
+        }
+        return TimeExpand::format($time);
+    }
+
+    /**
+     * 输出是多久以前
+     * @param int $time
+     * @return string
+     */
+    public function ago($time) {
+        return TimeExpand::isTimeAgo($time);
+    }
+
+    /**
+     * 翻译 {}
+     * @param string $message
+     * @param array $param
+     * @param string $name
+     * @return mixed
+     */
+    public function t($message, $param = [], $name = 'app') {
+        return Factory::i18n()->translate($message, $param, $name);
+    }
+
+    public function extend($name, $data = array()) {
+        return $this->factory->render($name, $data);
+    }
     
     public function __set($name, $value) {
         $this->factory->set($name, $value);
@@ -113,5 +170,12 @@ class View {
     
     public function __unset($name) {
         $this->factory->delete($name);
+    }
+
+    public function __call($name, $arguments) {
+        if (method_exists($this->factory, $name)) {
+            return call_user_func_array([$this->factory, $name], $arguments);
+        }
+        throw new \BadMethodCallException($name.' METHOD NOT FIND!');
     }
 }

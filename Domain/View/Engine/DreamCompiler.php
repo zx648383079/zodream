@@ -1,45 +1,16 @@
 <?php
-namespace Zodream\Domain\Template;
+namespace Zodream\Domain\View\Engine;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/7/16
  * Time: 10:28
  */
-use Zodream\Infrastructure\DomainObject\CompilerObject;
-use Zodream\Infrastructure\FileSystem;
 
-class DreamCompiler extends Compiler implements CompilerObject {
-
-    protected $path;
-
+class DreamCompiler extends CompilerEngine {
+    
     protected $footer = [];
 
-    public function getPath() {
-        return $this->path;
-    }
-
-    public function setPath($path) {
-        $this->path = $path;
-    }
-
-    /**
-     * 编译文件
-     *
-     * @param  string $path
-     * @return void
-     */
-    public function compile($path = null) {
-        if (!empty($path)) {
-            $this->setPath($path);
-        }
-
-        $contents = $this->compileString(FileSystem::read($this->getPath()));
-
-        if (!is_null($this->cachePath)) {
-            FileSystem::write($this->getCompiledPath($this->getPath()), $contents);
-        }
-    }
 
     /**
      * 转化内容

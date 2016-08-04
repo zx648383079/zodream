@@ -102,7 +102,7 @@ class Html {
      */
     public static function img($src = '#', $option = array()) {
         $option['src'] = Url::to($src);
-        return static::tag('img', '', $option);
+        return static::tag('img', null, $option);
     }
 
     /**
@@ -113,7 +113,7 @@ class Html {
      */
     public static function input($type, $option = array()) {
         $option['type'] = $type;
-        return static::tag('input', '', $option);
+        return static::tag('input', null, $option);
     }
 
     /**
@@ -174,6 +174,22 @@ class Html {
      */
     public static function style($content, $options = array()) {
         return static::tag('style', $content, $options);
+    }
+
+    public static function meta($content, $option = array()) {
+        $option['content'] = $content;
+        return static::tag('meta', null, $option);
+    }
+
+    /**
+     * LINK OUTSIDE RESOURCE
+     * @param string $url
+     * @param array $option
+     * @return string
+     */
+    public static function link($url, $option = array()) {
+        $option['href'] = Url::to($url);
+        return static::tag('link', null, $option);
     }
 
     /**
