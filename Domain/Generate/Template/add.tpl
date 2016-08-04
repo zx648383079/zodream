@@ -1,7 +1,7 @@
 <?php
 defined('APP_DIR') or exit();
 use Zodream\Domain\Html\Bootstrap\FormWidget;
-/** @var $this \Zodream\Domain\View\Engine\DreamEngine */
+/** @var $this \Zodream\Domain\View\View */
 $this->extend(array(
 'layout' => array(
 		'head'

@@ -142,7 +142,7 @@ final class Request {
 
 	
 	public static function isCli() {
-		return !empty(self::server('argv'));
+		return !is_null(self::server('argv'));
 	}
 
 

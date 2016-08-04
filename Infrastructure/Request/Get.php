@@ -6,8 +6,21 @@ namespace Zodream\Infrastructure\Request;
  * Date: 2016/4/3
  * Time: 9:29
  */
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\Request;
+
 class Get extends BaseRequest {
     public function __construct() {
-        $this->setValues($_GET);
+        if (!Request::isCli()) {
+            $this->setValues($_GET);
+            return;
+        }
+        // SET ARGV TO GET PARAM, IF NO '=' , VALUE IS '', YOU CAN USE IS_NULL JUDGE
+        $args = Request::server('argv');
+        unset($args[0]);
+        foreach ($args as $arg) {
+            list($key, $item) = StringExpand::explode($arg, '=', 2, '');
+            $this->_data[$key] = $item;
+        }
     }
 }

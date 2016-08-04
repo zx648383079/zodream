@@ -1,5 +1,5 @@
 <?php
-/** @var $this \Zodream\Domain\View\Engine\DreamEngine */
+/** @var $this \Zodream\Domain\View\View */
 ?>
 <!DOCTYPE html>
 <html lang="<?php $this->ech('language','zh-CN');?>">

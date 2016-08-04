@@ -115,13 +115,7 @@ class Url {
 	 * @return string
 	 */
 	public static function getRoot($withScript = TRUE) {
-		$secret = Request::server('HTTPS');
-		if (empty($secret) || 'off' === strtolower($secret)) {
-			$root = 'http';
-		} else {
-			$root = 'https';
-		}
-		$root .= '://'.self::getHost() . '/';
+		$root = (self::isSsl() ? 'https' : 'http'). '://'.self::getHost() . '/';
 		$self = Request::server('script_name');
 		if ($self !== '/index.php' && $withScript) {
 			$root .= ltrim($self, '/');
@@ -159,10 +153,7 @@ class Url {
 		if (is_null($search) && $url == '/') {
 			return true;
 		}
-		if (strpos($url, '/'.trim($search, '/')) !== false) {
-			return true;
-		}
-		return false;
+		return strpos($url, '/'.trim($search, '/')) !== false;
 	}
 
 	/**
@@ -180,19 +171,17 @@ class Url {
 	 * @return string 真实显示的网址
 	 */
 	public static function getUri() {
-		$requestUri = Request::server('REQUEST_URI');
-		if (!is_null($requestUri)) {
-			$uri = $requestUri;
-		} else {
-			$argv = Request::server('argv');
-			$self = Request::server('PHP_SELF');
-			if (!is_null($argv)) {
-				$uri = $self .'?'. $argv[0];
-			} else {
-				$uri = $self .'?'. Request::server('QUERY_STRING');
-			}
+		$uri = Request::server('REQUEST_URI');
+		if (!is_null($uri)) {
+			return $uri;
 		}
-		return $uri;
+		$argv = Request::server('argv');
+		$self = Request::server('PHP_SELF');
+		if (!is_null($argv)) {
+			unset($argv[0]);
+			return $self .'?'.implode('&', $argv);
+		}
+		return $self .'?'. Request::server('QUERY_STRING');
 	}
 
 	public static function getUriWithoutParam() {
@@ -203,20 +192,18 @@ class Url {
 	 * 判断是否SSL协议
 	 * @return boolean
 	 */
-	public static function isSsl()
-	{
-		if (isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))) {
-			return true;
-		} elseif (isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'])) {
+	public static function isSsl() {
+		$https = Request::server('HTTPS');
+		if ('1' == $https || 'on' == strtolower($https)) {
 			return true;
 		}
-		return false;
+		return Request::server('SERVER_PORT') == 443;
 	}
 	
 	/**
 	 * 获取执行脚本的文件    /index.php
 	 */
 	public static function getScript() {
-		return $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']; 
+		return Request::server('PHP_SELF') ?: Request::server('SCRIPT_NAME'); 
 	}
 }
