@@ -73,8 +73,7 @@ class Cookie {
      *
      * @return string The cookie
      */
-    public function __toString()
-    {
+    public function __toString() {
         $str = urlencode($this->getName()).'=';
 
         if ('' === (string) $this->getValue()) {
@@ -111,8 +110,7 @@ class Cookie {
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -121,8 +119,7 @@ class Cookie {
      *
      * @return string
      */
-    public function getValue()
-    {
+    public function getValue() {
         return $this->value;
     }
 
@@ -131,8 +128,7 @@ class Cookie {
      *
      * @return string
      */
-    public function getDomain()
-    {
+    public function getDomain() {
         return $this->domain;
     }
 
@@ -141,8 +137,7 @@ class Cookie {
      *
      * @return int
      */
-    public function getExpiresTime()
-    {
+    public function getExpiresTime() {
         return $this->expire;
     }
 
@@ -151,8 +146,7 @@ class Cookie {
      *
      * @return string
      */
-    public function getPath()
-    {
+    public function getPath() {
         return $this->path;
     }
 
@@ -161,8 +155,7 @@ class Cookie {
      *
      * @return bool
      */
-    public function isSecure()
-    {
+    public function isSecure() {
         return $this->secure;
     }
 
@@ -171,8 +164,7 @@ class Cookie {
      *
      * @return bool
      */
-    public function isHttpOnly()
-    {
+    public function isHttpOnly() {
         return $this->httpOnly;
     }
 
@@ -181,8 +173,7 @@ class Cookie {
      *
      * @return bool
      */
-    public function isCleared()
-    {
+    public function isCleared() {
         return $this->expire < time();
     }
 }

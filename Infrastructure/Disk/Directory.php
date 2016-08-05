@@ -53,6 +53,14 @@ class Directory extends FileObject {
     }
 
     /**
+     * GET PARENT DIRECTORY
+     * @return static
+     */
+    public function parent() {
+        return new static(dirname($this->fullName));
+    }
+
+    /**
      * GET ALL CHILDREN OF DIRECTORY
      * @return FileObject[]
      */
@@ -79,7 +87,7 @@ class Directory extends FileObject {
      * @return bool|FileObject
      */
     public function child($name) {
-        $file = $this->fullName . '/'. $name;
+        $file = $this->getChild($name);
         if (is_dir($file)) {
             return new static($file);
         }
@@ -89,12 +97,31 @@ class Directory extends FileObject {
         return false;
     }
 
-    public function hasFile($name) {
-        return is_file($this->fullName . '/'. $name);
+    /**
+     * GET CHILD FILE, ONLY ALLOW CHILD NOT '../' '//'
+     * @param string $name
+     * @return string
+     */
+    protected function getChild($name) {
+        return preg_replace('#/+#', '/', preg_replace('#\.*[\\/]+#', '/', $this->fullName . '/'. $name));
     }
 
+    /**
+     * FILE IN CHILDREN 
+     * @param string $name
+     * @return bool
+     */
+    public function hasFile($name) {
+        return is_file($this->getChild($name));
+    }
+
+    /**
+     * DIRECTORY IN CHILDREN
+     * @param string $name
+     * @return bool
+     */
     public function hasDirectory($name) {
-        return is_dir($this->fullName . '/'. $name);
+        return is_dir($this->getChild($name));
     }
 
     /**
@@ -103,7 +130,7 @@ class Directory extends FileObject {
      * @return File
      */
     public function childFile($name) {
-        return new File($this->fullName . '/'. $name);
+        return new File($this->getChild($name));
     }
 
     /**
@@ -112,7 +139,7 @@ class Directory extends FileObject {
      * @return static
      */
     public function childDirectory($name) {
-        return new File($this->fullName . '/'. $name);
+        return new static($this->getChild($name));
     }
 
     /**
@@ -146,7 +173,7 @@ class Directory extends FileObject {
      * @return int
      */
     public function addFile($name, $data) {
-        $file = new File($this->fullName.'/'.$name);
+        $file = new File($this->getChild($name));
         return $file->write($data);
     }
 
@@ -157,7 +184,7 @@ class Directory extends FileObject {
      */
     public function deleteFile($arg) {
         foreach (func_get_args() as $name) {
-            (new File($this->fullName.'/'.$name))->delete();
+            (new File($this->getChild($name)))->delete();
         }
         return true;
     }
@@ -181,7 +208,7 @@ class Directory extends FileObject {
      * @return bool
      */
     public function addDirectory($name, $mode = 0777) {
-        return mkdir($this->fullName.'/'. $name, $mode);
+        return mkdir($this->getChild($name), $mode);
     }
 
     /**

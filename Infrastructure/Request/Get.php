@@ -17,9 +17,9 @@ class Get extends BaseRequest {
         }
         // SET ARGV TO GET PARAM, IF NO '=' , VALUE IS '', YOU CAN USE IS_NULL JUDGE
         $args = Request::server('argv');
-        unset($args[0]);
-        foreach ($args as $arg) {
+        foreach ($args as $k => $arg) {
             list($key, $item) = StringExpand::explode($arg, '=', 2, '');
+            $this->_data[$k] = $arg;
             $this->_data[$key] = $item;
         }
     }
