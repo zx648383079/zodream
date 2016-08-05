@@ -6,26 +6,29 @@ namespace Zodream\Infrastructure;
  * Date: 2016/3/17
  * Time: 21:28
  */
+use Zodream\Infrastructure\Disk\Directory;
 class Template extends  MagicObject {
-    protected $baseDir;
+    /**
+     * @var Directory
+     */
+    protected $directory;
 
     protected $beginTag = '{';
 
     protected $endTag = '}';
 
-    public function __construct($baseDir = null) {
-        if (!is_dir($baseDir)) {
-            $baseDir = APP_DIR.'/UserInterface/Template';
-        }
-        $this->setBase($baseDir);
+    public function __construct($directory = null) {
+        $this->setDirectory($directory ?: APP_DIR.'/UserInterface/Template');
     }
 
     /**
      * 设置基路径
-     * @param string $value
+     * @param $directory
+     * @internal param string $value
      */
-    public function setBase($value) {
-        $this->baseDir = rtrim($value, '/') . '/';
+    public function setDirectory($directory) {
+        $this->directory = $directory instanceof Directory ?
+            $directory : new Directory($directory);
     }
 
     /**
@@ -44,22 +47,20 @@ class Template extends  MagicObject {
      * @return bool|mixed
      */
     public function getText($file) {
-        $file = $this->baseDir.ltrim($file);
-        if (!is_file($file)) {
+        $file = $this->directory->childFile($file);
+        if (!$file->exist()) {
             return false;
         }
-        $content = file_get_contents($file);
-        return $this->replaceByArray($content, $this->get());
+        return $this->replaceByArray($file->read(), $this->get());
     }
 
     /**
      * 根据关联数组替换内容
      * @param string $content
      * @param array $data
-     * @param null|string $pre
      * @return string
      */
-    public function replaceByArray($content, array $data, $pre = null) {
+    public function replaceByArray($content, array $data) {
         /*foreach ($data as $key => $item) {
             if (is_array($item)) {
                 $content = $this->replaceByArray($content, $item, $pre.$key.'.');

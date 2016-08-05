@@ -9,13 +9,13 @@ namespace Zodream\Domain\Rss;
  * Time: 20:44
  */
 class RssItem extends BaseRss {
-    protected $guid;
+    protected $giud;
     protected $attachment;
     protected $length;
-    protected $mimetype;
+    protected $mimeType;
 
-    public function setGuid($guid) {
-        $this->guid = $guid;
+    public function setGiud($giud) {
+        $this->giud = $giud;
         return $this;
     }
 
@@ -26,12 +26,12 @@ class RssItem extends BaseRss {
         $out .= '<description>' . $this->description . "</description>\n";
         $out .= '<pubDate>' . $this->getPubDate() . "</pubDate>\n";
         if($this->attachment != '') {
-            $out .= "<enclosure url='{$this->attachment}' length='{$this->length}' type='{$this->mimetype}' />";
+            $out .= "<enclosure url='{$this->attachment}' length='{$this->length}' type='{$this->mimeType}' />";
         }
-        if(empty($this->guid)) {
-            $this->guid = $this->link;
+        if(empty($this->giud)) {
+            $this->giud = $this->link;
         }
-        $out .= '<guid>' . $this->guid . "</guid>\n";
+        $out .= '<guid>' . $this->giud . "</guid>\n";
         foreach($this->tags as $key => $val) {
             $out .= "<$key>$val</$key\n>";
         }
@@ -39,9 +39,9 @@ class RssItem extends BaseRss {
         return $out;
     }
 
-    public function enclosure($url, $mimetype, $length) {
+    public function enclosure($url, $mimeType, $length) {
         $this->attachment = $url;
-        $this->mimetype  = $mimetype;
+        $this->mimeType  = $mimeType;
         $this->length   = $length;
         return $this;
     }

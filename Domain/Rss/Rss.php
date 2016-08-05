@@ -1,15 +1,15 @@
 <?php
 namespace Zodream\Domain\Rss;
-use Zodream\Domain\Response\ResponseResult;
-
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/3/16
  * Time: 20:42
  */
+use Zodream\Domain\Response\ResponseResult;
+
 class Rss extends BaseRss {
-    protected $language = "zh-CN";
+    protected $language = 'zh-CN';
     protected $items = array();
 
     public function setLanguage($value) {

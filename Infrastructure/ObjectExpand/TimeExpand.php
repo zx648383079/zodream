@@ -127,4 +127,13 @@ class TimeExpand {
 		}
 		return self::format($time);
 	}
+
+    /**
+     * GET NOW WITH microtime
+     * @return float
+     */
+	public static function millisecond() {
+        list($tmp1, $tmp2) = explode(' ', microtime());
+        return (float)sprintf('%.0f', (floatval($tmp1) + floatval($tmp2)) * 1000);
+    }
 }

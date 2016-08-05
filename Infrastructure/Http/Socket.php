@@ -12,8 +12,13 @@ class Socket {
 	protected $ip;
 	
 	protected $port;
-	
-	/**
+    
+    public function __construct($ip, $port) {
+        $this->ip = $ip;
+        $this->port = $port;
+    }
+
+    /**
 	 * 创建
 	 */
 	public function create() {

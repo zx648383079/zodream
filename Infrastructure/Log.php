@@ -1,12 +1,12 @@
 <?php 
 namespace Zodream\Infrastructure;
-use Zodream\Infrastructure\EventManager\Action;
 
 /**
 * 日志类
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\EventManager\Action;
 
 class Log {
 	public static $fileHandlerCache;
