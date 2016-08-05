@@ -1,30 +1,30 @@
 <?php
 namespace Zodream\Domain\Response;
 
+use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Error\Error;
-use Zodream\Infrastructure\EventManager\EventManger;
-use Zodream\Infrastructure\FileSystem;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 
 class FileResponse extends BaseResponse {
 	protected $speed = 512;   // 下载速度
-	
+
+	/**
+	 * @var File
+	 */
 	protected $file;
 	
 	protected $fileName;
 
 	/**
 	 * FileResponse constructor.
-	 * @param string $file
+	 * @param string|File $file
 	 * @param string $fileName
 	 * @param int $speed
 	 */
 	public function __construct($file, $fileName = null, $speed = 512) {
-		$this->file = $file;
-		if (empty($fileName)) {
-			$this->fileName = basename($file);//获取文件名字
-		}
+		$this->file = $file instanceof File ? $file : new File($file);
+		$this->fileName = $fileName ?: $this->file->getName();
 		$this->setSpeed($speed);
 	}
 
@@ -32,12 +32,12 @@ class FileResponse extends BaseResponse {
 	 * @throws \Zodream\Infrastructure\Error\Exception
 	 */
 	public function sendContent() {
-		if (!is_file($this->file)) {
+		if (!$this->file->exist()) {
 			Error::out('FILE NOT FIND', __FILE__, __LINE__);
 		}
 		
-		$length = filesize($this->file);//获取文件大小
-		$fileExtension = FileSystem::getExtension($this->fileName);//获取文件扩展名
+		$length = $this->file->size();//获取文件大小
+		$fileExtension = $this->file->getExtension();//获取文件扩展名
 		
 		ResponseResult::sendCacheControl('public');
 		//根据扩展名 指出输出浏览器格式
@@ -57,7 +57,7 @@ class FileResponse extends BaseResponse {
 		ResponseResult::sendAcceptRanges();
 		$range = self::getRange($length);
 		//打开文件
-		$fp = fopen($this->file.'', 'rb');
+		$fp = fopen($this->file->getFullName(), 'rb');
 		//如果有$_SERVER['HTTP_RANGE']参数
 		if(null !== $range) {
 			/*   ---------------------------

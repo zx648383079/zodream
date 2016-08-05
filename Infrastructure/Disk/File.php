@@ -26,6 +26,10 @@ class File extends FileObject {
         $this->extension = $args['extension'];
         $this->directory = $args['dirname'];
     }
+    
+    public function getExtension() {
+        return $this->extension;
+    }
 
     /**
      * GET FILE TYE
@@ -37,9 +41,12 @@ class File extends FileObject {
 
     /**
      * GET FILE MIME
-     * @return string
+     * @return string|bool
      */
     public function mimeType() {
+        if (!class_exists('finfo')) {
+            return false;
+        }
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $this->fullName);
     }
 
