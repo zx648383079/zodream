@@ -6,8 +6,9 @@ namespace Zodream\Infrastructure\Disk;
  * Date: 2016/7/29
  * Time: 11:26
  */
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\Request;
 abstract class FileObject {
-    
     protected $name;
     
     protected $fullName;
@@ -63,5 +64,17 @@ abstract class FileObject {
     
     public function __toString() {
         return $this->getName();
+    }
+
+    /**
+     * GET URL IN WEB ROOT
+     * @return bool|string
+     */
+    public function toUrl() {
+        $root = Request::server('DOCUMENT_ROOT');
+        if (strpos($this->fullName, $root) === 0) {
+            return StringExpand::firstReplace($this->fullName, $root, '');
+        }
+        return false;
     }
 }
