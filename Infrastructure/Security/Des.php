@@ -49,13 +49,20 @@ class Des {
     }
 
     public function decrypt($data) {
-        return mcrypt_decrypt(
+        $arg = mcrypt_decrypt(
             MCRYPT_RIJNDAEL_256,
             $this->key,
             base64_decode($data),
             MCRYPT_MODE_ECB,
             $this->createIv()
         );
+        for ($i = strlen($arg)- 1; $i >= 0; $i --) {
+            if (ord($arg[$i]) > 0) {
+                $arg = substr($arg, 0, $i + 1);
+                break;
+            }
+        }
+        return $arg;
     }
 
     protected function createIv() {
