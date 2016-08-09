@@ -6,7 +6,7 @@ namespace Zodream\Domain\Html;
  * @author Jason
  * @time 2015-12-1
  */
-use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Url\Url;
 
 class Script {
 

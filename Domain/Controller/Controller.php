@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Routing;
+namespace Zodream\Domain\Controller;
 /**
  * 控制器基类
  *

@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Routing;
+namespace Zodream\Infrastructure\Url;
 
 /**
  * 单个路由

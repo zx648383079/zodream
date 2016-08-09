@@ -13,9 +13,13 @@ use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\EventManager\EventManger;
+use Zodream\Infrastructure\Url\DefaultUri;
 
 defined('VERSION') or define('VERSION', 2.0);
 defined('APP_DIR') or define('APP_DIR', dirname(dirname(__FILE__)).'/');
+defined('APP_CONTROLLER') or define('APP_CONTROLLER', Config::getInstance()->get('app.controller'));
+defined('APP_ACTION')     or define('APP_ACTION', Config::getInstance()->get('app.action'));
+defined('APP_MODEL')      or define('APP_MODEL', Config::getInstance()->get('app.model'));
 
 class Application {
 	/**
@@ -30,7 +34,7 @@ class Application {
 			->shutDown();
 		Cookie::restore();
 		EventManger::getInstance()->run('appRun');
-		$route = Factory::router()->run();
+		$route = Factory::router()->run(new DefaultUri());
 		return $route->run();
 	}
 }

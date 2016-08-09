@@ -7,7 +7,7 @@ namespace Zodream\Domain\View;
  * Date: 2016/8/3
  * Time: 9:48
  */
-use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Url\Url;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Disk\Directory;

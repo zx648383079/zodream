@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Domain\Routing;
+namespace Zodream\Infrastructure\Url;
 /**
 * BASE ROUTER
  * 		IT DON'T KNOW HOW TO JUDGE, BU IT'S CHILD KNOW!
@@ -9,16 +9,9 @@ namespace Zodream\Domain\Routing;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\DomainObject\RouteObject;
-use Zodream\Infrastructure\EventManager\EventManger;
 use Zodream\Infrastructure\Request;
 
-defined('APP_CONTROLLER') or define('APP_CONTROLLER', Config::getInstance()->get('app.controller'));
-defined('APP_ACTION')     or define('APP_ACTION', Config::getInstance()->get('app.action'));
-defined('APP_MODEL')      or define('APP_MODEL', Config::getInstance()->get('app.model'));
-
-class BaseRouter {
-	
-
+class Router {
 	/**
 	 * @var Route[]
 	 */
@@ -49,38 +42,33 @@ class BaseRouter {
 		}
 	}
 
-	/**
-	 * 路由加载及运行方法
-	 * @return ResponseObject
-	 */
-	public function run() {
-		EventManger::getInstance()->run('getRoute');
-		
-		return self::getRoute()->run();
-	}
-
-	/**
-	 * 根据网址判断
-	 * @param string $uri
-	 * @return Route
-	 */
-	protected function runByUri($uri) {
+    /**
+     * 路由加载及运行方法
+     * @param string|Url $url
+     * @return ResponseObject
+     */
+	public function run($url) {
+	    if ($url instanceof Uri) {
+	        $url = $url->getPath();
+        }
 		$method = Request::method();
-		if (isset($this->routes[$method][$uri])) {
-			return $this->routes[$method][$uri];
+		if (isset($this->routes[$method][$url])) {
+			return $this->routes[$method][$url];
 		}
 		if (array_key_exists($method, $this->routes)) {
 			foreach ($this->routes[$method] as $key => $item) {
 				$pattern = str_replace(':num', '[0-9]+', $key);
 				$pattern = str_replace(':any', '[^/]+', $pattern);
 				$pattern = str_replace('/', '\\/', $pattern);
-				if (preg_match('/'.$pattern.'/i', $uri, $match)) {
+				if (preg_match('/'.$pattern.'/i', $url, $match)) {
+				    Request::get(true)->set($match);
 					return $item;
 				}
 			}
 		}
-		return new Route('GET', $uri, $uri);
+		return new Route('GET', $url, $url);
 	}
+
 
 	/**
 	 * 手动注册路由

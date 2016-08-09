@@ -10,7 +10,7 @@ class Aes {
     protected $key;
 
     public function setKey($key) {
-        $this->key = $key;
+        $this->key = md5($key);
         return $this;
     }
 
@@ -33,14 +33,6 @@ class Aes {
     protected function pkcs5Pad ($text, $blockSize) {
         $pad = $blockSize - (strlen($text) % $blockSize);
         return $text . str_repeat(chr($pad), $pad);
-    }
-
-    protected function padKey($key) {
-        $len = 8 - strlen($key) % 8;
-        for ( $i = 0; $i < $len; $i++ ) {
-            $key .= chr( 0 );
-        }
-        return $key;
     }
 
     public function decrypt($data) {

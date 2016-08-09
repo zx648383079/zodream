@@ -8,7 +8,6 @@ namespace Zodream\Infrastructure;
  * Date: 2016/6/24
  * Time: 22:57
  */
-use Zodream\Domain\Routing\GraceRouter;
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
@@ -18,6 +17,7 @@ use Zodream\Infrastructure\Header\Headers;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
+use Zodream\Infrastructure\Url\Router;
 
 class Factory {
     
@@ -72,10 +72,10 @@ class Factory {
     /**
      * O! IF YOU NEED ROUTE, HERE. 
      *          IT GO TO DO SOME THING LIKE GO TO CONTROLLER
-     * @return RouterObject
+     * @return Router
      */
     public static function router() {
-        return self::getInstance('route', GraceRouter::class);
+        return self::getInstance('_____', Router::class);
     }
 
     /**

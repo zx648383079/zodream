@@ -15,7 +15,7 @@ class Des {
     protected $size = MCRYPT_RIJNDAEL_256;
 
     public function setKey($key) {
-        $this->key = $key;
+        $this->key = md5($key);
         return $this;
     }
 

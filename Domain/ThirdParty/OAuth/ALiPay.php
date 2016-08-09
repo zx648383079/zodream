@@ -7,7 +7,8 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 16:01
  */
 class ALiPay extends BaseOAuth {
-    protected $config = 'taobao';
+    protected $config = 'alipay';
+
     protected $apiMap = array(
         'login' => array(
             'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm',

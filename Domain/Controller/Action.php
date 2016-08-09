@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Routing;
+namespace Zodream\Domain\Controller;
 /**
  * Created by PhpStorm.
  * User: zx648

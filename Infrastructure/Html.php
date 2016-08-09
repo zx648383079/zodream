@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure;
  * Date: 2016/4/29
  * Time: 16:50
  */
-use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Url\Url;
 class Html {
     /**
      * @var array 无内容的标签

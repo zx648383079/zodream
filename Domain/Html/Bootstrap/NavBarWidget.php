@@ -7,7 +7,7 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 10:44
  */
 use Zodream\Domain\Html\Widget;
-use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Url\Url;
 
 class NavBarWidget extends Widget {
 

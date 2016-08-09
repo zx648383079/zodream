@@ -6,7 +6,7 @@ namespace Zodream\Domain\Html;
  * $page = new Page();
  */
 use Zodream\Infrastructure\Request;
-use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Url\Url;
 
 class PageLink extends Widget {
 	

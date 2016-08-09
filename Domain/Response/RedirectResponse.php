@@ -4,7 +4,7 @@ namespace Zodream\Domain\Response;
  * 跳转
  * @author Jason
  */
-use Zodream\Domain\Routing\Url;
+use Zodream\Infrastructure\Url\Url;
 
 class RedirectResponse extends BaseResponse {
 
