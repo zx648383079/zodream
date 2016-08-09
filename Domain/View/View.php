@@ -11,6 +11,7 @@ use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Error\FileException;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
+use Zodream\Infrastructure\Traits\ConditionTrait;
 
 /**
  * Class View
@@ -20,8 +21,8 @@ use Zodream\Infrastructure\ObjectExpand\TimeExpand;
  * @method registerMetaTag($content, $options = array(), $key = null) 
  * @method registerLinkTag($url, $options = array(), $key = null)
  * @method registerCss($css, $key = null)
- * @method registerCssFile($url, $options, $key = null)
- * @method registerJs($js, $position = self::JQUERY_READY, $key = null)
+ * @method registerCssFile($url, $options = array(), $key = null)
+ * @method registerJs($js, $position = self::HTML_FOOT, $key = null)
  * @method registerJsFile($url, $options = [], $key = null)
  * @method string head()
  * @method string foot()
@@ -30,6 +31,8 @@ use Zodream\Infrastructure\ObjectExpand\TimeExpand;
  * @method section($name, $default = null)
  */
 class View {
+
+    use ConditionTrait;
 
     const HTML_HEAD = 'html head';
 
@@ -166,6 +169,10 @@ class View {
     
     public function __set($name, $value) {
         $this->factory->set($name, $value);
+    }
+
+    public function __get($name) {
+        return $this->factory->get($name);
     }
     
     public function __unset($name) {

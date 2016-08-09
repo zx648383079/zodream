@@ -140,12 +140,13 @@ class ViewFactory extends MagicObject {
         $this->css[$key] = Html::style($css);
     }
 
-    public function registerCssFile($url, $options, $key = null) {
+    public function registerCssFile($url, $options = array(), $key = null) {
         $key = $key ?: $url;
+        $options['rel'] = 'stylesheet';
         $this->cssFiles[$key] = Html::link($url, $options);
     }
 
-    public function registerJs($js, $position = View::JQUERY_READY, $key = null) {
+    public function registerJs($js, $position = View::HTML_FOOT, $key = null) {
         $key = $key ?: md5($js);
         $this->js[$position][$key] = $js;
     }

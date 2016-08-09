@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\ObjectExpand;
+namespace Zodream\Infrastructure\Security;
 /**
  * Created by PhpStorm.
  * User: zx648
