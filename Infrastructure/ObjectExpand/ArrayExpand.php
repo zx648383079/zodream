@@ -277,6 +277,39 @@ class ArrayExpand {
 	public static function ucFirst(array $arguments) {
 		return array_map('ucfirst', $arguments);
 	}
+
+    /**
+     * GET KEY BY VALUE IN ARRAY
+     * @param array $args
+     * @param mixed $value
+     * @return mixed
+     */
+	public static function getKey(array $args, $value) {
+	    return array_search($value, $args);
+    }
+
+    /**
+     *
+     * EXAMPLE:
+     *  $args = [
+     *      [
+     *          'a' => 12,
+     *          'b' => 12323
+     *      ]
+     * ];
+     * if $column = 'a', $indexKey = null
+     * return [0 => 12],
+     * else $indexKey = 'b',
+     * return = [12323 => 12];
+     *
+     * @param array $args
+     * @param string $column
+     * @param string $indexKey
+     * @return array
+     */
+    public static function getColumn(array $args, $column, $indexKey = null) {
+        return array_column($args, $column, $indexKey);
+    }
 	
 	/**
 	 * 合并多个二维数组 如果键名相同后面的数组会覆盖前面的数组

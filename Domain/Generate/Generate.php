@@ -206,7 +206,7 @@ class Generate {
 		return $this->_replace(
 			'config',
 			array('data' => $configs),
-			APP_DIR.'/Service/config/'.$module.'.php'
+			$module
 		);
 	}
 

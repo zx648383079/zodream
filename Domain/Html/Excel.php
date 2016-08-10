@@ -28,6 +28,9 @@ class Excel implements ExpertObject {
      */
     public function __construct($title = '', $firstRow = array(), $data = array()) {
         $this->title = $title;
+        if (empty($firstRow) && !empty($data)) {
+            $firstRow = array_keys($data[0]);
+        }
         $this->firstRow = $firstRow;
         $this->data = $data;
     }
@@ -38,7 +41,7 @@ class Excel implements ExpertObject {
      * @return string
      */
     public function excelExportIconv($output){
-        return iconv(self::$charset, 'GBK', $output);
+        return iconv($this->charset, 'GBK', $output);
     }
 
     /**
@@ -47,26 +50,11 @@ class Excel implements ExpertObject {
      */
     public function send() {
         if (!empty($this->title)) {
-            echo self::excelExportIconv($this->title) . "\t\n";
-        }
-        /**
-         *  第一行与后面的数据以键名关联
-         */
-        if (empty($this->firstRow) || !is_array($this->firstRow)) {
-            if (!empty($this->data) && is_array($this->data)) {
-                foreach ($this->data as $item) {
-                    foreach ($item as $val) {
-                        echo self::excelExportIconv($val) . "\t";
-                    }
-                    echo "\n";
-                }
-                echo "\n";
-            }
-            return;
+            echo $this->excelExportIconv($this->title) . "\t\n";
         }
         //输出第一行内容
         foreach ($this->firstRow as $first) {
-            echo self::excelExportIconv($first) . "\t";
+            echo $this->excelExportIconv($first) . "\t";
         }
         echo "\n";
 
@@ -74,11 +62,11 @@ class Excel implements ExpertObject {
             return;
         }
         foreach ($this->data as $item) {
-            foreach ($this->firstRow as $_key => $_val) {
-                if (isset($item[$_key])) {
-                    echo self::excelExportIconv($item[$_key]) . "\t";
+            foreach ($this->firstRow as $key => $val) {
+                if (isset($item[$key])) {
+                    echo $this->excelExportIconv($item[$key]) . "\t";
                 } else {
-                    echo self::excelExportIconv('') . "\t";
+                    echo $this->excelExportIconv('') . "\t";
                 }
             }
             echo "\n";
