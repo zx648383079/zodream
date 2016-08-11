@@ -19,11 +19,26 @@ class Table implements \ArrayAccess {
 
     protected $tableName;
 
+    /**
+     * @var Column[]
+     */
     protected $data = [];
 
     protected $charset = 'UTF8';
 
     protected $engine = 'MyIAM';
+
+    protected $foreignKey = [];
+
+    protected $checks = [];
+
+    protected $aiBegin = 1;
+
+    protected $index = [];
+
+    protected $primaryKey;
+
+    protected $comment = null;
 
     public function __construct($table, $data = [], $engine = self::MyISAM, $charset = 'UTF8') {
         $this->tableName = $table;
@@ -37,8 +52,44 @@ class Table implements \ArrayAccess {
         return $this;
     }
 
+    public function setComment($arg) {
+        $this->comment = $arg;
+        return $this;
+    }
+
+    public function pk($field) {
+        $this->primaryKey = $field;
+        return $this;
+    }
+
     public function setEngine($arg) {
         $this->engine = $arg;
+        return $this;
+    }
+
+    public function setAI($arg) {
+        $this->aiBegin = max($this->aiBegin, intval($arg));
+        return $this;
+    }
+
+    public function fk($name, $field, $table, $fkField, $delete = 'NO ACTION', $update = 'NO ACTION') {
+        $this->foreignKey[$name] = [$field, $table, $fkField, $delete, $update];
+        return $this;
+    }
+
+    public function index($name, $field, $order = null) {
+        $this->index[$name] = [$field, $order];
+        return $this;
+    }
+
+    public function unique($name, $field, $order = null) {
+        $this->index[$name] = [$field, $order, 'UNIQUE'];
+        return $this;
+    }
+
+
+    public function check($name, $arg) {
+        $this->checks[$name] = $arg;
         return $this;
     }
 
@@ -47,23 +98,43 @@ class Table implements \ArrayAccess {
     }
 
     public function delete() {
-        return 'DROP TABLE IF EXISTS '.$this->tableName;
+        return "DROP TABLE IF EXISTS `{$this->tableName}`;";
     }
 
     public function create() {
-        return 'CREATE DATABASE IF NOT EXISTS '.$this->tableName;
+        $sql = "CREATE DATABASE IF NOT EXISTS `{$this->tableName}` (";
+        $column = $this->data;
+        if (!empty($this->primaryKey)) {
+            $column[] = "PRIMARY KEY (`{$this->primaryKey}`)";
+        }
+        foreach ($this->index as $key => $item) {
+            $column[] = (count($item) > 2 ? 'UNIQUE ': null). "INDEX `{$key}` (`{$item[0]}` {$item['1']})";
+        }
+
+        foreach ($this->foreignKey as $key => $item) {
+            $column[] = "CONSTRAINT `{$key}` FOREIGN KEY (`{$item[0]}`) REFERENCES `{$item[1]}` (`{$item[2]}`) ON DELETE {$item[2]} ON UPDATE {$item[3]}";
+        }
+        $sql .= implode(',', $column).") ENGINE={$this->engine}";
+        if ($this->aiBegin > 1) {
+            $sql .= ' AUTO_INCREMENT='.$this->aiBegin;
+        }
+        return $sql." DEFAULT CHARSET={$this->charset} COMMENT={$this->comment};";
     }
 
     public function replace() {
-
+        return $this->delete().$this->create();
     }
 
     public function clear() {
-        return 'TRUNCATE '.$this->tableName;
+        return "TRUNCATE `{$this->tableName}`;";
     }
 
     public function alert() {
-        return 'ALTER TABLE '.$this->tableName.' CHANGE COLUMN ';
+        $sql = [];
+        foreach ($this->data as $item) {
+            $sql[] = $item->getAlterSql();
+        }
+        return "ALTER TABLE `$this->tableName` ".implode(',', $sql).';';
     }
 
 

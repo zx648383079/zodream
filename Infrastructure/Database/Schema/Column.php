@@ -12,15 +12,11 @@ class Column {
 
     const NULL = 1;
 
-    const PK = 2;
+    const AI = 2;
 
-    const UQ = 3;
+    const DEFAULT = 3;
 
-    const AI = 4;
-
-    const DEFAULT = 5;
-
-    const COMMENT = 6;
+    const COMMENT = 4;
 
     protected $data = [];
 
@@ -28,13 +24,15 @@ class Column {
 
     protected $oldField;
 
-    protected $foreignKey = [];
+    protected $afterColumn;
 
-    protected $checks = [];
+    /**
+     * @var Table
+     */
+    protected $table;
 
-    protected $aiBegin = null;
-
-    public function __construct($field) {
+    public function __construct(Table $table, $field) {
+        $this->table = $table;
         $this->setField($field);
     }
 
@@ -42,7 +40,7 @@ class Column {
         if (is_array($field)) {
             list($this->oldField, $this->field) = $field;
         } else {
-            $this->oldField = $this->field = $field;
+            $this->field = $field;
         }
         return $this;
     }
@@ -50,6 +48,15 @@ class Column {
     public function setOldField($field) {
         $this->oldField = $field;
         return $this;
+    }
+
+    public function setAfter($column) {
+        $this->afterColumn = $column;
+        return $this;
+    }
+
+    public function getAfter() {
+        return $this->afterColumn;
     }
 
     public function getOldField() {
@@ -186,30 +193,58 @@ class Column {
     }
 
     public function ai($begin = null) {
-        $this->aiBegin = $begin;
+        $this->table->setAI($begin);
         return $this->addData(self::AI, 'AUTO_INCREMENT');
     }
 
     public function pk() {
-        return $this-$this->addData(self::PK, 'PRIMARY KEY');
+        $this->table->pk($this->field);
+        return $this;
     }
 
-
-
     public function fk($name, $table, $field) {
-        $this->foreignKey[$name] = [$table, $field];
+        $this->table->fk($name, $this->field, $table, $field);
+        return $this;
+    }
+
+    public function unique($name = null, $order = null) {
+        if (empty($name)) {
+            $name = $this->field;
+        }
+        $this->table->unique($name, $this->field, $order);
+        return $this;
+    }
+
+    public function index($name = null, $order = null) {
+        if (empty($name)) {
+            $name = $this->field;
+        }
+        $this->table->index($name, $this->field, $order);
         return $this;
     }
 
     public function check($name, $arg) {
-        $this->checks[$name] = $arg;
+        $this->table->check($name, $arg);
         return $this;
     }
 
-    public function __toString() {
+    public function getSql() {
         $sql = implode(' ', $this->data);
         if (!empty($this->name)) {
             $sql = "`{$this->name}` ".$sql;
+        }
+        return $sql;
+    }
+
+    public function __toString() {
+        return $this->getSql();
+    }
+
+    public function getAlterSql() {
+        $sql = empty($this->oldField) ? 'ADD COLUMN ' : "CHANGE COLUMN `{$this->oldField}` ";
+        $sql .= $this->getSql();
+        if (!empty($this->afterColumn)) {
+            $sql .= " after `{$this->afterColumn}`";
         }
         return $sql;
     }
