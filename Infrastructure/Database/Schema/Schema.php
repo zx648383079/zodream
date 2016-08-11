@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Schema;
 /**
  * Created by PhpStorm.
  * User: zx648

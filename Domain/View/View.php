@@ -164,7 +164,9 @@ class View {
     }
 
     public function extend($name, $data = array()) {
-        return $this->factory->render($name, $data);
+        foreach ((array)$name as $item) {
+            echo $this->factory->render($item, $data);
+        }
     }
     
     public function __set($name, $value) {
