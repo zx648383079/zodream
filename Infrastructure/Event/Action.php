@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\EventManager;
+namespace Zodream\Infrastructure\Event;
 /**
  * Created by PhpStorm.
  * User: zx648
