@@ -223,7 +223,7 @@ class Column {
         return $this;
     }
 
-    public function check($name, $arg) {
+    public function check($name, $arg = null) {
         $this->table->check($name, $arg);
         return $this;
     }
