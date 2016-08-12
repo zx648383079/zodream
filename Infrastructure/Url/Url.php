@@ -23,90 +23,56 @@ class Url {
 	 * 产生完整的网址
 	 * @param string $file
 	 * @param array|string|\Closure $extra
-	 * @return string
+	 * @return string|Uri
 	 */
 	public static function to($file = null, $extra = null) {
+        if ($file === '#' || strpos($file, 'javascript:') != false) {
+            return $file;
+        }
+        $uri = new Uri();
 		if (is_array($file)) {
-			$files = $file;
-			foreach ($files as $key => $item) {
+			foreach ($file as $key => $item) {
 				if (is_integer($key)) {
-					$file = $item;
+					$uri->decode(static::getPath($item));
 					continue;
 				}
-				$extra[$key] = $item;
+				$uri->addData($key, $item);
 			}
-			unset($files);
-		}
-		if ($file === '#' || strpos($file, 'javascript:') != false) {
-			return $file;
-		}
-		if (strpos($file, '?') !== false) {
-			$args = explode('?', $file, 2);
-			$args[0] = self::toByFile($args[0]);
-			$url = implode('?', $args);
 		} else {
-			$url = self::toByFile($file);
-		}
-		return self::addParam($url, $extra);
+		    $uri->decode(static::getPath($file));
+        }
+        if (!empty($extra)) {
+            $uri->setData($extra);
+        }
+        if (empty($uri->getHost())) {
+            $uri->setScheme(self::isSsl() ? 'https' : 'http')
+                ->setHost(self::getHost());
+        }
+        return $uri;
 	}
 
-	/**
-	 * 给url 添加值
-	 * @param string $url
-	 * @param array|string|\Closure $extra
-	 * @return string
-	 */
-	protected static function addParam($url, $extra = null) {
-		if (empty($extra)) {
-			return $url;
-		}
-		if (is_array($extra)) {
-			return StringExpand::urlBindValue($url, $extra);
-		}
-		if (is_object($extra)) {
-			return $extra($url);
-		}
-		if (strpos($url, '?') === false) {
-			return $url.'?'.$extra;
-		}
-		return StringExpand::urlBindValue($url, $extra);
-	}
-
-	/**
-	 * 根据网址自动补充完整
-	 * @param string $file
-	 * @return string
-	 */
-	protected static function toByFile($file = null) {
-		if ($file === null || 0 === $file || '0' === $file) {
-			return self::getRoot(FALSE).ltrim(self::getUri(), '/');
-		}
-		if ($file === '-' || -1 == $file) {
-			return self::referrer();
-		}
-		if (strpos($file, '//') !== false) {
-			if (strpos($file, '://') !== false || ltrim($file, '/') === substr($file, 2)) {
-				return $file;
-			}
-			$file = str_replace('//', '/', $file);
-		}
-		if ($file === '' || $file === '/') {
-			return APP_URL;
-		}
-		if (strpos($file, '.') !== false) {
-			return self::toAsset($file);
-		}
-		return $file;
-	}
-
-	/**
-	 * 获取物理路径
-	 * @param string $file
-	 * @return string
-	 */
-	public static function toAsset($file) {
-		return self::getRoot(FALSE).ltrim($file, '/');
-	}
+	protected static function getPath($path) {
+	    if (empty($path) || $path === '0') {
+	        return null;
+        }
+        if ($path === -1 || $path === '-1') {
+            return static::referrer();
+        }
+        if (!empty(parse_url($path, PHP_URL_HOST))) {
+            return $path;
+        }
+        if (strpos($path, '//') !== false) {
+            $path = preg_replace('#/+#', '/', $path);
+        }
+        if (strpos($path, '/') === 0) {
+            return $path;
+        }
+        $name = Request::server('script_name');
+        if ($name === '/index.php') {
+            return '/'.$path;
+        }
+        return $name.'/'.$path;
+    }
 	
 	/**
 	 * 获取根网址

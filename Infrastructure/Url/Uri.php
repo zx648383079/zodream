@@ -56,7 +56,11 @@ class Uri {
      * @return $this
      */
     public function setHost($arg) {
-        $this->host = $arg;
+        $args = explode(':', $arg);
+        $this->host = $args[0];
+        if (count($args) > 1) {
+            $this->setPort($args[1]);
+        }
         return $this;
     }
 
@@ -123,7 +127,7 @@ class Uri {
         if ($arg instanceof FileObject) {
             $arg = $arg->toUrl();
         }
-        $this->path = '/'.ltrim($arg, '/');
+        $this->path = $arg;
         return $this;
     }
 
@@ -237,8 +241,8 @@ class Uri {
      * @return string
      */
     public function encode($hasRoot = true) {
-        $arg = $hasRoot ? $this->getRoot() : null;
-        $arg .= $this->path;
+        $arg = $hasRoot && !empty($this->host) ? $this->getRoot() : null;
+        $arg .= '/'.ltrim($this->path, '/');
         if (!empty($this->data)) {
             $arg .= '?'. http_build_query($this->data);
         }

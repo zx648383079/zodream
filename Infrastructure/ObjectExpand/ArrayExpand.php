@@ -367,4 +367,11 @@ class ArrayExpand {
 		}
 		return array_merge($keyArray, $noArray);
 	}
+
+	public static function keyAndValue(array $args) {
+	    return [
+	        key($args),
+            current($args)
+        ];
+    }
 }

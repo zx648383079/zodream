@@ -37,10 +37,13 @@ class Column {
     }
 
     public function setField($field) {
-        if (is_array($field)) {
+        if (!is_array($field)) {
+            $this->field = $field;
+        } elseif (count($field) > 1) {
             list($this->oldField, $this->field) = $field;
         } else {
-            $this->field = $field;
+            $this->oldField = key($field);
+            $this->field = current($field);
         }
         return $this;
     }
