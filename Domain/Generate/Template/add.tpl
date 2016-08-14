@@ -2,11 +2,7 @@
 defined('APP_DIR') or exit();
 use Zodream\Domain\Html\Bootstrap\FormWidget;
 /** @var $this \Zodream\Domain\View\View */
-$this->extend(array(
-'layout' => array(
-		'head'
-	))
-);
+$this->extend('layout/head');
 ?>
 
 
@@ -15,21 +11,15 @@ $this->extend(array(
 		<h3 class="panel-title">增加</h3>
 	</div>
 	<div class="panel-body">
-		<?=FormWidget::begin($this->get('data'))
+		<?=FormWidget::begin($data)
 		->hidden('id')
 {data}
 		->button()
 		->end();
 		?>
-		<p><?php $this->ech('error');?></p>
+		<p><?=$error?></p>
 	</div>
 </div>
 
 
-<?php
-$this->extend(array(
-	'layout' => array(
-		'foot'
-	))
-);
-?>
+<?php $this->extend('layout/foot');?>

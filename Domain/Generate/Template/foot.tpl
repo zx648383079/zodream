@@ -1,7 +1,6 @@
 <?php
 /** @var $this \Zodream\Domain\View\View */
-$this->jcs([
-	'jquery.min'
-]);?>
+?>
+<?=$this->foot();?>
 </body>
 </html>
