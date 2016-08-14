@@ -51,7 +51,9 @@ class WeChat extends BaseOAuth {
      * @return array
      */
     public function callback() {
-        parent::callback();
+        if (parent::callback() === false) {
+            return false;
+        }
         /**
          * access_token	接口调用凭证
          * expires_in	access_token接口调用凭证超时时间，单位（秒）
@@ -61,6 +63,10 @@ class WeChat extends BaseOAuth {
          * unionid	当且仅当该网站应用已获得该用户的userinfo授权时，才会出现该字段。
          */
         $access = $this->getJson('access');
+        if (!array_key_exists('access_token', $access)) {
+            return false;
+        }
+        $access['identity'] = $access['openid'];
         $this->set($access);
         return $access;
     }
@@ -77,6 +83,13 @@ class WeChat extends BaseOAuth {
         privilege	用户特权信息，json数组，如微信沃卡用户为（chinaunicom）
         unionid	用户统一标识。针对一个微信开放平台帐号下的应用，同一用户的unionid是唯一的。
          */
-        return $this->getJson('info');
+        $user = $this->getJson('info');
+        if (!array_key_exists('nickname', $user)) {
+            return false;
+        }
+        $user['username'] = $user['nickname'];
+        $user['avatar'] = $user['headimgurl'];
+        $user['sex'] = $user['sex'] == 2 ? '女' : '男';
+        return $user;
     }
 }

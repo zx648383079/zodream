@@ -70,7 +70,7 @@ class ResponseResult {
 		if (defined('DEBUG') && DEBUG) {
 			Factory::view()->set($data);
 		}
-		return new BadResponse(Factory::view()->setPath(Config::getValue('error', 404))->render(), $status);
+		return new BadResponse(Factory::view()->render(Config::getValue('error', 404)), $status);
 	}
 	
 	public static function sendRedirect($url, $time = 0) {

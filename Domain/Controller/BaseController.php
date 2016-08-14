@@ -17,6 +17,7 @@ use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Event\EventManger;
+use Zodream\Infrastructure\Url\Url;
 
 abstract class BaseController extends Action {
 	

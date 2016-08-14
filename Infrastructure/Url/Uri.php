@@ -143,6 +143,9 @@ class Uri {
      * @return $this
      */
     public function setData($arg) {
+        if (empty($arg)) {
+            return $this;
+        }
         if (is_string($arg)) {
             $str = str_replace('&amp;', '&', $arg);
             $arg = array();
@@ -158,11 +161,14 @@ class Uri {
      * @return $this
      */
     public function addData($key, $value = null) {
+        if (empty($key)) {
+            return $this;
+        }
         if (is_array($key)) {
             $this->data = array_merge($this->data, $key);
-        } else {
-            $this->data[$key] = $value;
+            return $this;
         }
+        $this->data[$key] = $value;
         return $this;
     }
 

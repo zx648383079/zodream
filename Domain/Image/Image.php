@@ -42,7 +42,7 @@ class Image {
 		if (is_null($file)) {
 			return;
 		}
-		if (is_file($file)) {
+		if (is_string($file) && is_file($file)) {
 			$this->open($file);
 		}
 		$this->setImage($file);

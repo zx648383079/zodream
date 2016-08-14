@@ -14,6 +14,15 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\ThirdParty;
 
+/**
+ * Class BaseOAuth
+ * @package Zodream\Domain\ThirdParty\OAuth
+ *
+ * @property string $identity
+ * @property string $username
+ * @property string $sex
+ * @property string #avatar
+ */
 abstract class BaseOAuth extends ThirdParty {
 
     public function callback() {

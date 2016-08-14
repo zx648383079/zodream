@@ -42,7 +42,9 @@ class ALiPay extends BaseOAuth {
      * @return array
      */
     public function callback() {
-        parent::callback();
+        if (parent::callback() === false) {
+            return false;
+        }
         /**
          * access_token
          * user_id
@@ -51,6 +53,10 @@ class ALiPay extends BaseOAuth {
          * refresh_token
          */
         $access = $this->getJson('access');
+        if (!array_key_exists('access_token', $access)) {
+            return false;
+        }
+        $access['identity'] = $access['access_token'];
         $this->set($access);
         return $access;
     }
@@ -78,6 +84,13 @@ class ALiPay extends BaseOAuth {
         user_status	用户状态（Q/T/B/W）	String	Q代表快速注册用户；T代表已认证用户；B代表被冻结账户；W代表已注册，未激活的账户	不可空	T
         is_id_auth	是否身份证认证	String	T为是身份证认证，F为非身份证认证	不可空	T
          */
-        return $this->getJson('info');
+        $user = $this->getJson('info');
+        if (!array_key_exists('nick_name', $user)) {
+            return false;
+        }
+        $user['username'] = $user['nick_name'];
+        $user['sex'] = $user['gender'] == 'F' ? '女': '男';
+        $this->set($user);
+        return $user;
     }
 }

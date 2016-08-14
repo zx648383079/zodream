@@ -53,7 +53,9 @@ class WeiBo extends BaseOAuth {
     );
 
     public function callback() {
-        parent::callback();
+        if (parent::callback() === false) {
+            return false;
+        }
         /**
          * access_token
          * expires_in
@@ -61,6 +63,9 @@ class WeiBo extends BaseOAuth {
          * uid
          */
         $access = $this->getJson('access');
+        if (!array_key_exists('access_token', $access)) {
+            return false;
+        }
         /**
          * uid	string	授权用户的uid。
          * appkey	string	access_token所属的应用appkey。
@@ -68,8 +73,9 @@ class WeiBo extends BaseOAuth {
          * create_at	string	access_token的创建时间，从1970年到创建时间的秒数。
          * expire_in	string	access_token的剩余时间，单位是秒数。
          */
-        $info = $this->getJson('token', $access);
-        $access['uid'] = $info['uid'];
+        //$info = $this->getJson('token', $access);
+        //$access['uid'] = $info['uid'];
+        $access['identity'] = $access['uid'];
         $this->set($access);
         return $access;
     }
@@ -112,6 +118,13 @@ online_status	int	用户的在线状态，0：不在线、1：在线
 bi_followers_count	int	用户的互粉数
 lang	string	用户当前的语言版本，zh-cn：简体中文，zh-tw：繁体中文，en：英语
          */
-        return $this->getJson('info');
+        $user = $this->getJson('info');
+        if (!array_key_exists('screen_name', $user)) {
+            return false;
+        }
+        $user['username'] = $user['screen_name'];
+        $user['avatar'] = $user['profile_image_url'];
+        $user['sex'] = $user['gender'] == 'm' ? '男' : '女';
+        return $user;
     }
 }

@@ -78,18 +78,26 @@ class QQ extends BaseOAuth {
      * @return array
      */
     public function callback() {
-        parent::callback();
+        if (parent::callback() === false) {
+            return false;
+        }
         /**
          * access_token	授权令牌，Access_Token。
          * expires_in	该access token的有效期，单位为秒。
          * refresh_token
          */
         $access = $this->getJson('access');
+        if (!array_key_exists('access_token', $access)) {
+            return false;
+        }
         /**
          *
          */
         $openId = $this->getJson('openid', $access);
-        $access['openid'] = $openId['openid'];
+        if (!array_key_exists('openid', $openId)) {
+            return false;
+        }
+        $access['identity'] = $access['openid'] = $openId['openid'];
         $this->set($access);
         return $access;
     }
@@ -112,7 +120,13 @@ class QQ extends BaseOAuth {
      * @return array
      */
     public function getInfo() {
-        $args = $this->getJson('info');
-        return $args;
+        $user = $this->getJson('info');
+        if (!array_key_exists('nickname', $user)) {
+            return false;
+        }
+        $user['username'] = $user['nickname'];
+        $user['avatar'] = $user['figureurl_qq_2'];
+        $user['sex'] = $user['gender'];
+        return $user;
     }
 }

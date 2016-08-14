@@ -47,8 +47,14 @@ class DouBan extends BaseOAuth {
     ];
 
     public function callback() {
-        parent::callback();
+        if (parent::callback() === false) {
+            return false;
+        }
         $access = $this->getJson('access');
+        if (!array_key_exists('douban_user_id', $access)) {
+            return false;
+        }
+        $access['identity'] = $access['douban_user_id'];
         $this->set($access);
         return $access;
     }
@@ -58,6 +64,12 @@ class DouBan extends BaseOAuth {
      * @return array
      */
     public function getInfo() {
-        return $this->getJson('info');
+        $user = $this->getJson('info');
+        if (!array_key_exists('name', $user)) {
+            return false;
+        }
+        $user['username'] = $user['name'];
+        $user['sex'] = '女';
+        return $user;
     }
 }

@@ -27,6 +27,10 @@ class Url {
      * @return string|Uri
      */
 	public static function to($file = null, $extra = null, $complete = false) {
+	    if ($file instanceof Uri) {
+	        $file->addData($extra);
+	        return $file;
+        }
         if (is_string($file) &&
             ($file === '#' || strpos($file, 'javascript:') != false)) {
             return $file;
@@ -42,7 +46,7 @@ class Url {
 					$uri->decode(static::getPath($item));
 					continue;
 				}
-				$uri->addData($key, $item);
+				$uri->addData($key, (string)$item);
 			}
 			if (empty($uri->getPath())) {
                 $uri->decode(static::getPath(null));

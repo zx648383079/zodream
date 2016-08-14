@@ -64,7 +64,9 @@ class BaiDu extends BaseOAuth {
      * @return array
      */
     public function callback() {
-        parent::callback();
+        if (parent::callback() === false) {
+            return false;
+        }
         /**
          * access_token：要获取的Access Token；
          * expires_in：Access Token的有效期，以秒为单位；请参考“Access Token生命周期”
@@ -74,6 +76,10 @@ class BaiDu extends BaseOAuth {
          * session_secret：基于http调用Open API时计算参数签名用的签名密钥。
          */
         $access = $this->getJson('access');
+        if (!array_key_exists('access_token', $access)) {
+            return false;
+        }
+        $access['identity'] = $access['access_token'];
         $this->set($access);
         return $access;
     }
@@ -86,6 +92,31 @@ class BaiDu extends BaseOAuth {
          *      small image: http://tb.himg.baidu.com/sys/portraitn/item/{$portrait}
          *      large image: http://tb.himg.baidu.com/sys/portrait/item/{$portrait}
          */
-        return $this->getJson('uid');
+
+        /**
+         * userid	uint	是	67411167	当前登录用户的数字ID
+        username	string	否	robin928	当前登录用户的用户名，值可能为空
+        realname	string	否	阳光	用户真实姓名，可能为空
+        portrait	string	否	e2c1776c31393837313031319605	当前登录用户的头像
+        small image: http://tb.himg.baidu.com/sys/portraitn/item/{$portrait} large image: http://tb.himg.baidu.com/sys/portrait/item/{$portrait}
+
+        userdetail	string	否	喜欢自由	自我简介，可能为空
+        birthday	string	否	1987-01-01	生日，以yyyy-mm-dd格式显示
+        marriage	string	否	已婚	婚姻状况
+        sex	string	否	男	性别
+        blood	string	否	O	血型
+        figure	string	否	小巧	体型
+        constellation	string	否	射手	星座
+        education	string	否	大学/专科	学历
+        trade	string	否	计算机/电子产品	当前职业
+        job	string	否	未知	职位
+         */
+        $user = $this->getJson('info');
+        if (!array_key_exists('userid', $user)) {
+            return false;
+        }
+        $user['avatar'] = $user['portrait'];
+        $this->set($user);
+        return $user;
     }
 }
