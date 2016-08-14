@@ -37,6 +37,8 @@ class ViewFactory extends MagicObject {
      */
     protected $cache;
 
+    protected $assetsDirectory;
+
     public $metaTags = [];
 
     public $linkTags = [];
@@ -55,15 +57,41 @@ class ViewFactory extends MagicObject {
         $this->configs = Config::getValue('view', [
             'driver' => null,
             'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
-            'suffix' => '.php'
+            'suffix' => '.php',
+            'assets' => '/'
         ]);
         if (class_exists($this->configs['driver'])) {
             $class = $this->configs['driver'];
             $this->engine = new $class($this);
         }
+        $this->setAssetsDirectory($this->configs['assets']);
         $this->cache = new FileCache();
         $this->setDirectory($this->configs['directory']);
         $this->set('__zd', $this);
+    }
+
+    public function setAssetsDirectory($directory) {
+        $this->assetsDirectory = '/'.trim($directory, '/');
+        if ($this->assetsDirectory != '/') {
+            $this->assetsDirectory .= '/';
+        }
+        return $this;
+    }
+
+    /**
+     * GET ASSET FILE
+     * @param string $file
+     * @return string
+     */
+    public function getAssetFile($file) {
+        if (strpos($file, '/') === 0 || strpos($file, '//') !== false) {
+            return $file;
+        }
+        $ext = pathinfo($file, PATHINFO_EXTENSION);
+        if ($ext == 'js' || $ext == 'css') {
+            $file = $ext.'/'. $file;
+        }
+        return $this->assetsDirectory.$file;
     }
     
     public function setDirectory($directory) {
@@ -143,7 +171,7 @@ class ViewFactory extends MagicObject {
     public function registerCssFile($url, $options = array(), $key = null) {
         $key = $key ?: $url;
         $options['rel'] = 'stylesheet';
-        $this->cssFiles[$key] = Html::link($url, $options);
+        $this->cssFiles[$key] = Html::link($this->getAssetFile($url), $options);
     }
 
     public function registerJs($js, $position = View::HTML_FOOT, $key = null) {
@@ -154,7 +182,7 @@ class ViewFactory extends MagicObject {
     public function registerJsFile($url, $options = [], $key = null) {
         $key = $key ?: $url;
         $position = ArrayExpand::remove($options, 'position', View::HTML_FOOT);
-        $options['src'] = Url::to($url);
+        $options['src'] = Url::to($this->getAssetFile($url));
         $this->jsFiles[$position][$key] = Html::script(null, $options);
     }
 

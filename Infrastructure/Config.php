@@ -110,7 +110,7 @@ class Config extends MagicObject {
 		if (empty($args)) {
 			return $default;
 		}
-		return array_merge((array)$args, $default);
+		return array_merge($default, (array)$args);
 	}
 
 	/**

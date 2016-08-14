@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure\Database;
  * Time: 9:07
  */
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\EventManager\EventManger;
+use Zodream\Infrastructure\Event\EventManger;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;

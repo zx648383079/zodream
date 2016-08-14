@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\EventManager\Action;
+use Zodream\Infrastructure\Event\Action;
 
 class Log {
 	public static $fileHandlerCache;

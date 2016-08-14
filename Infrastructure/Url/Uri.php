@@ -23,7 +23,7 @@ class Uri {
 
     protected $password;
 
-    protected $path = '/';
+    protected $path = null;
 
     protected $data = array();
 
@@ -76,7 +76,7 @@ class Uri {
      * @return $this
      */
     public function setPort($arg = 80) {
-        $this->host = intval($arg);
+        $this->port = intval($arg);
         return $this;
     }
 

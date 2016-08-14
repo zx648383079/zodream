@@ -24,6 +24,7 @@ use Zodream\Infrastructure\Traits\ConditionTrait;
  * @method registerCssFile($url, $options = array(), $key = null)
  * @method registerJs($js, $position = self::HTML_FOOT, $key = null)
  * @method registerJsFile($url, $options = [], $key = null)
+ * @method getAssetFile($file)
  * @method string head()
  * @method string foot()
  * @method start($name)

@@ -3,7 +3,7 @@ namespace Zodream\Domain\Response;
 
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\EventManager\EventManger;
+use Zodream\Infrastructure\Event\EventManger;
 use Zodream\Infrastructure\Request;
 class ResponseResult {
 	/**

@@ -10,7 +10,7 @@ use Zodream\Domain\Filter\ModelFilter;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
 use Zodream\Infrastructure\Database\Record;
-use Zodream\Infrastructure\EventManager\Action;
+use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;

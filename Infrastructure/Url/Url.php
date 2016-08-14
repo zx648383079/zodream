@@ -19,15 +19,21 @@ class Url {
 		return Request::server('HTTP_REFERER');
 	}
 
-	/**
-	 * 产生完整的网址
-	 * @param string $file
-	 * @param array|string|\Closure $extra
-	 * @return string|Uri
-	 */
-	public static function to($file = null, $extra = null) {
-        if ($file === '#' || strpos($file, 'javascript:') != false) {
+    /**
+     * 产生网址
+     * @param string $file
+     * @param array|string|\Closure $extra
+     * @param bool $complete
+     * @return string|Uri
+     */
+	public static function to($file = null, $extra = null, $complete = false) {
+        if (is_string($file) &&
+            ($file === '#' || strpos($file, 'javascript:') != false)) {
             return $file;
+        }
+        if (is_bool($extra)) {
+            $complete = $extra;
+            $extra = null;
         }
         $uri = new Uri();
 		if (is_array($file)) {
@@ -38,13 +44,16 @@ class Url {
 				}
 				$uri->addData($key, $item);
 			}
+			if (empty($uri->getPath())) {
+                $uri->decode(static::getPath(null));
+            }
 		} else {
 		    $uri->decode(static::getPath($file));
         }
         if (!empty($extra)) {
             $uri->setData($extra);
         }
-        if (empty($uri->getHost())) {
+        if ($complete && empty($uri->getHost())) {
             $uri->setScheme(self::isSsl() ? 'https' : 'http')
                 ->setHost(self::getHost());
         }
@@ -53,7 +62,7 @@ class Url {
 
 	protected static function getPath($path) {
 	    if (empty($path) || $path === '0') {
-	        return null;
+	        return self::getUri();
         }
         if ($path === -1 || $path === '-1') {
             return static::referrer();

@@ -12,7 +12,7 @@ use Zodream\Infrastructure\Cookie;
 use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\EventManager\EventManger;
+use Zodream\Infrastructure\Event\EventManger;
 use Zodream\Infrastructure\Url\DefaultUri;
 
 defined('VERSION') or define('VERSION', 2.0);
