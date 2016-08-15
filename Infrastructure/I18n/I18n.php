@@ -74,9 +74,6 @@ abstract class I18n extends MagicObject {
     }
 
     public function translate($message, $param = [], $name = null) {
-        if (empty($message)) {
-            return $message;
-        }
         if (!is_null($name) && $name != $this->fileName) {
             $this->fileName = $name;
             $this->reset();

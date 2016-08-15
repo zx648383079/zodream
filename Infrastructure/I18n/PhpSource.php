@@ -8,12 +8,16 @@ namespace Zodream\Infrastructure\I18n;
  */
 class PhpSource extends I18n {
 
-    public function translate($message, $param = [], $name = 'app') {
+    public function translate($message, $param = [], $name = null) {
+        if (empty($message)) {
+            return $message;
+        }
         parent::translate($message, $param, $name);
-        if (!$this->has($name) || !array_key_exists($message, (array)$this->get($name))) {
+        $args = $this->get($this->fileName, array());
+        if (!$this->has($name) || !array_key_exists($message, $args)) {
             return $this->format($message, $param);
         }
-        return $this->format($this->get($name)[$message], $param);
+        return $this->format($args[$message], $param);
     }
 
 

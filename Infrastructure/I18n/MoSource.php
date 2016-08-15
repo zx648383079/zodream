@@ -36,7 +36,10 @@ class MoSource extends I18n {
 		bind_textdomain_codeset($this->fileName, 'UTF-8');
 	}
 
-	public function translate($message, $param = [], $name = 'app') {
+	public function translate($message, $param = [], $name = null) {
+        if (empty($message)) {
+            return $message;
+        }
 		parent::translate($message, $param, $name);
 		return $this->format(gettext($message), $param);
 	}
