@@ -12,7 +12,7 @@ use Zodream\Infrastructure\MagicObject;
 
 abstract class I18n extends MagicObject {
 
-    protected $fileName;
+    protected $fileName = 'zodream';
 
     protected $language = 'ZH-CN';
 
@@ -26,16 +26,33 @@ abstract class I18n extends MagicObject {
     }
 
 
+    /**
+     * SET LANGUAGE DIRECTORY
+     * @param string|Directory $directory
+     * @return $this
+     */
     public function setDirectory($directory) {
         if (!$directory instanceof Directory) {
             $directory = new Directory($directory);
         }
         $this->directory = $directory;
+        return $this;
+    }
+
+    /**
+     * SET FILE NAME
+     * @param string $arg
+     * @return $this
+     */
+    public function setFileName($arg) {
+        $this-$this->fileName = $arg;
+        return $this;
     }
 
     /**
      * 设置应用程序语言包
      * @param string $arg 语言
+     * @return $this
      */
     public function setLanguage($arg = null) {
         if (empty($arg)) {
@@ -44,6 +61,7 @@ abstract class I18n extends MagicObject {
             $arg = $match[0];
         }
         $this->language = $arg;
+        return $this;
     }
 
     /**
@@ -55,11 +73,11 @@ abstract class I18n extends MagicObject {
         return $this->language;
     }
 
-    public function translate($message, $param = [], $name = 'app') {
+    public function translate($message, $param = [], $name = null) {
         if (empty($message)) {
             return $message;
         }
-        if ($name != $this->fileName) {
+        if (!is_null($name) && $name != $this->fileName) {
             $this->fileName = $name;
             $this->reset();
         }

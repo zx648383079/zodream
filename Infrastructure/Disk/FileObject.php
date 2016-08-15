@@ -63,7 +63,7 @@ abstract class FileObject {
     abstract public function delete();
     
     public function __toString() {
-        return $this->getName();
+        return $this->getFullName();
     }
 
     /**
