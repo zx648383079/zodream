@@ -31,7 +31,7 @@ class MoSource extends I18n {
 		putenv('LANG='.$this->get('lang'));
 		putenv('LANGUAGE='.$this->get('lang'));
 		setlocale(LC_ALL, $this->get('lang'));
-		bindtextdomain($this->fileName, 'lang/');
+		bindtextdomain($this->fileName, (string)$this->directory);
 		textdomain($this->fileName);
 		bind_textdomain_codeset($this->fileName, 'UTF-8');
 	}

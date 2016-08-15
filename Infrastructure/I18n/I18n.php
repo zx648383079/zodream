@@ -6,6 +6,8 @@ namespace Zodream\Infrastructure\I18n;
  * Date: 2016/6/25
  * Time: 17:15
  */
+use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\MagicObject;
 
 abstract class I18n extends MagicObject {
@@ -13,6 +15,23 @@ abstract class I18n extends MagicObject {
     protected $fileName;
 
     protected $language = 'ZH-CN';
+
+    /**
+     * @var Directory
+     */
+    protected $directory;
+
+    public function __construct() {
+        $this->setDirectory(Config::getValue('i18n.directory', APP_DIR.'/lang/'));
+    }
+
+
+    public function setDirectory($directory) {
+        if (!$directory instanceof Directory) {
+            $directory = new Directory($directory);
+        }
+        $this->directory = $directory;
+    }
 
     /**
      * 设置应用程序语言包

@@ -24,11 +24,11 @@ class PhpSource extends I18n {
         if ($this->has($this->fileName)) {
             return;
         }
-        $file = APP_DIR.'/lang/'.$this->language.'/'.$this->fileName.'.php';
-        if (!is_file($file)) {
+        $file = $this->directory->childFile($this->language.'/'.$this->fileName.'.php');
+        if (!$file->exist()) {
             return;
         }
-        $args = include($file);
+        $args = include (string)$file;
         if (!is_array($args)) {
             return;
         }
