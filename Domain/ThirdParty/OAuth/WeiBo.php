@@ -8,7 +8,8 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class WeiBo extends BaseOAuth {
 
-    protected $config = 'weibo';
+    protected $name = 'weibo';
+
     protected $apiMap = array(
        'login' => array(
            'https://api.weibo.com/oauth2/authorize',
@@ -63,7 +64,7 @@ class WeiBo extends BaseOAuth {
          * uid
          */
         $access = $this->getJson('access');
-        if (!array_key_exists('access_token', $access)) {
+        if (!is_array($access) || !array_key_exists('access_token', $access)) {
             return false;
         }
         /**
@@ -119,7 +120,7 @@ bi_followers_count	int	用户的互粉数
 lang	string	用户当前的语言版本，zh-cn：简体中文，zh-tw：繁体中文，en：英语
          */
         $user = $this->getJson('info');
-        if (!array_key_exists('screen_name', $user)) {
+        if (!is_array($user) || !array_key_exists('screen_name', $user)) {
             return false;
         }
         $user['username'] = $user['screen_name'];

@@ -8,7 +8,8 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class WeChat extends BaseOAuth {
 
-    protected $config = 'wechat';
+    protected $name = 'wechat';
+
     protected $apiMap = array(
        'login' => array(
            'https://open.weixin.qq.com/connect/qrconnect',
@@ -63,7 +64,7 @@ class WeChat extends BaseOAuth {
          * unionid	当且仅当该网站应用已获得该用户的userinfo授权时，才会出现该字段。
          */
         $access = $this->getJson('access');
-        if (!array_key_exists('access_token', $access)) {
+        if (!is_array($access) || !array_key_exists('access_token', $access)) {
             return false;
         }
         $access['identity'] = $access['openid'];
@@ -84,7 +85,7 @@ class WeChat extends BaseOAuth {
         unionid	用户统一标识。针对一个微信开放平台帐号下的应用，同一用户的unionid是唯一的。
          */
         $user = $this->getJson('info');
-        if (!array_key_exists('nickname', $user)) {
+        if (!is_array($user) || !array_key_exists('nickname', $user)) {
             return false;
         }
         $user['username'] = $user['nickname'];

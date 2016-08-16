@@ -16,7 +16,7 @@ abstract class ThirdParty extends MagicObject {
     /**
      * @var string config 中标记
      */
-    protected $config = 'oauth';
+    protected $name;
 
     /**
      *
@@ -31,34 +31,49 @@ abstract class ThirdParty extends MagicObject {
      * @var Http
      */
     protected $http;
-    
+
     protected $error;
+
+    protected $log = array();
 
     public function __construct($config = array()) {
         $this->http = new Http();
         if (empty($config)) {
-            $this->set(Config::getValue($this->config));
+            $this->set(Config::getValue($this->name));
             return;
         }
-        if (array_key_exists($this->config, $config) && is_array($config[$this->config])) {
-            $this->set($config[$this->config]);
+        if (array_key_exists($this->name, $config) && is_array($config[$this->name])) {
+            $this->set($config[$this->name]);
             return;
         }
         $this->set($config);
     }
 
+    /**
+     * GET NAME
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
     protected function httpGet($url, $data = array()) {
         /*if (ini_get("allow_url_fopen") == "1") {
-            return file_get_contents(StringExpand::urlBindValue($url, $data));
+            return
         }*/
-        return $this->http->get($url, $data);
+        $args = $this->http->get($url, $data);
+        $this->log[] = [$url, $data, 'GET', $args];
+        return $args;
     }
 
     protected function httpPost($url, $data, $flag = 0) {
         if ($flag) {
-            return $this->http->post($url, $data);
+            $args = $this->http->post($url, $data);
+        } else {
+            $args = $this->http->setUrl($url)->checkSSL(false)->post(null, $data);
         }
-        return $this->http->setUrl($url)->checkSSL(false)->post(null, $data);
+        $this->log[] = [$url, $data, $flag, 'POST', $args];
+        return $args;
     }
 
     protected function getByApi($name, $args = array()) {
@@ -128,7 +143,7 @@ abstract class ThirdParty extends MagicObject {
                     $data[$k] = $arg;
                     continue;
                 }
-                // 判断 #n:m 
+                // 判断 #n:m
                 $k = array_keys($arg)[0];
                 $arg = current($arg);
                 if (is_null($arg)) {
@@ -152,7 +167,7 @@ abstract class ThirdParty extends MagicObject {
     protected function json($json, $is_array = true) {
         return JsonExpand::decode($json, $is_array);
     }
-    
+
     protected function getXml($name, $args = array(), $is_array = true) {
         return $this->xml($this->getByApi($name, $args), $is_array);
     }
@@ -179,5 +194,13 @@ abstract class ThirdParty extends MagicObject {
      */
     public function getError() {
         return $this->error;
+    }
+
+    /**
+     * GET HTTP LOG
+     * @return array
+     */
+    public function getLog() {
+        return $this->log;
     }
 }

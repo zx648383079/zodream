@@ -155,6 +155,9 @@ class File extends FileObject {
      * @return int
      */
     public function write($data, $lock = false) {
+        if (!is_string($data) && !is_integer($data)) {
+            $data = var_export($data, true);
+        }
         return file_put_contents($this->fullName, $data, $lock ? LOCK_EX : 0);
     }
 

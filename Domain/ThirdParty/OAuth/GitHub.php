@@ -8,7 +8,8 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class GitHub extends BaseOAuth {
 
-    protected $config = 'github';
+    protected $name = 'github';
+
     protected $apiMap = array(
        'login' => array(
            'https://github.com/login/oauth/authorize',

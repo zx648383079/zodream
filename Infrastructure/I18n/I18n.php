@@ -9,6 +9,7 @@ namespace Zodream\Infrastructure\I18n;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Request;
 
 abstract class I18n extends MagicObject {
 
@@ -60,7 +61,7 @@ abstract class I18n extends MagicObject {
             preg_match('/[\w-]+/', $language, $match);
             $arg = $match[0];
         }
-        $this->language = $arg;
+        $this->language = strtoupper($arg);
         return $this;
     }
 

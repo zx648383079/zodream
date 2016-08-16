@@ -9,7 +9,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class QQ extends BaseOAuth {
 
-    protected $config = 'qq';
+    protected $name = 'qq';
 
     protected $apiMap = array(
         'login' => array(
@@ -75,6 +75,26 @@ class QQ extends BaseOAuth {
     }
 
     /**
+     * GET ACCESS
+     * @return array
+     */
+    public function access() {
+        return $this->getString('access');
+    }
+
+    /**
+     * @param $name
+     * @param array $args
+     * @return array
+     */
+    protected function getString($name, $args = []) {
+        $access = $this->getByApi($name, $args);
+        $args = [];
+        parse_str($access, $args);
+        return $args;
+    }
+
+    /**
      * @return array
      */
     public function callback() {
@@ -86,15 +106,15 @@ class QQ extends BaseOAuth {
          * expires_in	该access token的有效期，单位为秒。
          * refresh_token
          */
-        $access = $this->getJson('access');
-        if (!array_key_exists('access_token', $access)) {
+        $access = $this->access();
+        if (!is_array($access) || !array_key_exists('access_token', $access)) {
             return false;
         }
         /**
          *
          */
         $openId = $this->getJson('openid', $access);
-        if (!array_key_exists('openid', $openId)) {
+        if (!is_array($openId) || !array_key_exists('openid', $openId)) {
             return false;
         }
         $access['identity'] = $access['openid'] = $openId['openid'];
@@ -121,7 +141,7 @@ class QQ extends BaseOAuth {
      */
     public function getInfo() {
         $user = $this->getJson('info');
-        if (!array_key_exists('nickname', $user)) {
+        if (!is_array($user) || !array_key_exists('nickname', $user)) {
             return false;
         }
         $user['username'] = $user['nickname'];

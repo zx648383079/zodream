@@ -19,7 +19,8 @@ namespace Zodream\Domain\ThirdParty\SMS;
 use Zodream\Infrastructure\ThirdParty;
 class IHuYi extends ThirdParty {
 
-    protected $config = 'sms';
+    protected $name = 'sms';
+
     protected $apiMap = array(
         'url' => array(
             array(

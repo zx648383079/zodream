@@ -8,6 +8,8 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class DouBan extends BaseOAuth {
 
+    protected $name = 'douban';
+
     protected $apiMap = [
         'login' => [
             'https://www.douban.com/service/auth2/auth',
@@ -51,7 +53,7 @@ class DouBan extends BaseOAuth {
             return false;
         }
         $access = $this->getJson('access');
-        if (!array_key_exists('douban_user_id', $access)) {
+        if (!is_array($access) || !array_key_exists('douban_user_id', $access)) {
             return false;
         }
         $access['identity'] = $access['douban_user_id'];
@@ -65,7 +67,7 @@ class DouBan extends BaseOAuth {
      */
     public function getInfo() {
         $user = $this->getJson('info');
-        if (!array_key_exists('name', $user)) {
+        if (!is_array($user) || !array_key_exists('name', $user)) {
             return false;
         }
         $user['username'] = $user['name'];

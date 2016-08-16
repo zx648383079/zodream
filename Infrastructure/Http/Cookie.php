@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Header;
+namespace Zodream\Infrastructure\Http;
 
 /*
  * This file is part of the Symfony package.

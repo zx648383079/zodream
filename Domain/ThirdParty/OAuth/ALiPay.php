@@ -7,7 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 16:01
  */
 class ALiPay extends BaseOAuth {
-    protected $config = 'alipay';
+    protected $name = 'alipay';
 
     protected $apiMap = array(
         'login' => array(
@@ -53,7 +53,7 @@ class ALiPay extends BaseOAuth {
          * refresh_token
          */
         $access = $this->getJson('access');
-        if (!array_key_exists('access_token', $access)) {
+        if (!is_array($access) || !array_key_exists('access_token', $access)) {
             return false;
         }
         $access['identity'] = $access['access_token'];
@@ -85,7 +85,7 @@ class ALiPay extends BaseOAuth {
         is_id_auth	是否身份证认证	String	T为是身份证认证，F为非身份证认证	不可空	T
          */
         $user = $this->getJson('info');
-        if (!array_key_exists('nick_name', $user)) {
+        if (!is_array($user) || !array_key_exists('nick_name', $user)) {
             return false;
         }
         $user['username'] = $user['nick_name'];

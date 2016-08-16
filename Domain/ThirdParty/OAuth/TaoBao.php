@@ -8,7 +8,8 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class TaoBao extends BaseOAuth {
 
-    protected $config = 'taobao';
+    protected $name = 'taobao';
+
     protected $apiMap = array(
         'login' => array(
             'https://oauth.taobao.com/authorize',

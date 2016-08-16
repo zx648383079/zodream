@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Header;
+namespace Zodream\Infrastructure\Http;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -7,7 +7,11 @@ namespace Zodream\Infrastructure\Header;
  * Time: 17:26
  */
 
-class Headers {
+class Header {
+
+    const COOKIES_ARRAY = 'array';
+
+    const COOKIES_FLAT = 'flat';
 
     protected $headers = array();
     

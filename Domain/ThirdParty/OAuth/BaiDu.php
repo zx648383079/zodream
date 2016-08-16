@@ -7,7 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 17:44
  */
 class BaiDu extends BaseOAuth {
-    protected $config = 'baidu';
+    protected $name = 'baidu';
 
     protected $apiMap = array(
         'login' => array(
@@ -76,7 +76,7 @@ class BaiDu extends BaseOAuth {
          * session_secret：基于http调用Open API时计算参数签名用的签名密钥。
          */
         $access = $this->getJson('access');
-        if (!array_key_exists('access_token', $access)) {
+        if (!is_array($access) || !array_key_exists('access_token', $access)) {
             return false;
         }
         $access['identity'] = $access['access_token'];
@@ -112,7 +112,7 @@ class BaiDu extends BaseOAuth {
         job	string	否	未知	职位
          */
         $user = $this->getJson('info');
-        if (!array_key_exists('userid', $user)) {
+        if (!is_array($user) || !array_key_exists('userid', $user)) {
             return false;
         }
         $user['avatar'] = $user['portrait'];
