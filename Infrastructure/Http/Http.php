@@ -6,16 +6,30 @@ namespace Zodream\Infrastructure\Http;
 * @author Jason
 * @time 2015-12-19
 */
+use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Url\Uri;
 
 class Http {
+    /**
+     * @var resource
+     */
 	protected $curl;
-	
+
+    /**
+     * @var Uri
+     */
 	protected $url;
-	
+
+    /**
+     * @var File
+     */
 	public $cookieFile;
-	
+
+    /**
+     * @var
+     */
 	protected $data;
 
 	protected $headers = [
@@ -182,7 +196,7 @@ class Http {
 		$header = [];
 		foreach ($this->headers as $key => $item) {
 			if ($key === 'Host' && empty($item)) {
-				$item = parse_url($this->url)['host'];
+				$item = parse_url($this->url, PHP_URL_HOST);
 			}
 			if (empty($item)) {
 				continue;

@@ -147,6 +147,7 @@ class QQ extends BaseOAuth {
         $user['username'] = $user['nickname'];
         $user['avatar'] = $user['figureurl_qq_2'];
         $user['sex'] = $user['gender'];
+        $this->set($user);
         return $user;
     }
 }

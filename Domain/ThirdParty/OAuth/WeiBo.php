@@ -76,7 +76,7 @@ class WeiBo extends BaseOAuth {
          */
         //$info = $this->getJson('token', $access);
         //$access['uid'] = $info['uid'];
-        $access['identity'] = $access['uid'];
+        $access['identity'] = $access['access_token'];
         $this->set($access);
         return $access;
     }
@@ -126,6 +126,7 @@ lang	string	用户当前的语言版本，zh-cn：简体中文，zh-tw：繁体�
         $user['username'] = $user['screen_name'];
         $user['avatar'] = $user['profile_image_url'];
         $user['sex'] = $user['gender'] == 'm' ? '男' : '女';
+        $this->set($user);
         return $user;
     }
 }

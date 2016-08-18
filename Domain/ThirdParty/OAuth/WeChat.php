@@ -17,7 +17,7 @@ class WeChat extends BaseOAuth {
                '#appid',
                '#redirect_uri',
                'response_type' => 'code',
-               '#scope',
+               'scope' => 'snsapi_login',
                'state'
            )
        ),
@@ -91,6 +91,7 @@ class WeChat extends BaseOAuth {
         $user['username'] = $user['nickname'];
         $user['avatar'] = $user['headimgurl'];
         $user['sex'] = $user['sex'] == 2 ? '女' : '男';
+        $this->set($user);
         return $user;
     }
 }

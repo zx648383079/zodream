@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Domain\Upload;
-use Zodream\Infrastructure\FileSystem;
 
 /**
  * Created by PhpStorm.
@@ -8,6 +7,8 @@ use Zodream\Infrastructure\FileSystem;
  * Date: 2016/6/28
  * Time: 14:17
  */
+ use Zodream\Infrastructure\FileSystem;
+ 
 abstract class BaseUpload {
 
     protected $name;

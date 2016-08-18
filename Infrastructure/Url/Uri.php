@@ -9,6 +9,7 @@ namespace Zodream\Infrastructure\Url;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\FileObject;
 use Zodream\Infrastructure\Factory;
+use Zodream\Infrastructure\Http\Curl;
 use Zodream\Infrastructure\Request;
 
 class Uri {
@@ -287,6 +288,14 @@ class Uri {
      */
     public function run() {
         return Factory::router()->run($this);
+    }
+
+    /**
+     * GET WEB PAGE BY URL
+     * @return Curl
+     */
+    public function get() {
+        return new Curl($this);
     }
 
     public function __toString() {
