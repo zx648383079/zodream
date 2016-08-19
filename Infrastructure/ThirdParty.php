@@ -7,12 +7,16 @@ namespace Zodream\Infrastructure;
  * Date: 2016/5/13
  * Time: 11:44
  */
+use Zodream\Infrastructure\Http\Curl;
 use Zodream\Infrastructure\Http\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
+use Zodream\Infrastructure\Url\Uri;
 
 abstract class ThirdParty extends MagicObject {
+
+    const GET = 'GET';
+    const POST = 'POST';
     /**
      * @var string config 中标记
      */
@@ -37,7 +41,7 @@ abstract class ThirdParty extends MagicObject {
     protected $log = array();
 
     public function __construct($config = array()) {
-        $this->http = new Http();
+        $this->http = new Curl();
         if (empty($config)) {
             $this->set(Config::getValue($this->name));
             return;
@@ -57,105 +61,97 @@ abstract class ThirdParty extends MagicObject {
         return $this->name;
     }
 
-    protected function httpGet($url, $data = array()) {
-        /*if (ini_get("allow_url_fopen") == "1") {
-            return
-        }*/
-        $args = $this->http->get($url, $data);
-        $this->log[] = [$url, $data, 'GET', $args];
+    protected function httpGet($url) {
+        $args = $this->http->setUrl($url)->get();
+        $this->log[] = [$url, self::GET, $args];
         return $args;
     }
 
-    protected function httpPost($url, $data, $flag = 0) {
-        if ($flag) {
-            $args = $this->http->post($url, $data);
-        } else {
-            $args = $this->http->setUrl($url)->checkSSL(false)->post(null, $data);
-        }
-        $this->log[] = [$url, $data, $flag, 'POST', $args];
+    protected function httpPost($url, $data) {
+        $args = $this->http->setUrl($url)->post($data);
+        $this->log[] = [$url, $data, self::POST, $args];
         return $args;
     }
 
+    /**
+     * @param string $name
+     * @param array $args
+     * @return mixed|null|string
+     */
     protected function getByApi($name, $args = array()) {
-        if (empty($this->apiMap[$name])){
-            $this->error = 'api调用名称错误,不存在的API';
-            return false;
+        if (array_key_exists($name, $this->apiMap)){
+            throw new \InvalidArgumentException('api调用名称错误,不存在的API');
         }
-        $this->set($args);
-        $data = $this->getData(isset($this->apiMap[$name][1]) ? $this->apiMap[$name][1] : array());
-        if ($data === false) {
-            return false;
+        $args += $this->get();
+        $map = $this->apiMap[$name];
+        $url = new Uri();
+        if (is_array($map[0])) {
+            return $this->httpPost(
+                $url->decode($map[0][0])
+                    ->addData($this->getData($map[0][1], $args)),
+                $this->getData($map[1], $args)
+            );
         }
-        if (!isset($this->apiMap[$name][2]) || strtolower($this->apiMap[$name][2]) == 'get') {
-            return $this->httpGet($this->apiMap[$name][0], $data);
+        $url->decode($map[0]);
+        if (count($map) != 3 || strtoupper($args[2]) != self::POST) {
+            return $this->httpGet($url->addData($this->getData($args[1], $args)));
         }
-        $url = $this->apiMap[$name][0];
-        $flag = true;
-        if (is_array($url)) {
-            if (isset($url[2])) {
-                $flag = boolval($url[2]);
-            }
-            $param = $this->getData($url[1]);
-            if ($param === false) {
-                return false;
-            }
-            $url = StringExpand::urlBindValue($url[0], $param);
-        }
-        return $this->httpPost($url, $data, $flag);
+        return $this->httpPost($url,
+            $this->getData($map[1], $args));
     }
+
 
     /**
      * GET URL THAT METHOD IS GET
      * @param string $name
-     * @return bool|string
+     * @return Uri
      */
     protected function getUrl($name) {
-        if (isset($this->apiMap[$name][2]) && strtolower($this->apiMap[$name][2]) !== 'get') {
-            return false;
+        $args = $this->apiMap[$name];
+        $uri = new Uri();
+        if (is_array($args[0])) {
+            return $uri->decode($args[0][0])
+                ->addData($this->getData($args[0][1], $this->get()));
         }
-        $data = $this->getData(isset($this->apiMap[$name][1]) ? $this->apiMap[$name][1] : array());
-        if ($data === false) {
-            return false;
+        $uri->decode($args[0]);
+        if (count($args) != 3 || strtoupper($args[2]) != self::POST) {
+            $uri->addData($this->getData($args[1], $this->get()));
         }
-        return StringExpand::urlBindValue($this->apiMap[$name][0], $data);
+        return $uri;
     }
 
     /**
      * 获取值 根据 #区分必须  $key => $value 区分默认值
      * @param array $keys
+     * @param array $args
      * @return array
      */
-    protected function getData($keys = array()) {
-        $data = array();
-        foreach ((array)$keys as $key => $item) {
-            if (!is_integer($key)) {
-                $data[$key] = $this->get($key, $item);
+    protected function getData(array $keys, array $args) {
+        $data = [];
+        foreach ($keys as $key => $item) {
+            if (is_integer($key)) {
+                $key = $item;
+                $item = null;
+            }
+            $need = false;
+            if (strpos($key, '#') === 0) {
+                $key = substr($key, 1);
+                $need = true;
+            }
+            $keyTemp = explode(':', $key, 2);
+            if (array_key_exists($keyTemp[0], $args)) {
+                $item = $args[$keyTemp[0]];
+            }
+            if (is_null($item)) {
+                if ($need) {
+                    throw new \InvalidArgumentException($keyTemp[0].' IS NEED!');
+                }
                 continue;
             }
-            if (strpos($item, '#') === 0) {
-                $k = substr($item, 1);
-                $arg = $this->get($k);
-                if (is_null($arg)) {
-                    $this->error = $k.' 是必须的!';
-                    return false;
-                }
-                if (!is_array($arg)) {
-                    $data[$k] = $arg;
-                    continue;
-                }
-                // 判断 #n:m
-                $k = array_keys($arg)[0];
-                $arg = current($arg);
-                if (is_null($arg)) {
-                    $this->error = $k.' 是必须的!';
-                    return false;
-                }
-                $data[$k] = $arg;
-                continue;
+            if (count($keyTemp) > 1) {
+                $key = $keyTemp[1];
             }
-            if ($this->has($item)) {
-                $data[$item] = $this->get($item);
-            }
+            $data[$key] = $item;
         }
         return $data;
     }

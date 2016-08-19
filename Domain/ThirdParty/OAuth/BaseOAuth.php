@@ -48,11 +48,7 @@ abstract class BaseOAuth extends ThirdParty {
     }
     
     public function redirect($name) {
-        $url = $this->getUrl($name);
-        if (!empty($url)) {
-            return new RedirectResponse($url);
-        }
-        Error::out('URL IS ERROR! '.$this->getError(), __FILE__, __LINE__);
+        return new RedirectResponse($this->getUrl($name));
     }
 
     /**

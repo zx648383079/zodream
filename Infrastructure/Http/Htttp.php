@@ -10,7 +10,7 @@ namespace Zodream\Infrastructure\Http;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Url\Uri;
 
-class HttpRequest {
+class Http {
 
     // 通过请求URI得到资源
     const GET = 'GET';
@@ -59,6 +59,8 @@ class HttpRequest {
      */
     protected $curl;
 
+    protected $options = [];
+
     public function __construct($url = null) {
         if (empty($url)) {
             $this->setUrl($url);
@@ -105,6 +107,27 @@ class HttpRequest {
         return $this;
     }
 
+    public function getOption($key = null) {
+        if (is_null($key)) {
+            return $this->options;
+        }
+        return array_key_exists($key, $this->options) ? $this->options[$key] : null;
+    }
+
+    public function setOption($key, $value = null) {
+        $this->options = [];
+        return $this->addData($key, $value);
+    }
+
+    public function addOption($key, $value = null) {
+        if (is_array($key)) {
+            $this->options = array_merge($this->options, $key);
+            return $this;
+        }
+        $this->options[$key] = $value;
+        return $this;
+    }
+
     public function getCookie($key = null) {
         if (is_null($key)) {
             return $this->cookie;
@@ -146,16 +169,5 @@ class HttpRequest {
 
     public function request() {
         $this->curl = new Curl($this->url);
-    }
-
-    public function save($file) {
-        if (!$file instanceof File) {
-            $file = new File($file);
-        }
-        $fp = fopen((string)$file, 'w');
-        $this->curl->setOption(CURLOPT_FILE, $fp)->execute();
-        $this->curl->close();
-        fclose($fp);
-        return true;
     }
 }

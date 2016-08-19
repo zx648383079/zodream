@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure\Http;
  * Time: 13:49
  */
 use Zodream\Infrastructure\Disk\File;
+use Zodream\Infrastructure\Url\Uri;
 
 class Curl {
     /**
@@ -22,8 +23,20 @@ class Curl {
 
     protected $result = null;
 
-    public function __construct($url) {
-        $this->curl = curl_init((string)$url);
+    public function __construct($url = null) {
+        $this->curl = curl_init();
+        if (!empty($url)) {
+            $this->setUrl($url);
+        }
+    }
+
+    /**
+     * SET URL
+     * @param string|Uri $url
+     * @return Curl
+     */
+    public function setUrl($url) {
+        return $this->setOption(CURLOPT_URL, (string)$url);
     }
 
     /**
@@ -102,11 +115,62 @@ class Curl {
     }
 
     /**
+     * SET COMMON OPTION
+     * @return $this
+     */
+    public function setCommonOption() {
+        return $this->setOption(CURLOPT_HEADER, 0)
+            ->setOption(CURLOPT_RETURNTRANSFER, 1)
+            ->setOption(CURLOPT_FOLLOWLOCATION, 1)
+            ->setOption(CURLOPT_AUTOREFERER, 1);
+    }
+
+    /**
+     * SET USER AGENT
+     * @param string $args
+     * @return Curl
+     */
+    public function setUserAgent($args) {
+        return $this->setOption(CURLOPT_USERAGENT, $args);
+    }
+
+    /**
+     * SET REFERRER URL
+     * @param string|Uri $url
+     * @return Curl
+     */
+    public function setReferrer($url) {
+        return $this->setOption(CURLOPT_REFERER, (string)$url);
+    }
+
+    /**
+     * NOT OUTPUT BODY
+     * @return Curl
+     */
+    public function setNoBody() {
+        return $this->setOption(CURLOPT_NOBODY, 1);
+    }
+
+    /**
+     * SET COOKIE
+     * @param string|array $cookie
+     * @return Curl
+     */
+    public function setCookie($cookie) {
+        if (is_array($cookie)) {
+            $cookie = http_build_query($cookie);
+        }
+        return $this->setOption(CURLOPT_COOKIE, $cookie);
+    }
+
+    /**
      * GET METHOD
      * @return string
      */
     public function get() {
-        return $this->execute();
+        return $this
+            ->setCommonOption()
+            ->execute();
     }
 
     /**
@@ -147,7 +211,8 @@ class Curl {
      * @return mixed|null
      */
     public function delete() {
-        return $this->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE')->execute();
+        return $this->setCommonOption()
+            ->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE')->execute();
     }
 
     /**

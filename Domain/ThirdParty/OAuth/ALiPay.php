@@ -7,6 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 16:01
  */
 class ALiPay extends BaseOAuth {
+
     protected $name = 'alipay';
 
     protected $apiMap = array(
