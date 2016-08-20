@@ -7,25 +7,26 @@ use Zodream\Infrastructure\ObjectExpand\Xml\XmlToArray;
 class XmlExpand {
     /**
      * @param string $xml
-     * @param bool $is_array
+     * @param bool $isArray
      * @return array|object
      * @throws Xml\Exception
      */
-    public static function decode($xml, $is_array = true) {
+    public static function decode($xml, $isArray = true) {
         if (!is_string($xml)) {
             return $xml;
         }
-        if ($is_array === false) {
+        if ($isArray === false) {
             return simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         }
         return XmlToArray::createArray($xml);
     }
 
     /**
-     * @param array $atgs
-     * @return \DOMDocument
+     * @param array $args
+     * @param string $root
+     * @return string
      */
-    public static function encode(array $atgs) {
-        return ArrayToXml::createXML('root', $atgs);
+    public static function encode(array $args, $root = 'root') {
+        return ArrayToXml::createXML($root, $args)->saveXML();
     }
 }

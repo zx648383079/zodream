@@ -151,14 +151,17 @@ class File extends FileObject {
     /**
      * PUT FILE CONTENT
      * @param string $data
-     * @param bool $lock
+     * @param bool|integer $lock
      * @return int
      */
     public function write($data, $lock = false) {
         if (!is_string($data) && !is_integer($data)) {
             $data = var_export($data, true);
         }
-        return file_put_contents($this->fullName, $data, $lock ? LOCK_EX : 0);
+        if (is_bool($lock)) {
+            $lock = $lock ? LOCK_EX : 0;
+        }
+        return file_put_contents($this->fullName, $data, $lock);
     }
 
     /**

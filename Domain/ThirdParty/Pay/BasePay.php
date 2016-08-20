@@ -36,7 +36,7 @@ abstract class BasePay extends ThirdParty {
      */
     protected $publicKeyFile;
 
-    public function __construct(array $config) {
+    public function __construct(array $config = array()) {
         parent::__construct($config);
         $this->signType = strtoupper($this->get('signType', self::RSA));
         if ($this->has('key')) {
@@ -88,66 +88,27 @@ abstract class BasePay extends ThirdParty {
 
 
     /**
-     * 生成请求参数的签名
-     *
-     * @param $params array
+     * @param array $args
      * @return string
-     * @throws FileException
      */
-     public function sign($params) {
-        // 支付宝的签名串必须是未经过 urlencode 的字符串
-        // 不清楚为何 PHP 5.5 里没有 http_build_str() 方法
-        $paramStr = urldecode(http_build_query($params));
-        if ($this->signType == self::MD5) {
-            return md5($paramStr . $this->key);
-        }
-        if ($this->signType != self::RSA
-            && $this->signType != self::RSA2) {
-            return null;
-        }
-        if (!$this->privateKeyFile->exist()) {
-            throw new FileException($this->privateKeyFile);
-        }
-        $res = openssl_get_privatekey($this->privateKeyFile->read());
-        openssl_sign($paramStr, $sign, $res,
-            $this->signType == self::RSA ? OPENSSL_ALGO_SHA1 : OPENSSL_ALGO_SHA256);
-        openssl_free_key($res);
-        //base64编码
-        return base64_encode($sign);
-    }
+    abstract public function sign(array $args);
 
-    public function verify($params, $sign) {
-        $params = $this->filterSignParameter($params);
-        ksort($params);
-        reset($params);
-        $content = urldecode(http_build_query($params));
-        if ($this->signType == self::MD5) {
-            return md5($content. $this->key) == $sign;
-        }
-        if ($this->publicKeyFile->exist()) {
-            throw new FileException($this->publicKeyFile);
-        }
-        //转换为openssl格式密钥
-        $res = openssl_get_publickey($this->publicKeyFile->read());
-        if(!$res){
-            throw new Exception('公钥格式错误');
-        }
-        //调用openssl内置方法验签，返回bool值
-        $result = (bool)openssl_verify($content, base64_decode($sign), $res,
-            $this->signType == self::RSA ? OPENSSL_ALGO_SHA1 : OPENSSL_ALGO_SHA256);
-        //释放资源
-        openssl_free_key($res);
+    /**
+     * @param $args
+     * @param $sign
+     * @return bool
+     */
+    abstract public function verify(array $args, $sign);
 
-        return $result;
-    }
+    /**
+     * @return mixed
+     */
+    abstract public function callback();
 
-    public function filterSignParameter($params) {
-        $result = array();
-        foreach ($params as $key => $value) {
-            if ($key != 'sign' && $key != 'sign_type' && $value) {
-                $result[$key] = $value;
-            }
+    public function xml($xml, $isArray = true) {
+        if ($isArray) {
+            return json_decode(json_encode(parent::xml($xml, false)), true);
         }
-        return $result;
+        return parent::xml($xml, $isArray);
     }
 }

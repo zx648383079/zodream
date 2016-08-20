@@ -12,5 +12,4 @@ class BadResponse extends HtmlResponse {
     public function __construct($message = '/(ㄒoㄒ)/~~PAGE NOT FIND!', $status = 404) {
         parent::__construct($message, $status);
     }
-    
 }

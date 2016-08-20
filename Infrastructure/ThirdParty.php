@@ -32,13 +32,11 @@ abstract class ThirdParty extends MagicObject {
     protected $apiMap = array();
 
     /**
-     * @var Http
+     * @var Curl
      */
     protected $http;
 
     protected $error;
-
-    protected $log = array();
 
     public function __construct($config = array()) {
         $this->http = new Curl();
@@ -63,13 +61,13 @@ abstract class ThirdParty extends MagicObject {
 
     protected function httpGet($url) {
         $args = $this->http->setUrl($url)->get();
-        $this->log[] = [$url, self::GET, $args];
+        $this->log([$url, self::GET, $args]);
         return $args;
     }
 
     protected function httpPost($url, $data) {
         $args = $this->http->setUrl($url)->post($data);
-        $this->log[] = [$url, $data, self::POST, $args];
+        $this->log([$url, $data, self::POST, $args]);
         return $args;
     }
 
@@ -88,34 +86,36 @@ abstract class ThirdParty extends MagicObject {
         if (is_array($map[0])) {
             return $this->httpPost(
                 $url->decode($map[0][0])
-                    ->addData($this->getData($map[0][1], $args)),
-                $this->getData($map[1], $args)
+                    ->addData($this->getData((array)$map[0][1], $args)),
+                $this->getData((array)$map[1], $args)
             );
         }
         $url->decode($map[0]);
-        if (count($map) != 3 || strtoupper($args[2]) != self::POST) {
-            return $this->httpGet($url->addData($this->getData($args[1], $args)));
+        if (count($map) != 3 || strtoupper($map[2]) != self::POST) {
+            return $this->httpGet($url->addData($this->getData((array)$map[1], $args)));
         }
         return $this->httpPost($url,
-            $this->getData($map[1], $args));
+            $this->getData((array)$map[1], $args));
     }
 
 
     /**
      * GET URL THAT METHOD IS GET
      * @param string $name
+     * @param array $args
      * @return Uri
      */
-    protected function getUrl($name) {
-        $args = $this->apiMap[$name];
+    protected function getUrl($name, array $args = array()) {
+        $map = $this->apiMap[$name];
+        $args += $this->get();
         $uri = new Uri();
-        if (is_array($args[0])) {
-            return $uri->decode($args[0][0])
-                ->addData($this->getData($args[0][1], $this->get()));
+        if (is_array($map[0])) {
+            return $uri->decode($map[0][0])
+                ->addData($this->getData((array)$map[0][1], $args));
         }
-        $uri->decode($args[0]);
-        if (count($args) != 3 || strtoupper($args[2]) != self::POST) {
-            $uri->addData($this->getData($args[1], $this->get()));
+        $uri->decode($map[0]);
+        if (count($map) != 3 || strtoupper($map[2]) != self::POST) {
+            $uri->addData($this->getData((array)$map[1], $args));
         }
         return $uri;
     }
@@ -129,6 +129,10 @@ abstract class ThirdParty extends MagicObject {
     protected function getData(array $keys, array $args) {
         $data = [];
         foreach ($keys as $key => $item) {
+            if (is_array($item)) {
+                $data = array_merge($data, $this->chooseData($item, $args));
+                continue;
+            }
             if (is_integer($key)) {
                 $key = $item;
                 $item = null;
@@ -156,20 +160,34 @@ abstract class ThirdParty extends MagicObject {
         return $data;
     }
 
-    protected function xml($xml, $is_array = true) {
-        return XmlExpand::decode($xml, $is_array);
+    /**
+     * MANY CHOOSE ONE
+     * @param array $item
+     * @param array $args
+     * @return array
+     */
+    protected function chooseData(array $item, array $args) {
+        $data = $this->getData($item, $args);
+        if (empty($choose)) {
+            throw new \InvalidArgumentException('MANY\'ONE IS NEED!');
+        }
+        return $data;
     }
 
-    protected function json($json, $is_array = true) {
-        return JsonExpand::decode($json, $is_array);
+    protected function xml($xml, $isArray = true) {
+        return XmlExpand::decode($xml, $isArray);
     }
 
-    protected function getXml($name, $args = array(), $is_array = true) {
-        return $this->xml($this->getByApi($name, $args), $is_array);
+    protected function json($json, $isArray = true) {
+        return JsonExpand::decode($json, $isArray);
     }
 
-    protected function getJson($name, $args = array(), $is_array = true) {
-        return $this->json($this->getByApi($name, $args), $is_array);
+    protected function getXml($name, $args = array(), $isArray = true) {
+        return $this->xml($this->getByApi($name, $args), $isArray);
+    }
+
+    protected function getJson($name, $args = array(), $isArray = true) {
+        return $this->json($this->getByApi($name, $args), $isArray);
     }
 
     /**
@@ -193,10 +211,16 @@ abstract class ThirdParty extends MagicObject {
     }
 
     /**
-     * GET HTTP LOG
-     * @return array
+     * @param $arg
+     * @return bool|int
      */
-    public function getLog() {
-        return $this->log;
+    public function log($arg) {
+        if (defined('DEBUG') && DEBUG) {
+            if (is_array($arg)) {
+                $arg = print_r($arg,true);
+            };
+            return Log::out('http_'.time(), $arg);
+        }
+        return false;
     }
 }

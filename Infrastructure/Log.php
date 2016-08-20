@@ -6,16 +6,27 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Event\Action;
+use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 class Log {
 	public static $fileHandlerCache;
     private static $initFlag = false;
     private static $MAX_LOOP_COUNT = 3;
+
+    protected $log = array();
  
     private static function init() {
         self::$initFlag = true;
         register_shutdown_function(__NAMESPACE__.'\Log::_shutDown');
+    }
+
+    static function record($message, $level = self::ERR, $record = false) {
+        if($record) {
+            $now = TimeExpand::format();
+            self::$log[] = "{$now} ".$_SERVER['REQUEST_URI']." | {$level}: {$message}\r\n";
+        }
     }
 
     public static function save($data, $action) {
@@ -25,17 +36,18 @@ class Log {
  
     /**
      * 输出到文件日志
-     * @param string $filePath 文件路径
+     * @param string|File $file 文件路径
      * @param mixed $msg  日志信息
      * @return int
      */
-    public static function out($filePath, $msg) {
-        if (!is_file($filePath)) {
-            $filePath = APP_DIR.'/log/'.ltrim($filePath, '/');
+    public static function out($file, $msg) {
+        if (!$file instanceof File) {
+            $file = new File(APP_DIR.'/log/'.ltrim($file, '/'));
         }
-        if (is_dir(dirname($filePath))) {
-            file_put_contents($filePath, $msg, FILE_APPEND | LOCK_EX);
+        if ($file->getDirectory()->exist()) {
+            return $file->write($msg, FILE_APPEND | LOCK_EX);
         }
+        return error_log($msg);
         //return self::internalOut($filePath, $msg);
     }
  

@@ -43,7 +43,7 @@ class BaseResponse implements ResponseObject {
     }
     
     public function sendContent() {
-        
+        return $this;
     }
 
     /**

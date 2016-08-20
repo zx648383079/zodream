@@ -23,6 +23,8 @@ class Curl {
 
     protected $result = null;
 
+    protected $isWith = false;
+
     public function __construct($url = null) {
         $this->curl = curl_init();
         if (!empty($url)) {
@@ -36,6 +38,14 @@ class Curl {
      * @return Curl
      */
     public function setUrl($url) {
+        if (!$url instanceof Uri) {
+            $url = new Uri();
+        }
+        if ($url->getScheme() == 'https') {
+            $this->setOption(CURLOPT_SSL_VERIFYPEER, FALSE)
+                ->setOption(CURLOPT_SSL_VERIFYHOST, FALSE)
+                ->setOption(CURLOPT_SSLVERSION, 1);
+        }
         return $this->setOption(CURLOPT_URL, (string)$url);
     }
 
@@ -91,8 +101,21 @@ class Curl {
         $this->header = curl_getinfo($this->curl);
         $this->header['error'] = curl_error($this->curl);
         $this->header['errorNo'] = curl_errno($this->curl);
-        $this->close();
+        if (!$this->isWith) {
+            $this->close();
+        } else {
+            $this->isWith = false;
+        }
         return $this->result;
+    }
+
+    /**
+     * 连续执行
+     * @return $this
+     */
+    public function with() {
+        $this->isWith = true;
+        return $this;
     }
 
     /**
@@ -225,7 +248,9 @@ class Curl {
             $file = new File($file);
         }
         $fp = fopen((string)$file, 'w');
-        $this->curl->setOption(CURLOPT_FILE, $fp)->execute();
+        $this->setCommonOption()
+            ->setOption(CURLOPT_FILE, $fp)
+            ->execute();
         fclose($fp);
         return $this->result;
     }
