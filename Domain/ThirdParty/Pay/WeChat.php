@@ -294,7 +294,7 @@ class WeChat extends BasePay {
         reset($args);
         $arg = '';
         foreach ($args as $key => $item) {
-            if (is_null($item) || $item == '' || $key == 'sign') {
+            if ($this->checkEmpty($item) || $key == 'sign') {
                 continue;
             }
             $arg .= "{$key}=$item&";

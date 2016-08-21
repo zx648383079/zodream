@@ -7,8 +7,8 @@ namespace Zodream\Infrastructure;
  * Date: 2016/5/13
  * Time: 11:44
  */
+use Zodream\Domain\Filter\Filters\RequiredFilter;
 use Zodream\Infrastructure\Http\Curl;
-use Zodream\Infrastructure\Http\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Url\Uri;
@@ -122,6 +122,7 @@ abstract class ThirdParty extends MagicObject {
 
     /**
      * 获取值 根据 #区分必须  $key => $value 区分默认值
+     * 支持多选 键必须为 数字， 支持多级 键必须为字符串
      * @param array $keys
      * @param array $args
      * @return array
@@ -130,10 +131,13 @@ abstract class ThirdParty extends MagicObject {
         $data = [];
         foreach ($keys as $key => $item) {
             if (is_array($item)) {
-                $data = array_merge($data, $this->chooseData($item, $args));
-                continue;
+                $item = $this->chooseData($item, $args);
             }
             if (is_integer($key)) {
+                if (is_array($item)) {
+                    $data = array_merge($data, $item);
+                    continue;
+                }
                 $key = $item;
                 $item = null;
             }
@@ -146,7 +150,7 @@ abstract class ThirdParty extends MagicObject {
             if (array_key_exists($keyTemp[0], $args)) {
                 $item = $args[$keyTemp[0]];
             }
-            if (is_null($item)) {
+            if ($this->checkEmpty($item)) {
                 if ($need) {
                     throw new \InvalidArgumentException($keyTemp[0].' IS NEED!');
                 }
@@ -188,6 +192,10 @@ abstract class ThirdParty extends MagicObject {
 
     protected function getJson($name, $args = array(), $isArray = true) {
         return $this->json($this->getByApi($name, $args), $isArray);
+    }
+
+    protected function checkEmpty($value) {
+        return !(new RequiredFilter())->validate($value);
     }
 
     /**
