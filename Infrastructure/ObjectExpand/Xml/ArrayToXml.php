@@ -17,6 +17,8 @@ namespace Zodream\Infrastructure\ObjectExpand\Xml;
  *       echo $xml->saveXML();
  */
 use DOMDocument;
+use Exception;
+
 class ArrayToXml {
     private static $xml = null;
     private static $encoding = 'UTF-8';
@@ -64,7 +66,7 @@ class ArrayToXml {
             if(isset($arr['@attributes'])) {
                 foreach($arr['@attributes'] as $key => $value) {
                     if(!self::isValidTagName($key)) {
-                        throw new Exception('[Array2XML] Illegal character in attribute name. attribute: '.$key.' in node: '.$node_name);
+                        throw new \Exception('[Array2XML] Illegal character in attribute name. attribute: '.$key.' in node: '.$node_name);
                     }
                     $node->setAttribute($key, self::bool2str($value));
                 }

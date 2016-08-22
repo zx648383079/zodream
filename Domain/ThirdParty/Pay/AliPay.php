@@ -7,7 +7,6 @@ namespace Zodream\Domain\ThirdParty\Pay;
  * Date: 2016/8/17
  * Time: 15:21
  */
-use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Error\FileException;
 
 class AliPay extends BasePay {
@@ -32,31 +31,127 @@ class AliPay extends BasePay {
                     ]
                 ]
             ]
+        ],
+        'pay' => [
+            '',
+            [
+                '#app_id',
+                'method' => 'alipay.trade.app.pay',
+                'format' => 'JSON',
+                'charset' => 'utf-8',
+                'sign_type' => 'RSA',
+                'sign',
+                '#timestamp', // yyyy-MM-dd HH:mm:ss,
+                'version' => '1.0',
+                'app_auth_token',
+                '#biz_content' => [
+                    'body',
+                    '#subject',
+                    '#out_trade_no',
+                    'timeout_express',
+                    '#total_amount',
+                    'seller_id',
+                    '#product_code'
+                ]
+            ]
         ]
     ];
 
     /**
-     * RSA解密
-     * @param $content string 需要解密的内容，密文
-     * @return string 解密后内容，明文
-     * @throws FileException
+     * 加密方法
+     * @param string $str
+     * @return string
      */
-    public function rsaDecrypt($content) {
-        if (!$this->privateKeyFile->exist()) {
-            throw new FileException($this->privateKeyFile);
+    protected function encrypt($str){
+        //AES, 128 模式加密数据 CBC
+        $screct_key = base64_decode($this->key);
+        $str = trim($str);
+        $str = addPKCS7Padding($str);
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), 1);
+        $encrypt_str =  mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $screct_key, $str, MCRYPT_MODE_CBC);
+        return base64_encode($encrypt_str);
+    }
+
+    /**
+     * 解密方法
+     * @param string $str
+     * @return string
+     */
+    function decrypt($str){
+        //AES, 128 模式加密数据 CBC
+        $str = base64_decode($str);
+        $screct_key = base64_decode($this->key);
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), 1);
+        $encrypt_str =  mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $screct_key, $str, MCRYPT_MODE_CBC);
+        $encrypt_str = trim($encrypt_str);
+
+        $encrypt_str = stripPKSC7Padding($encrypt_str);
+        return $encrypt_str;
+
+    }
+
+    /**
+     * 填充算法
+     * @param string $source
+     * @return string
+     */
+    protected function addPKCS7Padding($source){
+        $source = trim($source);
+        $block = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+
+        $pad = $block - (strlen($source) % $block);
+        if ($pad <= $block) {
+            $char = chr($pad);
+            $source .= str_repeat($char, $pad);
         }
-        $res = openssl_get_privatekey($this->privateKeyFile->read());
-        //用base64将内容还原成二进制
-        $content = base64_decode($content);
-        //把需要解密的内容，按128位拆开解密
-        $result = '';
-        for ($i = 0; $i < strlen($content) / 128; $i++) {
-            $data = substr($content, $i * 128, 128);
-            openssl_private_decrypt($data, $decrypt, $res);
-            $result .= $decrypt;
+        return $source;
+    }
+    /**
+     * 移去填充算法
+     * @param string $source
+     * @return string
+     */
+    protected function stripPKSC7Padding($source){
+        $source = trim($source);
+        $char = substr($source, -1);
+        $num = ord($char);
+        if($num==62)return $source;
+        $source = substr($source,0,-$num);
+        return $source;
+    }
+
+    public function rsaEncrypt($data) {
+        //转换为openssl格式密钥
+        $res = openssl_get_publickey($this->publicKeyFile->read());
+        $blocks = $this->splitCN($data, 0, 30, $charset);
+        $chrtext  = null;
+        $encodes  = array();
+        foreach ($blocks as $n => $block) {
+            if (!openssl_public_encrypt($block, $chrtext , $res)) {
+                echo "<br/>" . openssl_error_string() . "<br/>";
+            }
+            $encodes[] = $chrtext ;
         }
-        openssl_free_key($res);
-        return $result;
+        $chrtext = implode(",", $encodes);
+
+        return $chrtext;
+    }
+
+    public function rsaDecrypt($data, $rsaPrivateKeyPem, $charset) {
+        //读取私钥文件
+        $priKey = file_get_contents($rsaPrivateKeyPem);
+        //转换为openssl格式密钥
+        $res = openssl_get_privatekey($priKey);
+        $decodes = explode(',', $data);
+        $strnull = '';
+        $dcyCont = '';
+        foreach ($decodes as $n => $decode) {
+            if (!openssl_private_decrypt($decode, $dcyCont, $res)) {
+                echo '<br/>' . openssl_error_string() . '<br/>';
+            }
+            $strnull .= $dcyCont;
+        }
+        return $strnull;
     }
 
     /**
@@ -88,6 +183,15 @@ class AliPay extends BasePay {
 
     public function verify(array $params, $sign) {
         $content = $this->getSignContent($params);
+        $result = $this->verifyContent($content, $sign);
+        if (!$result && strpos($content, '\\/') > 0) {
+            $content = str_replace('\\/', '/', $content);
+            return $this->verifyContent($content, $sign);
+        }
+        return $result;
+    }
+
+    public function verifyContent($content, $sign) {
         if ($this->signType == self::MD5) {
             return md5($content. $this->key) == $sign;
         }
@@ -111,7 +215,7 @@ class AliPay extends BasePay {
         ksort($params);
         $args = [];
         foreach ($params as $key => $item) {
-            if ($this->checkEmpty($item) || $key == 'sign') {
+            if ($this->checkEmpty($item) || $key == 'sign' || $key == 'sign_type') {
                 continue;
             }
             $args[] = "{$key}={$item}";
@@ -123,6 +227,13 @@ class AliPay extends BasePay {
      * @return mixed
      */
     public function callback() {
-        // TODO: Implement callback() method.
+        $data = [];
+         foreach ($_GET as $key => $item) {
+             $data[$key] = urldecode($item);
+         }
+        if (!$this->verify($data, base64_decode($data['sign']))) {
+            return false;
+        }
+        return $data;
     }
 }
