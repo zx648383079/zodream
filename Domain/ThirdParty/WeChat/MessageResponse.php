@@ -12,12 +12,6 @@ use Zodream\Domain\Response\ResponseResult;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 
 class MessageResponse extends BaseResponse {
-    const TEXT = 'text';
-    const IMAGE = 'image';
-    const VOICE = 'voice';
-    const VIDEO = 'video';
-    const MUSIC = 'music';
-    const NEWS = 'news';
 
     protected $data = [];
 
@@ -49,11 +43,11 @@ class MessageResponse extends BaseResponse {
     }
 
     public function setText($arg) {
-        return $this->setType(self::TEXT)->setData('Content', $arg);
+        return $this->setType(MessageEnum::Text)->setData('Content', $arg);
     }
 
     public function setImage($mediaId) {
-        return $this->setType(self::IMAGE)->setData('Image', [
+        return $this->setType(MessageEnum::Image)->setData('Image', [
             'MediaId' => [
                 '@cdata' => $mediaId
             ]
@@ -61,7 +55,7 @@ class MessageResponse extends BaseResponse {
     }
 
     public function setVoice($mediaId) {
-        return $this->setType(self::VOICE)->setData('Voice', [
+        return $this->setType(MessageEnum::Voice)->setData('Voice', [
             'MediaId' => [
                 '@cdata' => $mediaId
             ]
@@ -84,7 +78,7 @@ class MessageResponse extends BaseResponse {
                 '@cdata' => $description
             ];
         }
-        return $this->setType(self::VIDEO)->setData('Video', $data);
+        return $this->setType(MessageEnum::Video)->setData('Video', $data);
     }
 
     public function setMusic($mediaId,
@@ -123,7 +117,7 @@ class MessageResponse extends BaseResponse {
                 '@cdata' => $thumbMediaId
             ];
         }
-        return $this->setType(self::MUSIC)->setData('Music', $data);
+        return $this->setType(MessageEnum::Music)->setData('Music', $data);
     }
 
     public function setNews(array $arg) {
@@ -138,7 +132,7 @@ class MessageResponse extends BaseResponse {
                 '@cdata' => $item
             ];
         }, $arg['item']);
-        return $this->setType(self::NEWS)
+        return $this->setType(MessageEnum::News)
             ->setData('ArticleCount', count($arg['item']), false)
             ->setData('Articles', $arg);
     }
