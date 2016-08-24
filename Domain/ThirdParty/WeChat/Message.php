@@ -14,20 +14,44 @@ use Zodream\Infrastructure\Request;
  * Class Message
  * @package Zodream\Domain\ThirdParty\WeChat
  *
+ * @property string $toUserName
+ * @property string $fromUserName
+ * @property integer $createTime
+ * @property string $msgType
+ * //消息
+ * @property integer $msgId
+ * @property string $msgType
+ * //文本
+ * @property string $content
+ * //图片消息
+ * @property string $picUrl
+ * @property string $mediaId
+ * //语音消息
+ * @property string $format
+ * @property string $recognition  开通语音识别
+ * //视频消息 小视频消息
+ * @property string $thumbMediaId
+ * //地理位置消息
+ * @property float $location_X
+ * @property float $location_Y
+ * @property integer $scale
+ * @property string $label
+ * //链接消息
+ * @property string $title
+ * @property string $description
+ * @property string $url
+ *
  * @property string $event
  */
 class Message extends MagicObject {
-    const TEXT = 'text';
-    const IMAGE = 'image';
-    const VOICE = 'voice';
-    const VIDEO = 'video';
-    const MUSIC = 'music';
 
     protected $xml;
 
     protected $events = [];
 
-    public function __construct() {
+    protected $token;
+
+    public function __construct($token) {
         $this->get();
     }
 
@@ -43,14 +67,27 @@ class Message extends MagicObject {
             $this->xml = Request::input();
         }
         if (!empty($this->xml)) {
-            $this->_data = (array)XmlExpand::decode($this->xml, false);
+            $args = (array)XmlExpand::decode($this->xml, false);
+            foreach ($args as $key => $item) {
+                $this->set(lcfirst($key), $item);
+            }
         }
-
         return $this;
     }
 
     public function getEvent() {
-        return $this->get('event');
+        if (!$this->isEvent()) {
+            return false;
+        }
+        return $this->event;
+    }
+
+    public function isEvent() {
+        return $this->msgType == 'event';
+    }
+
+    public function isMessage() {
+        return !$this->isEvent();
     }
 
     public function getXml() {

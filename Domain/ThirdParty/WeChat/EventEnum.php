@@ -15,6 +15,7 @@ class EventEnum extends Enum {
      * 二维码关注
      */
     const Subscribe = 'subscribe';
+    const ScanSubscribe = 'scan_subscribe';
     /**
      * 取消关注
      */
