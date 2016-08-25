@@ -17,18 +17,17 @@ class UploadInput extends BaseUpload {
 
     /**
      * 保存到指定路径
-     * @param string $file
      * @return bool
      */
-    public function save($file) {
-        if (!parent::save($file)) {
+    public function save() {
+        if (!parent::save()) {
             return false;
         }
         if (!$fileOpen = @fopen('php://input', 'rb')) {
             $this->setError('INPUT_ERROR');
             return false;
         }
-        if (!$fileOutput = @fopen($file, 'wb')) {
+        if (!$fileOutput = @fopen($this->file->getFullName(), 'wb')) {
             $this->setError('WRITE_ERROR');
             return false;
         }
@@ -39,7 +38,7 @@ class UploadInput extends BaseUpload {
 
         @fclose($fileOutput);
         @fclose($fileOpen);
-        $this->size = filesize($file);
+        $this->size = $this->file->size();
         return true;
     }
 }

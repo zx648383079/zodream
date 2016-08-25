@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Engine;
 /**
 * mysql 
 * 
@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure\Database;
 */
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-class Mysql extends Database {
+class Mysql extends BaseEngine {
 	
 	/**
 	 * 连接数据库

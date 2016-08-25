@@ -6,19 +6,24 @@ namespace Zodream\Domain\Upload;
  * Date: 2016/6/28
  * Time: 10:58
  */
+use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\MagicObject;
 
 class Upload extends MagicObject {
     /** @var BaseUpload[] */
     protected $_data = [];
 
-    protected $folder = null;
+    /**
+     * @var Directory
+     */
+    protected $directory;
 
-    public function setFolder($file) {
-        if (empty($file)) {
-            return;
+    public function setDirectory($directory) {
+        if (!$directory instanceof Directory) {
+            $directory = new Directory($directory);
         }
-        $this->folder = rtrim($file, '/\\'). '/';
+        $this->directory = $directory;
+        return $this;
     }
 
     /**
@@ -40,8 +45,7 @@ class Upload extends MagicObject {
         }
         $files = $_FILES[$key];
         if (!is_array($files['name'])) {
-            $this->addFile($files);
-            return true;
+            return $this->addFile($files);
         }
         for ($i = 0, $length = count($files['name']); $i < $length; $i ++) {
             $this->addFile(
@@ -51,6 +55,7 @@ class Upload extends MagicObject {
                 $files['error'][$i]
             );
         }
+        return $this;
     }
 
     public function addFile($file) {
@@ -58,27 +63,27 @@ class Upload extends MagicObject {
             $upload = new UploadFile();
             call_user_func_array([$upload, 'load'], func_get_args());
             $this->_data[] = $upload;
-            return;
+            return $upload;
         }
         if ($file instanceof BaseUpload) {
             $this->_data[] = $file;
-            return;
+            return $file;
         }
         if (is_array($file)) {
-            $this->_data[] = new UploadFile($file);
-            return;
+            $upload = new UploadFile($file);
+            $this->_data[] = $upload;
+            return $upload;
         }
         if (!is_string($file)) {
-            return;
+            return false;
         }
-        $this->upload($file);
+        return $this->upload($file);
     }
     
-    public function save($folder = null) {
-        $this->setFolder($folder);
+    public function save() {
         $result = true;
         foreach ($this->_data as $item) {
-            $result = !$item->save($folder.$item->getRandomName()) || $result;
+            $result = !$item->save($this->directory->childFile($item->getRandomName())) || $result;
         }
         return $result;
     }

@@ -7,6 +7,7 @@ namespace Zodream\Domain\Upload;
  * Date: 2016/6/28
  * Time: 14:17
  */
+ use Zodream\Infrastructure\Disk\File;
  use Zodream\Infrastructure\FileSystem;
  
 abstract class BaseUpload {
@@ -16,7 +17,10 @@ abstract class BaseUpload {
     protected $type;
 
     protected $size;
-    
+
+    /**
+     * @var File
+     */
     protected $file;
     
     protected $error = null;
@@ -25,20 +29,29 @@ abstract class BaseUpload {
 
     public function setError($error = 0) {
         if (empty($error)) {
-            return;
+            return $this;
         }
         if (!is_numeric($error)) {
             $this->error = $error;
         }
         $this->error = $this->errorMap[$error] || $error;
+        return $this;
     }
 
     /**
      * 获取保存后的路径
-     * @return string
+     * @return File
      */
     public function getFile() {
         return $this->file;
+    }
+
+    public function setFile($file) {
+        if ($file instanceof File) {
+            $file = new File($file);
+        }
+        $this->file = $file;
+        return $this;
     }
 
     public function getError() {
@@ -54,6 +67,7 @@ abstract class BaseUpload {
             $type = FileSystem::getExtension($this->name);
         }
         $this->type = $type;
+        return $this;
     }
     
     public function getType() {
@@ -70,15 +84,10 @@ abstract class BaseUpload {
 
     /**
      * 保存到指定路径
-     * @param string $file
      * @return bool
      */
-    public function save($file) {
-        $this->file = $file;
-        if (!$this->checkFolder(dirname($file))) {
-            return false;
-        }
-        return true;
+    public function save() {
+        return $this->checkDirectory();
     }
 
     public function getRandomName($template = null) {
@@ -139,15 +148,15 @@ abstract class BaseUpload {
 
     /**
      * 验证文件夹
-     * @param string $file
      * @return bool
      */
-    public function checkFolder($file) {
-        if (!is_dir($file) && !mkdir($file, 0777, true)) {
+    public function checkDirectory() {
+        $directory = $this->file->getDirectory();
+        if (!$directory->exist() && !$directory->create()) {
             $this->setError('ERROR_CREATE_DIR');
             return false;
         }
-        if (!is_writable($file)) {
+        if (!$this->file->canWrite()) {
             $this->setError('ERROR_DIR_NOT_WRITEABLE');
             return false;
         }

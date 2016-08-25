@@ -1,26 +1,12 @@
 <?php 
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Engine;
 /**
  * 
  * @author zx648
  *
  */
 
-abstract class Database {
-	//用于存放实例化的对象
-	protected static $instance = null;
-
-	/**
-	 * 公共静态方法获取实例化的对象
-	 * @param array $config
-	 * @return static
-	 */
-	public static function getInstance(array $config) {
-		if (is_null(static::$instance)) {
-			static::$instance = new static($config);
-		}
-		return static::$instance;
-	}
+abstract class BaseEngine {
 	
 	protected $driver             = null;
 
@@ -50,6 +36,10 @@ abstract class Database {
 		$this->configs = $config;
 		$this->connect();
 	}
+
+	public function getConfig($key, $default = null) {
+	    return array_key_exists($key, $this->configs) ? $this->configs[$key] : $default;
+    }
 	
 	protected abstract function connect();
 	

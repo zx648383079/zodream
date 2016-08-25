@@ -1,12 +1,12 @@
 <?php 
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Engine;
 /**
 * mysqli 
 * 
 * @author Jason
 */
 
-class Mysqli extends Database {
+class Mysqli extends BaseEngine {
 
 	/**
 	 * @var \mysqli

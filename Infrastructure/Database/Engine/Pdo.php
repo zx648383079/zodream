@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Engine;
 /**
 * pdo
 * 
@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure\Database;
 */
 use Zodream\Infrastructure\Error\Error;
 
-class Pdo extends Database {
+class Pdo extends BaseEngine {
 
 	/**
 	 * @var \PDO

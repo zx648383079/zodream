@@ -23,15 +23,14 @@ class UploadBase64 extends BaseUpload {
 
     /**
      * 保存到指定路径
-     * @param string $file
      * @return bool
      */
-    public function save($file) {
-        if (!parent::save($file)) {
+    public function save() {
+        if (!parent::save()) {
             return false;
         }
-        if (!file_put_contents($file, $this->name) ||
-            !is_file($file)) { //移动失败
+        if (!$this->file->write($this->name) ||
+            !$this->file->exist()) { //移动失败
             $this->setError('ERROR_WRITE_CONTENT');
             return;
         }

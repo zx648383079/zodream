@@ -46,14 +46,14 @@ class UploadFile extends BaseUpload {
 
     /**
      * 保存到指定路径
-     * @param string $file
      * @return bool
      */
-    public function save($file) {
-        if (!parent::save($file)) {
+    public function save() {
+        if (!parent::save()) {
             return false;
         }
-        if (!move_uploaded_file($this->tempName, $file) || !is_file($file)) {
+        if (!move_uploaded_file($this->tempName, $this->file->getFullName()) ||
+            !$this->file->exist()) {
             $this->setError('ERROR_FILE_MOVE');
             return false;
         }

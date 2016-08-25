@@ -7,6 +7,8 @@ namespace Zodream\Infrastructure\Database;
  * Time: 9:07
  */
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Database\Engine\BaseEngine;
+use Zodream\Infrastructure\Database\Engine\Pdo;
 use Zodream\Infrastructure\Event\EventManger;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
@@ -25,32 +27,72 @@ class Command {
     protected $cacheLife = 3600;
 
     /**
-     * @var Database
+     * @var BaseEngine[]
      */
-    protected $db;
+    protected $engines;
+
+    protected $currentName = '__default';
+
+    protected $configs = [];
 
     public function __construct() {
         $configs = Config::getInstance()->get('db');
-        if (!array_key_exists('driver', $configs) || !class_exists($configs['driver'])) {
-            $configs['driver'] = Pdo::class;
+        if (!is_array(current($configs))) {
+            $configs = [
+                $this->currentName => $configs
+            ];
         }
-        $this->db = call_user_func(array($configs['driver'], 'getInstance'), $configs);
-        $this->prefix = $configs['prefix'];
-        $this->allowCache = $configs['allowCache'];
-        $this->cacheLife = $configs['cacheLife'];
+        if (!array_key_exists($this->currentName, $configs)) {
+            $this->currentName = key($configs);
+        }
+        $this->configs = $configs;
         if (isset($this->table)) {
             $this->setTable($this->table);
         }
+    }
+
+    /**
+     * @param string $name
+     * @param array $configs
+     * @return BaseEngine
+     */
+    public function addEngine($name, $configs) {
+        if (array_key_exists($name, $this->engines)) {
+            $this->engines[$name]->close();
+        }
+        if ($configs instanceof BaseEngine) {
+            return $this->engines[$name] = $configs;
+        }
+        if (!array_key_exists('driver', $configs) || !class_exists($configs['driver'])) {
+            $configs['driver'] = Pdo::class;
+        }
+        $class = $configs['driver'];
+        $this->engines[$name] = new $class($configs);
+        return $this->engines[$name];
+    }
+
+    public function getEngine($name = null) {
+        if (is_null($name)) {
+            $name = $this->currentName;
+        }
+        if (array_key_exists($name, $this->configs)) {
+            return $this->addEngine($name, $this->configs[$name]);
+        }
+        if (array_key_exists($name, $this->engines)) {
+            return $this->engines[$name];
+        }
+        throw new \InvalidArgumentException($name. ' DOES NOT HAVE CONFIG!');
     }
 
     public function addPrefix($table) {
         if (strpos($table, '!') === 0) {
             return substr($table, 1);
         }
-        if (empty($this->prefix)) {
+        $prefix = $this->getEngine()->getConfig('prefix');
+        if (empty($prefix)) {
             return $table;
         }
-        return $this->prefix. StringExpand::firstReplace($table, $this->prefix, null);
+        return $prefix.StringExpand::firstReplace($table, $prefix);
     }
 
     /**
@@ -73,7 +115,7 @@ class Command {
      * @return $this
      */
     public function changedDatabase($database) {
-        $this->db->execute('use '.$database);
+        $this->getEngine()->execute('use '.$database);
         return $this;
     }
 
@@ -92,7 +134,7 @@ class Command {
         if (!$this->allowCache) {
             return null;
         }
-        $cache = Factory::cache()->get('data/'.md5($sql));
+        $cache = Factory::cache()->get('data/'.md5($this->currentName.$sql));
         if (empty($cache)) {
             return null;
         }
@@ -103,7 +145,7 @@ class Command {
         if (!$this->allowCache) {
             return;
         }
-        return Factory::cache()->set('data/'.md5($sql), serialize($data), 3600);
+        return Factory::cache()->set('data/'.md5($this->currentName.$sql), serialize($data), 3600);
     }
 
     /**
@@ -123,7 +165,7 @@ class Command {
      * @return bool
      */
     public function transaction($args) {
-        return $this->db->transaction($args);
+        return $this->getEngine()->transaction($args);
     }
 
     /**
@@ -131,8 +173,8 @@ class Command {
      * @return Database
      */
     public function beginTransaction() {
-        $this->db->begin();
-        return $this->db;
+        $this->getEngine()->begin();
+        return $this->getEngine();
     }
 
     /**
@@ -150,7 +192,7 @@ class Command {
         if (strpos($tags, '(') !== 0) {
             $tags = '('.$tags.')';
         }
-        return $this->db->insert("INSERT INTO {$this->table} {$columns} VALUES {$tags}", $parameters);
+        return $this->getEngine()->insert("INSERT INTO {$this->table} {$columns} VALUES {$tags}", $parameters);
     }
 
     /**
@@ -169,7 +211,7 @@ class Command {
         if (strpos($tags, '(') !== 0) {
             $tags = '('.$tags.')';
         }
-        return $this->db->update("INSERT INTO {$this->table} {$columns} VALUES {$tags} ON DUPLICATE KEY UPDATE {$update}", $parameters);
+        return $this->getEngine()->update("INSERT INTO {$this->table} {$columns} VALUES {$tags} ON DUPLICATE KEY UPDATE {$update}", $parameters);
     }
 
     /**
@@ -187,7 +229,7 @@ class Command {
         if (strpos($tags, '(') !== 0) {
             $tags = '('.$tags.')';
         }
-        return $this->update("REPLACE INTO {$this->table} {$columns} VALUES {$tags}", $parameters);
+        return $this->getEngine()->update("REPLACE INTO {$this->table} {$columns} VALUES {$tags}", $parameters);
     }
 
     /**
@@ -201,7 +243,7 @@ class Command {
         if (strncasecmp(ltrim($where), 'where', 5) !== 0) {
             $where = 'WHERE '.$where;
         }
-        return $this->db->update("UPDATE {$this->table} SET {$columns} {$where}", $parameters);
+        return $this->getEngine()->update("UPDATE {$this->table} SET {$columns} {$where}", $parameters);
     }
 
     /**
@@ -215,7 +257,7 @@ class Command {
         if (!empty($where) && strncasecmp($where, 'where', 5) !== 0) {
             $where = 'WHERE '.$where;
         }
-        return $this->db->delete("DELETE FROM {$this->table} {$where}", $parameters);
+        return $this->getEngine()->delete("DELETE FROM {$this->table} {$where}", $parameters);
     }
 
     /**
@@ -226,13 +268,13 @@ class Command {
     public function execute($sql, $parameters = array()) {
         EventManger::getInstance()->run('executeSql', $sql);
         if (preg_match('/^(insert|delete|update|replace|drop|create)\s+/i', $sql)) {
-            return $this->db->execute($sql, $parameters);
+            return $this->getEngine()->execute($sql, $parameters);
         }
         $args = empty($parameters) ? serialize($parameters) : null;
         if ($cache = $this->getCache($sql.$args)) {
             return $cache;
         }
-        $result = $this->db->execute($sql, $parameters);
+        $result = $this->getEngine()->execute($sql, $parameters);
         $this->setCache($sql.$args, $result);
         return $result;
     }
@@ -247,7 +289,7 @@ class Command {
         if ($cache = $this->getCache($sql.$args)) {
             return $cache;
         }
-        $result = $this->db->getArray($sql, $parameters);
+        $result = $this->getEngine()->getArray($sql, $parameters);
         $this->setCache($sql.$args, $result);
         return $result;
     }
@@ -261,22 +303,15 @@ class Command {
         if ($cache = $this->getCache($sql.$args)) {
             return $cache;
         }
-        $result = $this->db->getObject($sql, $parameters);
+        $result = $this->getEngine()->getObject($sql, $parameters);
         $this->setCache($sql.$args, $result);
         return $result;
-    }
-
-    /**
-     * @return Database
-     */
-    public function getDb() {
-        return $this->db;
     }
 
     /**
      * 获取错误信息
      */
     public function getError() {
-        return $this->db->getError();
+        return $this->getEngine()->getError();
     }
 }
