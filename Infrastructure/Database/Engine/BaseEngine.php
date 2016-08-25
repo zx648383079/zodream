@@ -32,7 +32,7 @@ abstract class BaseEngine {
 	//私有克隆
 	protected function __clone() {}
 	
-	protected function __construct(array $config) {
+	public function __construct(array $config) {
 		$this->configs = $config;
 		$this->connect();
 	}

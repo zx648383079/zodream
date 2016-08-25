@@ -29,7 +29,7 @@ class Command {
     /**
      * @var BaseEngine[]
      */
-    protected $engines;
+    protected $engines = [];
 
     protected $currentName = '__default';
 

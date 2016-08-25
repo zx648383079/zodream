@@ -29,11 +29,11 @@ namespace Zodream\Domain\Template;
 {name=qq?v:b}                   <?php name = qq ? v : b;?>
 
 {if:name=qq}                    <?php if (name = qq):?>
-{if:name=qq,hh}
-{if:name>qq,hh,gg}
-{/if}
-{else}
-{elseif}
+{if:name=qq,hh}                 <?php if (name = qq){ echo hh; }?>
+{if:name>qq,hh,gg}              <?php if (name = qq){ echo hh; } else { echo gg;}?>
+{/if}                           <?php endif;?>
+{else}                          <?php else:?>
+{elseif}                        <?php elseif:?>
 
 {switch:name}
 {switch:name,value}
