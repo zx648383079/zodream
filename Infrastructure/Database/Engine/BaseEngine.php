@@ -33,7 +33,7 @@ abstract class BaseEngine {
 	protected function __clone() {}
 	
 	public function __construct(array $config) {
-		$this->configs = $config;
+		$this->configs = array_merge($this->configs, $config);
 		$this->connect();
 	}
 

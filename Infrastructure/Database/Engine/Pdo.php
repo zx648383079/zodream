@@ -5,7 +5,6 @@ namespace Zodream\Infrastructure\Database\Engine;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Error\Error;
 
 class Pdo extends BaseEngine {
 
@@ -40,7 +39,7 @@ class Pdo extends BaseEngine {
 			$this->driver->query ( "SET character_set_connection={$this->configs['encoding']}" );
 			$this->driver->query ( "SET character_set_results={$this->configs['encoding']}" );
 		} catch (\PDOException $ex) {
-			Error::out($ex->getMessage(), __FILE__, __LINE__);
+			throw $ex;
 		}
 	}
 	
