@@ -51,7 +51,7 @@ class Error{
 			ResponseResult::sendError($errorInfo)->send();
 			exit();
 		}
-		if (defined('DEBUG') && DEBUG) {
+		if (DEBUG) {
 			throw (new Exception($error, '200'))->setFile($file)->setLine($line);
 		}
 	}

@@ -1,11 +1,12 @@
 <?php 
 namespace Zodream\Infrastructure\Database\Engine;
+
 /**
  * 
  * @author zx648
  *
  */
-
+use Zodream\Infrastructure\Factory;
 abstract class BaseEngine {
 	
 	protected $driver             = null;
@@ -33,8 +34,10 @@ abstract class BaseEngine {
 	protected function __clone() {}
 	
 	public function __construct(array $config) {
+        Factory::timer()->record('dbEngineInit');
 		$this->configs = array_merge($this->configs, $config);
 		$this->connect();
+        Factory::timer()->record('dbEngineEnd');
 	}
 
 	public function getConfig($key, $default = null) {

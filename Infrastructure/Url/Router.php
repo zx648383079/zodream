@@ -7,8 +7,8 @@ namespace Zodream\Infrastructure\Url;
 * @author Jason
 */
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\DomainObject\RouteObject;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 
 class Router {
@@ -45,9 +45,10 @@ class Router {
     /**
      * 路由加载及运行方法
      * @param string|Url $url
-     * @return ResponseObject
+     * @return Route
      */
 	public function run($url) {
+        Factory::timer()->record('route');
 	    if ($url instanceof Uri) {
 	        $url = $url->getPath();
         }

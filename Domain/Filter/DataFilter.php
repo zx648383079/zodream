@@ -102,10 +102,9 @@ class DataFilter {
     }
     
     protected static function runFilterOrValidate($args, $option, $isValidate = true) {
-		static::$_error = [];
 		$args = (array)$args;
 		$option = (array)$option;
-		self::$_error = array();
+		self::$error = array();
     	$filters = self::getFilters($option);
     	if ($isValidate) {
     		return self::runValidate($filters, $args);

@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure;
  * Date: 2016/6/24
  * Time: 22:57
  */
+use Zodream\Domain\Debug\Timer;
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
@@ -94,5 +95,13 @@ class Factory {
      */
     public static function view() {
         return self::getInstance('______', ViewFactory::class);
+    }
+
+    /**
+     * TIMER , LOG ALL TIME
+     * @return Timer
+     */
+    public static function timer() {
+        return self::getInstance('____', Timer::class);
     }
 }

@@ -7,6 +7,7 @@ namespace Zodream\Domain\Response;
  * Time: 12:55
  */
 use Zodream\Infrastructure\DomainObject\ResponseObject;
+use Zodream\Infrastructure\Factory;
 
 class BaseResponse implements ResponseObject {
     
@@ -51,6 +52,8 @@ class BaseResponse implements ResponseObject {
      * @return boolean
      */
     public function send() {
+        Factory::timer()->end();
+        Factory::timer()->log();
         $this->sendHeaders();
         $this->sendContent();
         return true;

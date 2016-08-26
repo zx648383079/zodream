@@ -50,6 +50,7 @@ abstract class BaseController extends Action {
 	 * @return string|BaseResponse
 	 */
 	public function runAction($action, array $vars = array()) {
+        Factory::timer()->record('controllerStart');
 		$this->action = $action;
 		if ($this->canCSRFValidate && Request::isPost() && !VerifyCsrfToken::verify()) {
 			return Error::out('BAD POST REQUEST!', __FILE__, __LINE__);
@@ -70,6 +71,7 @@ abstract class BaseController extends Action {
 		EventManger::getInstance()->run('runController', $vars);
 		$result = $this->runAllAction($action, $vars);
 		$this->finalize();
+        Factory::timer()->record('controllerEnd');
 		return $result;
 	}
 	
@@ -265,6 +267,9 @@ abstract class BaseController extends Action {
 	 * @return bool|string
 	 */
 	public function runCache($key = null) {
+	    if (DEBUG) {
+	        return false;
+        }
 		$update = Request::get('cache', false);
 		if (!Auth::guest() && empty($update)) {
 			return false;

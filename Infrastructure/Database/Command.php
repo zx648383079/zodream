@@ -36,6 +36,7 @@ class Command {
     protected $configs = [];
 
     public function __construct() {
+        Factory::timer()->record('dbInit');
         $configs = Config::getInstance()->get('db');
         if (!is_array(current($configs))) {
             $configs = [
@@ -68,18 +69,20 @@ class Command {
         }
         $class = $configs['driver'];
         $this->engines[$name] = new $class($configs);
+        Factory::timer()->record('dbEnd');
         return $this->engines[$name];
     }
 
     public function getEngine($name = null) {
+        Factory::timer()->record('dbGet');
         if (is_null($name)) {
             $name = $this->currentName;
         }
-        if (array_key_exists($name, $this->configs)) {
-            return $this->addEngine($name, $this->configs[$name]);
-        }
         if (array_key_exists($name, $this->engines)) {
             return $this->engines[$name];
+        }
+        if (array_key_exists($name, $this->configs)) {
+            return $this->addEngine($name, $this->configs[$name]);
         }
         throw new \InvalidArgumentException($name. ' DOES NOT HAVE CONFIG!');
     }
@@ -142,7 +145,7 @@ class Command {
     }
 
     public function setCache($sql, $data) {
-        if (!$this->allowCache) {
+        if (!$this->allowCache || DEBUG) {
             return;
         }
         return Factory::cache()->set('data/'.md5($this->currentName.$sql), serialize($data), 3600);

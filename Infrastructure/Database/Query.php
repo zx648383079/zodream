@@ -379,7 +379,13 @@ class Query extends BaseQuery {
         }
         return $this->command()->getObject($this->getSql(), $this->get());
     }
-    
+
+    /**
+     *
+     * @param int $size
+     * @param string $key
+     * @return Page
+     */
     public function page($size = 20, $key = 'page') {
         $select = $this->select;
         $this->select = [];
