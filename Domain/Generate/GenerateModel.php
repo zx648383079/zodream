@@ -40,7 +40,7 @@ class GenerateModel extends Command {
      * @param string $db
      */
     public function createDatabase($db) {
-        $this->db->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
+        $this->getEngine()->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
             '` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
         echo $db.'数据库创建成功！';
     }
@@ -60,7 +60,7 @@ class GenerateModel extends Command {
         $tables = $this->getTables(file_get_contents($file));
         $charset = Config::getValue('db.encoding', 'utf8');
         foreach ($tables as $key => $value) {
-            $this->db->execute(
+            $this->getEngine()->execute(
                 "CREATE TABLE IF NOT EXISTS `{$key}` {$value[0]} ENGINE={$value[1]} DEFAULT CHARSET={$charset};"
             );
             echo $key, '表创建成功！<br>';
@@ -87,7 +87,7 @@ class GenerateModel extends Command {
      * 获取所有数据库名
      */
     public function getDatabase() {
-        return $this->_getArrayFormDouble($this->db->getArray('SHOW DATABASES'));
+        return $this->_getArrayFormDouble($this->getEngine()->getArray('SHOW DATABASES'));
     }
 
     /**
@@ -97,9 +97,9 @@ class GenerateModel extends Command {
      */
     public function getTableByDatabase($arg = null) {
         if (!empty($arg)) {
-            $this->db->execute('use '.$arg);
+            $this->getEngine()->execute('use '.$arg);
         }
-        return $this->_getArrayFormDouble($this->db->getArray('SHOW TABLES'));
+        return $this->_getArrayFormDouble($this->getEngine()->getArray('SHOW TABLES'));
     }
 
     private function _getArrayFormDouble(array $args) {
@@ -125,7 +125,7 @@ class GenerateModel extends Command {
         if ($prefix) {
             $arg = $this->prefix.StringExpand::firstReplace($arg, $this->prefix);
         }
-        return $this->db->getArray('SHOW COLUMNS FROM '.$arg);
+        return $this->getEngine()->getArray('SHOW COLUMNS FROM '.$arg);
     }
 
     /**
@@ -134,7 +134,7 @@ class GenerateModel extends Command {
      * @return array
      */
     public function getFullColumn($arg) {
-        return $this->db->getArray('SHOW FULL COLUMNS FROM '.$arg);
+        return $this->getEngine()->getArray('SHOW FULL COLUMNS FROM '.$arg);
     }
 
     /**
@@ -154,9 +154,9 @@ class GenerateModel extends Command {
      */
     public function getTableStatus($arg = null) {
         if (!empty($arg)) {
-            $this->db->execute('use '.$arg);
+            $this->getEngine()->execute('use '.$arg);
         }
-        return $this->db->getArray('SHOW TABLE STATUS');
+        return $this->getEngine()->getArray('SHOW TABLE STATUS');
     }
 
     /**
@@ -165,7 +165,7 @@ class GenerateModel extends Command {
      * @return string
      */
     public function getCreateTableSql($table) {
-        $data = $this->db->getArray("SHOW CREATE TABLE `{$table}`");
+        $data = $this->getEngine()->getArray("SHOW CREATE TABLE `{$table}`");
         if (empty($data)) {
             return null;
         }
@@ -249,6 +249,6 @@ class GenerateModel extends Command {
      * @return \Zodream\infrastructure\Database\Database
      */
     public function getConnect() {
-        return $this->db;
+        return $this->getEngine();
     }
 }
