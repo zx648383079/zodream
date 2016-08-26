@@ -9,9 +9,10 @@ namespace Zodream\Infrastructure;
 use ArrayIterator;
 use ArrayAccess;
 use IteratorAggregate;
+use Zodream\Infrastructure\Base\Object;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
-class MagicObject implements ArrayAccess, IteratorAggregate {
+class MagicObject extends Object implements ArrayAccess, IteratorAggregate {
 	
 	protected $_data = array();
 
@@ -141,4 +142,12 @@ class MagicObject implements ArrayAccess, IteratorAggregate {
 	public function getIterator() {
 		return new ArrayIterator($this->get());
 	}
+
+	public function parse($args) {
+        return $this->set($args);
+    }
+
+    public function toArray() {
+        return $this->get();
+    }
 }

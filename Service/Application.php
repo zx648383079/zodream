@@ -23,7 +23,7 @@ defined('APP_MODEL')      or define('APP_MODEL', Config::getInstance()->get('app
 
 class Application {
 	/**
-	 * 程序启动
+	 * APP RUN IN THIS
 	 * @param array $configs
 	 * @return ResponseObject
 	 */

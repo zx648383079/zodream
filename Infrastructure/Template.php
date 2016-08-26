@@ -18,27 +18,32 @@ class Template extends  MagicObject {
     protected $endTag = '}';
 
     public function __construct($directory = null) {
-        $this->setDirectory($directory ?: APP_DIR.'/UserInterface/Template');
+        if (!empty($directory)) {
+            $this->setDirectory($directory);
+        }
     }
 
     /**
      * 设置基路径
      * @param $directory
-     * @internal param string $value
+     * @return $this
      */
     public function setDirectory($directory) {
         $this->directory = $directory instanceof Directory ?
             $directory : new Directory($directory);
+        return $this;
     }
 
     /**
      * 设置标志
      * @param string $beginTag
      * @param string $endTag
+     * @return $this
      */
     public function setTag($beginTag = '{', $endTag = '}') {
         $this->beginTag = $beginTag;
         $this->endTag = $endTag;
+        return $this;
     }
 
     /**

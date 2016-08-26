@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Access;
 /**
- *
+ * AUTH CONTROL
  *
  * @author Jason
  */

@@ -9,6 +9,7 @@ namespace Zodream\Infrastructure\Base;
 abstract class Object {
     /**
      * @param array|Object $args
+     * @return $this
      */
     public function parse($args) {
         if ($args instanceof Object) {
@@ -19,6 +20,7 @@ abstract class Object {
                 $this->$key = $item;
             }
         }
+        return $this;
     }
 
     /**
