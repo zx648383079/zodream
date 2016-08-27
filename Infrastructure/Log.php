@@ -42,7 +42,7 @@ class Log {
      */
     public static function out($file, $msg) {
         if (!$file instanceof File) {
-            $file = new File(APP_DIR.'/log/'.ltrim($file, '/'));
+            $file = Factory::root()->childFile('log/'.ltrim($file, '/'));
         }
         if ($file->getDirectory()->exist()) {
             return $file->write($msg, FILE_APPEND | LOCK_EX);

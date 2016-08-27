@@ -6,7 +6,6 @@ namespace Zodream\Infrastructure\Disk;
  * Date: 2016/7/29
  * Time: 11:26
  */
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 abstract class FileObject {
     protected $name;
@@ -35,6 +34,22 @@ abstract class FileObject {
      */
     public function exist() {
         return file_exists($this->fullName);
+    }
+
+    /**
+     * IS FILE
+     * @return bool
+     */
+    public function isFile() {
+        return is_file($this->fullName);
+    }
+
+    /**
+     * IS DIRECTORY
+     * @return bool
+     */
+    public function isDirectory() {
+        return is_dir($this->fullName);
     }
 
     /**
@@ -67,14 +82,36 @@ abstract class FileObject {
     }
 
     /**
+     * WINDOWS PATH TO LINUX PATH
+     * @param string $file
+     * @return string
+     */
+    public function getSafePath($file) {
+        return str_replace('\\', '/', $file);
+    }
+
+    /**
+     * GET RELATIVE PATH, BUT PATH MUST BE ROOT'S CHILD
+     * @param string $root
+     * @return bool|string
+     */
+    public function getRelative($root) {
+        if ($root instanceof FileObject) {
+            $root = $root->getFullName();
+        } else {
+            $root = rtrim($this->getSafePath($root), '/');
+        }
+        if (strpos($this->fullName, $root) === 0) {
+            return substr($this->fullName, strlen($root));
+        }
+        return false;
+    }
+
+    /**
      * GET URL IN WEB ROOT
      * @return bool|string
      */
     public function toUrl() {
-        $root = Request::server('DOCUMENT_ROOT');
-        if (strpos($this->fullName, $root) === 0) {
-            return StringExpand::firstReplace($this->fullName, $root, '');
-        }
-        return false;
+        return $this->getRelative(Request::server('DOCUMENT_ROOT'));
     }
 }

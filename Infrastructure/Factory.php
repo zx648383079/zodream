@@ -12,9 +12,10 @@ use Zodream\Domain\Debug\Timer;
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
+use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\DomainObject\RouterObject;
 use Zodream\Infrastructure\Error\Error;
-use Zodream\Infrastructure\Header\Headers;
+use Zodream\Infrastructure\Http\Header;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
@@ -86,7 +87,7 @@ class Factory {
      * @return Headers
      */
     public static function header() {
-        return self::getInstance('headers', Headers::class);
+        return self::getInstance('headers', Header::class);
     }
 
     /**
@@ -103,5 +104,15 @@ class Factory {
      */
     public static function timer() {
         return self::getInstance('____', Timer::class);
+    }
+
+    /**
+     * @return Directory
+     */
+    public static function root() {
+        if (!array_key_exists('root', static::$_instance)) {
+            static::$_instance['root'] = new Directory(APP_DIR);
+        }
+        return static::$_instance['root'];
     }
 }

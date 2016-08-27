@@ -126,10 +126,18 @@ class Record extends Query {
             ->command()
             ->update(implode(',', $data), $this->getWhere().$this->getLimit(), $parameters);
     }
+
+    public function replace() {
+        $addFields = implode('`,`', array_keys($this->_data));
+        return $this->setTable()
+            ->command()
+            ->insertOrReplace("`{$addFields}`", StringExpand::repeat('?', count($this->_data)),
+                array_values($this->_data));
+    }
     
     public function delete($tag = null) {
-        if (is_null($tag) && $this->has($tag)) {
-            return parent::delete();
+        if (func_num_args() > 0) {
+            return call_user_func_array('parent::delete', func_get_args());
         }
         return $this->setTable()
             ->command()

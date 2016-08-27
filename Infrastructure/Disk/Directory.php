@@ -8,10 +8,14 @@ namespace Zodream\Infrastructure\Disk;
  * Time: 11:30
  */
 class Directory extends FileObject {
-
     public function __construct($directory) {
-        $this->fullName = ltrim($directory, '/\\');
-        $this->name = basename($this->fullName);
+        if ($directory instanceof FileObject) {
+            $this->fullName = $directory->getFullName();
+            $this->name = $this->getName();
+        } else {
+            $this->fullName = rtrim($this->getSafePath($directory), '/');
+            $this->name = basename($this->fullName);
+        }
     }
 
     /**
@@ -147,7 +151,7 @@ class Directory extends FileObject {
      * @return bool
      */
     public function exist() {
-        return is_dir($this->fullName);
+        return $this->isDirectory();
     }
 
     /**

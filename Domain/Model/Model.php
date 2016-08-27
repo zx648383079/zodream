@@ -79,8 +79,9 @@ abstract class Model extends MagicObject {
 	public function load($data = null, $key = null) {
 		if (is_string($data)) {
 			$key = $data;
+            $data = null;
 		}
-		if (!is_array($data)) {
+		if (Request::isPost()) {
 			$data = Request::post($key);
 		}
 		if (empty($data)) {

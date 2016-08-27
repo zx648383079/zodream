@@ -7,6 +7,7 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Time: 21:04
  */
 use Zodream\Domain\Html\Widget;
+use Zodream\Infrastructure\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 class DetailWidget extends Widget {
@@ -21,6 +22,9 @@ class DetailWidget extends Widget {
     
     protected function run() {
         $data = $this->get('data');
+        if ($data instanceof MagicObject) {
+            $data = $data->toArray();
+        }
         $args = $this->get('items');
         if (empty($args) && empty($data)) {
             return null;

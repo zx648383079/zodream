@@ -20,11 +20,18 @@ class File extends FileObject {
     protected $directory;
 
     public function __construct($file) {
-        $this->fullName = $file;
-        $args = pathinfo($this->fullName);
-        $this->name = $args['basename'];
-        $this->extension = $args['extension'];
-        $this->directory = $args['dirname'];
+        if ($file instanceof File) {
+            $this->fullName = $file->getFullName();
+            $this->name = $this->getName();
+            $this->extension = $this->getExtension();
+            $this->directory = $this->getDirectoryName();
+        } else {
+            $this->fullName = $this->getSafePath($file);
+            $args = pathinfo($this->fullName);
+            $this->name = $args['basename'];
+            $this->extension = $args['extension'];
+            $this->directory = $args['dirname'];
+        }
     }
     
     public function getExtension() {
@@ -102,7 +109,7 @@ class File extends FileObject {
      * @return bool
      */
     public function exist() {
-        return is_file($this->fullName);
+        return $this->isFile();
     }
 
     /**

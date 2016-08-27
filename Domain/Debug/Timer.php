@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Domain\Debug;
 
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 class Timer {
 	protected $startTime;
@@ -40,7 +41,7 @@ class Timer {
     }
 
     public function log() {
-        $handle = fopen(APP_DIR.'/log/timer', 'w');
+        $handle = fopen(Factory::root()->childFile('log/timer.log'), 'w');
         fwrite($handle, TimeExpand::format()."\r\n");
         fwrite($handle, $this->startTime."\r\n");
         foreach ($this->times as $key => $item) {
