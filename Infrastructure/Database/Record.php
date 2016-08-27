@@ -27,6 +27,10 @@ class Record extends Query {
         return $this;
     }
 
+    public function hasParam($key) {
+        return array_key_exists($key, $this->parameters);
+    }
+
     /**
      * @param array|string $key 需要添加的集合
      * @param string $value

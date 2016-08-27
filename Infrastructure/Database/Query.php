@@ -355,6 +355,15 @@ class Query extends BaseQuery {
     }
 
     /**
+     * HAS BUILD VALUE
+     * @param string $key
+     * @return bool
+     */
+    public function hasParam($key) {
+        return $this->has($key);
+    }
+
+    /**
      * @return string
      */
     public function getSql() {
@@ -665,7 +674,10 @@ class Query extends BaseQuery {
         if (strpos($value, '@') === 0) {
             return substr($value, 1);
         }
-        if (is_numeric($value)) {
+
+        if (is_numeric($value) ||
+            $value === '?' ||
+            (strpos($value, ':') === 0 && $this->hasParam($value))) {
             return $value;
         }
         return "'{$value}'";
