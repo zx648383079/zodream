@@ -12,16 +12,15 @@ use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Http\Curl;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
+use Zodream\Infrastructure\Traits\ConfigTrait;
 use Zodream\Infrastructure\Url\Uri;
 
 abstract class ThirdParty extends MagicObject {
 
+    use ConfigTrait;
+
     const GET = 'GET';
     const POST = 'POST';
-    /**
-     * @var string config 中标记
-     */
-    protected $name;
 
     /**
      *
@@ -42,11 +41,11 @@ abstract class ThirdParty extends MagicObject {
     public function __construct($config = array()) {
         $this->http = new Curl();
         if (empty($config)) {
-            $this->set(Config::getValue($this->name));
+            $this->set(Config::getValue($this->configKey));
             return;
         }
-        if (array_key_exists($this->name, $config) && is_array($config[$this->name])) {
-            $this->set($config[$this->name]);
+        if (array_key_exists($this->configKey, $config) && is_array($config[$this->configKey])) {
+            $this->set($config[$this->configKey]);
             return;
         }
         $this->set($config);
@@ -57,7 +56,7 @@ abstract class ThirdParty extends MagicObject {
      * @return string
      */
     public function getName() {
-        return $this->name;
+        return $this->configKey;
     }
 
     protected function httpGet($url) {

@@ -8,7 +8,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class DouBan extends BaseOAuth {
 
-    protected $name = 'douban';
+    protected $configKey = 'douban';
 
     protected $apiMap = [
         'login' => [

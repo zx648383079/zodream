@@ -9,7 +9,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 use Zodream\Infrastructure\ThirdParty;
 
 abstract class BaseWeChat extends ThirdParty {
-    protected $name = 'wechat';
+    protected $configKey = 'wechat';
 
 
 

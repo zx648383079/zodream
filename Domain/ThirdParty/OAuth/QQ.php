@@ -9,7 +9,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class QQ extends BaseOAuth {
 
-    protected $name = 'qq';
+    protected $configKey = 'qq';
 
     protected $apiMap = array(
         'login' => array(

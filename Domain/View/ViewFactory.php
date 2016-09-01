@@ -7,6 +7,7 @@ namespace Zodream\Domain\View;
  * Date: 2016/8/3
  * Time: 9:48
  */
+use Zodream\Infrastructure\Traits\ConfigTrait;
 use Zodream\Infrastructure\Url\Url;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Config;
@@ -20,6 +21,8 @@ use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class ViewFactory extends MagicObject {
 
+    use ConfigTrait;
+
     /**
      * @var Directory
      */
@@ -29,8 +32,6 @@ class ViewFactory extends MagicObject {
      * @var EngineObject
      */
     protected $engine;
-
-    protected $configs;
 
     /**
      * @var FileCache
@@ -54,7 +55,8 @@ class ViewFactory extends MagicObject {
     protected $sections = [];
     
     public function __construct() {
-        $this->configs = Config::getValue('view', [
+        $this->configKey = 'view';
+        $this->configs = Config::getValue($this->configKey, [
             'driver' => null,
             'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
             'suffix' => '.php',

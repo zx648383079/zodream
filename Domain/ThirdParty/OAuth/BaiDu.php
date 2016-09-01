@@ -7,7 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 17:44
  */
 class BaiDu extends BaseOAuth {
-    protected $name = 'baidu';
+    protected $configKey= 'baidu';
 
     protected $apiMap = array(
         'login' => array(

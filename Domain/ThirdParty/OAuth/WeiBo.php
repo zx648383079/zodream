@@ -8,7 +8,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class WeiBo extends BaseOAuth {
 
-    protected $name = 'weibo';
+    protected $configKey = 'weibo';
 
     protected $apiMap = array(
        'login' => array(
