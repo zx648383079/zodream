@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure;
  * Time: 11:44
  */
 use Zodream\Domain\Filter\Filters\RequiredFilter;
+use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Http\Curl;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;

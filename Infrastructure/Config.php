@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure;
 * @author Jason
 */
 use Zodream\Domain\Generate\Generate;
+use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 

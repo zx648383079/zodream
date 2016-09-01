@@ -6,7 +6,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Date: 2016/8/22
  * Time: 19:01
  */
-use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Request;
 

@@ -16,18 +16,16 @@ class FileCache extends Cache {
      */
 	protected $directory;
 
-	protected $extension = '.cache';
+    protected $configs = [
+        'directory' => 'cache/',
+        'extension' => '.cache',
+        'gc' => 10
+    ];
 
 
     public function __construct() {
-        $configs = Config::getValue('cache', [
-            'directory' => 'cache/',
-            'extension' => '.cache',
-            'gc' => 10
-        ]);
-        $this->setDirectory($configs['directory'])
-            ->setExtension($configs['extension'])
-            ->setGCChance($configs['gc']);
+        $this->loadConfigs();
+        $this->setDirectory($this->configs['directory']);
     }
 
     public function setDirectory($directory) {
@@ -35,14 +33,6 @@ class FileCache extends Cache {
             $directory = new Directory(APP_DIR.'/'.trim($directory, '/'));
         }
         $this->directory = $directory;
-        return $this;
-    }
-
-    public function setExtension($arg) {
-        if ($arg[0] !== '.') {
-            $arg = '.'.$arg;
-        }
-        $this->extension = $arg;
         return $this;
     }
 
@@ -103,11 +93,11 @@ class FileCache extends Cache {
      */
 	public function getCacheFile($key) {
         $this->directory->create();
-		return $this->directory->childFile($key.$this->extension);
+		return $this->directory->childFile($key.$this->configs['extension']);
 	}
 	
 	public function gc($force = false, $expiredOnly = true) {
-        if ($force || mt_rand(0, 1000000) < $this->gcChance) {
+        if ($force || mt_rand(0, 1000000) < $this->getGC()) {
             $this->gcRecursive($this->directory, $expiredOnly);
         }
     }

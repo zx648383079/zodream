@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Request;
  * Date: 2016/4/3
  * Time: 9:23
  */
-use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Base\MagicObject;
 abstract class BaseRequest extends MagicObject {
     /**
      * 格式化

@@ -1,10 +1,12 @@
 <?php 
 namespace Zodream\Infrastructure;
+
 /**
 * 反射调用类
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Base\MagicObject;
 
 class Loader extends MagicObject {
 	/**

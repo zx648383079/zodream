@@ -1,13 +1,18 @@
 <?php 
 namespace Zodream\Infrastructure\Mailer;
+
 /**
 * mail
 * 
 * @author Jason
 * @time 2015-11-29
 */
-abstract class BaseMailer {
+use Zodream\Infrastructure\Base\ConfigObject;
+
+abstract class BaseMailer extends ConfigObject {
 	protected $mail;
+
+    protected $configKey = 'mail';
 
 	/**
 	 * 设置发送者的信息

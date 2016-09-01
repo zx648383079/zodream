@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Caching;
  * Date: 2016/4/17
  * Time: 22:43
  */
+
 /**
  * PHP memcache 队列类
  * @author LKK/lianq.net

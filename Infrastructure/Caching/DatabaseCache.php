@@ -10,30 +10,37 @@ use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
 
 class DatabaseCache extends Cache {
-	/**
-	 *  ```php
-	 * CREATE TABLE cache (
-	 *     id char(128) NOT NULL PRIMARY KEY,
-	 *     expire int(11),
-	 *     data BLOB
-	 * );
-	 * ```
-	 * @var Command
-	 */
-	protected $db;
 	
-	protected $table = 'cache';
+	protected $configs = [
+	    'table' => 'cache',
+        'gc' => 10
+    ];
 
-
-
+    /**
+     *  ```php
+     * CREATE TABLE cache (
+     *     id char(128) NOT NULL PRIMARY KEY,
+     *     expire int(11),
+     *     data BLOB
+     * );
+     * ```
+     * @var Command
+     */
 	public function __construct() {
-		$this->db = Command::getInstance();
-		$this->db->setTable($this->table);
+	    $this->loadConfigs();
 	}
+
+    /**
+     * @return Command
+     */
+	public function command() {
+	    return Command::getInstance()
+            ->setTable($this->configs['table']);
+    }
 
 	protected function query() {
 		$query = new Query();
-		$query->from($this->table);
+		$query->from($this->configs['table']);
 		return $query;
 	}
 	
@@ -45,7 +52,8 @@ class DatabaseCache extends Cache {
 	}
 	
 	protected function setValue($key, $value, $duration) {
-		 $result = $this->db->update('expire = :expire, data = :data', 'id = :id', array(
+		 $result = $this->command()
+             ->update('expire = :expire, data = :data', 'id = :id', array(
 			':expire' => $duration > 0 ? $duration + time() : 0,
 			':data' => [$value, \PDO::PARAM_LOB],
 			':id' => $key
@@ -60,7 +68,8 @@ class DatabaseCache extends Cache {
 	protected function addValue($key, $value, $duration) {
 		$this->gc();
 		try {
-			$this->db->insert('id, expire, data', ':id, :expire, :data', array(
+			$this->command()
+                ->insert('id, expire, data', ':id, :expire, :data', array(
 					':id' => $key,
 					':expire' => $duration > 0 ? $duration + time() : 0,
 					':data' => [$value, \PDO::PARAM_LOB],
@@ -72,8 +81,9 @@ class DatabaseCache extends Cache {
 	}
 
 	public function gc($force = false) {
-		if ($force || mt_rand(0, 1000000) < $this->gcChance) {
-			$this->db->delete('expire > 0 AND expire < ' . time());
+		if ($force || mt_rand(0, 1000000) < $this->getGC()) {
+			$this->command()
+                ->delete('expire > 0 AND expire < ' . time());
 		}
 	}
 	
@@ -86,12 +96,14 @@ class DatabaseCache extends Cache {
 	}
 	
 	protected function deleteValue($key) {
-		$this->db->delete('id = :id', array(
+		$this->command()
+            ->delete('id = :id', array(
 			':id' => $key
 		));
 	}
 	
 	protected function clearValue() {
-		$this->db->delete();
+		$this->command()
+            ->delete();
 	}
 }

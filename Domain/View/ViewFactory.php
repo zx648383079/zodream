@@ -15,7 +15,7 @@ use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\DomainObject\EngineObject;
 use Zodream\Infrastructure\Error\FileException;
 use Zodream\Infrastructure\Html;
-use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class ViewFactory extends MagicObject {

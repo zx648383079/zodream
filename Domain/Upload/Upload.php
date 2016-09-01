@@ -7,7 +7,7 @@ namespace Zodream\Domain\Upload;
  * Time: 10:58
  */
 use Zodream\Infrastructure\Disk\Directory;
-use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Base\MagicObject;
 
 class Upload extends MagicObject {
     /** @var BaseUpload[] */

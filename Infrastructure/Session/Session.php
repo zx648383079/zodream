@@ -1,12 +1,15 @@
 <?php
 namespace Zodream\Infrastructure\Session;
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/3/6
  * Time: 9:56
  */
-class Session implements \ArrayAccess {
+use Zodream\Infrastructure\Base\ConfigObject;
+
+class Session extends ConfigObject implements \ArrayAccess {
 
     public $flashParam = '__flash';
 

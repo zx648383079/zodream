@@ -6,8 +6,9 @@ namespace Zodream\Infrastructure\Database\Engine;
  * @author zx648
  *
  */
+use Zodream\Infrastructure\Base\ConfigObject;
 use Zodream\Infrastructure\Factory;
-abstract class BaseEngine {
+abstract class BaseEngine extends ConfigObject {
 	
 	protected $driver             = null;
 
@@ -35,8 +36,7 @@ abstract class BaseEngine {
 	
 	public function __construct(array $config) {
         Factory::timer()->record('dbEngineInit');
-		$this->configs = array_merge($this->configs, $config);
-		$this->connect();
+		$this->setConfigs($config)->connect();
         Factory::timer()->record('dbEngineEnd');
 	}
 

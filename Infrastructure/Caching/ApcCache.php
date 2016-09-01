@@ -7,37 +7,37 @@ namespace Zodream\Infrastructure\Caching;
 */
 
 class ApcCache extends Cache {
-	
-	public $useApcu = false;
-	
-	public function __construct() {
-		$extension = $this->useApcu ? 'apcu' : 'apc';
-		if (!extension_loaded($extension)) {
-			//throw new \er("ApcCache requires PHP $extension extension to be loaded.");
-		}
-	}
+
+    const APCU = 'apcu';
+    const APC = 'apc';
+
+    protected $configs = ['extension' => self::APC];
+
+	protected function isAPc() {
+	    return $this->configs['extension'] == self::APC;
+    }
 	
 	protected function getValue($key) {
-		return $this->useApcu ? apcu_fetch($key) : apc_fetch($key);
+		return $this->isAPc() ? apc_fetch($key) : apcu_fetch($key);
 	}
 	
 	protected function setValue($key, $value, $duration) {
-		$this->useApcu ? apcu_store($key, $value, $duration) : apc_store($key, $value, $duration);
+        $this->isAPc() ? apc_store($key, $value, $duration) : apcu_store($key, $value, $duration);
 	}
 	
 	protected function addValue($key, $value, $duration) {
-		return $this->useApcu ? apcu_add($key, $value, $duration) : apc_add($key, $value, $duration);
+		return $this->isAPc() ? apc_add($key, $value, $duration) : apcu_add($key, $value, $duration);
 	}
 	
 	protected function hasValue($key) {
-		return $this->useApcu ? apcu_exists($key) : apc_exists($key);
+		return $this->isAPc() ? apc_exists($key) : apcu_exists($key);
 	}
 	
 	protected function deleteValue($key) {
-		return $this->useApcu ? apcu_delete($key) : apc_delete($key);
+		return $this->isAPc() ? apc_delete($key) : apcu_delete($key);
 	}
 	
 	protected function clearValue() {
-		return $this->useApcu ? apcu_clear_cache() : apc_clear_cache('user');
+		return $this->isAPc() ? apc_clear_cache('user') : apcu_clear_cache();
 	}
 }

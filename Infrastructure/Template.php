@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure;
  * Date: 2016/3/17
  * Time: 21:28
  */
+use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Disk\Directory;
 class Template extends  MagicObject {
     /**

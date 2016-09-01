@@ -6,7 +6,6 @@ namespace Zodream\Infrastructure\Mailer;
 * @author Jason
 * @time 2015-11-29
 */
-use Zodream\Infrastructure\Config;
 
 class Mailer extends BaseMailer {
 	/**
@@ -15,6 +14,7 @@ class Mailer extends BaseMailer {
 	protected $mail;
 	
 	public function __construct() {
+	    $this->loadConfigs();
 		$this->mail          = new \PHPMailer;
 		$this->mail->CharSet = 'UTF-8';
 		$this->mail->isSMTP();
@@ -23,11 +23,10 @@ class Mailer extends BaseMailer {
 		if (defined('DEBUG') && DEBUG) {
 			$this->mail->SMTPDebug = 1;
 		}
-		$config = Config::getInstance()->get('mail');
-		$email = empty($config['email']) ? $config['user'] : $config['email'];
-		$name = empty($config['name']) ? $email : $config['name'];
-		$this->setHost($config['host'], $config['port'])
-			->setUser($config['user'], $config['password'])
+		$email = empty($this->configs['email']) ? $this->configs['user'] : $this->configs['email'];
+		$name = empty($this->configs['name']) ? $email : $this->configs['name'];
+		$this->setHost($this->configs['host'], $this->configs['port'])
+			->setUser($this->configs['user'], $this->configs['password'])
 			->setFrom($email, $name);
 	}
 

@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Database;
  * Date: 2016/5/14
  * Time: 9:07
  */
+use Zodream\Infrastructure\Base\ConfigObject;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Database\Engine\BaseEngine;
 use Zodream\Infrastructure\Database\Engine\Pdo;
@@ -14,7 +15,7 @@ use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
-class Command {
+class Command extends ConfigObject {
 
     use SingletonPattern;
 
@@ -26,6 +27,8 @@ class Command {
 
     protected $cacheLife = 3600;
 
+    protected $configKey = 'db';
+
     /**
      * @var BaseEngine[]
      */
@@ -33,11 +36,9 @@ class Command {
 
     protected $currentName = '__default';
 
-    protected $configs = [];
-
     public function __construct() {
         Factory::timer()->record('dbInit');
-        $configs = Config::getInstance()->get('db');
+        $configs = Config::getValue($this->configKey);
         if (!is_array(current($configs))) {
             $configs = [
                 $this->currentName => $configs

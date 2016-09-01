@@ -7,7 +7,7 @@ namespace Zodream\Domain;
  */
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Traits\SingletonPattern;
-use Zodream\Infrastructure\MagicObject;
+use Zodream\Infrastructure\Base\MagicObject;
 
 class Autoload extends MagicObject {
 	

@@ -5,20 +5,24 @@ namespace Zodream\Infrastructure\Caching;
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Base\ConfigObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-abstract class Cache implements \ArrayAccess {
+abstract class Cache extends ConfigObject implements \ArrayAccess {
 
 	/**
 	 * gc自动执行的几率 0-1000000；
 	 * @var int
 	 */
-	protected $gcChance = 10;
+    protected $configs = [
+        'gc' => 10
+    ];
 
-	public function setGCChance($chance) {
-		$this->gcChance = intval($chance);
-		return $this;
-	}
+    protected $configKey = 'cache';
+
+    protected function getGC() {
+        return $this->configs['gc'];
+    }
 	
 	public function filterKey($key) {
 		if (is_string($key)) {
@@ -70,7 +74,7 @@ abstract class Cache implements \ArrayAccess {
 	
 	abstract protected function clearValue();
 	
-	public function offsetExists ($key) {
+	public function offsetExists($key) {
 		return $this->has($key);
 	}
 
@@ -78,7 +82,7 @@ abstract class Cache implements \ArrayAccess {
 	 * @param string $key
 	 * @return array|string
 	 */
-	public function offsetGet ($key) {
+	public function offsetGet($key) {
 		return $this->get($key);
 	}
 
@@ -86,7 +90,7 @@ abstract class Cache implements \ArrayAccess {
 	 * @param string $key
 	 * @param string|array $value
 	 */
-	public function offsetSet ($key, $value) {
+	public function offsetSet($key, $value) {
 		$this->set($key, $value);
 	}
 
@@ -94,7 +98,7 @@ abstract class Cache implements \ArrayAccess {
 	 * @param string $key
 	 * @internal param $offset
 	 */
-	public function offsetUnset ($key) {
+	public function offsetUnset($key) {
 		$this->delete($key);
 	}
 }

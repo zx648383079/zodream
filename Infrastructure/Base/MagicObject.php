@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Base;
 /**
 * object 的扩展
 * 主要增加get、set、has 方法，及使用魔术变量
@@ -9,7 +9,6 @@ namespace Zodream\Infrastructure;
 use ArrayIterator;
 use ArrayAccess;
 use IteratorAggregate;
-use Zodream\Infrastructure\Base\Object;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class MagicObject extends Object implements ArrayAccess, IteratorAggregate {
