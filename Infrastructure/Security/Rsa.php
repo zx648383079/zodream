@@ -3,17 +3,25 @@ namespace Zodream\Infrastructure\Security;
 
 
 
-class Rsa {
+use Zodream\Infrastructure\Disk\File;
+
+class Rsa extends BaseSecurity {
     protected $privateKey;
 
     protected $publicKey;
 
     public function setPublicKey($key) {
+        if ($key instanceof File) {
+            $key = $key->read();
+        }
         $this->publicKey = openssl_pkey_get_public($key);
         return $this;
     }
 
     public function setPrivateKey($key) {
+        if ($key instanceof File) {
+            $key = $key->read();
+        }
         $this->privateKey = openssl_pkey_get_private($key);
         return $this;
     }
@@ -79,5 +87,23 @@ class Rsa {
         $encrypted = '';
         openssl_private_decrypt(base64_decode($data), $encrypted, $this->publicKey);
         return $encrypted;
+    }
+
+    /**
+     * ENCRYPT STRING
+     * @param string $data
+     * @return string
+     */
+    public function encrypt($data) {
+        return $this->publicKeyEncrypt($data);
+    }
+
+    /**
+     * DECRYPT STRING
+     * @param string $data
+     * @return string
+     */
+    public function decrypt($data) {
+        return $this->decryptPublicEncrypt($data);
     }
 }

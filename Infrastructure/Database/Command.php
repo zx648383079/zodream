@@ -38,19 +38,34 @@ class Command extends ConfigObject {
 
     public function __construct() {
         Factory::timer()->record('dbInit');
-        $configs = Config::getValue($this->configKey);
-        if (!is_array(current($configs))) {
-            $configs = [
-                $this->currentName => $configs
-            ];
+        $this->loadConfigs();
+        if (!array_key_exists($this->currentName, $this->configs)) {
+            $this->currentName = key($this->configs);
         }
-        if (!array_key_exists($this->currentName, $configs)) {
-            $this->currentName = key($configs);
-        }
-        $this->configs = $configs;
         if (isset($this->table)) {
             $this->setTable($this->table);
         }
+    }
+
+    /**
+     * ADD 2D ARRAY
+     * @param array $args
+     * @return $this
+     */
+    public function setConfigs(array $args) {
+        if (!is_array(current($args))) {
+            $args = [
+                $this->currentName => $args
+            ];
+        }
+        foreach ($args as $key => $item) {
+            if (array_key_exists($key, $this->configs)) {
+                $this->configs[$key] = array_merge($this->configs[$key], $item);
+            } else {
+                $this->configs[$key] = $item;
+            }
+        }
+        return $this;
     }
 
     /**

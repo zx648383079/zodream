@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Security;
  * Date: 2016/8/9
  * Time: 13:13
  */
-class Encrypt {
+class Encrypt extends BaseSecurity {
     protected $key;
 
     public function setKey($key) {

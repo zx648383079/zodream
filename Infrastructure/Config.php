@@ -58,7 +58,7 @@ class Config extends MagicObject {
 		}
 		$common  = $this->_getConfig(static::getPath().'config.php');
 		$this->set(ArrayExpand::merge2D((array)$configs, 
-			(array)$common, (array)$personal), (array)$args);
+			(array)$common, (array)$personal, (array)$args));
 	}
 
 	/**

@@ -6,13 +6,21 @@ namespace Zodream\Infrastructure\Session;
  * Date: 2016/3/6
  * Time: 9:56
  */
+use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Error\Error;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+
 class DatabaseCache extends Session {
 
+    protected $configs = [
+        'table' => 'session'
+    ];
     /**
-     * @var \Zodream\Domain\Model
+     * @return Command
      */
-    private $_model;
+    protected function command() {
+        return Command::getInstance()->setTable('session');
+    }
 
     public function useCustomStorage() {
         return true;
@@ -26,43 +34,37 @@ class DatabaseCache extends Session {
             return;
         }
         $newID = session_id();
-        $row = $this->_model->findById($oldID);
-        if (!empty($row)) {
+        $data = $this->command()->select('WHERE id = ? LIMIT 1', '*', [$newID]);
+        if (!empty($data)) {
             if ($deleteOldSession) {
-                $this->_model->updateById($oldID, array(
-                    'id' => $newID
-                ));
+                $this->command()->update('id = ?', 'id = ?', [$newID, $oldID]);
             } else {
+                $row = current($data);
                 $row['id'] = $newID;
-                $this->_model->add($row);
+                $this->command()->insert('`'.implode('`,`', array_keys($row)).'`',
+                    StringExpand::repeat('?', count($row)), array_values($row));
             }
         } else {
-            $this->_model->add(array(
-                'id' => $newID
-            ));
+            $this->command()->insert('id', '?', [$newID]);
         }
     }
 
     public function readSession($id) {
-        $data = $this->_model->findOne(array(
-            'expire > '.time(),
-            'id = '.$id
-        ), 'data');
-        return empty($data) ? '' : $data['data'];
+        $data = $this->command()
+            ->select('WHERE id = ? AND expire > '.time().' LIMIT 1', 'data', [$id]);
+        if (empty($data)) {
+            return '';
+        }
+        return current($data)['data'];
     }
 
     public function writeSession($id, $data) {
         try {
-            $exists = $this->_model->findById($id);
+            $exists = $this->command()->select('WHERE id = ? LIMIT 1', '*', [$id]);
             if (empty($exists)) {
-                $this->_model->add(array(
-                    'id' => $id,
-                    'data' => $data
-                ));
+                $this->command()->insert('id, data', '?, ?', [$id, $data]);
             } else {
-                unset($exists['id']);
-                $exists['data'] = $data;
-                $this->_model->updateById($id, $exists);
+                $this->command()->update('data = ?', 'id = ?', [$data, $id]);
             }
         } catch (\Exception $e) {
             Error::out('WRITESESSION FAIL', __FILE__, __LINE__);
@@ -71,15 +73,12 @@ class DatabaseCache extends Session {
     }
 
     public function destroySession($id) {
-        $this->_model->deleteById($id);
-
+        $this->command()->delete('id = ?', [$id]);
         return true;
     }
 
     public function gcSession($maxLifetime) {
-        $this->_model->delete(array(
-            'expire < '.time()
-        ));
+        $this->command()->delete('expire < '.time());
         return true;
     }
 }

@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Security;
  * Date: 2016/8/9
  * Time: 12:14
  */
-class Aes {
+class Aes extends BaseSecurity {
     protected $key;
 
     public function setKey($key) {
@@ -28,11 +28,6 @@ class Aes {
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);
         return base64_encode($data);
-    }
-
-    protected function pkcs5Pad ($text, $blockSize) {
-        $pad = $blockSize - (strlen($text) % $blockSize);
-        return $text . str_repeat(chr($pad), $pad);
     }
 
     public function decrypt($data) {

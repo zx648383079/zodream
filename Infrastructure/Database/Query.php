@@ -277,6 +277,11 @@ class Query extends BaseQuery {
         return $this->addParam($params);
     }
 
+    /**
+     * @param $condition
+     * @param array $params
+     * @return Query
+     */
     public function andHaving($condition, $params = array()) {
         $this->having[] = array(
             $condition,
@@ -285,6 +290,11 @@ class Query extends BaseQuery {
         return $this->addParam($params);
     }
 
+    /**
+     * @param $condition
+     * @param array $params
+     * @return Query
+     */
     public function orHaving($condition, $params = array()) {
         $this->having[] = array(
             $condition,
@@ -293,6 +303,11 @@ class Query extends BaseQuery {
         return $this->addParam($params);
     }
 
+    /**
+     * ORDER SQL
+     * @param array|string $args
+     * @return static
+     */
     public function order($args) {
         if (!is_array($args)) {
             $args = func_get_args();

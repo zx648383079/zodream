@@ -11,11 +11,20 @@ use Zodream\Infrastructure\Base\ConfigObject;
 
 class Session extends ConfigObject implements \ArrayAccess {
 
-    public $flashParam = '__flash';
+    protected $configKey = 'session';
+
+    protected $configs = [
+        'flashParam' => '__flash',
+        'savePath' => false
+    ];
 
     private $_cookieParams = array(
         'httponly' => true
     );
+
+    public function __construct() {
+        $this->loadConfigs();
+    }
 
     public function useCustomStorage() {
         return false;
@@ -33,7 +42,10 @@ class Session extends ConfigObject implements \ArrayAccess {
         $this->_setCookieParamsInternal();
         $this->useCookie(true);
         $this->useTransparentSessionID(false);
-        $this->savePath(APP_DIR.'/temp');
+        if (is_string($this->configs['savePath']) &&
+            is_dir($this->configs['savePath'])) {
+            $this->savePath(APP_DIR.'/temp');
+        }
         @session_start();
     }
 

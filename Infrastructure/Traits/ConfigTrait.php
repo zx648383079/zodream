@@ -8,16 +8,6 @@ namespace Zodream\Infrastructure\Traits;
  */
 use Zodream\Infrastructure\Config;
 trait ConfigTrait {
-    /**
-     * CONFIGS
-     * @var array
-     */
-    protected $configs = [];
-    /**
-     * KEY IN CONFIG
-     * @var string
-     */
-    protected $configKey;
 
     /**
      * SET CONFIGS

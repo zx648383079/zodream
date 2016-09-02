@@ -16,8 +16,11 @@ use Zodream\Infrastructure\Traits\ConfigTrait;
 use Zodream\Infrastructure\Url\Uri;
 
 abstract class ThirdParty extends MagicObject {
-
-    use ConfigTrait;
+    /**
+     * KEY IN CONFIG
+     * @var string
+     */
+    protected $configKey;
 
     const GET = 'GET';
     const POST = 'POST';

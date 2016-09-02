@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Security;
  * Date: 2016/8/9
  * Time: 11:55
  */
-class Des {
+class Des extends BaseSecurity {
     protected $key;
 
     /**
@@ -50,7 +50,7 @@ class Des {
 
     public function decrypt($data) {
         $arg = mcrypt_decrypt(
-            MCRYPT_RIJNDAEL_256,
+            $this->size,
             $this->key,
             base64_decode($data),
             MCRYPT_MODE_ECB,
