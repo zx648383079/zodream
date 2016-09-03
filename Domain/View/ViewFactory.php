@@ -21,7 +21,15 @@ use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
 class ViewFactory extends MagicObject {
 
+    protected $configKey = 'view';
+    protected $configs = [
+        'driver' => null,
+        'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
+        'suffix' => '.php',
+        'assets' => '/'
+    ];
     use ConfigTrait;
+
 
     /**
      * @var Directory
@@ -55,13 +63,7 @@ class ViewFactory extends MagicObject {
     protected $sections = [];
     
     public function __construct() {
-        $this->configKey = 'view';
-        $this->configs = Config::getValue($this->configKey, [
-            'driver' => null,
-            'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
-            'suffix' => '.php',
-            'assets' => '/'
-        ]);
+        $this->loadConfigs();
         if (class_exists($this->configs['driver'])) {
             $class = $this->configs['driver'];
             $this->engine = new $class($this);

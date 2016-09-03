@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure;
  * Date: 2016/6/24
  * Time: 22:57
  */
+use Zodream\Infrastructure\Response;
 use Zodream\Domain\Debug\Timer;
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
@@ -77,17 +78,24 @@ class Factory {
      * @return Router
      */
     public static function router() {
-        return self::getInstance('_____', Router::class);
+        return self::getInstance('Router', Router::class);
     }
 
     /**
      * I WANT TO SEND HEADERS WHEN REQUEST FINISH! 
      *      BUT NOW IT'S NOT FINISH!
      *          WOW! PLEASE WAIT A LITTLE TIME.
-     * @return Headers
+     * @return Header
      */
     public static function header() {
-        return self::getInstance('headers', Header::class);
+        return static::response()->header;
+    }
+
+    /**
+     * @return Response
+     */
+    public static function response() {
+        return self::getInstance('response', Response::class);
     }
 
     /**
@@ -95,7 +103,7 @@ class Factory {
      * @return ViewFactory
      */
     public static function view() {
-        return self::getInstance('______', ViewFactory::class);
+        return self::getInstance('ViewFactory', ViewFactory::class);
     }
 
     /**
@@ -103,7 +111,7 @@ class Factory {
      * @return Timer
      */
     public static function timer() {
-        return self::getInstance('____', Timer::class);
+        return self::getInstance('Timer', Timer::class);
     }
 
     /**

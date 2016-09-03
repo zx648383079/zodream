@@ -8,15 +8,12 @@ namespace Zodream\Domain\Controller;
  */
 use Zodream\Domain\Access\Auth;
 use Zodream\Domain\Html\VerifyCsrfToken;
-use Zodream\Domain\Response\AjaxResponse;
-use Zodream\Domain\Response\BaseResponse;
-use Zodream\Domain\Response\HtmlResponse;
-use Zodream\Domain\Response\RedirectResponse;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Event\EventManger;
+use Zodream\Infrastructure\Response;
 use Zodream\Infrastructure\Url\Url;
 
 abstract class BaseController extends Action {
@@ -162,8 +159,8 @@ abstract class BaseController extends Action {
 	 *
 	 * @param string $name 视图的文件名
 	 * @param array $data 要传的数据
-	 * @return BaseResponse
-	 */
+	 * @return Response
+     */
 	public function show($name = null, $data = array()) {
 		if (is_array($name)) {
 			$data = $name;
@@ -176,15 +173,21 @@ abstract class BaseController extends Action {
 			$pattern = 'Service.'.APP_MODULE.'.(.+)'.APP_CONTROLLER;
 			$name = preg_replace('/^'.$pattern.'$/', '$1', get_called_class()).'/'.$name;
 		}
-		return new HtmlResponse(Factory::view()->render($name, $data));
+		return Factory::response()->sendHtml(Factory::view()->render($name, $data));
 	}
 
-	public function ajax($data, $type = AjaxResponse::JSON) {
-		return new AjaxResponse($data, $type);
+	public function ajax($data, $type = 'json') {
+	    switch (strtolower($type)) {
+            case 'xml':
+                return Factory::response()->sendXml($data);
+            case 'jsonp':
+                return Factory::response()->sendJsonp($data);
+        }
+		return Factory::response()->sendJson($data);
 	}
 
-	public function redirect($url, $time = 0, $message = null, $status = 200) {
-		return new RedirectResponse($url, $time, $message, $status);
+	public function redirect($url, $time = 0) {
+		return Factory::response()->sendRedirect(Url::to($url), $time);
 	}
 
 	public function goHome() {

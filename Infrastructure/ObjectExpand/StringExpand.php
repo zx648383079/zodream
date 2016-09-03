@@ -7,10 +7,15 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 use Zodream\Infrastructure\Error\Error;
+
 class StringExpand {
-	// 获取值
+    /**
+     * 获取值
+     * @param string $value
+     * @return mixed
+     */
 	public static function value($value) {
-		return $value instanceof \Closure ? $value() : $value;
+		return is_callable($value) ? call_user_func($value) : $value;
 	}
 	
 	public static function formatSize($size) { 

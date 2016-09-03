@@ -41,7 +41,7 @@ class Cookie {
 	 * @param boolean $httpOnly 是否只通过http协议 不允许js等脚本进入，防止xss
 	 */
 	public static function set($name, $value = '', $expire = 0, $path = null, $domain = null, $secure = FALSE, $httpOnly = FALSE) {
-		setcookie($name, $value, time() + $expire, $path, $domain, $secure, $httpOnly);
+		Factory::response()->header->setCookie($name, $value, time() + $expire, $path, $domain, $secure, $httpOnly);
 	}
 	
 	/**
@@ -51,6 +51,6 @@ class Cookie {
 	 * @param string $name 名称
 	 */
 	public static function delete($name) {
-		setcookie($name, '', time() - 3600);
+		Factory::response()->header->removeCookie($name);
 	}
 }

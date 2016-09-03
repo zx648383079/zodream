@@ -37,7 +37,8 @@ class Application {
 			->shutDown();
 		Cookie::restore();
 		EventManger::getInstance()->run('appRun');
-		$route = Factory::router()->run(new DefaultUri());
+		$route = Factory::router()
+            ->run(new DefaultUri());
 		return $route->run();
 	}
 }

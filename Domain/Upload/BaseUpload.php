@@ -7,10 +7,18 @@ namespace Zodream\Domain\Upload;
  * Date: 2016/6/28
  * Time: 14:17
  */
+ use Zodream\Infrastructure\Base\ConfigObject;
  use Zodream\Infrastructure\Disk\File;
  use Zodream\Infrastructure\FileSystem;
  
-abstract class BaseUpload {
+abstract class BaseUpload extends ConfigObject {
+
+    protected $configKey = 'upload';
+
+    protected $configs = [
+        'allowType' => ['png', 'jpg', 'jpeg', 'bmp', 'gif'],
+        'maxSize' => 2000000
+    ];
 
     protected $name;
 

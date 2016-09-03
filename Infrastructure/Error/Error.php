@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Error;
 * @author Jason
 */
 use Zodream\Domain\Response\ResponseResult;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Url\Url;
 use Zodream\Infrastructure\Log;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
@@ -46,10 +47,9 @@ class Error{
 	 */
 	public static function out($error, $file = null, $line = null) {
 		$errorInfo = "ERROR: {$error} , in {$file} on line {$line}, URL:".Url::to();
-		if (defined('APP_MODULE')) {   //作为插件使用时
+		if (!defined('APP_MODULE')) {   //作为插件使用时
 			Log::out(TimeExpand::format('Y-m-d').'.txt', TimeExpand::format().':'.$errorInfo. "\r\n");
-			ResponseResult::sendError($errorInfo)->send();
-			exit();
+			exit($errorInfo);
 		}
 		if (DEBUG) {
 			throw (new Exception($error, '200'))->setFile($file)->setLine($line);

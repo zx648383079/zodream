@@ -5,14 +5,11 @@ namespace Zodream\Infrastructure\Url;
  * 单个路由
  * @author Jason
  */
-use Zodream\Domain\Response\BaseResponse;
-use Zodream\Domain\Response\HtmlResponse;
-use Zodream\Domain\Response\View;
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Response;
 
 class Route {
 
@@ -88,7 +85,7 @@ class Route {
 
 	/**
 	 * 执行路由
-	 * @return ResponseObject
+	 * @return Response
 	 */
 	public function run() {
 		return $this->parseResponse($this->runAction());
@@ -115,13 +112,13 @@ class Route {
 
 	/**
 	 * @param $response
-	 * @return BaseResponse
+	 * @return Response
 	 */
 	protected function parseResponse($response) {
-		if ($response instanceof BaseResponse) {
+		if ($response instanceof Response) {
 			return $response;
 		}
-		return new HtmlResponse($response);
+		return new Response($response);
 	}
 
 	/**

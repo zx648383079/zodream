@@ -72,4 +72,18 @@ class Excel implements ExpertObject {
             echo "\n";
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->title .'.xls';
+    }
+
+    /**
+     * @return string
+     */
+    public function getType() {
+        return 'xls';
+    }
 }

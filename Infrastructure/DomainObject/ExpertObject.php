@@ -8,6 +8,16 @@ namespace Zodream\Infrastructure\DomainObject;
  * Time: 18:21
  */
 interface ExpertObject {
+
+    /**
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * @return string
+     */
+    public function getType();
     /**
      * 开始
      * @return mixed

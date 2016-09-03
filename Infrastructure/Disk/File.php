@@ -33,7 +33,35 @@ class File extends FileObject {
             $this->directory = $args['dirname'];
         }
     }
-    
+
+    /**
+     * SET REAL NAME
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name) {
+        $this->name = $name;
+        $arg = pathinfo($name, PATHINFO_EXTENSION);
+        if (!empty($arg)) {
+            $this->extension = $arg;
+        }
+        return $this;
+    }
+
+    /**
+     * SET EXTENSION
+     * @param string $arg
+     * @return $this
+     */
+    public function setExtension($arg) {
+        $this->extension = ltrim($arg, '.');
+        return $this;
+    }
+
+    /**
+     * GET EXTENSION
+     * @return string
+     */
     public function getExtension() {
         return $this->extension;
     }
