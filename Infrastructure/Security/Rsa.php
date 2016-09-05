@@ -44,7 +44,9 @@ class Rsa extends BaseSecurity {
             return false;
         }
         $encrypted = '';
-        openssl_private_encrypt($data, $encrypted, $this->privateKey);
+        if (!openssl_private_encrypt($data, $encrypted, $this->privateKey)) {
+            return false;
+        }
         return base64_encode($encrypted);
     }
 
@@ -58,7 +60,9 @@ class Rsa extends BaseSecurity {
             return false;
         }
         $encrypted = '';
-        openssl_public_encrypt($data, $encrypted, $this->privateKey);
+        if (!openssl_public_encrypt($data, $encrypted, $this->publicKey)) {
+            return false;
+        }
         return base64_encode($encrypted);
     }
 
@@ -72,7 +76,9 @@ class Rsa extends BaseSecurity {
             return false;
         }
         $encrypted = '';
-        openssl_public_decrypt(base64_decode($data), $encrypted, $this->publicKey);
+        if (!openssl_public_decrypt(base64_decode($data), $encrypted, $this->publicKey)) {
+            return false;
+        }
         return $encrypted;
     }
     /**
@@ -85,7 +91,9 @@ class Rsa extends BaseSecurity {
             return false;
         }
         $encrypted = '';
-        openssl_private_decrypt(base64_decode($data), $encrypted, $this->publicKey);
+        if (!openssl_private_decrypt(base64_decode($data), $encrypted, $this->privateKey)) {
+            return false;
+        }
         return $encrypted;
     }
 

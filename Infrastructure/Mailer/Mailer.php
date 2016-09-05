@@ -1,11 +1,13 @@
 <?php 
 namespace Zodream\Infrastructure\Mailer;
+
 /**
 * mail
 * 
 * @author Jason
 * @time 2015-11-29
 */
+use Zodream\Infrastructure\Template;
 
 class Mailer extends BaseMailer {
 	/**
@@ -144,6 +146,17 @@ class Mailer extends BaseMailer {
 		$this->mail->AltBody = $altBody;
 		return $this->mail->send();
 	}
+
+	public function sendTemplate($file, array $args, $subject) {
+	    $template = new Template();
+        $template->set($args);
+        if (is_dir($this->configs['template'])) {
+            return $this->send($subject, $template->getText($file));
+        }
+        return $this->send($subject,
+            $template->replaceByArray($this->configs['template'],
+                $template->get()));
+    }
 	
 	/**
 	 * 获取错误信息

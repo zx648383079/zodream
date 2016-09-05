@@ -8,6 +8,8 @@ namespace Zodream\Infrastructure;
  */
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Disk\Directory;
+use Zodream\Infrastructure\Disk\File;
+
 class Template extends  MagicObject {
     /**
      * @var Directory
@@ -53,7 +55,7 @@ class Template extends  MagicObject {
      * @return bool|mixed
      */
     public function getText($file) {
-        $file = $this->directory->childFile($file);
+        $file = is_file($file) ? new File($file) : $this->directory->childFile($file);
         if (!$file->exist()) {
             return false;
         }
