@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Domain\ThirdParty\OAuth;
-use Zodream\Infrastructure\Request;
 
 /**
  * Created by PhpStorm.
@@ -8,6 +7,8 @@ use Zodream\Infrastructure\Request;
  * Date: 2016/9/7
  * Time: 9:19
  */
+use Zodream\Infrastructure\Request;
+
 class WeiMoB extends BaseOAuth {
 
     protected $apiMap = [
