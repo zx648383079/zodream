@@ -25,6 +25,26 @@ use Zodream\Infrastructure\ThirdParty;
  */
 abstract class BaseOAuth extends ThirdParty {
 
+    protected $baseUrl = '';
+
+    public function getBaseUrl() {
+        return $this->baseUrl;
+    }
+
+    public function getMap($name) {
+        $map = parent::getMap($name);
+        $baseUrl = $this->getBaseUrl();
+        if (empty($baseUrl)) {
+            return $map;
+        }
+        if (is_array($map[0])) {
+            $map[0][0] = $baseUrl.$map[0][0];
+        } else {
+            $map[0] = $baseUrl.$map[0];
+        }
+        return $map;
+    }
+
     public function callback() {
         $state = Request::get('state');
         if (empty($state) || $state != Factory::session()->get('state')) {

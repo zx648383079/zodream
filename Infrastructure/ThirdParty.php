@@ -62,6 +62,18 @@ abstract class ThirdParty extends MagicObject {
         return $this->configKey;
     }
 
+    /**
+     * GET MAP BY NAME
+     * @param string $name
+     * @return array
+     */
+    public function getMap($name) {
+        if (array_key_exists($name, $this->apiMap)){
+            throw new \InvalidArgumentException('api调用名称错误,不存在的API');
+        }
+        return $this->apiMap[$name];
+    }
+
     protected function httpGet($url) {
         $args = $this->http->setUrl($url)->get();
         $this->log([$url, self::GET, $args]);
@@ -80,11 +92,8 @@ abstract class ThirdParty extends MagicObject {
      * @return mixed|null|string
      */
     protected function getByApi($name, $args = array()) {
-        if (array_key_exists($name, $this->apiMap)){
-            throw new \InvalidArgumentException('api调用名称错误,不存在的API');
-        }
         $args += $this->get();
-        $map = $this->apiMap[$name];
+        $map = $this->getMap($name);
         $url = new Uri();
         if (is_array($map[0])) {
             return $this->httpPost(
@@ -109,7 +118,7 @@ abstract class ThirdParty extends MagicObject {
      * @return Uri
      */
     protected function getUrl($name, array $args = array()) {
-        $map = $this->apiMap[$name];
+        $map = $this->getMap($name);
         $args += $this->get();
         $uri = new Uri();
         if (is_array($map[0])) {

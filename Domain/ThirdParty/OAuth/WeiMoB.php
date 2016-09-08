@@ -11,6 +11,8 @@ use Zodream\Infrastructure\Request;
 
 class WeiMoB extends BaseOAuth {
 
+    protected $configKey = 'weimob';
+
     protected $apiMap = [
         'login' => [
             'https://dopen.weimob.com/fuwu/b/oauth2/authorize',
@@ -24,15 +26,19 @@ class WeiMoB extends BaseOAuth {
             ]
         ],
         'access' => [
-            'https://dopen.weimob.com/fuwu/b/oauth2/token',
             [
-                '#client_id',
-                '#client_secret',
-                'grant_type' => 'authorization_code',
-                '#code',
-                '#redirect_uri',
-                'state'
-            ]
+                'https://dopen.weimob.com/fuwu/b/oauth2/token',
+                [
+                    '#client_id',
+                    '#client_secret',
+                    'grant_type' => 'authorization_code',
+                    '#code',
+                    '#redirect_uri',
+                    'state'
+                ]
+            ],
+            [],
+            'POST'
         ],
         'info' => [
             'http://dopen.weimob.com/api/1_0/open/usercenter/getWeimobUserInfo',
