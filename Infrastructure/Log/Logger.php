@@ -1,12 +1,16 @@
 <?php
 namespace Zodream\Infrastructure\Log;
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/9/8
  * Time: 14:23
+ *
  */
-class Logger {
+use Psr\Log\LoggerInterface;
+
+class Logger implements LoggerInterface {
     protected $logs;
 
     public function __construct() {

@@ -8,6 +8,9 @@ namespace Zodream\Infrastructure;
  * Date: 2016/6/24
  * Time: 22:57
  */
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Zodream\Infrastructure\Response;
 use Zodream\Domain\Debug\Timer;
 use Zodream\Domain\View\ViewFactory;
@@ -122,5 +125,17 @@ class Factory {
             static::$_instance['root'] = new Directory(APP_DIR);
         }
         return static::$_instance['root'];
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public static function log() {
+        if (!array_key_exists('log', static::$_instance)) {
+            $log = new Logger('ZoDream');
+            $log->pushHandler(new StreamHandler(static::root()->childFile('log/app.log'), Logger::WARNING));
+            static::$_instance['log'] = $log;
+        }
+        return static::$_instance['log'];
     }
 }

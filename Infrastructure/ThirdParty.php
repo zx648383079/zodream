@@ -239,7 +239,7 @@ abstract class ThirdParty extends MagicObject {
             if (is_array($arg)) {
                 $arg = print_r($arg,true);
             };
-            return Log::out('http_'.time(), $arg);
+            return Factory::log()->info('http_'.time(), $arg);
         }
         return false;
     }
