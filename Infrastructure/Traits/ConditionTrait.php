@@ -32,11 +32,11 @@ trait ConditionTrait {
 	 * @return null|string
 	 */
 	public function cas($condition, $value = null) {
-		if (null !== $value) {
+		if (!is_null($value)) {
 			$this->_switchValue = $value;
 		}
-		if ((null === $this->_switchCondition && true === $condition) ||
-			($this->_switchCondition !== null && $this->_switchCondition == $condition)) {
+		if ((is_null($this->_switchCondition) && true === $condition) ||
+			(!is_null($this->_switchCondition) && $this->_switchCondition == $condition)) {
 			return $this->_switchValue;
 		}
 		return null;

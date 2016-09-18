@@ -34,7 +34,13 @@ abstract class Cache extends ConfigObject implements \ArrayAccess {
 	public function get($key) {
 		return $this->getValue($this->filterKey($key));
 	}
-	
+
+    /**
+     * SET CACHE
+     * @param string $key
+     * @param string $value
+     * @param int $duration
+     */
 	public function set($key, $value = null, $duration = null) {
 		if (is_array($key) && null === $value && null === $duration) {
 			foreach ($key as $k => $v) {

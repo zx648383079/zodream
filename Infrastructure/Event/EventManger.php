@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure\Event;
  * Time: 9:13
  */
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
 class EventManger {
@@ -61,7 +62,9 @@ class EventManger {
     }
 
     public function run($event, $args = array()) {
-        if (!$this->canAble || !isset($this->events[$event]) || !($this->events[$event] instanceof Event)) {
+        if (!$this->canAble ||
+            !isset($this->events[$event]) ||
+            !($this->events[$event] instanceof Event)) {
             return;
         }
         $this->events[$event]->run($args);

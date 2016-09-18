@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Infrastructure\Event;
+use Zodream\Infrastructure\Factory;
+
 /**
  * Created by PhpStorm.
  * User: zx648

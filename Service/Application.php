@@ -35,7 +35,7 @@ class Application {
 		Autoload::getInstance()
 			->setError()
 			->shutDown();
-		Cookie::restore();
+		//Cookie::restore();
 		EventManger::getInstance()->run('appRun');
 		$route = Factory::router()
             ->run(new DefaultUri());

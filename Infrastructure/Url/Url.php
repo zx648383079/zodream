@@ -21,48 +21,54 @@ class Url {
 
     /**
      * 产生网址
-     * @param string $file
-     * @param array|string|\Closure $extra
+     * @param string|array|Uri $file
+     * @param array|string|bool $extra
      * @param bool $complete
      * @return string|Uri
      */
 	public static function to($file = null, $extra = null, $complete = false) {
-	    if ($file instanceof Uri) {
-	        $file->addData($extra);
-	        return $file;
-        }
         if (is_string($file) &&
-            ($file === '#' || strpos($file, 'javascript:') != false)) {
+            ($file === '#' || strpos($file, 'javascript:') == 0)) {
             return $file;
+        }
+	    if (!$file instanceof Uri) {
+	        $file = static::createUri($file);
         }
         if (is_bool($extra)) {
             $complete = $extra;
             $extra = null;
         }
-        $uri = new Uri();
-		if (is_array($file)) {
-			foreach ($file as $key => $item) {
-				if (is_integer($key)) {
-					$uri->decode(static::getPath($item));
-					continue;
-				}
-				$uri->addData($key, (string)$item);
-			}
-			if (empty($uri->getPath())) {
-                $uri->decode(static::getPath(null));
-            }
-		} else {
-		    $uri->decode(static::getPath($file));
-        }
         if (!empty($extra)) {
-            $uri->setData($extra);
+            $file->addData($extra);
         }
-        if ($complete && empty($uri->getHost())) {
-            $uri->setScheme(self::isSsl() ? 'https' : 'http')
+        if ($complete && empty($file->getHost())) {
+            $file->setScheme(self::isSsl() ? 'https' : 'http')
                 ->setHost(self::getHost());
         }
-        return $uri;
+        return $file;
 	}
+
+    /**
+     * CREATE URI BY STRING OR ARRAY
+     * @param array|string $file
+     * @return Uri
+     */
+	public static function createUri($file) {
+        $uri = new Uri();
+        if (!is_array($file)) {
+            return $uri->decode(static::getPath($file));
+        }
+        $path = null;
+        $data = array();
+        foreach ($file as $key => $item) {
+            if (is_integer($key)) {
+                $path = $item;
+                continue;
+            }
+            $data[$key] = (string)$item;
+        }
+        return $uri->decode(static::getPath($path))->addData($data);
+    }
 
 	protected static function getPath($path) {
 	    if (empty($path) || $path === '0') {
@@ -164,7 +170,8 @@ class Url {
 	}
 
 	public static function getUriWithoutParam() {
-		return explode('?', self::getUri())[0];
+	    $arg = explode('?', self::getUri());
+		return current($arg);
 	}
 	
 	/**

@@ -5,14 +5,11 @@ namespace Zodream\Domain\Model;
  *
  * @author Jason
  */
-use Zodream\Domain\Filter\DataFilter;
 use Zodream\Domain\Filter\ModelFilter;
-use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Database\Query;
 use Zodream\Infrastructure\Database\Record;
 use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 
 abstract class Model extends MagicObject {
@@ -62,7 +59,7 @@ abstract class Model extends MagicObject {
 
 	/**
 	 * 主键
-	 * @var string
+	 * @var array
 	 */
 	protected $primaryKey = [
 		'id'
@@ -254,7 +251,10 @@ abstract class Model extends MagicObject {
 		$this->runBehavior(self::AFTER_INSERT);
 		return $row;
 	}
-	
+
+    /**
+     * @return Record
+     */
 	protected function getRecord() {
 		return (new Record())->from(static::$table);
 	}
@@ -278,7 +278,7 @@ abstract class Model extends MagicObject {
 
 	/**
 	 * 自动获取条件
-	 * @return array
+	 * @return array|bool
 	 */
 	protected function getWhereKey() {
 		foreach ($this->primaryKey as $item) {
@@ -286,7 +286,7 @@ abstract class Model extends MagicObject {
 				return [$item => $this->get($item)];
 			}
 		}
-		return fasle;
+		return false;
 	}
 
 	/**
@@ -391,8 +391,8 @@ abstract class Model extends MagicObject {
 	 * @param array|string $param 条件
 	 * @param string $field
 	 * @param array $parameters
-	 * @return static|bool
-	 */
+	 * @return static|boolean
+     */
 	public static function findOne($param, $field = '*', $parameters = array()) {
 		$model = new static;
 		if (is_numeric($param)) {

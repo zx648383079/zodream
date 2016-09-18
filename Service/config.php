@@ -31,7 +31,7 @@ $configs = array(
 	),
 	'db'     => array(							//MYSQL数据库的信息
 		'driver'   => Zodream\Infrastructure\Database\Pdo::class,
-		'host'     => 'localhost',                //服务器
+		'host'     => '127.0.0.1',                //服务器
 		'port'     => '3306',						//端口
 		'database' => 'test',					//数据库
 		'user'     => 'root',						//账号
