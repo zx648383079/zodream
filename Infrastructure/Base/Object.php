@@ -27,6 +27,6 @@ abstract class Object {
      * @return array
      */
     public function toArray() {
-        return [];
+        return array();
     }
 }

@@ -73,7 +73,9 @@ class Common extends ThirdParty {
         ),
         'taoBaoIP' => array(
             'http://ip.taobao.com/service/getIpInfo.php',
-            '#ip'
+            array(
+                '#ip'
+            )
         )
     );
 
@@ -96,8 +98,10 @@ class Common extends ThirdParty {
 
     public function getAddressByIp($ip = null) {
         if (empty($ip)) {
-            return $this->getJson('sinaIp');
+            return $this->getJson('sinaIP');
         }
-        return $this->getJson('taoBaoIP');
+        return $this->getJson('taoBaoIP', array(
+            'ip' => $ip
+        ));
     }
 }

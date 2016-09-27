@@ -68,21 +68,21 @@ abstract class ThirdParty extends MagicObject {
      * @return array
      */
     public function getMap($name) {
-        if (array_key_exists($name, $this->apiMap)){
-            throw new \InvalidArgumentException('api调用名称错误,不存在的API');
+        if (!array_key_exists($name, $this->apiMap)){
+            throw new \InvalidArgumentException('API NOT EXIST!');
         }
         return $this->apiMap[$name];
     }
 
     protected function httpGet($url) {
         $args = $this->http->setUrl($url)->get();
-        $this->log([$url, self::GET, $args]);
+        $this->log(array($url, self::GET, $args));
         return $args;
     }
 
     protected function httpPost($url, $data) {
         $args = $this->http->setUrl($url)->post($data);
-        $this->log([$url, $data, self::POST, $args]);
+        $this->log(array($url, $data, self::POST, $args));
         return $args;
     }
 
@@ -140,7 +140,7 @@ abstract class ThirdParty extends MagicObject {
      * @return array
      */
     protected function getData(array $keys, array $args) {
-        $data = [];
+        $data = array();
         foreach ($keys as $key => $item) {
             if (is_array($item)) {
                 $item = $this->chooseData($item, $args);
@@ -207,7 +207,8 @@ abstract class ThirdParty extends MagicObject {
     }
 
     protected function checkEmpty($value) {
-        return !(new RequiredFilter())->validate($value);
+        $filter = new RequiredFilter();
+        return !$filter->validate($value);
     }
 
     /**
