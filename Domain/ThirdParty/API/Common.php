@@ -63,6 +63,17 @@ class Common extends ThirdParty {
                 '#toCurrency',
                 '#amount'
             )
+        ),
+        'sinaIP' => array(
+            'http://int.dpool.sina.com.cn/iplookup/iplookup.php',
+            array(
+                'format' => 'json',
+                'ip'
+            )
+        ),
+        'taoBaoIP' => array(
+            'http://ip.taobao.com/service/getIpInfo.php',
+            '#ip'
         )
     );
 
@@ -81,5 +92,12 @@ class Common extends ThirdParty {
             'toCurrency' => $to,
             'amount' => $amount
         ));
+    }
+
+    public function getAddressByIp($ip = null) {
+        if (empty($ip)) {
+            return $this->getJson('sinaIp');
+        }
+        return $this->getJson('taoBaoIP');
     }
 }

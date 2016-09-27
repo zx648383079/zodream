@@ -6,11 +6,20 @@ namespace Zodream\Infrastructure\Http;
  * User: zx648
  * Date: 2016/8/17
  * Time: 13:49
+ * Update: 2016-09-27  ADD FORMAT
  */
 use Zodream\Infrastructure\Disk\File;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Url\Uri;
 
 class Curl {
+
+    const JSON = 'JSON';
+
+    const XML = 'XML';
+
+    const NONE = 'NONE';
     /**
      * @var resource
      */
@@ -24,6 +33,8 @@ class Curl {
     protected $result = null;
 
     protected $isWith = false;
+
+    protected $format = self::NONE;
 
     public function __construct($url = null) {
         $this->curl = curl_init();
@@ -47,6 +58,14 @@ class Curl {
                 ->setOption(CURLOPT_SSLVERSION, 1);
         }
         return $this->setOption(CURLOPT_URL, (string)$url);
+    }
+
+    /**
+     * SET FORMAT
+     * @param string $format JSON or XML or NONE
+     */
+    public function setFormat($format) {
+        $this->format = strtoupper($format);
     }
 
     /**
@@ -105,6 +124,12 @@ class Curl {
             $this->close();
         } else {
             $this->isWith = false;
+        }
+        if ($this->format == self::JSON) {
+            return JsonExpand::decode($this->result);
+        }
+        if ($this->format == self::XML) {
+            return XmlExpand::decode($this->result);
         }
         return $this->result;
     }
