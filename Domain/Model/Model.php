@@ -476,6 +476,40 @@ abstract class Model extends MagicObject {
 		return $args;
 	}
 
+    /**
+     * @param $args
+     * @param int $index
+     * @param int $size
+     * @param array $parameters
+     * @return \Zodream\Domain\Html\Page
+     */
+    public static function findPage($args,
+                                    $index = 0,
+                                    $size = 20,
+                                    $parameters = array()) {
+        if (!is_array($args) ||
+            (!array_key_exists('where', $args) &&
+                !array_key_exists('group', $args) &&
+                !array_key_exists('order', $args) &&
+                !array_key_exists('having', $args)) ) {
+            $args = array(
+                'where' => $args
+            );
+        }
+        $page = static::find()
+            ->addParam($parameters)
+            ->load($args)->page($index, $size);
+        $data = [];
+        foreach ($page->getPage() as $item) {
+            $model = new static;
+            $model->set($item);
+            $model->isNewRecord = false;
+            $args[] = $model;
+        }
+        $page->setPage($data);
+        return $page;
+    }
+
 
 	/**
 	 * 总记录
