@@ -52,7 +52,7 @@ class DataFilter {
 	}
 
 	private static function setError($key, $error) {
-		if (!array_key_exists($key, self::$_error)) {
+		if (!array_key_exists($key, self::$error)) {
 			self::$error[$key] = array();
 		}
 		self::$error[$key][] = $error;

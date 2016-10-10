@@ -13,6 +13,7 @@ use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Request;
 
 class WeChat extends BasePay {
+    protected $configKey = 'wechat';
 
     protected $apiMap = [
         'order' => [

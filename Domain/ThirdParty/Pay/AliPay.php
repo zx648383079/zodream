@@ -8,8 +8,13 @@ namespace Zodream\Domain\ThirdParty\Pay;
  * Time: 15:21
  */
 use Zodream\Infrastructure\Error\FileException;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+use Zodream\Infrastructure\Url\Uri;
+use Zodream\Infrastructure\Url\Url;
 
 class AliPay extends BasePay {
+
+    protected $configKey = 'alipay';
 
     protected $apiMap = [
         'query' => [
@@ -32,7 +37,36 @@ class AliPay extends BasePay {
                 ]
             ]
         ],
-        'pay' => [
+        'pay' => [    //app
+            'https://openapi.alipay.com/gateway.do',
+            [
+                '#app_id',
+                'method' => 'alipay.trade.app.pay',
+                'format' => 'JSON',
+                'charset' => 'utf-8',
+                'sign_type' => 'RSA',
+                'sign',
+                '#timestamp', // yyyy-MM-dd HH:mm:ss,
+                'version' => '1.0',
+                '#notify_url',
+                'app_auth_token',
+                '#biz_content' => [
+                    'body',
+                    'scene' => 'bar_code',   //bar_code,wave_code
+                    '#auth_code',
+                    'discountable_amount',
+                    'undiscountable_amount',
+                    'extend_params',
+                    'royalty_info',
+                    'sub_merchant',
+                    '#subject',
+                    '#out_trade_no',
+                    '#total_amount',
+                    'seller_id'
+                ]
+            ]
+        ],
+        'appPay' => [    //app
             '',
             [
                 '#app_id',
@@ -43,7 +77,7 @@ class AliPay extends BasePay {
                 'sign',
                 '#timestamp', // yyyy-MM-dd HH:mm:ss,
                 'version' => '1.0',
-                'app_auth_token',
+                '#notify_url',
                 '#biz_content' => [
                     'body',
                     '#subject',
@@ -123,7 +157,7 @@ class AliPay extends BasePay {
     public function rsaEncrypt($data) {
         //转换为openssl格式密钥
         $res = openssl_get_publickey($this->publicKeyFile->read());
-        $blocks = $this->splitCN($data, 0, 30, $charset);
+        $blocks = $this->splitCN($data, 0, 30, 'utf-8');
         $chrtext  = null;
         $encodes  = array();
         foreach ($blocks as $n => $block) {
@@ -132,7 +166,7 @@ class AliPay extends BasePay {
             }
             $encodes[] = $chrtext ;
         }
-        $chrtext = implode(",", $encodes);
+        $chrtext = implode(',', $encodes);
 
         return $chrtext;
     }
@@ -228,12 +262,27 @@ class AliPay extends BasePay {
      */
     public function callback() {
         $data = [];
-         foreach ($_GET as $key => $item) {
-             $data[$key] = urldecode($item);
-         }
+        foreach ($_GET as $key => $item) {
+            $data[$key] = urldecode($item);
+        }
         if (!$this->verify($data, base64_decode($data['sign']))) {
             return false;
         }
         return $data;
+    }
+
+    public function getAppPayOrder($arg = array()) {
+        $data = $this->getData($this->getMap('appPay')[1], array_merge($this->get(), $arg));
+        $data['biz_content'] = JsonExpand::encode($data['biz_content']);
+        $data['sign'] = $this->sign($data);
+        return $data;
+    }
+
+    public function getPayUrl($arg = array()) {
+        $data = $this->getData($this->getMap('pay')[1], array_merge($this->get(), $arg));
+        $data['biz_content'] = JsonExpand::encode($data['biz_content']);
+        $data['sign'] = $this->sign($data);
+        $uri = new Uri();
+        return $uri->decode($this->getMap('pay')[0])->setData($data);
     }
 }

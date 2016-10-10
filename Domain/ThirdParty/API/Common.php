@@ -88,7 +88,7 @@ class Common extends ThirdParty {
      * @return array
      */
     public function exchange($from, $to, $amount = 1) {
-        $this->http->setHeader('apikey', $this->get('apikey'));
+        $this->http->setHeader(['apikey' => $this->get('apikey')]);
         return $this->getJson('exchange', array(
             'fromCurrency' => $from,
             'toCurrency' => $to,

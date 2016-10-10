@@ -12,7 +12,7 @@ class RequiredFilter extends FilterObject {
         if (is_string($arg)) {
             return trim($arg) !== '';
         }
-        if (!is_array()) {
+        if (!is_array($arg)) {
             return true;
         }
         foreach ($arg as $item) {
