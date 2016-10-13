@@ -76,6 +76,13 @@ class PayPal extends BaseOAuth {
         return $this->baseUrl[$this->mode];
     }
 
+    public function callback() {
+        if (!parent::callback()) {
+            return false;
+        }
+        return $this->getAccess();
+    }
+
     /**
      * GET ACCESS
      * @return array
