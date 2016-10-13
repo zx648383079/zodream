@@ -19,12 +19,6 @@ use Zodream\Infrastructure\Url\Uri;
  * @package Zodream\Infrastructure\Http
  */
 class Curl {
-
-    const JSON = 'JSON';
-
-    const XML = 'XML';
-
-    const NONE = 'NONE';
     /**
      * @var resource
      */
@@ -36,11 +30,6 @@ class Curl {
     protected $header;
 
     protected $result = null;
-
-    protected $isWith = false;
-
-    protected $format = self::NONE;
-
     public function __construct($url = null) {
         $this->curl = curl_init();
         if (!empty($url)) {
@@ -55,7 +44,7 @@ class Curl {
      */
     public function setUrl($url) {
         if (!$url instanceof Uri) {
-            $url = new Uri();
+            $url = new Uri($url);
         }
         if ($url->getScheme() == 'https') {
             $this->setOption(CURLOPT_SSL_VERIFYPEER, FALSE)
@@ -63,14 +52,6 @@ class Curl {
                 ->setOption(CURLOPT_SSLVERSION, 1);
         }
         return $this->setOption(CURLOPT_URL, (string)$url);
-    }
-
-    /**
-     * SET FORMAT
-     * @param string $format JSON or XML or NONE
-     */
-    public function setFormat($format) {
-        $this->format = strtoupper($format);
     }
 
     /**
@@ -129,35 +110,7 @@ class Curl {
         $this->header = curl_getinfo($this->curl);
         $this->header['error'] = curl_error($this->curl);
         $this->header['errorNo'] = curl_errno($this->curl);
-        if (!$this->isWith) {
-            $this->close();
-        } else {
-            $this->isWith = false;
-        }
-        if ($this->format == self::JSON) {
-            return JsonExpand::decode($this->result);
-        }
-        if ($this->format == self::XML) {
-            return XmlExpand::decode($this->result);
-        }
         return $this->result;
-    }
-
-    /**
-     * 连续执行
-     * @return $this
-     */
-    public function with() {
-        $this->isWith = true;
-        return $this;
-    }
-
-    /**
-     * GET IS WITH
-     * @return bool
-     */
-    public function isWith() {
-        return $this->isWith;
     }
 
     /**
@@ -236,9 +189,7 @@ class Curl {
      * @return string
      */
     public function get() {
-        return $this
-            ->setCommonOption()
-            ->execute();
+        return $this->setCommonOption()->execute();
     }
 
     /**
@@ -279,8 +230,7 @@ class Curl {
      * @return mixed|null
      */
     public function delete() {
-        return $this->setCommonOption()
-            ->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE')->execute();
+        return $this->setOption(CURLOPT_CUSTOMREQUEST, 'DELETE')->execute();
     }
 
     /**

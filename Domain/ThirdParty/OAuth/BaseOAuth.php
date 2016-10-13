@@ -6,13 +6,10 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Date: 2016/4/10
  * Time: 14:34
  */
-use Zodream\Domain\Response\Redirect;
-use Zodream\Domain\Response\RedirectResponse;
-use Zodream\Infrastructure\Error\Error;
+use Zodream\Domain\ThirdParty\ThirdParty;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\ThirdParty;
 
 /**
  * Class BaseOAuth
@@ -23,7 +20,7 @@ use Zodream\Infrastructure\ThirdParty;
  * @property string $sex
  * @property string #avatar
  */
-abstract class BaseOAuth extends ThirdParty {
+abstract class BaseOAuth extends ThirdParty  {
 
     protected $baseUrl = '';
 
@@ -68,7 +65,7 @@ abstract class BaseOAuth extends ThirdParty {
     }
     
     public function redirect($name) {
-        return new RedirectResponse($this->getUrl($name));
+        return Factory::response()->sendRedirect($this->getUrl($name));
     }
 
     /**

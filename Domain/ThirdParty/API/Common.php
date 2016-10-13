@@ -1,8 +1,9 @@
 <?php
 namespace Zodream\Domain\ThirdParty\API;
 
-use Zodream\Infrastructure\ThirdParty;
-class Common extends ThirdParty {
+use Zodream\Domain\ThirdParty\ThirdParty;
+
+class Common extends ThirdParty  {
 
     protected $apiMap = array(
         'weather' => array(

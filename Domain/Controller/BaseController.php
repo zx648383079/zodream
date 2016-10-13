@@ -187,7 +187,8 @@ abstract class BaseController extends Action {
 	}
 
 	public function redirect($url, $time = 0) {
-		return Factory::response()->sendRedirect(Url::to($url), $time);
+		return Factory::response()
+            ->sendRedirect(Url::to($url), $time);
 	}
 
 	public function goHome() {

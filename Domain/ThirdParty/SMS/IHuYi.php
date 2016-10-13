@@ -7,6 +7,7 @@ namespace Zodream\Domain\ThirdParty\SMS;
  * Date: 2016/5/12
  * Time: 15:13
  */
+use Zodream\Domain\ThirdParty\ThirdParty;
 
 /**
  * Class IHuYi
@@ -16,8 +17,7 @@ namespace Zodream\Domain\ThirdParty\SMS;
  * @property string $account 账户
  * @property string $password 密码 可以是32位md5加密过的
  */
-use Zodream\Infrastructure\ThirdParty;
-class IHuYi extends ThirdParty {
+class IHuYi extends ThirdParty  {
 
     protected $configKey = 'sms';
 

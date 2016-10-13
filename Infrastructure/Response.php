@@ -347,7 +347,12 @@ class Response {
         return $this->setParameter($expert);
     }
 
-    public function sendRedirect(Uri $url, $time = 0) {
+    /**
+     * @param Uri|string $url
+     * @param int $time
+     * @return $this
+     */
+    public function sendRedirect($url, $time = 0) {
         $this->header->setRedirect($url, $time);
         return $this;
     }

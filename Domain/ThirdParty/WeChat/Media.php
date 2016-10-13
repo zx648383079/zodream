@@ -138,15 +138,13 @@ class Media extends BaseWeChat {
     }
 
     public function addMedia($file, $type, $title = null, $introduction = null) {
-        if ($type == self::VIDEO) {
-            //$this->http->with();
-        }
         $args = $this->getJson('addMedia', [
             'type' => $type,
             'media' => '@'.$file
         ]);
         if ($type == self::VIDEO) {
-            $args = $this->json($this->http->post([
+            $args = $this->json($this->http
+                ->request(false)->post([
                 'description' => json_encode([
                     'title' => $title,
                     'introduction' => $introduction

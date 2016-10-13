@@ -6,8 +6,8 @@ namespace Zodream\Domain\ThirdParty\API;
  * Date: 2016/7/27
  * Time: 12:03
  */
+use Zodream\Domain\ThirdParty\ThirdParty;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
-use Zodream\Infrastructure\ThirdParty;
 
 class Search extends ThirdParty {
     protected $apiMap = [

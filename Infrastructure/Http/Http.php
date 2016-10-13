@@ -179,11 +179,12 @@ class Http {
 
     /**
      * CREATE CURL
+     * @param bool $isNew
      * @return Curl
      */
-    public function request() {
-        if (!$this->curl instanceof Curl || !$this->curl->isWith()) {
-            $this->curl = new Curl();
+    public function request($isNew = true) {
+        if (!$this->curl instanceof Curl || $isNew) {
+            $this->create();
         }
         $this->curl->setUrl($this->url);
         $this->curl->setHeader($this->header->toArray())
@@ -195,5 +196,17 @@ class Http {
             $this->curl->setCookieFile($this->cookieFile);
         }
         return $this->curl;
+    }
+
+    /**
+     * CLOSE AND CREATE NEW CURL
+     * @return $this
+     */
+    public function create() {
+        if ($this->curl instanceof Curl) {
+            $this->curl->close();
+        }
+        $this->curl = new Curl();
+        return $this;
     }
 }

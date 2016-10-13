@@ -1,14 +1,15 @@
 <?php
 namespace Zodream\Domain\ThirdParty\API;
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/6/2
  * Time: 12:55
  */
-use Zodream\Infrastructure\ThirdParty;
+use Zodream\Domain\ThirdParty\ThirdParty;
 
-class Microsoft extends ThirdParty {
+class Microsoft extends ThirdParty  {
 
     protected $apiMap = array(
         'faceScore' => array(

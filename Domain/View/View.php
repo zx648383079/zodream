@@ -12,6 +12,7 @@ use Zodream\Infrastructure\Error\FileException;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 use Zodream\Infrastructure\Traits\ConditionTrait;
+use Zodream\Infrastructure\Url\Url;
 
 /**
  * Class View
@@ -162,6 +163,16 @@ class View {
      */
     public function t($message, $param = [], $name = 'app') {
         return Factory::i18n()->translate($message, $param, $name);
+    }
+
+    /**
+     * GET COMPLETE URL
+     * @param null $file
+     * @param null $extra
+     * @return string|\Zodream\Infrastructure\Url\Uri
+     */
+    public function url($file = null, $extra = null) {
+        return Url::to($file, $extra, true);
     }
 
     public function extend($name, $data = array()) {

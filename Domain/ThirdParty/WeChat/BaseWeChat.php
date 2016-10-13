@@ -1,14 +1,15 @@
 <?php
 namespace Zodream\Domain\ThirdParty\WeChat;
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/8/19
  * Time: 22:27
  */
-use Zodream\Infrastructure\ThirdParty;
+use Zodream\Domain\ThirdParty\ThirdParty;
 
-abstract class BaseWeChat extends ThirdParty {
+abstract class BaseWeChat extends ThirdParty  {
     protected $configKey = 'wechat';
 
 
