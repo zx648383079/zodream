@@ -271,7 +271,7 @@ class WeChat extends BasePay {
         //curl_setopt($ch,CURLOPT_SSLKEY,getcwd().'/private.pem');
 
         //第二种方式，两个文件合成一个.pem文件
-        $this->http->setOption(CURLOPT_SSLCERT, (string)$this->privateKeyFile);
+        $this->http->addOption(CURLOPT_SSLCERT, (string)$this->privateKeyFile);
         $args = $this->xml(
             $this->httpPost($this->apiMap['query'][0],
                 XmlExpand::encode($data, 'xml'

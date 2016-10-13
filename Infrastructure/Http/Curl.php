@@ -13,6 +13,11 @@ use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Url\Uri;
 
+/**
+ * MAKE CURL WITH MY KIND
+ * Class Curl
+ * @package Zodream\Infrastructure\Http
+ */
 class Curl {
 
     const JSON = 'JSON';
@@ -98,6 +103,7 @@ class Curl {
      * @return Curl
      */
     public function setHeader(array $args) {
+        $header = [];
         foreach ($args as $key => $item) {
             $key = implode('-', array_map('ucfirst', explode('-', strtolower($key))));
             if (empty($item)) {
@@ -107,6 +113,9 @@ class Curl {
                 $item = implode(',', $item);
             }
             $header[] = $key. ':'. $item;
+        }
+        if (empty($header)) {
+            return $this;
         }
         return $this->setOption(CURLOPT_HTTPHEADER, $header);
     }
@@ -141,6 +150,14 @@ class Curl {
     public function with() {
         $this->isWith = true;
         return $this;
+    }
+
+    /**
+     * GET IS WITH
+     * @return bool
+     */
+    public function isWith() {
+        return $this->isWith;
     }
 
     /**
@@ -205,6 +222,9 @@ class Curl {
      * @return Curl
      */
     public function setCookie($cookie) {
+        if (empty($cookie)) {
+            return $this;
+        }
         if (is_array($cookie)) {
             $cookie = http_build_query($cookie);
         }

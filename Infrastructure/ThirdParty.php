@@ -9,10 +9,9 @@ namespace Zodream\Infrastructure;
  */
 use Zodream\Domain\Filter\Filters\RequiredFilter;
 use Zodream\Infrastructure\Base\MagicObject;
-use Zodream\Infrastructure\Http\Curl;
+use Zodream\Infrastructure\Http\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
-use Zodream\Infrastructure\Traits\ConfigTrait;
 use Zodream\Infrastructure\Url\Uri;
 
 abstract class ThirdParty extends MagicObject {
@@ -35,14 +34,14 @@ abstract class ThirdParty extends MagicObject {
     protected $apiMap = array();
 
     /**
-     * @var Curl
+     * @var Http
      */
     protected $http;
 
     protected $error;
 
     public function __construct($config = array()) {
-        $this->http = new Curl();
+        $this->http = new Http();
         if (empty($config)) {
             $this->set(Config::getValue($this->configKey));
             return;
@@ -75,13 +74,18 @@ abstract class ThirdParty extends MagicObject {
     }
 
     protected function httpGet($url) {
-        $args = $this->http->setUrl($url)->get();
+        $args = $this->http
+            ->setUrl($url)
+            ->request()
+            ->get();
         $this->log(array($url, self::GET, $args));
         return $args;
     }
 
     protected function httpPost($url, $data) {
-        $args = $this->http->setUrl($url)->post($data);
+        $args = $this->http->setUrl($url)
+            ->request()
+            ->post($data);
         $this->log(array($url, $data, self::POST, $args));
         return $args;
     }
@@ -206,6 +210,11 @@ abstract class ThirdParty extends MagicObject {
         return $this->json($this->getByApi($name, $args), $isArray);
     }
 
+    /**
+     * CHECK IS EMPTY
+     * @param $value
+     * @return bool
+     */
     protected function checkEmpty($value) {
         $filter = new RequiredFilter();
         return !$filter->validate($value);

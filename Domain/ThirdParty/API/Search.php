@@ -27,8 +27,9 @@ class Search extends ThirdParty {
      */
     public function putBaiDu(array $args) {
         return JsonExpand::decode($this->http
-            ->setHeader('Content-Type', 'text/plain')
-            ->post($this->getUrl('baidu'), implode("\n", $args)));
+            ->addHeaders(['Content-Type', 'text/plain'])
+            ->setUrl($this->getUrl('baidu'))
+            ->request()->post(implode("\n", $args)));
     }
 
 

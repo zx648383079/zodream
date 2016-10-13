@@ -40,6 +40,11 @@ class Http {
     protected $data = [];
 
     /**
+     * @var Curl
+     */
+    protected $curl;
+
+    /**
      * @var Header
      */
     protected $header;
@@ -53,11 +58,6 @@ class Http {
      * @var array
      */
     protected $cookie = [];
-
-    /**
-     * @var Curl
-     */
-    protected $curl;
 
     protected $options = [];
 
@@ -167,7 +167,33 @@ class Http {
         return $this;
     }
 
+    /**
+     * ADD headers
+     * @param array $headers
+     * @return $this
+     */
+    public function addHeaders(array $headers) {
+        $this->header->set($headers);
+        return $this;
+    }
+
+    /**
+     * CREATE CURL
+     * @return Curl
+     */
     public function request() {
-        $this->curl = new Curl($this->url);
+        if (!$this->curl instanceof Curl || !$this->curl->isWith()) {
+            $this->curl = new Curl();
+        }
+        $this->curl->setUrl($this->url);
+        $this->curl->setHeader($this->header->toArray())
+            ->setOption($this->options);
+        if (!empty($this->cookie)) {
+            $this->curl->setCookie($this->cookie);
+        }
+        if ($this->cookieFile instanceof File) {
+            $this->curl->setCookieFile($this->cookieFile);
+        }
+        return $this->curl;
     }
 }

@@ -36,7 +36,8 @@ class PayPal extends BaseOAuth {
                 'grant_type' => 'authorization_code',
                 '#code',
                 '#redirect_uri'
-            ]
+            ],
+            'POST'
         ],
         'refresh' => [
             'webapps/auth/protocol/openidconnect/v1/identity/tokenservice',
@@ -75,12 +76,33 @@ class PayPal extends BaseOAuth {
         return $this->baseUrl[$this->mode];
     }
 
+    /**
+     * GET ACCESS
+     * @return array
+     */
+    public function getAccess() {
+        $this->http->addHeaders(array(
+            'Content-Type' => 'application/json',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Authorization' => 'Basic ' . base64_encode($this->get('client_id') .
+                    ':' . $this->get('client_secret'))
+        ));
+
+        $access = $this->getJson('access');
+        $this->set($access);
+        return $access;
+    }
 
     /**
      * 获取用户信息
      * @return array
      */
     public function getInfo() {
+        $this->http->addHeaders(array(
+            'Content-Type' => 'application/json',
+            'Authorization' => "Bearer " . $this->get('access_token'),
+            'Content-Type' => 'x-www-form-urlencoded'
+        ));
         $user = $this->getJson('info');
         if (!is_array($user) || !array_key_exists('user_id', $user)) {
             return false;
