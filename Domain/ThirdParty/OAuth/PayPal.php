@@ -60,7 +60,16 @@ class PayPal extends BaseOAuth {
      *
      * @var bool
      */
-    protected $mode = self::LIVE;
+    protected $mode = self::SANDBOX;
+
+    public function __construct(array $config) {
+        parent::__construct($config);
+        $this->http->setOption(array(
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => FALSE,
+            //CURLOPT_SSLVERSION => 2
+        ));
+    }
 
     /**
      * IS TEST OR LIVE
