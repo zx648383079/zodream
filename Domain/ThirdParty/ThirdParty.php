@@ -9,6 +9,7 @@ namespace Zodream\Domain\ThirdParty;
  */
 use Zodream\Domain\Filter\Filters\RequiredFilter;
 use Zodream\Infrastructure\Base\MagicObject;
+use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Http\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
@@ -188,7 +189,7 @@ abstract class ThirdParty extends MagicObject {
      */
     protected function chooseData(array $item, array $args) {
         $data = $this->getData($item, $args);
-        if (empty($choose)) {
+        if (empty($data)) {
             throw new \InvalidArgumentException('MANY\'ONE IS NEED!');
         }
         return $data;

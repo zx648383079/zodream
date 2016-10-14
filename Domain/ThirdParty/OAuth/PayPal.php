@@ -67,7 +67,7 @@ class PayPal extends BaseOAuth {
         $this->http->setOption(array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => FALSE,
-            //CURLOPT_SSLVERSION => 2
+            CURLOPT_SSLVERSION => 3
         ));
     }
 

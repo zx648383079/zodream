@@ -85,7 +85,7 @@ class AliPay extends BasePay {
                     'timeout_express',
                     '#total_amount',
                     'seller_id',
-                    '#product_code'
+                    'product_code' => 'QUICK_MSECURITY_PAY'
                 ]
             ]
         ]
