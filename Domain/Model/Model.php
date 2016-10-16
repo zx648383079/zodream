@@ -6,8 +6,8 @@ namespace Zodream\Domain\Model;
  * @author Jason
  */
 use Zodream\Domain\Filter\ModelFilter;
-use Zodream\Infrastructure\Database\Query;
-use Zodream\Infrastructure\Database\Record;
+use Zodream\Infrastructure\Database\Query\Query;
+use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Request;
@@ -232,7 +232,7 @@ abstract class Model extends MagicObject {
 	 * @param string $key
 	 * @return array
 	 */
-	public function hasMany($table, $link, $key) {
+	public function hasMany($table, $link, $key = 'id') {
 		return (new Query())
 			->from($table)
 			->where([$link => $this->get($key)])
@@ -256,7 +256,7 @@ abstract class Model extends MagicObject {
      * @return Record
      */
 	protected function getRecord() {
-		return (new Record())->from(static::$table);
+		return (new Record())->setTable(static::$table);
 	}
 
 	/**
@@ -268,7 +268,7 @@ abstract class Model extends MagicObject {
 	 * @return int 返回最后插入的ID,
 	 */
 	public function add(array $addData) {
-		return $this->getRecord()->load($addData)->insert();
+		return $this->getRecord()->set($addData)->insert();
 	}
 
 	public function addValues(array $columns, array $values = null) {
@@ -327,8 +327,8 @@ abstract class Model extends MagicObject {
 		}
 		$this->runBehavior(self::BEFORE_UPDATE);
 		$row = $this->getRecord()
-			->load($this->getUpdateData())
-			->whereMany($where)
+            ->set($this->getUpdateData())
+            ->whereMany($where)
 			->update();
 		$this->runBehavior(self::AFTER_UPDATE);
 		return $row;

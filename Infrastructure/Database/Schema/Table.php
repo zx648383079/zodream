@@ -36,7 +36,12 @@ class Table extends BaseQuery {
 
     protected $comment = null;
 
-    public function __construct($table, $data = [], $engine = self::MyISAM, $charset = 'UTF8') {
+    public function __construct(
+        $table,
+        $data = [],
+        $engine = self::MyISAM,
+        $charset = 'UTF8'
+    ) {
         $this->tableName = $this->addPrefix($table);
         $this->_data = $data;
         $this->engine = $engine;

@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Query;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -8,10 +8,16 @@ namespace Zodream\Infrastructure\Database;
  */
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-class Record extends Query {
+class Record extends BaseQuery  {
     
     protected $parameters = [];
-    
+
+    /**
+     * ADD PARAM
+     * @param $key
+     * @param null $value
+     * @return $this
+     */
     public function addParam($key, $value = null) {
         if (is_object($key)) {
             $key = (array)$key;
@@ -27,6 +33,11 @@ class Record extends Query {
         return $this;
     }
 
+    /**
+     * HAS PARAMETERS
+     * @param $key
+     * @return bool
+     */
     public function hasParam($key) {
         return array_key_exists($key, $this->parameters);
     }
@@ -46,25 +57,18 @@ class Record extends Query {
     }
 
     /**
-     * @param array $args
+     * SET TABLE
+     * @param $table
      * @return $this
      */
-    public function load(array $args) {
-        $this->_data = $args;
-        return $this;
-    }
-
-    public function setTable($table = null) {
-        if (is_null($table)) {
-            $table = current($this->from);
-        }
+    public function setTable($table) {
         $this->command()->setTable($table);
         return $this;
     }
 
 
     /**
-     * 新增记录
+     * INSERT RECORD
      *
      * @access public
      *
@@ -72,8 +76,7 @@ class Record extends Query {
      */
     public function insert() {
         $addFields = implode('`,`', array_keys($this->_data));
-        return $this->setTable()
-            ->command()
+        return $this->command()
             ->insert("`{$addFields}`", StringExpand::repeat('?', count($this->_data)),
                 array_values($this->_data));
     }
@@ -110,11 +113,14 @@ class Record extends Query {
             $args[] = '(' . implode(', ', $arg) . ')';
         }
 
-        return $this->setTable()
-            ->command()
+        return $this->command()
             ->insert(implode(', ', (array)$columns), implode(', ', $args));
     }
 
+    /**
+     * UPDATE
+     * @return mixed
+     */
     public function update() {
         $data = [];
         $parameters = array();
@@ -126,25 +132,38 @@ class Record extends Query {
             $data[] = "`{$key}` = ?";
             $parameters[] = $value;
         }
-        return $this->setTable()
-            ->command()
+        return $this->command()
             ->update(implode(',', $data), $this->getWhere().$this->getLimit(), $parameters);
     }
 
+    /**
+     * INSERT OR REPLACE
+     * @return mixed
+     */
     public function replace() {
         $addFields = implode('`,`', array_keys($this->_data));
-        return $this->setTable()
-            ->command()
+        return $this->command()
             ->insertOrReplace("`{$addFields}`", StringExpand::repeat('?', count($this->_data)),
                 array_values($this->_data));
     }
-    
+
+    /**
+     * DELETE RECORD
+     * @param null $tag
+     * @return mixed
+     */
     public function delete($tag = null) {
         if (func_num_args() > 0) {
             return call_user_func_array('parent::delete', func_get_args());
         }
-        return $this->setTable()
-            ->command()
+        return $this->command()
             ->delete($this->getWhere().$this->getLimit(), $this->parameters);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSql() {
+        return '';
     }
 }

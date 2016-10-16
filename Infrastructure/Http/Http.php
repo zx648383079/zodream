@@ -119,6 +119,16 @@ class Http {
         return $this->addData($key, $value);
     }
 
+    /**
+     * SET DEFAULT OPTION
+     * @param array $option
+     * @return $this
+     */
+    public function setDefaultOption(array $option) {
+        $this->options = $this->options + $option;
+        return $this;
+    }
+
     public function addOption($key, $value = null) {
         if (is_array($key)) {
             $this->options = array_merge($this->options, $key);

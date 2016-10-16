@@ -5,6 +5,7 @@ namespace Zodream\Infrastructure\Url;
  * 单个路由
  * @author Jason
  */
+use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
@@ -13,11 +14,19 @@ use Zodream\Infrastructure\Response;
 
 class Route {
 
+    const PATTERN = '#{([\w_]+)}#i';
+
 	protected $uri;
 
 	protected $methods = [];
 
 	protected $action = [];
+
+    /**
+     * VALIDATE VALUE
+     * @var array
+     */
+    protected $rules = [];
 
 	/**
 	 * Route constructor.
@@ -26,7 +35,7 @@ class Route {
 	 * @param string|object $action
 	 */
 	public function __construct($methods, $uri, $action) {
-		$this->uri = $uri;
+		$this->uri = preg_replace(self::PATTERN, '(?$1:.*?)', $uri);
 		$this->methods = (array) $methods;
 		$this->action = $this->parseAction($action);
 		if (!array_key_exists('param', $this->action)) {
@@ -83,6 +92,24 @@ class Route {
 		return $this->uri;
 	}
 
+    /**
+     * CAN RUN ROUTE
+     * @param string $url
+     * @return bool
+     */
+    public function canRun($url) {
+        if (preg_match('#'.$this->uri.'#', $url, $match, PREG_OFFSET_CAPTURE)) {
+            Request::get(true)->set($match);
+            return true;
+        }
+        return false;
+    }
+
+    public function filter($key, $pattern) {
+        $this->rules[$key] = $pattern;
+        return $this;
+    }
+
 	/**
 	 * 执行路由
 	 * @return Response
@@ -90,8 +117,15 @@ class Route {
 	public function run() {
 		return $this->parseResponse($this->runAction());
 	}
+
+	protected function runFilter() {
+	    if (!DataFilter::validate(Request::get(), $this->rules)) {
+	        throw new \InvalidArgumentException('URL ERROR');
+        }
+    }
 	
 	protected function runAction() {
+	    $this->runFilter();
 		$action = $this->action['uses'];
 		// 排除一个的方法
 		if (is_callable($action) && (!is_string($action) || strpos($action, '\\') > 0)) {

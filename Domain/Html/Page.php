@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Html;
 
-use Zodream\Infrastructure\Database\Query;
+use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Request;
 class Page {
 	private $_total = 0;

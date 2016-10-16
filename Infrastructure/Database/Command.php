@@ -89,6 +89,11 @@ class Command extends ConfigObject {
         return $this->engines[$name];
     }
 
+    /**
+     * GET DATABASE ENGINE
+     * @param string $name
+     * @return BaseEngine
+     */
     public function getEngine($name = null) {
         Factory::timer()->record('dbGet');
         if (is_null($name)) {
@@ -103,6 +108,11 @@ class Command extends ConfigObject {
         throw new \InvalidArgumentException($name. ' DOES NOT HAVE CONFIG!');
     }
 
+    /**
+     * ADD TABLE PREFIX
+     * @param string $table
+     * @return string
+     */
     public function addPrefix($table) {
         if (strpos($table, '!') === 0) {
             return substr($table, 1);
@@ -124,6 +134,10 @@ class Command extends ConfigObject {
         return $this;
     }
 
+    /**
+     * GET TABLE
+     * @return string
+     */
     public function getTable() {
         return $this->table;
     }

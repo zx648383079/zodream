@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Database;
+namespace Zodream\Infrastructure\Database\Schema;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -7,8 +7,9 @@ namespace Zodream\Infrastructure\Database;
  * Time: 9:38
  */
 use Zodream\Infrastructure\Base\MagicObject;
+use Zodream\Infrastructure\Database\Command;
 
-abstract class BaseQuery extends MagicObject {
+abstract class BaseSchema extends MagicObject {
 
     /**
      * @var Command

@@ -57,17 +57,14 @@ class Router {
 			return $this->routes[$method][$url];
 		}
 		if (array_key_exists($method, $this->routes)) {
-			foreach ($this->routes[$method] as $key => $item) {
-				$pattern = str_replace(':num', '[0-9]+', $key);
-				$pattern = str_replace(':any', '[^/]+', $pattern);
-				$pattern = str_replace('/', '\\/', $pattern);
-				if (preg_match('/'.$pattern.'/i', $url, $match)) {
-				    Request::get(true)->set($match);
+			foreach ($this->routes[$method] as $item) {
+			    /** @var $item Route */
+				if ($item->canRun($url)) {
 					return $item;
 				}
 			}
 		}
-		return new Route('GET', $url, $url);
+		return new Route($method, $url, $url);
 	}
 
 
