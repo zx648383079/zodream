@@ -61,7 +61,7 @@ class AliPay extends BasePay {
                     'sub_merchant',
                     '#subject',
                     '#out_trade_no',
-                    '#total_amount',
+                    '#total_amount',    // 只能有两位小数
                     'seller_id'
                 ]
             ]
@@ -83,7 +83,7 @@ class AliPay extends BasePay {
                     '#subject',
                     '#out_trade_no',
                     'timeout_express',
-                    '#total_amount',
+                    '#total_amount',  // 只能有两位小数
                     'seller_id',
                     'product_code' => 'QUICK_MSECURITY_PAY'
                 ]
@@ -273,14 +273,14 @@ class AliPay extends BasePay {
 
     public function getAppPayOrder($arg = array()) {
         $data = $this->getData($this->getMap('appPay')[1], array_merge($this->get(), $arg));
-        $data['biz_content'] = JsonExpand::encode($data['biz_content']);
+        $data['biz_content'] = $this->getSignContent($data['biz_content']);
         $data['sign'] = $this->sign($data);
         return $data;
     }
 
     public function getPayUrl($arg = array()) {
         $data = $this->getData($this->getMap('pay')[1], array_merge($this->get(), $arg));
-        $data['biz_content'] = JsonExpand::encode($data['biz_content']);
+        $data['biz_content'] = $this->getSignContent($data['biz_content']);
         $data['sign'] = $this->sign($data);
         $uri = new Uri();
         return $uri->decode($this->getMap('pay')[0])->setData($data);
