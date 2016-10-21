@@ -13,6 +13,7 @@ class PageLink extends Widget {
 	protected $default = array(
 		'total' => 0, //总条数
 		'pageSize' => 20,
+        'key' => 'page',
 		'index' => 1,
 		'length' => 8, //数字分页显示
 		/**

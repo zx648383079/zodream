@@ -137,10 +137,10 @@ class Curl {
      * @return $this
      */
     public function setCommonOption() {
-        return $this->setOption(CURLOPT_HEADER, 0)
-            ->setOption(CURLOPT_RETURNTRANSFER, 1)
-            ->setOption(CURLOPT_FOLLOWLOCATION, 1)
-            ->setOption(CURLOPT_AUTOREFERER, 1);
+        return $this->setOption(CURLOPT_HEADER, 0)   // 是否输出包含头部
+            ->setOption(CURLOPT_RETURNTRANSFER, 1) // 返回不直接输出
+            ->setOption(CURLOPT_FOLLOWLOCATION, 1)  // 允许重定向
+            ->setOption(CURLOPT_AUTOREFERER, 1);  // 自动设置 referrer
     }
 
     /**

@@ -86,6 +86,7 @@ abstract class ThirdParty extends MagicObject {
     protected function httpPost($url, $data) {
         $args = $this->http->setUrl($url)
             ->request()
+            ->setCommonOption()
             ->post($data);
         $this->log(array($url, $data, self::POST, $args));
         return $args;

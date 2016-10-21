@@ -291,6 +291,9 @@ class WeChat extends BasePay {
      * @return string
      */
     public function sign(array $args) {
+        if (empty($this->key)) {
+            throw new \InvalidArgumentException('KEY IS NEED');
+        }
         ksort($args);
         reset($args);
         $arg = '';
@@ -298,7 +301,7 @@ class WeChat extends BasePay {
             if ($this->checkEmpty($item) || $key == 'sign') {
                 continue;
             }
-            $arg .= "{$key}=$item&";
+            $arg .= "{$key}={$item}&";
         }
         return strtoupper(md5($arg.'key='.$this->key));
     }
