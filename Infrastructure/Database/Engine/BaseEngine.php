@@ -2,7 +2,7 @@
 namespace Zodream\Infrastructure\Database\Engine;
 
 /**
- * 
+ *
  * @author zx648
  *
  */
@@ -33,11 +33,19 @@ abstract class BaseEngine extends ConfigObject {
 	 
 	//私有克隆
 	protected function __clone() {}
-	
-	public function __construct(array $config) {
-        Factory::timer()->record('dbEngineInit');
-		$this->setConfigs($config)->connect();
-        Factory::timer()->record('dbEngineEnd');
+
+    /**
+     * BaseEngine constructor.
+     * @param array|resource|\mysqli|\PDO $config
+     */
+	public function __construct($config) {
+        if (is_array($config)) {
+            Factory::timer()->record('dbEngineInit');
+            $this->setConfigs($config)->connect();
+            Factory::timer()->record('dbEngineEnd');
+            return;
+        }
+        $this->setDriver($config);
 	}
 
 	public function getConfig($key, $default = null) {
@@ -49,6 +57,13 @@ abstract class BaseEngine extends ConfigObject {
 	public function getDriver() {
 		return $this->driver;
 	}
+
+    /**
+     * @param mixed $driver
+     */
+	public function setDriver($driver) {
+	    $this->driver = $driver;
+    }
 
 	public function getVersion() {
 		if (empty($this->version)) {

@@ -70,7 +70,7 @@ class Command extends ConfigObject {
 
     /**
      * @param string $name
-     * @param array $configs
+     * @param array|BaseEngine $configs
      * @return BaseEngine
      */
     public function addEngine($name, $configs) {
