@@ -7,10 +7,10 @@ namespace Zodream\Domain\View;
  * Date: 2016/8/3
  * Time: 9:48
  */
+use LogicException;
 use Zodream\Infrastructure\Traits\ConfigTrait;
 use Zodream\Infrastructure\Url\Url;
 use Zodream\Infrastructure\Caching\FileCache;
-use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\DomainObject\EngineObject;
@@ -22,12 +22,12 @@ use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 class ViewFactory extends MagicObject {
 
     protected $configKey = 'view';
-    protected $configs = [
+    protected $configs = array(
         'driver' => null,
         'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
         'suffix' => '.php',
         'assets' => '/'
-    ];
+    );
     use ConfigTrait;
 
 
@@ -193,7 +193,6 @@ class ViewFactory extends MagicObject {
     /**
      * Start a new section block.
      * @param  string $name
-     * @return null
      * @throws LogicException
      */
     public function start($name) {
@@ -211,7 +210,7 @@ class ViewFactory extends MagicObject {
      */
     public function stop() {
         if (empty($this->sections)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'You must start a section before you can stop it.'
             );
         }

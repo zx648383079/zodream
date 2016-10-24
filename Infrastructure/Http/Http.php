@@ -183,7 +183,7 @@ class Http {
      * @return $this
      */
     public function addHeaders(array $headers) {
-        $this->header->set($headers);
+        $this->header->add($headers);
         return $this;
     }
 

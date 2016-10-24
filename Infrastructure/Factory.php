@@ -81,7 +81,7 @@ class Factory {
      * @return Router
      */
     public static function router() {
-        return self::getInstance('Router', Router::class);
+        return self::getInstance('router', Router::class);
     }
 
     /**
@@ -106,7 +106,7 @@ class Factory {
      * @return ViewFactory
      */
     public static function view() {
-        return self::getInstance('ViewFactory', ViewFactory::class);
+        return self::getInstance('viewFactory', ViewFactory::class);
     }
 
     /**
@@ -114,7 +114,7 @@ class Factory {
      * @return Timer
      */
     public static function timer() {
-        return self::getInstance('Timer', Timer::class);
+        return self::getInstance('timer', Timer::class);
     }
 
     /**

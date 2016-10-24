@@ -62,13 +62,14 @@ class PayPal extends BaseOAuth {
      */
     protected $mode = self::SANDBOX;
 
-    public function __construct(array $config) {
+    public function __construct(array $config = array()) {
         parent::__construct($config);
         $this->http->setOption(array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => FALSE,
             CURLOPT_SSLVERSION => 3
         ));
+        $this->setMode($this->get('mode', self::SANDBOX));
     }
 
     /**

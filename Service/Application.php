@@ -7,13 +7,11 @@ namespace Zodream\Service;
 * @time 2015-12-19
 */
 use Zodream\Domain\Autoload;
-use Zodream\Domain\Debug\Timer;
 use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Cookie;
 use Zodream\Infrastructure\DomainObject\ResponseObject;
 use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Event\EventManger;
+use Zodream\Infrastructure\Response;
 use Zodream\Infrastructure\Url\DefaultUri;
 
 defined('VERSION') or define('VERSION', 2.3);
@@ -27,7 +25,7 @@ class Application {
 	/**
 	 * APP RUN IN THIS
 	 * @param array $configs
-	 * @return ResponseObject
+	 * @return Response
 	 */
 	public static function main($configs = []) {
 	    Factory::timer()->begin();
