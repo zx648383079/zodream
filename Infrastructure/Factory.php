@@ -133,7 +133,8 @@ class Factory {
     public static function log() {
         if (!array_key_exists('log', static::$_instance)) {
             $log = new Logger('ZoDream');
-            $log->pushHandler(new StreamHandler(static::root()->childFile('log/app.log'), Logger::WARNING));
+            $log->pushHandler(new StreamHandler(static::root()
+                ->childFile('log/app.log'), Logger::WARNING));
             static::$_instance['log'] = $log;
         }
         return static::$_instance['log'];

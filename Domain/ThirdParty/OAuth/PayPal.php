@@ -98,8 +98,12 @@ class PayPal extends BaseOAuth {
      * @return array
      */
     public function getAccess() {
+        $this->http->setDefaultOption([
+            CURLOPT_VERBOSE        => 1,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => FALSE
+        ]);
         $this->http->addHeaders(array(
-            'Content-Type' => 'application/json',
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Authorization' => 'Basic ' . base64_encode($this->get('client_id') .
                     ':' . $this->get('client_secret'))

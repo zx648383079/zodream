@@ -10,6 +10,7 @@ namespace Zodream\Domain\ThirdParty;
 use Zodream\Domain\Filter\Filters\RequiredFilter;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\Http\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
@@ -249,7 +250,7 @@ abstract class ThirdParty extends MagicObject {
     public function log($arg) {
         if (defined('DEBUG') && DEBUG) {
             if (is_array($arg)) {
-                $arg = print_r($arg,true);
+                $arg = print_r($arg, true);
             };
             return Factory::log()->info('http_'.time(), $arg);
         }
