@@ -304,7 +304,7 @@ class StringExpand {
 	/**
 	 * 判断字符串是否以$needles开头
 	 * @param string $haystack
-	 * @param string|array $needles
+	 * @param string|array $needles 要寻找的字符串
 	 * @return bool
 	 */
 	public static function startsWith($haystack, $needles) {
@@ -315,6 +315,16 @@ class StringExpand {
 		}
 		return false;
 	}
+
+    /**
+     * 是否以。。。结尾
+     * @param string $search
+     * @param string $arg
+     * @return bool
+     */
+	public static function endWith($arg, $search) {
+	    return strrchr($arg, $search) == $search;
+    }
 
 	/**
 	 * 首字符替换

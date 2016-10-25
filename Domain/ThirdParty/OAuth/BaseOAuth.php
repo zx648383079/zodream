@@ -18,7 +18,7 @@ use Zodream\Infrastructure\Request;
  * @property string $identity
  * @property string $username
  * @property string $sex
- * @property string #avatar
+ * @property string $avatar
  */
 abstract class BaseOAuth extends ThirdParty  {
 

@@ -81,4 +81,92 @@ class PinYin {
         }
         return $result;
     }
+
+    /**
+     * 获取首字母
+     * @param $arg
+     * @return string
+     */
+    public static function getFirst($arg) {
+        $str = iconv('UTF-8', 'gb2312', $arg);//如果程序是gbk的，此行就要注释掉
+        if (!preg_match('/^[\x7f-\xff]/', $str)) {
+            return strtoupper($str[0]);
+        }
+        $firstChar=ord($str{0});
+        if($firstChar >= ord('A') && $firstChar <= ord('z')) {
+            return strtoupper($str{0});
+        }
+        $a = $str;
+        $val = ord($a{0}) * 256 + ord($a{1}) - 65536;
+        if ($val >= -20319 && $val <= -20284)  {
+            return 'A';
+        }
+        if ($val >= -20283 && $val <= -19776) {
+            return 'B';
+        }
+        if ($val >= -19775 && $val <= -19219) {
+            return 'C';
+        }
+        if ($val >= -19218 && $val <= -18711) {
+            return 'D';
+        }
+        if ($val >= -18710 && $val <= -18527) {
+            return 'E';
+        }
+        if ($val >= -18526 && $val <= -18240) {
+            return 'F';
+        }
+        if ($val >= -18239 && $val <= -17923) {
+            return 'G';
+        }
+        if ($val >= -17922 && $val <= -17418) {
+            return 'H';
+        }
+        if ($val >= -17417 && $val <= -16475) {
+            return 'J';
+        }
+        if ($val >= -16474 && $val <= -16213) {
+            return 'K';
+        }
+        if ($val >= -16212 && $val <= -15641) {
+            return 'L';
+        }
+        if ($val >= -15640 && $val <= -15166) {
+            return 'M';
+        }
+        if ($val >= -15165 && $val <= -14923) {
+            return 'N';
+        }
+        if ($val >= -14922 && $val <= -14915) {
+            return 'O';
+        }
+        if ($val >= -14914 && $val <= -14631) {
+            return 'P';
+        }
+        if ($val >= -14630 && $val <= -14150) {
+            return 'Q';
+        }
+        if ($val >= -14149 && $val <= -14091) {
+            return 'R';
+        }
+        if ($val >= -14090 && $val <= -13319) {
+            return 'S';
+        }
+        if ($val >= -13318 && $val <= -12839) {
+            return 'T';
+        }
+        if ($val >= -12838 && $val <= -12557) {
+            return 'W';
+        }
+        if ($val >= -12556 && $val <= -11848) {
+            return 'X';
+        }
+        if ($val >= -11847 && $val <= -11056) {
+            return 'Y';
+        }
+        if ($val >= -11055 && $val <= -10247) {
+            return 'Z';
+        }
+        return strtoupper($str[0]);
+    }
 }
