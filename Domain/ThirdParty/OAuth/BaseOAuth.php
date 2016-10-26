@@ -55,17 +55,13 @@ abstract class BaseOAuth extends ThirdParty  {
     }
 
     /**
-     * 重定向到登录页面
+     * 返回重定向到登录页面的链接
      */
     public function login() {
         $state = StringExpand::randomNumber(7);
         Factory::session()->set('state', $state);
         $this->set('state', $state);
-        return $this->redirect('login');
-    }
-    
-    public function redirect($name) {
-        return Factory::response()->sendRedirect($this->getUrl($name));
+        return $this->getUrl('login');
     }
 
     /**
