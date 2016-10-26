@@ -273,14 +273,22 @@ class AliPay extends BasePay {
 
     public function getAppPayOrder($arg = array()) {
         $data = $this->getData($this->getMap('appPay')[1], array_merge($this->get(), $arg));
-        $data['biz_content'] = $this->getSignContent($data['biz_content']);
+        $data['biz_content'] = $this->encodeContent($data['biz_content']);
         $data['sign'] = $this->sign($data);
-        return $data;
+        return http_build_query($data);
+    }
+
+    protected function encodeContent(array $args) {
+        $data = [];
+        foreach ($args as $key => $item) {
+            $data[] = sprintf('"%s"="%s"', $key, $item);
+        }
+        return '{'.implode(',', $data).'}';
     }
 
     public function getPayUrl($arg = array()) {
         $data = $this->getData($this->getMap('pay')[1], array_merge($this->get(), $arg));
-        $data['biz_content'] = $this->getSignContent($data['biz_content']);
+        $data['biz_content'] = $this->encodeContent($data['biz_content']);
         $data['sign'] = $this->sign($data);
         $uri = new Uri();
         return $uri->decode($this->getMap('pay')[0])->setData($data);

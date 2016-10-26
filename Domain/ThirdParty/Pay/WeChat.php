@@ -28,7 +28,7 @@ class WeChat extends BasePay {
                 'attach',
                 '#out_trade_no',
                 'fee_type',
-                '#total_fee',
+                '#total_fee',   //以分为单位
                 '#spbill_create_ip',
                 'time_start',
                 'time_expire',
