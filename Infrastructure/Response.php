@@ -193,7 +193,7 @@ class Response {
         }
         $callback = null;
         if ((!defined('DEBUG') || !DEBUG) &&
-            (!defined('APP_GZIP') || APP_GZIP) &&
+            (!defined('APP_GZIP') && APP_GZIP) &&
             extension_loaded('zlib') && strpos(Request::server('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== FALSE) {
             $callback = 'ob_gzhandler';
         }

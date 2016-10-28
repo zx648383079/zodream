@@ -290,7 +290,7 @@ class WeChat extends BasePay {
      * @param array $args
      * @return string
      */
-    public function sign(array $args) {
+    public function sign($args) {
         if (empty($this->key)) {
             throw new \InvalidArgumentException('KEY IS NEED');
         }

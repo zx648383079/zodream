@@ -88,6 +88,31 @@ class AliPay extends BasePay {
                     'product_code' => 'QUICK_MSECURITY_PAY'
                 ]
             ]
+        ],
+        'mobilePay' => [
+            '',
+            [
+                'service' => 'mobile.securitypay.pay',
+                '#partner',
+                '_input_charset' => 'UTF-8',
+                'sign_type' => 'RSA',
+                'sign',
+                '#notify_url',
+                'app_id',
+                'appenv',
+                '#out_trade_no',
+                '#subject',
+                'payment_type' => 1,
+                '#seller_id',
+                '#total_fee',
+                '#body',
+                'goods_type' => 1,
+                'hb_fq_param',
+                'rn_check',
+                'it_b_pay' => '90m',
+                'extern_token',
+                'promo_params'
+            ]
         ]
     ];
 
@@ -191,12 +216,14 @@ class AliPay extends BasePay {
     /**
      * 生成请求参数的签名
      *
-     * @param $params array
+     * @param string|array $content
      * @return string
      * @throws FileException
      */
-    public function sign(array $params) {
-        $content = $this->getSignContent($params);
+    public function sign($content) {
+        if (is_array($content)) {
+            $content = $this->getSignContent($content);
+        }
         if ($this->signType == self::MD5) {
             return md5($content .$this->key);
         }
@@ -284,6 +311,22 @@ class AliPay extends BasePay {
             $data[] = sprintf('"%s"="%s"', $key, $item);
         }
         return '{'.implode(',', $data).'}';
+    }
+
+    public function getMobilePayOrder($arg = array()) {
+        $data = $this->getData($this->getMap('mobilePay')[1], array_merge($this->get(), $arg));
+        ksort($data);
+        reset($data);
+        $args = [];
+        foreach ($data as $key => $item) {
+            if ($this->checkEmpty($item) || $key == 'sign' || $key == 'sign_type') {
+                continue;
+            }
+            $args[] = $key.'="'.$item.'"';
+        }
+        $content = implode('&', $args);
+        $data['sign'] = urlencode($this->sign($content));
+        return $content.'&sign='.'"'.$data['sign'].'"'.'&sign_type='.'"'.$data['sign_type'].'"';;
     }
 
     public function getPayUrl($arg = array()) {

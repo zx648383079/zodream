@@ -87,10 +87,10 @@ abstract class BasePay extends ThirdParty  {
 
 
     /**
-     * @param array $args
+     * @param array|string $args
      * @return string
      */
-    abstract public function sign(array $args);
+    abstract public function sign($args);
 
     /**
      * @param $args
