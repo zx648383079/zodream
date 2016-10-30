@@ -247,6 +247,30 @@ class StringExpand {
 		return substr(str_shuffle(str_repeat($pool, $length)), 0, $length);
 	}
 
+    /**
+     * @param int $length 总长度
+     * @param int $arg 数字转字符串
+     * @param string $pool 随机字符串参考
+     * @return string
+     */
+    public static function randomByNumber(
+        $length = 6,
+        $arg = 0,
+        $pool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    ) {
+        $arg = intval($arg);
+        $str = '';
+        $len = 0;
+        $max = strlen($pool);
+        while ($id > 0) {
+            $index = $id % $max;
+            $str = $pool[$index].$str;
+            $len ++;
+            $arg = floor($arg / $max);
+        }
+        return substr($str.str_shuffle(str_repeat($pool, $length - $len)), 0, $length);
+    }
+
 	/**
 	 * 字节长度
 	 * @param string $string
