@@ -37,7 +37,49 @@ class AliPay extends BasePay {
                 ]
             ]
         ],
-        'pay' => [    //app
+        'webPay' => [
+            'https://mapi.alipay.com/gateway.do', // 即时支付
+            [
+                'service' => 'create_direct_pay_by_user',
+                '#partner',
+                '_input_charset' => 'utf-8',
+                'sign_type' => 'MD5', //DSA、RSA、MD5
+                'sign',
+                'notify_url',
+                'return_url',
+                '#out_trade_no',
+                '#subject',
+                'payment_type' => 1,
+                '#total_fee', // 2位小数
+                [
+                    'seller_id',
+                    'seller_email',
+                    'seller_account_name'
+                ],
+                'buyer_id',
+                'buyer_email',
+                'buyer_account_name',
+
+                'price',
+                'quantity',
+                'body',
+                'show_url',
+                'paymethod',
+                'enable_paymethod',
+                'anti_phishing_key',
+                'exter_invoke_ip',
+                'extra_common_param',
+                'it_b_pay' => '1h',
+                'token',
+                'qr_pay_mode',
+                'qrcode_width',
+                'need_buyer_realnamed',
+                'promo_param',
+                'hb_fq_param',
+                'goods_type'
+            ]
+        ],
+        'pay' => [
             'https://openapi.alipay.com/gateway.do',
             [
                 '#app_id',
@@ -313,6 +355,11 @@ class AliPay extends BasePay {
         return '{'.implode(',', $data).'}';
     }
 
+    /**
+     * APP 支付
+     * @param array $arg
+     * @return string
+     */
     public function getMobilePayOrder($arg = array()) {
         $data = $this->getData($this->getMap('mobilePay')[1], array_merge($this->get(), $arg));
         ksort($data);
@@ -329,9 +376,26 @@ class AliPay extends BasePay {
         return $content.'&sign='.'"'.$data['sign'].'"'.'&sign_type='.'"'.$data['sign_type'].'"';;
     }
 
+    /**
+     *
+     * @param array $arg
+     * @return $this
+     */
     public function getPayUrl($arg = array()) {
         $data = $this->getData($this->getMap('pay')[1], array_merge($this->get(), $arg));
         $data['biz_content'] = $this->encodeContent($data['biz_content']);
+        $data['sign'] = $this->sign($data);
+        $uri = new Uri();
+        return $uri->decode($this->getMap('pay')[0])->setData($data);
+    }
+
+    /**
+     * 及时支付
+     * @param array $arg
+     * @return $this
+     */
+    public function getWebPayUrl($arg = array()) {
+        $data = $this->getData($this->getMap('webPay')[1], array_merge($this->get(), $arg));
         $data['sign'] = $this->sign($data);
         $uri = new Uri();
         return $uri->decode($this->getMap('pay')[0])->setData($data);
