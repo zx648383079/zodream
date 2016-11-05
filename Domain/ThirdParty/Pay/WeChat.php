@@ -33,18 +33,18 @@ class WeChat extends BasePay {
                 'time_start',
                 'time_expire',
                 'goods_tag',
-                '#notify_url',
+                '#notify_url',  //不能带参数
                 '#trade_type',
                 'limit_pay',
                 'sign'
             ],
             'POST'
         ],
-        'pay' => [
+        'pay' => [    //app调起支付参数
             '',
             [
                 '#appid',
-                '#partnerid',
+                '#mch_id:partnerid',
                 '#prepayid',
                 'package' => 'Sign=WXPay',
                 '#noncestr',
@@ -165,11 +165,14 @@ class WeChat extends BasePay {
     public function getOrder(array $args = array()) {
         $args = $this->xmlPost('order', $args);
         if ($args['return_code'] != 'SUCCESS') {
+            $this->error = $args['return_msg'];
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
+            $this->error = '数据验签失败！';
             return false;
         }
+        $this->set($args);
         return $args;
     }
 
@@ -181,9 +184,11 @@ class WeChat extends BasePay {
     public function queryOrder(array $args = array()) {
         $args = $this->xmlPost('query', $args);
         if ($args['return_code'] != 'SUCCESS') {
+            $this->error = $args['return_msg'];
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
+            $this->error = '数据验签失败！';
             return false;
         }
         return $args;
@@ -197,9 +202,11 @@ class WeChat extends BasePay {
     public function closeOrder(array $args = array()) {
         $args = $this->xmlPost('close', $args);
         if ($args['return_code'] != 'SUCCESS') {
+            $this->error = $args['return_msg'];
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
+            $this->error = '数据验签失败！';
             return false;
         }
         return $args;
@@ -238,9 +245,11 @@ class WeChat extends BasePay {
     public function queryRefund(array $args = array()) {
         $args = $this->xmlPost('queryRefund', $args);
         if ($args['return_code'] != 'SUCCESS') {
+            $this->error = $args['return_msg'];
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
+            $this->error = '数据验签失败！';
             return false;
         }
         return $args;
@@ -277,9 +286,11 @@ class WeChat extends BasePay {
                 XmlExpand::encode($data, 'xml'
                 )));
         if ($args['return_code'] != 'SUCCESS') {
+            $this->error = $args['return_msg'];
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
+            $this->error = '数据验签失败！';
             return false;
         }
         return $args;
@@ -323,9 +334,11 @@ class WeChat extends BasePay {
     public function callback() {
         $args = $this->xml(Request::input());
         if ($args['return_code'] != 'SUCCESS') {
+            $this->error = $args['return_msg'];
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
+            $this->error = '数据验签失败！';
             return false;
         }
         return $args;
