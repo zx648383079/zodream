@@ -7,10 +7,13 @@ namespace Zodream\Domain\ThirdParty\Pay;
  * Date: 2016/8/18
  * Time: 19:07
  */
+use Zodream\Domain\Image\Image;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Url\Uri;
+use Zodream\Infrastructure\Url\Url;
 
 class WeChat extends BasePay {
     protected $configKey = 'wechat';
@@ -124,6 +127,48 @@ class WeChat extends BasePay {
                 'sign',
                 '#bill_date',
                 'bill_type'
+            ]
+        ],
+        'qrcode' => [ //生成支付二维码
+            'weixin：//wxpay/bizpayurl',
+            [
+                '#appid', // 微信分配的公众账号ID
+                '#mch_id',
+                '#time_stamp',
+                '#nonce_str',
+                '#product_id',
+                'sign'
+            ]
+        ],
+        'qrCallback' => [ // 二维码支付回调输出返回
+            '',
+            [
+                'return_code' => 'SUCCESS',
+                'return_msg',
+                '#appid',
+                '#mch_id',
+                '#nonce_str',
+                '#prepay_id',
+                'result_code' => 'SUCCESS',
+                'err_code_des',
+                'sign'
+            ]
+        ],
+        'orderQr' => [  //先生成预支付订单再生成二维码
+            'weixin：//wxpay/bizpayurl',
+            'sr'
+        ],
+        'jsapi' => [  // 公众号支付 网页端调起支付API
+            '',
+            [
+                '#appId',
+                '#timeStamp',
+                '#nonceStr',
+                '#package' => [
+                    '#prepay_id'
+                ],
+                'signType' => 'MD5',
+                'paySign'
             ]
         ]
     ];
@@ -342,5 +387,60 @@ class WeChat extends BasePay {
             return false;
         }
         return $args;
+    }
+
+    /**
+     * 微信二维码支付
+     * @param array $arg
+     * @return Image
+     */
+    public function qrPay(array $arg = array()) {
+        $url = new Uri($this->apiMap['qrcode']);
+        $url->setData($this->getDataByName('qrcode', $arg));
+        return $url->qrcode();
+    }
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_4
+     * @return array|mixed|object
+     */
+    public function qrCallback() {
+        /*$args = $this->callback();
+        if ($args === false) {
+            return false;
+        }
+        $order = $this->getOrder($args);
+        if ($order === false) {
+            return false;
+        }*/
+        return $this->xml($this->getDataByName('qrCallback'));
+    }
+
+    /**
+     * 商户后台系统先调用微信支付的统一下单接口，微信后台系统返回链接参数code_url，商户后台系统将code_url值生成二维码图片
+     * @param array $args
+     * @return Image
+     */
+    public function orderQr(array $args = array()) {
+        $data = $this->getOrder($args);
+        if ($data === false) {
+            return false;
+        }
+        return $this->getUrl('orderQr', $data)->qrcode();
+    }
+
+    /**
+     * 公众号支付 在微信浏览器里面打开H5网页中执行JS调起支付。接口输入输出数据格式为JSON。
+     * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
+     * @param array $args
+     */
+    public function jsPay(array $args = array()) {
+        $args['nonce_str'] = StringExpand::random(32);
+        $args['timeStamp'] = time();
+        $data = $this->getData($this->apiMap['jsapi'][1], array_merge($this->get(), $args));
+        $data['package'] = 'prepay_id='.$data['package']['prepay_id'];
+        $data['paySign'] = $this->sign($data);
+        return $data;
+
     }
 }

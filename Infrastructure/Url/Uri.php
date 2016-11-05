@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Url;
  * Date: 2016/8/6
  * Time: 10:07
  */
+use Zodream\Domain\Image\Image;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\FileObject;
 use Zodream\Infrastructure\Factory;
@@ -296,6 +297,16 @@ class Uri {
      */
     public function get() {
         return new Curl($this);
+    }
+
+    /**
+     * GENERATE QRCODE
+     * @return Image
+     */
+    public function qrcode() {
+        $image = new Image();
+        $image->create($this->encode());
+        return $image;
     }
 
     public function __toString() {
