@@ -334,7 +334,8 @@ class AliPay extends BasePay {
         foreach ($_GET as $key => $item) {
             $data[$key] = urldecode($item);
         }
-        if (!$this->verify($data, base64_decode($data['sign']))) {
+        if (!array_key_exists('sign', $data) || 
+            !$this->verify($data, base64_decode($data['sign']))) {
             return false;
         }
         return $data;

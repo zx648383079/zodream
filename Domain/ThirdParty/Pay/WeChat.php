@@ -378,6 +378,10 @@ class WeChat extends BasePay {
      */
     public function callback() {
         $args = $this->xml(Request::input());
+        if (!is_array($args)) {
+            $this->error = '非法数据';
+            return false;
+        }
         if ($args['return_code'] != 'SUCCESS') {
             $this->error = $args['return_msg'];
             return false;
