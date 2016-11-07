@@ -8,6 +8,15 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class WeChat extends BaseOAuth {
 
+    /**
+     * EXAMPLE:
+     * 'wechat' => [
+        'appid' => '',
+        'redirect_uri' => '',
+        'secret' => ''
+    ]
+     * @var string
+     */
     protected $configKey = 'wechat';
 
     protected $apiMap = array(

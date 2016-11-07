@@ -9,6 +9,15 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  */
 class QQ extends BaseOAuth {
 
+    /**
+     * EXAMPLE:
+     * 'qq' => [
+        'client_id' => '',
+        'redirect_uri' => '',
+        'client_secret' => ''
+    ]
+     * @var string
+     */
     protected $configKey = 'qq';
 
     protected $apiMap = array(
