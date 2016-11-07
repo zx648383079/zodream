@@ -192,7 +192,7 @@ abstract class ThirdParty extends MagicObject {
     protected function chooseData(array $item, array $args) {
         $data = $this->getData($item, $args);
         if (empty($data)) {
-            throw new \InvalidArgumentException('MANY\'ONE IS NEED!');
+            throw new \InvalidArgumentException('ONE OF MANY IS NEED!');
         }
         return $data;
     }
