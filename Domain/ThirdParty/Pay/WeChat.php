@@ -58,7 +58,7 @@ class WeChat extends BasePay {
             [
                 '#appid',
                 '#mch_id:partnerid',
-                '#prepayid',
+                '#prepay_id:prepayid',
                 'package' => 'Sign=WXPay',
                 '#noncestr',
                 '#timestamp',
@@ -277,10 +277,15 @@ class WeChat extends BasePay {
 
     /**
      * APP支付参数
+     * 
      * @param array $args
      * @return array
      */
     public function pay(array $args = array()) {
+        $args['noncestr'] = StringExpand::random(32);
+        if (!array_key_exists('timestamp', $args)) {
+            $args['timestamp'] = time();
+        }
         return $this->getDataByName('pay', $args);
     }
 
