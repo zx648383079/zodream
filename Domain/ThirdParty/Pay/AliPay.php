@@ -14,6 +14,17 @@ use Zodream\Infrastructure\Url\Url;
 
 class AliPay extends BasePay {
 
+    /**
+     * EXAMPLE:
+    'alipay' => array(
+        'app_id' => '',
+        'app_auth_token' => '',
+        'privateKeyFile' => '/alipay/rsa_private_key.pem',
+        'publicKeyFile' => '/alipay/alipay_rsa_public_key.pem',
+        'notify_url' => ''
+    )
+     * @var string
+     */
     protected $configKey = 'alipay';
 
     protected $apiMap = [
@@ -358,6 +369,14 @@ class AliPay extends BasePay {
 
     /**
      * APP 支付
+     * EXAMPLE:
+    [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'subject' => '',
+        'out_trade_no' => '',
+        'total_amount' => 0.01,
+        'body' => ''
+    ]
      * @param array $arg
      * @return string
      */

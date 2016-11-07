@@ -16,6 +16,16 @@ use Zodream\Infrastructure\Url\Uri;
 use Zodream\Infrastructure\Url\Url;
 
 class WeChat extends BasePay {
+    /**
+     * EXAMPLE: 
+     * 'wechat' => array(
+            'appid' => '',
+            'mch_id' => '',
+            'notify_url' => '',
+            'trade_type' => 'APP'
+        )
+     * @var string
+     */
     protected $configKey = 'wechat';
 
     protected $apiMap = [
@@ -204,6 +214,14 @@ class WeChat extends BasePay {
 
     /**
      * 生成预支付订单
+     [
+        'nonce_str' => '',
+        'body' => '',
+        'out_trade_no' => ',
+        'total_fee' => 1,
+        'spbill_create_ip' => '',
+        'time_start' => date('Ymdis')
+     ]
      * @param array $args
      * @return array|bool|mixed|object
      */
