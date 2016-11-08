@@ -235,24 +235,67 @@ abstract class BaseQuery extends BaseSchema  {
             }
             // ['a', 'between', 'b', 'c']
             return $this->getConditionLink(
-                $arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' AND '.$this->getValueByOperator($arg[3]));
+                $this->getBetween($arg[0], $arg[2], $arg[3]));
         }
 
         if ($length == 5) {
             if ($this->isOrOrAnd($arg[4])) {
                 //['a', 'between', 'b', 'c', 'or']
                 return $this->getConditionLink(
-                    $arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' AND '.$this->getValueByOperator($arg[3]),
+                    $this->getBetween($arg[0], $arg[2], $arg[3]),
                     $arg[4]);
             }
             //['a', 'between', 'b', 'and', 'c']
             return $this->getConditionLink(
-                $arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' '.$arg[3].' '.$this->getValueByOperator($arg[4]));
+                $this->getBetween($arg[0], $arg[2], $arg[4]));
         }
         //['a', 'between', 'b', 'and', 'c', 'or']
         return $this->getConditionLink(
-            $arg[0].' '.$arg[1]. ' '. $this->getValueByOperator($arg[2]). ' '.$arg[3].' '.$this->getValueByOperator($arg[4]),
+            $this->getBetween($arg[0], $arg[2], $arg[4]),
             $arg[5]);
+    }
+
+    protected function getBetween($key, $start, $end) {
+        $tag = is_numeric($start) && is_numeric($end) ? 'int' : 'string';
+        $start = $this->getValueWithParser($start, $tag);
+        $end = $this->getValueWithParser($end, $tag);
+        return "{$key} BETWEEN {$start} AND {$end}";
+    }
+
+    /**
+     * 把值进行转化
+     * @param $arg
+     * @param string $tag
+     * @return float|int|string
+     */
+    protected function getValueWithParser($arg, $tag = 'string') {
+        if (is_array($arg)
+            && count($arg) == 2
+            && is_string($arg[1])
+            && in_array(strtolower($arg['1'],
+                ['int', 'integer', 'numeric', 'bool', 'boolean', 'string', 'float', 'double']))) {
+            $tag = $arg[1];
+            $arg = $tag;
+        }
+        if (is_object($arg) || is_array($arg)) {
+            return "'".serialize($arg)."'";
+        }
+        switch (strtolower($tag)) {
+            case 'int':
+            case 'integer':
+            case 'numeric':
+                return intval($arg);
+            case 'bool':
+            case 'boolean':
+                return boolval($arg) ? 1 : 0;
+            case 'float':
+                return floatval($arg);
+            case 'double':
+                return doubleval($arg);
+            case 'string':
+            default:
+                return "'". addslashes($arg). "'";
+        }
     }
 
     protected function getValueByOperator($value, $operator = null) {
@@ -270,21 +313,7 @@ abstract class BaseQuery extends BaseSchema  {
         }
         // [a, int]
         if (is_array($value)) {
-            if (count($value) == 1) {
-                $value[] = 'string';
-            }
-            switch ($value[1]) {
-                case 'int':
-                case 'integer':
-                case 'numeric':
-                    return intval($value[0]);
-                case 'bool':
-                case 'boolean':
-                    return boolval($value[0]);
-                case 'string':
-                default:
-                    return "'". addslashes($value[0]). "'";
-            }
+            return $this->getValueWithParser($value);
         }
         // 连接查询 排除邮箱 排除网址
         if (strpos($value, '.') !== false
@@ -299,7 +328,8 @@ abstract class BaseQuery extends BaseSchema  {
 
         if (is_numeric($value) ||
             $value === '?' ||
-            (strpos($value, ':') === 0 && $this->hasParam($value))) {
+            (strpos($value, ':') === 0
+                && $this->hasParam($value))) {
             return $value;
         }
         return "'{$value}'";
