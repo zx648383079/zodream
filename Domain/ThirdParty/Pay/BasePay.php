@@ -37,16 +37,21 @@ abstract class BasePay extends ThirdParty  {
 
     public function __construct(array $config = array()) {
         parent::__construct($config);
-        $this->signType = strtoupper($this->get('signType', self::RSA));
         if ($this->has('key')) {
             $this->key = $this->get('key');
         }
         if ($this->has('privateKeyFile')) {
             $this->setPrivateKeyFile($this->get('privateKeyFile'));
         }
+        if ($this->has('publicKeyFile')) {
+            $this->setPublicKeyFile($this->get('publicKeyFile'));
+        }
         if ($this->has('caFile')) {
             $this->setCaFile($this->get('caFile'));
         }
+        $this->signType = strtoupper(
+            $this->get('signType',
+            empty($this->privateKeyFile) ? self::MD5 : self::RSA));
     }
 
     public function getKey() {
@@ -83,6 +88,22 @@ abstract class BasePay extends ThirdParty  {
     public function setCaFile($file) {
         $this->caFile = $file instanceof File ? $file : new File($file);
         return $this;
+    }
+
+    /**
+     * 获取带签名的参数
+     * @param string $name
+     * @param array $args
+     * @return array
+     */
+    protected function getSignData($name, array $args = array()) {
+        if (!array_key_exists($name, $this->apiMap)) {
+            $this->setError('API ERROR');
+            return [];
+        }
+        $data = $this->getData($this->apiMap[$name][1], array_merge($this->get(), $args));
+        $data['sign'] = $this->sign($data);
+        return $data;
     }
 
 

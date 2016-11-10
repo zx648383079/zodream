@@ -29,4 +29,20 @@ class XmlExpand {
     public static function encode(array $args, $root = 'root') {
         return ArrayToXml::createXML($root, $args)->saveXML();
     }
+
+    /**
+     * 特殊的xml 编码 主要用于微信回复
+     * @param array $args
+     */
+    public static function specialEncode(array $args, $root = 'xml') {
+        foreach ($args as &$item) {
+            if (!is_array($item)) {
+                $item = [
+                    '@cdata' => $item
+                ];
+            }
+        }
+        $document = ArrayToXml::createXML($root, $args);
+        return $document->saveXML();
+    }
 }

@@ -9,6 +9,7 @@ namespace Zodream\Domain\ThirdParty\Pay;
  */
 use Zodream\Infrastructure\Error\FileException;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Url\Uri;
 use Zodream\Infrastructure\Url\Url;
 
@@ -26,6 +27,12 @@ class AliPay extends BasePay {
      * @var string
      */
     protected $configKey = 'alipay';
+
+    /**
+     * 支付宝公钥
+     * @var string
+     */
+    protected $publicKey = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDIgHnOn7LLILlKETd6BFRJ0GqgS2Y3mn1wMQmyh9zEyWlz5p1zrahRahbXAfCfSqshSNfqOmAQzSHRVjCqjsAw1jyqrXaPdKBmr90DIpIxmIyKXv4GGAkPyJ/6FTFY99uhpiq0qadD/uSzQsefWo0aTvP/65zi3eof7TcZ32oWpwIDAQAB';
 
     protected $apiMap = [
         'query' => [
@@ -169,6 +176,31 @@ class AliPay extends BasePay {
         ]
     ];
 
+    public function __construct(array $config = array()) {
+        parent::__construct($config);
+        if ($this->has('publicKey')) {
+            $this->publicKey = $this->get('publicKey');
+        }
+    }
+
+    protected function getSignData($name, array $args = array()) {
+        if (!array_key_exists($name, $this->apiMap)) {
+            $this->setError('API ERROR');
+            return [];
+        }
+        $data = $this->getData($this->apiMap[$name][1], array_merge($this->get(), $args));
+        if (array_key_exists('sign_type', $data)) {
+            $this->signType = $data['sign_type'] =
+                ($data['sign_type'] == static::RSA
+                && !empty($this->privateKeyFile)) ? static::RSA : static::MD5;
+        }
+        if (array_key_exists('biz_content', $data)) {
+            $data['biz_content'] = $this->encodeContent($data['biz_content']);
+        }
+        $data['sign'] = $this->sign($data);
+        return $data;
+    }
+
     /**
      * 加密方法
      * @param string $str
@@ -240,7 +272,8 @@ class AliPay extends BasePay {
         $encodes  = array();
         foreach ($blocks as $n => $block) {
             if (!openssl_public_encrypt($block, $chrtext , $res)) {
-                echo "<br/>" . openssl_error_string() . "<br/>";
+                $this->setError(openssl_error_string());
+                return '';
             }
             $encodes[] = $chrtext ;
         }
@@ -259,7 +292,8 @@ class AliPay extends BasePay {
         $dcyCont = '';
         foreach ($decodes as $n => $decode) {
             if (!openssl_private_decrypt($decode, $dcyCont, $res)) {
-                echo '<br/>' . openssl_error_string() . '<br/>';
+                $this->setError(openssl_error_string());
+                return '';
             }
             $strnull .= $dcyCont;
         }
@@ -277,15 +311,17 @@ class AliPay extends BasePay {
         if (is_array($content)) {
             $content = $this->getSignContent($content);
         }
-        if ($this->signType == self::MD5) {
-            return md5($content .$this->key);
+        if ($this->signType == self::MD5
+            || empty($this->privateKeyFile)) {
+            return md5($content.$this->key);
         }
         if ($this->signType != self::RSA
             && $this->signType != self::RSA2) {
             return null;
         }
         if (!$this->privateKeyFile->exist()) {
-            throw new FileException($this->privateKeyFile);
+            $this->setError('私钥文件不存在');
+            return '';
         }
         $res = openssl_get_privatekey($this->privateKeyFile->read());
         openssl_sign($content, $sign, $res,
@@ -296,6 +332,9 @@ class AliPay extends BasePay {
     }
 
     public function verify(array $params, $sign) {
+        if (array_key_exists('sign_type', $params)) {
+            $this->signType = strtoupper($params['sign_type']);
+        }
         $content = $this->getSignContent($params);
         $result = $this->verifyContent($content, $sign);
         if (!$result && strpos($content, '\\/') > 0) {
@@ -309,13 +348,25 @@ class AliPay extends BasePay {
         if ($this->signType == self::MD5) {
             return md5($content. $this->key) == $sign;
         }
-        if ($this->publicKeyFile->exist()) {
-            throw new FileException($this->publicKeyFile);
+        return $this->checkRsa($content, $sign);
+    }
+
+    /**
+     * 根据公钥地址验签
+     * @param $content
+     * @param $sign
+     * @return bool
+     */
+    protected function checkRsaByFile($content, $sign) {
+        if (!$this->publicKeyFile->exist()) {
+            $this->setError('公钥文件不存在');
+            return false;
         }
         //转换为openssl格式密钥
         $res = openssl_get_publickey($this->publicKeyFile->read());
         if(!$res){
-            throw new Exception('公钥格式错误');
+            $this->setError('公钥格式错误');
+            return false;
         }
         //调用openssl内置方法验签，返回bool值
         $result = (bool)openssl_verify($content, base64_decode($sign), $res,
@@ -325,40 +376,98 @@ class AliPay extends BasePay {
         return $result;
     }
 
+    /**
+     * 验签
+     * @param string $content
+     * @param string $sign
+     * @return bool
+     */
+    protected function checkRsa($content, $sign) {
+        $res = "-----BEGIN PUBLIC KEY-----\n" .
+            wordwrap($this->publicKey, 64, "\n", true) .
+            "\n-----END PUBLIC KEY-----";
+
+        if (!$res) {
+            $this->setError('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
+            return false;
+        }
+        return (bool)openssl_verify($content, base64_decode($sign), $res,
+            $this->signType == self::RSA ? OPENSSL_ALGO_SHA1 : OPENSSL_ALGO_SHA256);
+    }
+
     protected function getSignContent(array $params) {
         ksort($params);
         $args = [];
         foreach ($params as $key => $item) {
-            if ($this->checkEmpty($item) || $key == 'sign' || $key == 'sign_type') {
+            if ($this->checkEmpty($item)
+                || $key == 'sign'
+                || $key == 'sign_type'
+                || strpos($item, '@') === 0
+            ) {
                 continue;
             }
-            $args[] = "{$key}={$item}";
+            $args[] = $key.'='.$item;
         }
         return implode('&', $args);
     }
 
     /**
+     *
      * @return mixed
      */
     public function callback() {
-        $data = [];
-        foreach ($_GET as $key => $item) {
-            $data[$key] = urldecode($item);
-        }
+        $data = $_POST;//Request::isPost() ? $_POST : $_GET;
         if (!array_key_exists('sign', $data) || 
-            !$this->verify($data, base64_decode($data['sign']))) {
+            !$this->verify($data, $data['sign'])) {
+            $this->setError('验签失败！');
             return false;
         }
         return $data;
     }
 
-    public function getAppPayOrder($arg = array()) {
-        $data = $this->getData($this->getMap('appPay')[1], array_merge($this->get(), $arg));
-        $data['biz_content'] = $this->encodeContent($data['biz_content']);
-        $data['sign'] = $this->sign($data);
-        return http_build_query($data);
+    /**
+     * 查询接口
+     * EXMAPLE:
+    [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'out_trade_no' => ''
+    ]
+     * @param array $args
+     * @return array|bool|mixed
+     */
+    public function queryOrder(array $args = array()) {
+        $url = new Uri($this->apiMap['query'][0]);
+        $args = $this->json($this->httpGet($url->setData($this->getSignData('query', $args))));
+        if (!array_key_exists('alipay_trade_query_response', $args)) {
+            $this->setError('未知错误！');
+            return false;
+        }
+        $args = $args['alipay_trade_query_response'];
+        if ($args['code'] != 10000) {
+            $this->setError($args['msg']);
+            return false;
+        }
+        if (!$this->verify($args, $args['sign'])) {
+            $this->setError('数据验签失败！');
+            return false;
+        }
+        return $args;
     }
 
+    /**
+     * 获取APP支付
+     * @param array $arg
+     * @return string
+     */
+    public function getAppPayOrder($arg = array()) {
+        return http_build_query($this->getSignData('appPay'));
+    }
+
+    /**
+     * 合并biz_content
+     * @param array $args
+     * @return string
+     */
     protected function encodeContent(array $args) {
         $data = [];
         foreach ($args as $key => $item) {
@@ -368,7 +477,7 @@ class AliPay extends BasePay {
     }
 
     /**
-     * APP 支付
+     * APP 支付 异步回调必须输出 success
      * EXAMPLE:
     [
         'timestamp' => date('Y-m-d H:i:s'),
@@ -397,16 +506,13 @@ class AliPay extends BasePay {
     }
 
     /**
-     *
+     *  获取支付的网址
      * @param array $arg
      * @return $this
      */
     public function getPayUrl($arg = array()) {
-        $data = $this->getData($this->getMap('pay')[1], array_merge($this->get(), $arg));
-        $data['biz_content'] = $this->encodeContent($data['biz_content']);
-        $data['sign'] = $this->sign($data);
-        $uri = new Uri();
-        return $uri->decode($this->getMap('pay')[0])->setData($data);
+        $uri = new Uri($this->getMap('pay')[0]);
+        return $uri->setData($this->getSignData('pay', $arg));
     }
 
     /**
@@ -415,9 +521,8 @@ class AliPay extends BasePay {
      * @return $this
      */
     public function getWebPayUrl($arg = array()) {
-        $data = $this->getData($this->getMap('webPay')[1], array_merge($this->get(), $arg));
-        $data['sign'] = $this->sign($data);
         $uri = new Uri();
-        return $uri->decode($this->getMap('pay')[0])->setData($data);
+        return $uri->decode($this->getMap('pay')[0])
+            ->setData($this->getSignData('webPay'));
     }
 }

@@ -48,7 +48,8 @@ abstract class ThirdParty extends MagicObject {
             $this->set(Config::getValue($this->configKey));
             return;
         }
-        if (array_key_exists($this->configKey, $config) && is_array($config[$this->configKey])) {
+        if (array_key_exists($this->configKey, $config)
+            && is_array($config[$this->configKey])) {
             $this->set($config[$this->configKey]);
             return;
         }
@@ -70,7 +71,7 @@ abstract class ThirdParty extends MagicObject {
      */
     public function getMap($name) {
         if (!array_key_exists($name, $this->apiMap)){
-            throw new \InvalidArgumentException('API NOT EXIST!');
+            $this->setError('API NOT EXIST!');
         }
         return $this->apiMap[$name];
     }
@@ -149,38 +150,49 @@ abstract class ThirdParty extends MagicObject {
     protected function getData(array $keys, array $args) {
         $data = array();
         foreach ($keys as $key => $item) {
-            if (is_array($item)) {
-                $item = $this->chooseData($item, $args);
-            }
-            if (is_integer($key)) {
-                if (is_array($item)) {
-                    $data = array_merge($data, $item);
-                    continue;
-                }
-                $key = $item;
-                $item = null;
-            }
-            $need = false;
-            if (strpos($key, '#') === 0) {
-                $key = substr($key, 1);
-                $need = true;
-            }
-            $keyTemp = explode(':', $key, 2);
-            if (array_key_exists($keyTemp[0], $args)) {
-                $item = $args[$keyTemp[0]];
-            }
-            if ($this->checkEmpty($item)) {
-                if ($need) {
-                    throw new \InvalidArgumentException($keyTemp[0].' IS NEED!');
-                }
-                continue;
-            }
-            if (count($keyTemp) > 1) {
-                $key = $keyTemp[1];
-            }
-            $data[$key] = $item;
+            $data = array_merge($data,
+                $this->getDataByKey($key, $item, $args));
         }
         return $data;
+    }
+
+    /**
+     * 获取一个值
+     * @param $key
+     * @param $item
+     * @param array $args
+     * @return array
+     */
+    protected function getDataByKey($key, $item, array $args) {
+        if (is_array($item)) {
+            $item = $this->chooseData($item, $args);
+        }
+        if (is_integer($key)) {
+            if (is_array($item)) {
+                return $item;
+            }
+            $key = $item;
+            $item = null;
+        }
+        $need = false;
+        if (strpos($key, '#') === 0) {
+            $key = substr($key, 1);
+            $need = true;
+        }
+        $keyTemp = explode(':', $key, 2);
+        if (array_key_exists($keyTemp[0], $args)) {
+            $item = $args[$keyTemp[0]];
+        }
+        if ($this->checkEmpty($item)) {
+            if ($need) {
+                $this->setError($keyTemp[0].' IS NEED!');
+            }
+            return [];
+        }
+        if (count($keyTemp) > 1) {
+            $key = $keyTemp[1];
+        }
+        return [$key => $item];
     }
 
     /**
@@ -192,7 +204,7 @@ abstract class ThirdParty extends MagicObject {
     protected function chooseData(array $item, array $args) {
         $data = $this->getData($item, $args);
         if (empty($data)) {
-            throw new \InvalidArgumentException('ONE OF MANY IS NEED!');
+            $this->setError('ONE OF MANY IS NEED!');
         }
         return $data;
     }
@@ -244,16 +256,17 @@ abstract class ThirdParty extends MagicObject {
     }
 
     /**
+     * SET ERROR AND LOG OR
      * @param $arg
-     * @return bool|int
      */
-    public function log($arg) {
+    public function setError($arg) {
+        if (is_array($arg)) {
+            $arg = print_r($arg, true);
+        };
+        $this->error = $arg;
         if (defined('DEBUG') && DEBUG) {
-            if (is_array($arg)) {
-                $arg = print_r($arg, true);
-            };
-            return Factory::log()->info('http_'.time(), $arg);
+            throw new \Exception($arg);
         }
-        return false;
+        Factory::log()->error($arg);
     }
 }

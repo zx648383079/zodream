@@ -196,11 +196,9 @@ class WeChat extends BasePay {
      * @param array $args
      * @return array
      */
-    protected function getDataByName($name, array $args = array()) {
+    protected function getSignData($name, array $args = array()) {
         $args['nonce_str'] = StringExpand::random(32);
-        $data = $this->getData($this->apiMap[$name][1], array_merge($this->get(), $args));
-        $data['sign'] = $this->sign($data);
-        return $data;
+        return parent::getSignData($name, $args);
     }
 
     /**
@@ -213,7 +211,7 @@ class WeChat extends BasePay {
         return $this->xml(
             $this->httpPost($this->apiMap[$name][0],
                 XmlExpand::encode(
-                    $this->getDataByName($name, $args), 'xml'
+                    $this->getSignData($name, $args), 'xml'
                 )
             )
         );
@@ -248,6 +246,10 @@ class WeChat extends BasePay {
 
     /**
      * 查询订单
+     * EXAMPLE:
+    [
+        'out_trade_no' =>
+    ]
      * @param array $args
      * @return array|bool|mixed|object
      */
@@ -283,21 +285,20 @@ class WeChat extends BasePay {
     }
 
     /**
-     * APP支付参数
+     * APP支付参数 异步回调必须输出 appCallbackReturn()
      *
      * @param array $args
      * @return array
      */
     public function pay(array $args = array()) {
-        $args['noncestr'] = StringExpand::random(32);
         if (!array_key_exists('timestamp', $args)) {
             $args['timestamp'] = time();
         }
-        return $this->getDataByName('pay', $args);
+        return $this->getSignData('pay', $args);
     }
 
     public function appCallbackReturn(array $args = array()) {
-        return XmlExpand::encode(
+        return XmlExpand::specialEncode(
             $this->getData($this->apiMap['appReturn'][1],
                 array_merge($this->get(), $args)));
     }
@@ -310,7 +311,7 @@ class WeChat extends BasePay {
      */
     public function downloadBill($file, array $args = array()) {
         $args = $this->httpPost($this->apiMap['bill'][0], XmlExpand::encode(
-            $this->getDataByName('bill', $args), 'xml'
+            $this->getSignData('bill', $args), 'xml'
         ));
         if (!$file instanceof File) {
             $file = new File($file);
@@ -342,16 +343,7 @@ class WeChat extends BasePay {
      * @return array|bool|mixed|object
      */
     public function refundOrder(array $args = array()) {
-        $args['nonce_str'] = StringExpand::random(32);
-        $data = $this->getData($this->apiMap['query'][1], array_merge($this->get(), $args));
-        if (!array_key_exists('transaction_id', $data) &&
-            !array_key_exists('out_trade_no', $data)) {
-            return false;
-        }
-        if ($data['total_fee'] < $data['refund_fee']) {
-            $data['refund_fee'] = $data['total_fee'];
-        }
-        $data['sign'] = $this->sign($data);
+        $data['sign'] = $this->getSignData('refund', $args);
         //第一种方法，cert 与 key 分别属于两个.pem文件
         //默认格式为PEM，可以注释
         //curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
@@ -363,15 +355,15 @@ class WeChat extends BasePay {
         //第二种方式，两个文件合成一个.pem文件
         $this->http->addOption(CURLOPT_SSLCERT, (string)$this->privateKeyFile);
         $args = $this->xml(
-            $this->httpPost($this->apiMap['query'][0],
+            $this->httpPost($this->apiMap['refund'][0],
                 XmlExpand::encode($data, 'xml'
                 )));
         if ($args['return_code'] != 'SUCCESS') {
-            $this->error = $args['return_msg'];
+            $this->setError($args['return_msg']);
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->error = '数据验签失败！';
+            $this->setError('数据验签失败！');
             return false;
         }
         return $args;
@@ -384,7 +376,7 @@ class WeChat extends BasePay {
      */
     public function sign($args) {
         if (empty($this->key)) {
-            throw new \InvalidArgumentException('KEY IS NEED');
+            $this->setError('KEY IS NEED');
         }
         ksort($args);
         reset($args);
@@ -415,15 +407,15 @@ class WeChat extends BasePay {
     public function callback() {
         $args = $this->xml(Request::input());
         if (!is_array($args)) {
-            $this->error = '非法数据';
+            $this->setError('非法数据');
             return false;
         }
         if ($args['return_code'] != 'SUCCESS') {
-            $this->error = $args['return_msg'];
+            $this->setError($args['return_msg']);
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->error = '数据验签失败！';
+            $this->setError('数据验签失败！');
             return false;
         }
         return $args;
@@ -436,7 +428,7 @@ class WeChat extends BasePay {
      */
     public function qrPay(array $arg = array()) {
         $url = new Uri($this->apiMap['qrcode']);
-        $url->setData($this->getDataByName('qrcode', $arg));
+        $url->setData($this->getSignData('qrcode', $arg));
         return $url->qrcode();
     }
 
@@ -453,7 +445,7 @@ class WeChat extends BasePay {
         if ($order === false) {
             return false;
         }*/
-        return XmlExpand::encode($this->getDataByName('qrCallback'));
+        return XmlExpand::encode($this->getSignData('qrCallback'));
     }
 
     /**
