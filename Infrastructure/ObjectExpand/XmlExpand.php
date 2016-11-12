@@ -35,14 +35,33 @@ class XmlExpand {
      * @param array $args
      */
     public static function specialEncode(array $args, $root = 'xml') {
-        foreach ($args as &$item) {
-            if (!is_array($item)) {
-                $item = [
-                    '@cdata' => $item
-                ];
-            }
+        $document = ArrayToXml::createXML($root, static::toSpecialArarry($args))->saveXML();
+    }
+
+    /**
+     *
+     * 转化成标准Xaml数组
+     * @param string $data
+     * @return array
+     */
+    protected static function toSpecialArarry($data) {
+        if (is_integer($data)) {
+            return $data;
         }
-        $document = ArrayToXml::createXML($root, $args);
-        return $document->saveXML();
+        if (is_object($data)) {
+            $data = (array)$data;
+        }
+        if (!is_array($data)) {
+            return [
+                '@cdata' => $item
+            ];
+        }
+        foreach ($data as $key => &$item) {
+            if (strpos($key, '@') === 0) {
+                continue;
+            }
+            $item = static::toSpecialArarry($item);
+        }
+        return $data;
     }
 }

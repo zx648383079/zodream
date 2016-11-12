@@ -55,7 +55,7 @@ class ArrayToXml {
      * @return DOMNode
      * @throws Exception
      */
-    private static function &convert($node_name, $arr=array()) {
+    private static function &convert($node_name, $arr = array()) {
 
         //print_arr($node_name);
         $xml = self::getXMLRoot();
