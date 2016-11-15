@@ -48,8 +48,8 @@ class Directory extends FileObject {
         $directory = '';
         $result = true;
         foreach ($args as $item) {
-            $directory .= $$item . '/';
-            if (!is_dir($directory)) {
+            $directory .= $item . '/';
+            if (!is_dir($directory) && !empty($directory)) {
                 $result = mkdir($directory);
             }
         }

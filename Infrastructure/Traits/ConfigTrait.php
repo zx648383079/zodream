@@ -20,8 +20,12 @@ trait ConfigTrait {
     }
 
     public function loadConfigs() {
-        if (!empty($this->configKey)) {
-            $this->setConfigs(Config::getValue($this->configKey));
+        if (empty($this->configKey)) {
+            return;
+        }
+        $configs = Config::getValue($this->configKey);
+        if (is_array($configs)) {
+            $this->setConfigs($configs);
         }
     }
 }

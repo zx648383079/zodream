@@ -7,9 +7,13 @@ namespace Zodream\Infrastructure\Database\Schema;
  * Date: 2016/6/25
  * Time: 9:19
  */
-use Zodream\Infrastructure\Database\BaseQuery;
+use Zodream\Infrastructure\Database\Query\BaseQuery;
 
 class Schema extends BaseQuery {
+    
+    public function addParam($params) {
+        
+    }
 
     /**
      * 数据库

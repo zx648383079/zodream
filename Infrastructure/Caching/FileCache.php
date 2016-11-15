@@ -74,7 +74,7 @@ class FileCache extends Cache {
 	
 	protected function hasValue($key) {
 		$cacheFile = $this->getCacheFile($key);
-        return $cacheFile->modifyTime() > time();
+        return !$cacheFile->exist() || $cacheFile->modifyTime() > time();
 	}
 	
 	protected function deleteValue($key) {
