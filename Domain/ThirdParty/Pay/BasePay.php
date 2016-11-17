@@ -49,9 +49,15 @@ abstract class BasePay extends ThirdParty  {
         if ($this->has('caFile')) {
             $this->setCaFile($this->get('caFile'));
         }
-        $this->signType = strtoupper(
-            $this->get('signType',
-            empty($this->privateKeyFile) ? self::MD5 : self::RSA));
+        $this->setSignType($this->get('signType'));
+    }
+    
+    public function setSignType($arg = null) {
+        if (empty($arg)) {
+            $arg = empty($this->privateKeyFile) ? self::MD5 : self::RSA;
+        }
+        $this->signType = strtoupper($arg);
+        return $this;
     }
 
     public function getKey() {
