@@ -181,6 +181,7 @@ class AliPay extends BasePay {
         if ($this->has('publicKey')) {
             $this->publicKey = $this->get('publicKey');
         }
+        $this->set('sign_type', $this->signType);
     }
 
     protected function getSignData($name, array $args = array()) {
