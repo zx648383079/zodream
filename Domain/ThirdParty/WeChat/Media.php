@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Domain\ThirdParty\WeChat;
-use Zodream\Infrastructure\Disk\File;
 
 /**
  * Created by PhpStorm.
@@ -8,6 +7,7 @@ use Zodream\Infrastructure\Disk\File;
  * Date: 2016/8/20
  * Time: 10:39
  */
+use Zodream\Infrastructure\Disk\File;
 class Media extends BaseWeChat {
     const IMAGE = 'image';
     const VOICE = 'voice';
