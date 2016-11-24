@@ -4,6 +4,7 @@ namespace Zodream\Domain\Generate;
 use Zodream\Domain\Model\Model;
 use Zodream\Domain\Response\Redirect;
 use Zodream\Infrastructure\Config;
+use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
@@ -30,7 +31,7 @@ class Generate {
 	}
 	
 	public function setModel() {
-		if (!$this->model instanceof Model) {
+		if (!$this->model instanceof Command) {
 			$this->model = new GenerateModel();
 		}
 	}
@@ -78,13 +79,14 @@ class Generate {
 	/**
 	 * 新建数据库
 	 * @param string $name
+     * @return boolean
 	 */
 	public function createDatabase($name) {
 		if (empty($name)) {
-			return;
+			return false;
 		}
 		$this->setModel();
-		$this->model->createDatabase($name);
+		return $this->model->createDatabase($name);
 	}
 
 	/**

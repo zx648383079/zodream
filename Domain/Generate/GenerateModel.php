@@ -38,11 +38,12 @@ class GenerateModel extends Command {
     /**
      * 新建数据库
      * @param string $db
+     * @return boolean
      */
     public function createDatabase($db) {
         $this->getEngine()->execute('CREATE SCHEMA IF NOT EXISTS `'.$db.
             '` DEFAULT CHARACTER SET utf8 ;USE `'.$db.'` ;');
-        echo $db.'数据库创建成功！';
+        return true;
     }
 
     /**
@@ -63,9 +64,9 @@ class GenerateModel extends Command {
             $this->getEngine()->execute(
                 "CREATE TABLE IF NOT EXISTS `{$key}` {$value[0]} ENGINE={$value[1]} DEFAULT CHARSET={$charset};"
             );
-            echo $key, '表创建成功！<br>';
+            //echo $key, '表创建成功！<br>';
         }
-        echo 'SQL文件执行完成！';
+        //echo 'SQL文件执行完成！';
     }
 
     private function getTables($sql) {

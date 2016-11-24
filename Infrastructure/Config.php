@@ -121,7 +121,7 @@ class Config extends MagicObject {
 	 * @return $this|void
 	 */
 	public function set($key, $value = null) {
-		if ($this->has($key) && is_array($value)) {
+		if (!is_array($key) && $this->has($key) && is_array($value)) {
 			$this->_data[$key] = array_merge((array)$this->_data[$key], $value);
 			return;
 		}
@@ -150,8 +150,14 @@ class Config extends MagicObject {
 	 * @return array|string
 	 */
 	public static function getValue($key = null, $default = null) {
-		return static::getInstance()->get($key, $default);
+		return static::getInstance()
+            ->get($key, $default);
 	}
+
+	public static function setValue($key, $value = null) {
+        return static::getInstance()
+            ->set($key, $value);
+    }
 
 	/**
 	 *

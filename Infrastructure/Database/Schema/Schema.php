@@ -56,7 +56,8 @@ class Schema extends BaseQuery {
      * 获取所有数据库名
      */
     public function getAllDatabase() {
-        return $this->command()->getArray('SHOW DATABASES');
+        return $this->command()
+            ->getArray('SHOW DATABASES');
     }
 
     /**
@@ -66,9 +67,11 @@ class Schema extends BaseQuery {
      */
     public function getAllTable($arg = null) {
         if (!empty($arg)) {
-            $this->command()->changedDatabase($arg);
+            $this->command()
+                ->changedDatabase($arg);
         }
-        return $this->command()->getArray('SHOW TABLES');
+        return $this->command()
+            ->getArray('SHOW TABLES');
     }
 
     protected function getColumns() {

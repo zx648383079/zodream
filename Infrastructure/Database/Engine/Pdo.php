@@ -26,7 +26,7 @@ class Pdo extends BaseEngine {
 				'mysql:host='. $this->configs['host'].
 				';port='.$this->configs['port'].
 				';dbname='.$this->configs['database'], 
-				$this->configs['user'], 
+				$this->configs['user'],
 				$this->configs['password'],
 				array(
 					\PDO::ATTR_PERSISTENT => $this->configs['persistent'] === true,

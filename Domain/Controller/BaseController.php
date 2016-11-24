@@ -49,10 +49,13 @@ abstract class BaseController extends Action {
 	public function runAction($action, array $vars = array()) {
         Factory::timer()->record('controllerStart');
 		$this->action = $action;
-		if ($this->canCSRFValidate && Request::isPost() && !VerifyCsrfToken::verify()) {
-			return Error::out('BAD POST REQUEST!', __FILE__, __LINE__);
+		if ($this->canCSRFValidate
+            && Request::isPost()
+            && !VerifyCsrfToken::verify()) {
+			throw new \HttpRequestException('BAD POST REQUEST!');
 		}
-		if ($this->canCSRFValidate) {
+		if ($this->canCSRFValidate
+            && Request::isGet()) {
 			VerifyCsrfToken::create();
 		}
 		if (!$this->hasAction($action)) {
@@ -78,11 +81,11 @@ abstract class BaseController extends Action {
 			return call_user_func($class);
 		}
 		if (!class_exists($class)) {
-			Error::out($action. ' CANNOT RUN CLASS!', __FILE__, __LINE__);
+			throw new \HttpUrlException($action. ' CANNOT RUN CLASS!');
 		}
 		$instance = new $class;
 		if (!$instance instanceof Action) {
-			Error::out($action. ' IS NOT ACTION!', __FILE__, __LINE__);
+			throw new \HttpUrlException($action. ' IS NOT ACTION!');
 		}
 		$instance->init();
 		$instance->prepare();
@@ -92,7 +95,7 @@ abstract class BaseController extends Action {
 	}
 
 	private function runAllAction($action, $vars = array()) {
-		$reflectionObject = new \ReflectionObject( $this );
+		$reflectionObject = new \ReflectionObject($this);
 		$action .= APP_ACTION;
 		$method = $reflectionObject->getMethod($action);
 
@@ -113,13 +116,15 @@ abstract class BaseController extends Action {
 				$arguments[] = $param->getDefaultValue();
 				continue;
 			}
-			Error::out($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!', __FILE__, __LINE__);
+			throw new \HttpUrlException($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!');
 		}
-		if ($this->canCache && Request::isGet() && (($cache = $this->runCache(get_called_class().$this->action.serialize($arguments))) !== false)) {
+		if ($this->canCache && Request::isGet() &&
+            (($cache = $this->runCache(get_called_class().$this->action.serialize($arguments))) !== false)) {
 			return new HtmlResponse($cache);
 		}
 		return call_user_func_array(array($this, $action), $arguments);
 	}
+
 	/**
 	 * 加载其他控制器的方法
 	 * @param static|string $controller
