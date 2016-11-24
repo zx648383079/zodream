@@ -26,6 +26,8 @@ use Zodream\Infrastructure\Url\Url;
  * @method registerJs($js, $position = self::HTML_FOOT, $key = null)
  * @method registerJsFile($url, $options = [], $key = null)
  * @method getAssetFile($file)
+ * @method get($key, $default = null)
+ * @method set($key, $value = null)
  * @method string head()
  * @method string foot()
  * @method start($name)
@@ -53,21 +55,11 @@ class View {
      */
     protected $factory;
     
-    protected $data;
-    
-    public function __construct($factory, $file = null, array $data = array()) {
+    public function __construct($factory, $file = null) {
         $this->factory = $factory;
-        $this->setData($data)->setFile($file);
-    }
-
-    /**
-     * SET DATA
-     * @param array $data
-     * @return $this
-     */
-    public function setData(array $data) {
-        $this->data = $data;
-        return $this;
+        if (!empty($file)) {
+            $this->setFile($file);
+        }
     }
 
     /**
@@ -105,7 +97,7 @@ class View {
         }
         $obLevel = ob_get_level();
         ob_start();
-        extract($this->data, EXTR_SKIP);
+        extract($this->factory->get(), EXTR_SKIP);
         try {
             include $this->file->getFullName();
         } catch (Exception $e) {

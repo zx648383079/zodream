@@ -19,11 +19,11 @@ trait ConfigTrait {
         return $this;
     }
 
-    public function loadConfigs() {
+    public function loadConfigs($default = []) {
         if (empty($this->configKey)) {
             return;
         }
-        $configs = Config::getValue($this->configKey);
+        $configs = Config::getValue($this->configKey, $default);
         if (is_array($configs)) {
             $this->setConfigs($configs);
         }

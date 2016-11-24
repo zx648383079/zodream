@@ -22,12 +22,7 @@ use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 class ViewFactory extends MagicObject {
 
     protected $configKey = 'view';
-    protected $configs = array(
-        'driver' => null,
-        'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
-        'suffix' => '.php',
-        'assets' => '/'
-    );
+    protected $configs = array();
     use ConfigTrait;
 
 
@@ -63,7 +58,12 @@ class ViewFactory extends MagicObject {
     protected $sections = [];
     
     public function __construct() {
-        $this->loadConfigs();
+        $this->loadConfigs([
+            'driver' => null,
+            'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
+            'suffix' => '.php',
+            'assets' => '/'
+        ]);
         if (class_exists($this->configs['driver'])) {
             $class = $this->configs['driver'];
             $this->engine = new $class($this);
@@ -141,8 +141,7 @@ class ViewFactory extends MagicObject {
      * @throws \Exception
      */
     public function render($file, array $data = array(), callable $callback = null) {
-        return $this->make($file)
-            ->setData(array_merge($this->get(), $data))
+        return $this->set($data)->make($file)
             ->render($callback);
     }
 

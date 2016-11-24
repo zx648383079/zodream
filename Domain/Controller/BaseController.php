@@ -176,6 +176,21 @@ abstract class BaseController extends Action {
 		return Factory::response()->sendHtml(Factory::view()->render($name, $data));
 	}
 
+    /**
+     * 直接返回文本
+     * @param string $html
+     * @return Response
+     */
+	public function showContent($html) {
+        return Factory::response()->sendHtml($html);
+    }
+
+    /**
+     * ajax 返回
+     * @param $data
+     * @param string $type
+     * @return Response
+     */
 	public function ajax($data, $type = 'json') {
 	    switch (strtolower($type)) {
             case 'xml':
@@ -186,6 +201,12 @@ abstract class BaseController extends Action {
 		return Factory::response()->sendJson($data);
 	}
 
+    /**
+     * 重定向
+     * @param string $url
+     * @param int $time
+     * @return $this
+     */
 	public function redirect($url, $time = 0) {
 		return Factory::response()
             ->sendRedirect(Url::to($url), $time);

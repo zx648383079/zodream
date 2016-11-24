@@ -63,8 +63,11 @@ $configs = array(
 		'allowtype' => 'mp3',				//允许上次类型，用‘；’分开
 		'savepath'  => 'upload/'               //文件保存路径
 	),
+    'log' => array(
+        'name' => 'ZoDream',
+        'file' => 'log/app.log'
+    ),
 	'safe' => array(
-		'log' => '',
 		'csrf' => false						//是否使用csrf防止表单注入攻击
 	),
 	'alias'  => array(
