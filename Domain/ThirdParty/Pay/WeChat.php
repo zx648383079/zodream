@@ -197,7 +197,7 @@ class WeChat extends BasePay {
      * @return array
      */
     protected function getSignData($name, array $args = array()) {
-        $args['nonce_str'] = StringExpand::random(32);
+        $args['noncestr'] = $args['nonce_str'] = StringExpand::random(32);
         return parent::getSignData($name, $args);
     }
 

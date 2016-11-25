@@ -67,7 +67,8 @@ class Url {
             }
             $data[$key] = (string)$item;
         }
-        return $uri->decode(static::getPath($path))->addData($data);
+        return $uri->decode(static::addScript(static::getPath($path)))
+            ->addData($data);
     }
 
 	protected static function getPath($path) {
@@ -83,9 +84,11 @@ class Url {
         if (strpos($path, '//') !== false) {
             $path = preg_replace('#/+#', '/', $path);
         }
-        if (strpos($path, '/') === 0) {
-            return $path;
-        }
+        return $path;
+    }
+
+    protected static function addScript($path) {
+        $path = ltrim($path, '/');
         $name = Request::server('script_name');
         if ($name === '/index.php') {
             return '/'.$path;

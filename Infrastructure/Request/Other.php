@@ -71,8 +71,8 @@ class Other extends BaseRequest {
                 $realIP = $unknown;
             }
         }
-        $realIP = preg_match("/[\d\.]{7,15}/", $realIP, $matches) ? $matches[0] : $unknown;
-        return $realIP;
+        $realIP = filter_var($realIP, FILTER_VALIDATE_IP);
+        return empty($realIP) ? $unknown : $realIP;
     }
 
     public function getIsMobile() {
