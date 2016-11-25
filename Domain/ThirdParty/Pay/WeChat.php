@@ -194,11 +194,12 @@ class WeChat extends BasePay {
      * 加入随机数加入签名
      * @param string $name
      * @param array $args
-     * @return array
+     * @return array|false
      */
     protected function getSignData($name, array $args = array()) {
         $args['noncestr'] = $args['nonce_str'] = StringExpand::random(32);
-        return parent::getSignData($name, $args);
+        $data = parent::getSignData($name, $args);
+        return empty($this->error) ? $data : false;
     }
 
     /**
@@ -233,11 +234,11 @@ class WeChat extends BasePay {
     public function getOrder(array $args = array()) {
         $args = $this->xmlPost('order', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->error = $args['return_msg'];
+            $this->setError($args['return_msg']);
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->error = '数据验签失败！';
+            $this->setError('数据验签失败！');
             return false;
         }
         $this->set($args);
@@ -256,11 +257,11 @@ class WeChat extends BasePay {
     public function queryOrder(array $args = array()) {
         $args = $this->xmlPost('query', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->error = $args['return_msg'];
+            $this->setError($args['return_msg']);
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->error = '数据验签失败！';
+            $this->setError('数据验签失败！');
             return false;
         }
         return $args;
@@ -274,11 +275,11 @@ class WeChat extends BasePay {
     public function closeOrder(array $args = array()) {
         $args = $this->xmlPost('close', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->error = $args['return_msg'];
+            $this->setError($args['return_msg']);
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->error = '数据验签失败！';
+            $this->setError('数据验签失败！');
             return false;
         }
         return $args;
@@ -327,11 +328,11 @@ class WeChat extends BasePay {
     public function queryRefund(array $args = array()) {
         $args = $this->xmlPost('queryRefund', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->error = $args['return_msg'];
+            $this->setError($args['return_msg']);
             return false;
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->error = '数据验签失败！';
+            $this->setError('数据验签失败！');
             return false;
         }
         return $args;
