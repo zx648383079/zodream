@@ -71,7 +71,7 @@ abstract class ThirdParty extends MagicObject {
      */
     public function getMap($name) {
         if (!array_key_exists($name, $this->apiMap)){
-            $this->setError('API NOT EXIST!');
+            throw new \InvalidArgumentException('API NOT EXIST!');
         }
         return $this->apiMap[$name];
     }
@@ -185,7 +185,7 @@ abstract class ThirdParty extends MagicObject {
         }
         if ($this->checkEmpty($item)) {
             if ($need) {
-                $this->setError($keyTemp[0].' IS NEED!');
+                throw  new \InvalidArgumentException($keyTemp[0].' IS NEED!');
             }
             return [];
         }
@@ -204,7 +204,7 @@ abstract class ThirdParty extends MagicObject {
     protected function chooseData(array $item, array $args) {
         $data = $this->getData($item, $args);
         if (empty($data)) {
-            $this->setError('ONE OF MANY IS NEED!');
+            throw new \InvalidArgumentException('ONE OF MANY IS NEED!');
         }
         return $data;
     }
@@ -245,28 +245,5 @@ abstract class ThirdParty extends MagicObject {
      */
     public function __call($name, $arg) {
         return $this->getByApi($name, isset($arg[0]) ? $arg[0] : array());
-    }
-
-    /**
-     * 获取错误信息
-     * @return string
-     */
-    public function getError() {
-        return $this->error;
-    }
-
-    /**
-     * SET ERROR AND LOG OR
-     * @param $arg
-     */
-    public function setError($arg) {
-        if (is_array($arg)) {
-            $arg = print_r($arg, true);
-        };
-        $this->error = $arg;
-        if (defined('DEBUG') && DEBUG) {
-            throw new \Exception($arg);
-        }
-        Factory::log()->error($arg);
     }
 }

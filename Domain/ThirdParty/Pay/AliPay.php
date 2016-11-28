@@ -186,8 +186,7 @@ class AliPay extends BasePay {
 
     protected function getSignData($name, array $args = array()) {
         if (!array_key_exists($name, $this->apiMap)) {
-            $this->setError('API ERROR');
-            return [];
+            throw new \InvalidArgumentException('API ERROR');
         }
         $data = $this->getData($this->apiMap[$name][1], array_merge($this->get(), $args));
         if (array_key_exists('sign_type', $data)) {
@@ -273,8 +272,7 @@ class AliPay extends BasePay {
         $encodes  = array();
         foreach ($blocks as $n => $block) {
             if (!openssl_public_encrypt($block, $chrtext , $res)) {
-                $this->setError(openssl_error_string());
-                return '';
+                throw new \InvalidArgumentException(openssl_error_string());
             }
             $encodes[] = $chrtext ;
         }
@@ -293,7 +291,7 @@ class AliPay extends BasePay {
         $dcyCont = '';
         foreach ($decodes as $n => $decode) {
             if (!openssl_private_decrypt($decode, $dcyCont, $res)) {
-                $this->setError(openssl_error_string());
+                throw new \InvalidArgumentException(openssl_error_string());
                 return '';
             }
             $strnull .= $dcyCont;
@@ -321,7 +319,7 @@ class AliPay extends BasePay {
             return null;
         }
         if (!$this->privateKeyFile->exist()) {
-            $this->setError('私钥文件不存在');
+            throw new FileException('私钥文件不存在');
             return '';
         }
         $res = openssl_get_privatekey($this->privateKeyFile->read());
@@ -360,13 +358,13 @@ class AliPay extends BasePay {
      */
     protected function checkRsaByFile($content, $sign) {
         if (!$this->publicKeyFile->exist()) {
-            $this->setError('公钥文件不存在');
+            throw new FileException('公钥文件不存在');
             return false;
         }
         //转换为openssl格式密钥
         $res = openssl_get_publickey($this->publicKeyFile->read());
         if(!$res){
-            $this->setError('公钥格式错误');
+            throw new \InvalidArgumentException('公钥格式错误');
             return false;
         }
         //调用openssl内置方法验签，返回bool值
@@ -389,7 +387,7 @@ class AliPay extends BasePay {
             "\n-----END PUBLIC KEY-----";
 
         if (!$res) {
-            $this->setError('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
+            throw new \InvalidArgumentException('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
             return false;
         }
         return (bool)openssl_verify($content, base64_decode($sign), $res,
@@ -420,7 +418,7 @@ class AliPay extends BasePay {
         $data = $_POST;//Request::isPost() ? $_POST : $_GET;
         if (!array_key_exists('sign', $data) || 
             !$this->verify($data, $data['sign'])) {
-            $this->setError('验签失败！');
+            throw new \InvalidArgumentException('验签失败！');
             return false;
         }
         return $data;
@@ -440,17 +438,14 @@ class AliPay extends BasePay {
         $url = new Uri($this->apiMap['query'][0]);
         $args = $this->json($this->httpGet($url->setData($this->getSignData('query', $args))));
         if (!array_key_exists('alipay_trade_query_response', $args)) {
-            $this->setError('未知错误！');
-            return false;
+            throw new \ErrorException('未知错误！');
         }
         $args = $args['alipay_trade_query_response'];
         if ($args['code'] != 10000) {
-            $this->setError($args['msg']);
-            return false;
+            throw new \ErrorException($args['msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         return $args;
     }

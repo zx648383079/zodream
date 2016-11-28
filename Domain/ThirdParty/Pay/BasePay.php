@@ -104,8 +104,7 @@ abstract class BasePay extends ThirdParty  {
      */
     protected function getSignData($name, array $args = array()) {
         if (!array_key_exists($name, $this->apiMap)) {
-            $this->setError('API ERROR');
-            return [];
+            throw new \InvalidArgumentException('API ERROR');
         }
         $data = $this->getData($this->apiMap[$name][1], array_merge($this->get(), $args));
         $data['sign'] = $this->sign($data);

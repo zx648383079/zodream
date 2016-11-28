@@ -7,6 +7,7 @@ namespace Zodream\Domain\Rss;
  * Time: 20:42
  */
 use Zodream\Domain\Response\ResponseResult;
+use Zodream\Infrastructure\Factory;
 
 class Rss extends BaseRss {
     protected $language = 'zh-CN';
@@ -44,6 +45,6 @@ class Rss extends BaseRss {
     }
 
     public function Show() {
-        ResponseResult::make($this->toString(), 'rss');
+         return Factory::response()->sendRss($this->toString());
     }
 }

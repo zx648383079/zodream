@@ -60,8 +60,7 @@ class IHuYi extends ThirdParty  {
             return $data['smsid'];
         }
         //$this->errorNo = $data['code'];
-        $this->error = $data['msg'];
-        return false;
+        throw new \ErrorException($data['msg']);
     }
     /**
      * 发送验证短信
@@ -84,7 +83,6 @@ class IHuYi extends ThirdParty  {
         if ($data['code'] == 2) {
             return $data['num'];
         }
-        $this->error = $data['msg'];
-        return false;
+        throw new \ErrorException($data['msg']);
     }
 }

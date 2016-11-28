@@ -252,6 +252,11 @@ class Response {
         return $this->setParameter(StringExpand::value($data));
     }
 
+    public function sendRss($data) {
+        $this->header->setContentType('rss');
+        return $this->setParameter(StringExpand::value($data));
+    }
+
     /**
      * SEND FILE
      * @param File $file

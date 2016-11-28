@@ -8,6 +8,7 @@ namespace Zodream\Domain\ThirdParty\Pay;
  * Time: 19:07
  */
 use Zodream\Domain\Image\Image;
+use Zodream\Domain\ThirdParty\ThirdParty;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
@@ -234,12 +235,10 @@ class WeChat extends BasePay {
     public function getOrder(array $args = array()) {
         $args = $this->xmlPost('order', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->setError($args['return_msg']);
-            return false;
+            throw new \ErrorException($args['return_msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         $this->set($args);
         return $args;
@@ -257,12 +256,10 @@ class WeChat extends BasePay {
     public function queryOrder(array $args = array()) {
         $args = $this->xmlPost('query', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->setError($args['return_msg']);
-            return false;
+            throw new \ErrorException($args['return_msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         return $args;
     }
@@ -275,12 +272,10 @@ class WeChat extends BasePay {
     public function closeOrder(array $args = array()) {
         $args = $this->xmlPost('close', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->setError($args['return_msg']);
-            return false;
+            throw new \ErrorException($args['return_msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         return $args;
     }
@@ -328,12 +323,10 @@ class WeChat extends BasePay {
     public function queryRefund(array $args = array()) {
         $args = $this->xmlPost('queryRefund', $args);
         if ($args['return_code'] != 'SUCCESS') {
-            $this->setError($args['return_msg']);
-            return false;
+            throw new \ErrorException($args['return_msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         return $args;
     }
@@ -360,12 +353,10 @@ class WeChat extends BasePay {
                 XmlExpand::encode($data, 'xml'
                 )));
         if ($args['return_code'] != 'SUCCESS') {
-            $this->setError($args['return_msg']);
-            return false;
+            throw new \ErrorException($args['return_msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         return $args;
     }
@@ -408,16 +399,13 @@ class WeChat extends BasePay {
     public function callback() {
         $args = $this->xml(Request::input());
         if (!is_array($args)) {
-            $this->setError('非法数据');
-            return false;
+            throw new \InvalidArgumentException('非法数据');
         }
         if ($args['return_code'] != 'SUCCESS') {
-            $this->setError($args['return_msg']);
-            return false;
+            throw new \ErrorException($args['return_msg']);
         }
         if (!$this->verify($args, $args['sign'])) {
-            $this->setError('数据验签失败！');
-            return false;
+            throw new \InvalidArgumentException('数据验签失败！');
         }
         return $args;
     }
