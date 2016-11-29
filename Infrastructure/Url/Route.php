@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure\Url;
 use Zodream\Domain\Filter\DataFilter;
 use Zodream\Infrastructure\Config;
 use Zodream\Infrastructure\Error\Error;
+use Zodream\Infrastructure\Factory;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Response;
@@ -152,6 +153,9 @@ class Route {
 		if ($response instanceof Response) {
 			return $response;
 		}
+		if (empty($response) || is_bool($response)) {
+            return Factory::response();
+        }
 		return new Response($response);
 	}
 

@@ -68,7 +68,23 @@ $configs = array(
         'file' => 'log/app.log'
     ),
 	'safe' => array(
-		'csrf' => false						//是否使用csrf防止表单注入攻击
+		'csrf' => false,						//是否使用csrf防止表单注入攻击
+        //http://www.ruanyifeng.com/blog/2016/09/csp.html
+        'csp' => [                              // 网页安全政策 Content-Security-Policy
+            'default-src' => '\'self\'',             //script-src和object-src是必设的，除非设置了default-src。
+            /*'script-src' => '',        //unsafe-inline unsafe-eval nonce hash 必须放在单引号里面。
+            'style-src' => '',
+            'img-src' => '',
+            'media-src' => '',
+            'font-src' => '',
+            'object-src' => '',
+            'child-src' => '',
+            'frame-ancestor' => '',
+            'connect-src' => '',
+            'worker-src' => '',
+            'manifest-src' => '',
+            'report-uri' => '',*/
+        ]
 	),
 	'alias'  => array(
 		'Config' => Zodream\Infrastructure\Config::class,

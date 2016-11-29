@@ -99,6 +99,7 @@ class Response {
 
     public function __construct($parameter = null, $statusCode = 200, array $headers = array()) {
         $this->header = new Header();
+        $headers['Content-Security-Policy'] = Config::getValue('safe.csp');
         $this->header->parse($headers);
         $this->setStatusCode($statusCode)
             ->setParameter($parameter);

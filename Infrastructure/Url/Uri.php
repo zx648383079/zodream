@@ -195,6 +195,18 @@ class Uri {
     }
 
     /**
+     * @param string $arg
+     * @return $this
+     */
+    public function addFragment($arg) {
+        if (empty($this->fragment)) {
+            return $this->setFragment($arg);
+        }
+        $this->fragment .= '&'.$arg;
+        return $this;
+    }
+
+    /**
      * ID
      * @return string
      */

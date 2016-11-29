@@ -52,7 +52,7 @@ class DefaultUri extends Uri {
     }
 
     /**
-     * 将索引数组根据单双转关联数组
+     * 将索引数组根据奇偶转关联数组
      * @param $values
      * @return array
      */
