@@ -15,9 +15,14 @@ class JsonExpand {
             return json_decode($json);
         }
         return json_decode($json, true);
-    } 
-    
-    public static function encode(array $args) {
-        return json_encode($args);
+    }
+
+    /**
+     * @param array $args
+     * @param int $option 默认不编码成 多字节 Unicode \u XXX
+     * @return string
+     */
+    public static function encode(array $args, $option = JSON_UNESCAPED_UNICODE) {
+        return json_encode($args, $option);
     }
 }
