@@ -7,3 +7,4 @@ Thumbs.db
 .buildpath
 .project
 phpunit.bat
+.idea/
