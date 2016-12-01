@@ -16,7 +16,10 @@ class JMailer extends BaseMailer {
     protected $mail;
 
     public function __construct() {
-        $this->mail = new \COM('JMail.Message') or Error::out('CANNOT USE JMail DLL!');
+        $this->mail = new \COM('JMail.Message');
+        if (!$this->mail) {
+            throw new \Exception('CANNOT USE JMail DLL!');
+        }
         if (defined('DEBUG') && DEBUG) {
             $this->mail->SiLent = true; //设置成True的话Jmail不会提示错误只会返回True和False
         }

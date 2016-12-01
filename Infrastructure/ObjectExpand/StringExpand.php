@@ -37,14 +37,6 @@ class StringExpand {
 	 */
 	public static function bindParam(&$sql, $location, $var, $type) {
 		switch (strtoupper($type)) {
-			//字符串
-			default:                    //默认使用字符串类型
-			case 'ENUM':
-			case 'TEXT':
-			case 'STR':
-			case 'STRING' :
-				$var = "'".addslashes($var)."'";      //加上单引号.SQL语句中字符串插入必须加单引号
-				break;
 			case 'INTEGER' :
 			case 'INT' :
 				$var = (int)$var;         //强制转换成int
@@ -56,10 +48,18 @@ class StringExpand {
 			case 'NULL':
 				$var = 'NULL';
 				break;
+            //字符串
+            case 'ENUM':
+            case 'TEXT':
+            case 'STR':
+            case 'STRING' :
+            default:                    //默认使用字符串类型
+                $var = "'".addslashes($var)."'";      //加上单引号.SQL语句中字符串插入必须加单引号
+                break;
 		}
 		//寻找问号的位置
-		for ($i=1, $pos = 0; $i<= $location; $i++) {
-			$pos = strpos($sql, '?', $pos+1);
+		for ($i = 1, $pos = 0; $i <= $location; $i++) {
+			$pos = strpos($sql, '?', $pos + 1);
 		}
 		//替换问号
 		$sql = substr($sql, 0, $pos) . $var . substr($sql, $pos + 1);
@@ -424,7 +424,7 @@ class StringExpand {
 	 * @param $suffix 是否加尾缀
 	 */
 	
-	public static function subStr($str, $start = 0, $length, $charset = "utf-8", $suffix = true) {
+	public static function subStr($str, $start, $length, $charset = 'utf-8', $suffix = true) {
 		if (function_exists("mb_substr")) {
 			if (mb_strlen($str, $charset) <= $length) return $str;
 			$slice = mb_substr($str, $start, $length, $charset);

@@ -53,8 +53,9 @@ abstract class RestController extends BaseController  {
                 return Factory::response()->sendXml($data);
             case 'jsonp':
                 return Factory::response()->sendJsonp($data);
+            default:
+                return Factory::response()->sendJson($data);
         }
-        return Factory::response()->sendJson($data);
     }
 
     /**

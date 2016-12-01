@@ -46,7 +46,7 @@ abstract class I18n extends MagicObject {
      * @return $this
      */
     public function setFileName($arg) {
-        $this-$this->fileName = $arg;
+        $this->fileName = $arg;
         return $this;
     }
 

@@ -103,7 +103,7 @@ class NewsItem extends Object {
 
     protected function getArray(NewsItem $item) {
         if (count($this->articles) > 1) {
-            $item-$this->setDigest(null);
+            $this->setDigest(null);
         }
         return $item->toArray();
     }

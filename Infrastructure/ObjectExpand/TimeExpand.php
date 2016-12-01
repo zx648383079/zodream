@@ -90,11 +90,12 @@ class TimeExpand {
 					mktime(0, 0, 0, 1, 1, date('Y') - 1),
 					mktime(23, 59, 59, 12, 31, date('Y') - 1)
 				);
+            default:
+                return array(
+                    0,
+                    time()
+                );
 		}
-		return array(
-			0,
-			time()
-		);
 	}
 
 	/**
