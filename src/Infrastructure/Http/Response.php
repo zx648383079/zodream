@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Http;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -46,7 +46,7 @@ class Response {
         305 => 'Use Proxy',
         307 => 'Temporary Redirect',
         308 => 'Permanent Redirect',    // RFC7238
-        400 => 'Bad Request',
+        400 => 'Bad Requests',
         401 => 'Unauthorized',
         402 => 'Payment Required',
         403 => 'Forbidden',
@@ -54,7 +54,7 @@ class Response {
         405 => 'Method Not Allowed',
         406 => 'Not Acceptable',
         407 => 'Proxy Authentication Required',
-        408 => 'Request Timeout',
+        408 => 'Requests Timeout',
         409 => 'Conflict',
         410 => 'Gone',
         411 => 'Length Required',
@@ -72,7 +72,7 @@ class Response {
         426 => 'Upgrade Required',                                            // RFC2817
         428 => 'Precondition Required',                                       // RFC6585
         429 => 'Too Many Requests',                                           // RFC6585
-        431 => 'Request Header Fields Too Large',                             // RFC6585
+        431 => 'Requests Header Fields Too Large',                             // RFC6585
         451 => 'Unavailable For Legal Reasons',
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
@@ -143,7 +143,15 @@ class Response {
 
         // cookies
         foreach ($this->header->getCookies() as $cookie) {
-            setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+            setcookie(
+                $cookie->getName(),
+                $cookie->getValue(),
+                $cookie->getExpiresTime(),
+                $cookie->getPath(),
+                $cookie->getDomain(),
+                $cookie->isSecure(),
+                $cookie->isHttpOnly()
+            );
         }
 
         return $this;

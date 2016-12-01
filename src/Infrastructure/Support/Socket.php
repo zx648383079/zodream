@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure\Http;
+namespace Zodream\Infrastructure\Support;
 /**
 * socket 
 * 
@@ -13,9 +13,28 @@ class Socket {
 	
 	protected $port;
     
-    public function __construct($ip, $port) {
+    public function __construct($ip = null, $port = null) {
+        if (!empty($ip) && !empty($port)) {
+            $this->setIpAddress($ip, $port);
+        }
+    }
+
+    /**
+     * SET IP AND PORT
+     * @param string $ip
+     * @param int $port
+     * @return $this
+     */
+    public function setIpAddress($ip, $port = 80) {
+        if (false !== strpos($ip, ':')) {
+            list($ip, $port) = explode(':', $ip);
+        }
+        if (empty($ip)) {
+            $ip = '127.0.0.1';
+        }
         $this->ip = $ip;
-        $this->port = $port;
+        $this->port = intval($port);
+        return $this;
     }
 
     /**
@@ -23,6 +42,7 @@ class Socket {
 	 */
 	public function create() {
 		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        return $this;
 	}
 
 	/**
@@ -32,6 +52,7 @@ class Socket {
 	public function listen($backlog = 4) {
 		socket_bind($this->socket, $this->ip, $this->port);
 		socket_listen($this->socket, $backlog); // 4条等待
+        return $this;
 	}
 	
 	/**
@@ -39,6 +60,7 @@ class Socket {
 	 */
 	public function connect() {
 		socket_connect($this->socket, $this->ip, $this->port);
+        return $this;
 	}
 	
 	/**
@@ -46,6 +68,7 @@ class Socket {
 	 */
 	public function accept() {
 		socket_accept($this->socket);
+        return $this;
 	}
 
 	/**
@@ -67,6 +90,7 @@ class Socket {
 	 */
 	public function write($content) {
 		 socket_write($this->socket, $content);
+        return $this;
 	}
 		
 	/**
@@ -74,6 +98,7 @@ class Socket {
 	 */
 	public function close() {
 		socket_close($this->socket);
+        return $this;
 	}
 	
 	/**

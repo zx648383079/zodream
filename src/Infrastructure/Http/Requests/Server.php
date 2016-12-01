@@ -1,13 +1,13 @@
 <?php
-namespace Zodream\Infrastructure\Request;
+namespace Zodream\Infrastructure\Http\Requests;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/4/3
  * Time: 9:29
  */
-class Files extends BaseRequest {
+class Server extends BaseRequest {
     public function __construct() {
-        $this->setValues($_FILES);
+        $this->setValues($_SERVER);
     }
 }

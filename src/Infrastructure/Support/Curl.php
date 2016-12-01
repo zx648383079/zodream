@@ -1,13 +1,6 @@
 <?php
-namespace Zodream\Infrastructure\Http;
+namespace Zodream\Infrastructure\Support;
 
-/**
- * Created by PhpStorm.
- * User: zx648
- * Date: 2016/8/17
- * Time: 13:49
- * Update: 2016-09-27  ADD FORMAT
- */
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
@@ -40,19 +33,22 @@ class Curl {
     /**
      * SET URL
      * @param string|Uri $url
+     * @param bool $verifySSL
      * @return Curl
      */
-    public function setUrl($url) {
+    public function setUrl($url, $verifySSL = false) {
         if (!$url instanceof Uri) {
             $url = new Uri($url);
         }
-        if ($url->getScheme() == 'https') {
+        if ($verifySSL && $url->isSSL()) {
             $this->setOption(CURLOPT_SSL_VERIFYPEER, FALSE)
                 ->setOption(CURLOPT_SSL_VERIFYHOST, FALSE)
                 ->setOption(CURLOPT_SSLVERSION, 1);
         }
         return $this->setOption(CURLOPT_URL, (string)$url);
     }
+
+
 
     /**
      * @param string|array $option

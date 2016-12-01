@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure;
 */
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request\BaseRequest;
-defined('APP_SAFE') or define('APP_SAFE', Config::getInstance()->get('app.safe', true));
+defined('APP_SAFE') || define('APP_SAFE', Config::getInstance()->get('app.safe', true));
 
 final class Request {
 
@@ -17,7 +17,6 @@ final class Request {
 		'get' => null,
 		'post' => null,
 		'header' => null,
-		'input' => null,
 		'request' => null,
 		'server' => null,
 		'other' => null
@@ -35,7 +34,7 @@ final class Request {
 		if (self::$_instances[$name] instanceof BaseRequest) {
 			return self::$_instances[$name];
 		}
-		$class = 'Zodream\\Infrastructure\\Request\\'.ucfirst($name);
+		$class = 'Zodream\\Infrastructure\\Http\\Requests\\'.ucfirst($name);
 		return self::$_instances[$name] = new $class;
 	}
 
@@ -108,7 +107,7 @@ final class Request {
 	 * @return string
 	 */
 	public static function input() {
-		return self::_getInstance(__FUNCTION__)->get();
+		return file_get_contents('php://input');
 	}
 
 	/**

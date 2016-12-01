@@ -415,7 +415,7 @@ class AliPay extends BasePay {
      * @return mixed
      */
     public function callback() {
-        $data = $_POST;//Request::isPost() ? $_POST : $_GET;
+        $data = $_POST;//Requests::isPost() ? $_POST : $_GET;
         if (!array_key_exists('sign', $data) || 
             !$this->verify($data, $data['sign'])) {
             throw new \InvalidArgumentException('验签失败！');

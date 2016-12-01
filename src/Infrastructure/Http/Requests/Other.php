@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Request;
+namespace Zodream\Infrastructure\Http\Requests;
 
 /**
  * Created by PhpStorm.
@@ -31,9 +31,8 @@ class Other extends BaseRequest {
     public function getMethod() {
         if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
             return strtoupper($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
-        } else {
-            return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
         }
+        return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
     }
 
     /**

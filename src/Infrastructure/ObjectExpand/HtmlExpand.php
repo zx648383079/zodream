@@ -8,6 +8,50 @@ namespace Zodream\Infrastructure\ObjectExpand;
  */
 class HtmlExpand {
 
+    /**
+     * 压缩html，
+     * @param string $arg
+     * @param bool $all 如果包含js请用false
+     * @return string
+     */
+    public static function compress($arg, $all = true) {
+        if (!$all) {
+            return preg_replace(
+                '/>\s+</',
+                '><',
+                preg_replace(
+                    "/>\s+\r\n/",
+                    '>', $arg));
+        }
+        return ltrim(rtrim(preg_replace(
+            array('/> *([^ ]*) *</',
+                '//',
+                '#/\*[^*]*\*/#',
+                "/\r\n/",
+                "/\n/",
+                "/\t/",
+                '/>[ ]+</'
+            ),
+            array(
+                '>\\1<',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '><'
+            ), $arg)));
+    }
+
+    /**
+     * 过滤html元素
+     * @param string $content
+     * @return string
+     */
+    public static function filterHtml($content) {
+        return preg_replace('/<(.*?)>/', '', htmlspecialchars_decode($content));
+    }
+
     public static function shortString($content, $length = 100) {
         $content = preg_replace('/(\<.+?\>)|(\&nbsp;)+/', '', htmlspecialchars_decode($content));
         return StringExpand::subString($content, 0, $length);

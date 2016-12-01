@@ -26,9 +26,8 @@ class Loader extends MagicObject {
 		$file = APP_DIR. '/Domain/Plugin/'. $plugin. '.php';
 		if (is_file($file)) {
 			include_once($file);
-		} else {
-			exit('Error: Could not load plugin ' . $plugin . '!');
 		}
+		throw new \InvalidArgumentException('Error: Could not load plugin ' . $plugin . '!');
 	}
 
 	/**
@@ -60,9 +59,8 @@ class Loader extends MagicObject {
 					call_user_func(array($instance, $action));
 				}
 				$this->set(is_numeric($key) ? (str_replace('\\', '_', $value).$after) : $key, $instance);
-			} else {
-				exit('Error: Could not load ' . $class . '!');
 			}
+			throw new \InvalidArgumentException('Error: Could not load ' . $class . '!');
 		}
 	}
 }

@@ -1,17 +1,11 @@
 <?php
-namespace Zodream\Infrastructure\Url;
+namespace Zodream\Infrastructure\Http\Component;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/8/6
  * Time: 10:07
  */
-use Zodream\Domain\Image\Image;
-use Zodream\Infrastructure\Disk\Directory;
-use Zodream\Infrastructure\Disk\FileObject;
-use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\Http\Curl;
-use Zodream\Infrastructure\Request;
 
 class Uri {
 
@@ -51,6 +45,13 @@ class Uri {
      */
     public function getScheme() {
         return $this->scheme;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSSL() {
+        return 'https' == $this->scheme;
     }
 
     /**
@@ -122,13 +123,10 @@ class Uri {
     }
 
     /**
-     * @param string|FileObject $arg
+     * @param string $arg
      * @return $this
      */
     public function setPath($arg) {
-        if ($arg instanceof FileObject) {
-            $arg = $arg->toUrl();
-        }
         $this->path = $arg;
         return $this;
     }
@@ -286,39 +284,6 @@ class Uri {
             return $arg. ':'. $this->port;
         }
         return $arg;
-    }
-
-    /**
-     * @return bool|FileObject
-     */
-    public function toFile() {
-        return (new Directory(Request::server('DOCUMENT_ROOT')))
-            ->child($this->path);
-    }
-
-    /**
-     * @return Route
-     */
-    public function run() {
-        return Factory::router()->run($this);
-    }
-
-    /**
-     * GET WEB PAGE BY URL
-     * @return Curl
-     */
-    public function get() {
-        return new Curl($this);
-    }
-
-    /**
-     * GENERATE QRCODE
-     * @return Image
-     */
-    public function qrcode() {
-        $image = new Image();
-        $image->create($this->encode());
-        return $image;
     }
 
     public function __toString() {

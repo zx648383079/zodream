@@ -17,88 +17,6 @@ class StringExpand {
 	public static function value($value) {
 		return is_callable($value) ? call_user_func($value) : $value;
 	}
-	
-	public static function formatSize($size) { 
-		$sizes = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB"); 
-		if ($size == 0) {  
-			return('n/a');  
-		} else { 
-		return (round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $sizes[$i]);  
-		} 
-	}
-
-	/**
-	 * 绑定值
-	 * @param string $sql
-	 * @param int $location ? 的位置
-	 * @param string|int $var 值
-	 * @param string $type 值得类型
-	 * @return string
-	 */
-	public static function bindParam(&$sql, $location, $var, $type) {
-		switch (strtoupper($type)) {
-			case 'INTEGER' :
-			case 'INT' :
-				$var = (int)$var;         //强制转换成int
-				break;
-			case 'BOOL':
-			case 'BOOLEAN':
-				$var = $var ? 1 : 0;
-				break;
-			case 'NULL':
-				$var = 'NULL';
-				break;
-            //字符串
-            case 'ENUM':
-            case 'TEXT':
-            case 'STR':
-            case 'STRING' :
-            default:                    //默认使用字符串类型
-                $var = "'".addslashes($var)."'";      //加上单引号.SQL语句中字符串插入必须加单引号
-                break;
-		}
-		//寻找问号的位置
-		for ($i = 1, $pos = 0; $i <= $location; $i++) {
-			$pos = strpos($sql, '?', $pos + 1);
-		}
-		//替换问号
-		$sql = substr($sql, 0, $pos) . $var . substr($sql, $pos + 1);
-	}
-
-	/**
-	 * 压缩html，
-	 * @param string $arg
-	 * @param bool $all 如果包含js请用false
-	 * @return string
-	 */
-	public static function compress($arg, $all = true) {
-		if (!$all) {
-			return preg_replace(
-				'/>\s+</',
-				'><',
-				preg_replace(
-					"/>\s+\r\n/",
-					'>', $arg));
-		}
-		return ltrim(rtrim(preg_replace(
-			array('/> *([^ ]*) *</',
-				'//',
-				'#/\*[^*]*\*/#',
-				"/\r\n/",
-				"/\n/",
-				"/\t/",
-				'/>[ ]+</'
-			),
-			array(
-				'>\\1<',
-				'',
-				'',
-				'',
-				'',
-				'',
-				'><'
-			), $arg)));
-	}
 
 	/**
 	 * 拓展str_repeat 重复字符并用字符连接
@@ -151,23 +69,11 @@ class StringExpand {
 		} elseif (function_exists('openssl_random_pseudo_bytes')) {
 			$bytes = openssl_random_pseudo_bytes($length, $strong);
 			if ($bytes === false || $strong === false) {
-				Error::out('Unable to generate random string.', __FILE__, __LINE__);
+				throw new \InvalidArgumentException('Unable to generate random string.');
 			}
 			return $bytes;
-		} else {
-			Error::out('OpenSSL extension or paragonie/random_compat is required for PHP 5 users.', __FILE__, __LINE__);
 		}
-		return null;
-	}
-
-	/**
-	 * 合并多个获取完整的路径
-	 * @param string $baseDir
-	 * @param string $other
-	 * @return string
-	 */
-	public static function getFile($baseDir, $other) {
-		return preg_replace('#[\\/]{2,}#', '/', implode('/', func_get_args()));
+		throw new \ErrorException('OpenSSL extension or paragonie/random_compat is required for PHP 5 users.');
 	}
 
 	/**
@@ -187,56 +93,24 @@ class StringExpand {
 		}
 		if (!is_null($value)) {
 			$data[$key] = $value;
-		} else {
-			if (is_array($key)) {
-				foreach ($key as $k => $val) {
-					if (!is_integer($k)) {
-						$data[$k] = $val;
-						continue;
-					}
-					$temps = self::explode($val, '=', 2);
-					$data[$temps[0]] = $temps[1];
-				}
-			} else if (is_string($key)) {
-				$keys = array();
-				parse_str($key, $keys);
-				$data = array_merge($data, $keys);
-			}
+            return $arr[0].'?'.http_build_query($data);
 		}
+        if (is_array($key)) {
+            foreach ($key as $k => $val) {
+                if (!is_integer($k)) {
+                    $data[$k] = $val;
+                    continue;
+                }
+                $temps = self::explode($val, '=', 2);
+                $data[$temps[0]] = $temps[1];
+            }
+        } else if (is_string($key)) {
+            $keys = array();
+            parse_str($key, $keys);
+            $data = array_merge($data, $keys);
+        }
 		return $arr[0].'?'.http_build_query($data);
 	}
-
-	/**
-	 * 获取两个路径的相对路径
-	 * @param string $a1
-	 * @param string $b1
-	 * @return string
-	 */
-	public static function getRelationPath($a1, $b1) {
-		$a1 = explode('/', ltrim($a1, '/'));
-		$b1 = explode('/', ltrim($b1, '/'));
-		for($i = 0; isset($b1[$i], $a1[$i]); $i++){
-			if($a1[$i] == $b1[$i]) $a1[$i] = "..";
-			else break;
-		}
-		return implode('/', $a1);
-	}
-
-	public static function getAbsolutePath($path) {
-        $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
-        $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
-        $absolutes = array();
-        foreach ($parts as $part) {
-            if ('.' == $part) continue;
-            if ('..' == $part) {
-                array_pop($absolutes);
-            } else {
-                $absolutes[] = $part;
-            }
-        }
-        return implode(DIRECTORY_SEPARATOR, $absolutes);
-    }
-
 	/**
 	 * 生成简单的随机字符串
 	 * @param  int  $length
@@ -278,15 +152,6 @@ class StringExpand {
 	 */
 	public static function byteLength($string) {
 		return mb_strlen($string, '8bit');
-	}
-
-	/**
-	 * 过滤html元素
-	 * @param string $content
-	 * @return string
-	 */
-	public static function filterHtml($content) {
-		return preg_replace('/<(.*?)>/', '', htmlspecialchars_decode($content));
 	}
 
 	/**
@@ -376,10 +241,9 @@ class StringExpand {
 		}
 		if (function_exists('mb_strlen')) {
 			return mb_strlen($str,'utf-8');
-		} else {
-			preg_match_all("/./u", $str, $ar);
-			return count($ar[0]);
 		}
+        preg_match_all("/./u", $str, $ar);
+        return count($ar[0]);
 	}
 
 	/**
@@ -397,21 +261,17 @@ class StringExpand {
 			if(func_num_args() >= 3) {
 				$end = func_get_arg(2);
 				return mb_substr($str,$start,$end,'utf-8');
-			} else {
-				mb_internal_encoding("UTF-8");
-				return mb_substr($str,$start);
 			}
-	
-		} else {
-			$null = "";
-			preg_match_all("/./u", $str, $ar);
-			if (func_num_args() >= 3) {
-				$end = func_get_arg(2);
-				return join($null, array_slice($ar[0], $start, $end));
-			} else {
-				return join($null, array_slice($ar[0], $start));
-			}
+            mb_internal_encoding("UTF-8");
+            return mb_substr($str,$start);
 		}
+        $null = "";
+        preg_match_all("/./u", $str, $ar);
+        if (func_num_args() >= 3) {
+            $end = func_get_arg(2);
+            return join($null, array_slice($ar[0], $start, $end));
+        }
+        return join($null, array_slice($ar[0], $start));
 	}
 	
 	/*

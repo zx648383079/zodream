@@ -88,7 +88,7 @@ $configs = array(
 	),
 	'alias'  => array(
 		'Config' => Zodream\Infrastructure\Config::class,
-		'Request' => Zodream\Infrastructure\Request::class,
+		'Requests' => Zodream\Infrastructure\Request::class,
 		'Cookie' => Zodream\Infrastructure\Cookie::class
 	),
 	// 注册事件

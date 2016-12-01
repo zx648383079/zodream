@@ -1,13 +1,13 @@
 <?php
-namespace Zodream\Infrastructure\Request;
+namespace Zodream\Infrastructure\Http\Requests;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/4/3
  * Time: 9:29
  */
-class Post extends BaseRequest {
+class Request extends BaseRequest {
     public function __construct() {
-        $this->setValues($_POST);
+        $this->setValues($_REQUEST);
     }
 }

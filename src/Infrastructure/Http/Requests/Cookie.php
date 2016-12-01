@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Request;
+namespace Zodream\Infrastructure\Http\Requests;
 /**
  * Created by PhpStorm.
  * User: zx648

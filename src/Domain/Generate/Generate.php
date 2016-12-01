@@ -44,9 +44,9 @@ class Generate {
 			Redirect::to('/');
 		}
 		$this->setModel();
-		/*if (Request::isPost()) {
+		/*if (Requests::isPost()) {
 			ResponseResult::sendContentType();
-			$this->makeConfig(Request::post());
+			$this->makeConfig(Requests::post());
 			$this->importSql(APP_DIR.'/document/zodream.sql');
 			Redirect::to('/', 10, '安装完成！');
 		}*/
