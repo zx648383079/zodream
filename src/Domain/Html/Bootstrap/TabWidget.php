@@ -25,8 +25,8 @@ class TabWidget extends Widget {
         $title = $content = null;
         foreach ($data['items'] as $key => $item) {
             $active = count($item) > 2;
-            $title .= $this->getTitle($item['title'] ?? $item[0], $key, $active);
-            $content .= $this->getContent($item['content'] ?? $item[0], $key, $active);
+            $title .= $this->getTitle($item['title'] ?: $item[0], $key, $active);
+            $content .= $this->getContent($item['content'] ?: $item[0], $key, $active);
         }
         unset($data['items']);
         return Html::div(Html::ul($title, [

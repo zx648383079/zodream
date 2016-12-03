@@ -8,7 +8,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Time: 10:23
  */
 use Zodream\Domain\Response\RedirectResponse;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 

@@ -120,7 +120,6 @@ class PayPal extends BaseOAuth {
      */
     public function getInfo() {
         $this->http->addHeaders(array(
-            'Content-Type' => 'application/json',
             'Authorization' => "Bearer " . $this->get('access_token'),
             'Content-Type' => 'x-www-form-urlencoded'
         ));

@@ -7,6 +7,7 @@ namespace Zodream\Domain\View\Engine;
  * Date: 2016/7/16
  * Time: 10:24
  */
+use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\DomainObject\EngineObject;
 

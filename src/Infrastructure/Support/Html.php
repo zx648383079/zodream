@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Support;
 
 /**
  * Created by PhpStorm.
@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure;
  * Date: 2016/4/29
  * Time: 16:50
  */
-use Zodream\Infrastructure\Url\Url;
+use Zodream\Infrastructure\Routing\Url;
 class Html {
     /**
      * @var array 无内容的标签
@@ -69,13 +69,13 @@ class Html {
 
     /**
      * 标签
-     * @param $name 标签名
+     * @param string $name 标签名
      * @param string $content 内容
      * @param array $options 属性值
      * @return string
      */
     public static function tag($name, $content = '', $options = array()) {
-        $html = "<$name" . static::renderTagAttributes($options) . '>';
+        $html = '<'.$name . static::renderTagAttributes($options) . '>';
         return isset(static::$voidTags[strtolower($name)]) ? $html : "{$html}{$content}</{$name}>";
     }
 

@@ -6,8 +6,8 @@ namespace Zodream\Infrastructure\Event;
  * Date: 2016/3/10
  * Time: 9:13
  */
-use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Config;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 
 class EventManger {

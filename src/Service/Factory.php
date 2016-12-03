@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure;
+namespace Zodream\Service;
 /**
  * FACTORY!
  *      EVERYWHERE CAN USE,AND NOT CREATE, AND ALL IS SAME,
@@ -23,7 +23,7 @@ use Zodream\Infrastructure\Http\Header;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
-use Zodream\Infrastructure\Url\Router;
+use Zodream\Service\Routing\Router;
 
 class Factory {
     

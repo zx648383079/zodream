@@ -8,7 +8,7 @@ namespace Zodream\Infrastructure\Traits;
  * Time: 15:08
  */
 use Monolog\Logger;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 
 trait LogTrait {
     /**

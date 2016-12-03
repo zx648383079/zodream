@@ -1,17 +1,17 @@
 <?php
-namespace Zodream\Infrastructure\Url;
+namespace Zodream\Service\Routing;
 
 /**
  * 单个路由
  * @author Jason
  */
 use Zodream\Domain\Filter\DataFilter;
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\Error\Error;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
-use Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\Response;
+use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\Http\Response;
 
 class Route {
 

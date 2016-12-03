@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure;
+namespace Zodream\Service;
 /**
 * 读写配置
 * 
@@ -18,12 +18,8 @@ class Config extends MagicObject {
 	protected static $path;
 	
 	public static function setPath($value = null) {
-		if (!is_dir($value)) {
-			if (defined('APP_DIR') && is_dir(APP_DIR)) {
-				$value = APP_DIR.'/Service/config/';
-			} else {
-				$value = dirname(dirname(dirname(dirname(dirname(__FILE__))))). '/Service/config/';
-			}
+		if (!is_dir($value) && defined('APP_DIR') && is_dir(APP_DIR)) {
+			$value = APP_DIR.'/Service/config/';
 		}
 		static::$path = $value;
 	}
@@ -51,12 +47,12 @@ class Config extends MagicObject {
 	 * @param array $args
 	 */
 	public function reset($args = array()) {
-		$configs = $this->_getConfig(dirname(dirname(__FILE__)). '/Service/config.php');
+		$configs = $this->getConfig(__DIR__. '/config/config.php');
 		$personal = array();
 		if (defined('APP_MODULE')) {
-			$personal = $this->_getConfig(static::getPath().APP_MODULE.'.php');
+			$personal = $this->getConfig(static::getPath().APP_MODULE.'.php');
 		}
-		$common  = $this->_getConfig(static::getPath().'config.php');
+		$common  = $this->getConfig(static::getPath().'config.php');
 		$this->set(ArrayExpand::merge2D((array)$configs, 
 			(array)$common, (array)$personal, (array)$args));
 	}
@@ -66,13 +62,13 @@ class Config extends MagicObject {
 	 * @param string $file
 	 * @return array
      */
-	private function _getConfig($file) {
+	protected function getConfig($file) {
 		if (!is_file($file)) {
 			return array();
 		}
 		$config = include($file);
 		if (is_string($config)) {
-			return $this->_getConfig($config);
+			return $this->getConfig($config);
 		}
 		return $config;
 	}
@@ -118,12 +114,12 @@ class Config extends MagicObject {
 	 * 支持根据键合并数组
 	 * @param array|string $key
 	 * @param mixed $value
-	 * @return $this|void
+	 * @return $this
 	 */
 	public function set($key, $value = null) {
 		if (!is_array($key) && $this->has($key) && is_array($value)) {
 			$this->_data[$key] = array_merge((array)$this->_data[$key], $value);
-			return;
+			return $this;
 		}
 		return parent::set($key, $value);
 	}

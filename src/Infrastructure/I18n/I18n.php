@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\I18n;
  * Date: 2016/6/25
  * Time: 17:15
  */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Request;

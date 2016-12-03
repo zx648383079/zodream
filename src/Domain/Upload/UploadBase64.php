@@ -32,7 +32,7 @@ class UploadBase64 extends BaseUpload {
         if (!$this->file->write($this->name) ||
             !$this->file->exist()) { //移动失败
             $this->setError('ERROR_WRITE_CONTENT');
-            return;
+            return false;
         }
         return true;
     }

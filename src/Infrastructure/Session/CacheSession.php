@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure\Session;
  * Date: 2016/3/6
  * Time: 9:56
  */
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 class CacheSession extends Session {
 
     public function useCustomStorage() {

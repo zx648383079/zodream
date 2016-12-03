@@ -7,7 +7,7 @@ namespace Zodream\Domain\Rest\OAuth\Grant;
  * Date: 2016/11/29
  * Time: 15:46
  */
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Url\Uri;
 

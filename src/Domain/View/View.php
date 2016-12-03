@@ -9,10 +9,11 @@ namespace Zodream\Domain\View;
  */
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Error\FileException;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
+use Zodream\Infrastructure\Http\Component\Uri;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 use Zodream\Infrastructure\Traits\ConditionTrait;
-use Zodream\Infrastructure\Url\Url;
+use Zodream\Infrastructure\Routing\Url;
 
 /**
  * Class View
@@ -23,7 +24,7 @@ use Zodream\Infrastructure\Url\Url;
  * @method registerLinkTag($url, $options = array(), $key = null)
  * @method registerCss($css, $key = null)
  * @method registerCssFile($url, $options = array(), $key = null)
- * @method registerJs($js, $position = self::HTML_FOOT, $key = null)
+ * @method registerJs($js, $position = 'html body end', $key = null)
  * @method registerJsFile($url, $options = [], $key = null)
  * @method getAssetFile($file)
  * @method get($key, $default = null)
@@ -100,10 +101,10 @@ class View {
         extract($this->factory->get(), EXTR_SKIP);
         try {
             include $this->file->getFullName();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->handleViewException($e, $obLevel);
-        } catch (Throwable $e) {
-            $this->handleViewException(new FatalThrowableError($e), $obLevel);
+        } catch (\Throwable $e) {
+            $this->handleViewException(new \Exception($e), $obLevel);
         }
 
         return ltrim(ob_get_clean());
@@ -161,7 +162,7 @@ class View {
      * GET COMPLETE URL
      * @param null $file
      * @param null $extra
-     * @return string|\Zodream\Infrastructure\Url\Uri
+     * @return string|Uri
      */
     public function url($file = null, $extra = null) {
         return Url::to($file, $extra, true);

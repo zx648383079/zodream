@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Domain\Upload;
+use phpDocumentor\Reflection\Types\Null_;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -22,8 +24,10 @@ class UploadFile extends BaseUpload {
         'UPLOAD_ERR_EXTENSION'
     ];
 
-    public function __construct(array $args) {
-        $this->load($args);
+    public function __construct(array $args = null) {
+        if (!is_null($args)) {
+            $this->load($args);
+        }
     }
 
     public function load($name, $tempName = null, $size = 0, $error = 0) {

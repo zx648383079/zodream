@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Traits;
  * Date: 2016/9/1
  * Time: 16:39
  */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 trait ConfigTrait {
 
     /**

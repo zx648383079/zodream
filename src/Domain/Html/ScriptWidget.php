@@ -6,7 +6,7 @@ namespace Zodream\Domain\Html;
  * Date: 2016/4/29
  * Time: 16:24
  */
-use Zodream\Infrastructure\Url\Url;
+use Zodream\Service\Routing\Url;
 use Zodream\Infrastructure\Html;
 
 class ScriptWidget extends Widget {

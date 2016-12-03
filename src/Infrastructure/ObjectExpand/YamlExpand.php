@@ -288,8 +288,8 @@ class YamlExpand {
      * Returns YAML from a key and a value
      * @access private
      * @return string
-     * @param $key The name of the key
-     * @param $value The value of the item
+     * @param string $key The name of the key
+     * @param mixed $value The value of the item
      * @param $indent The indent of the current node
      */
     private function _dumpNode($key, $value, $indent, $previous_key = -1, $first_key = 0, $source_array = null) {

@@ -1,28 +1,16 @@
 <?php
-namespace Zodream\Infrastructure\Url;
-/**
- * Created by PhpStorm.
- * User: zx648
- * Date: 2016/8/9
- * Time: 19:10
- */
-use Zodream\Infrastructure\Request;
+namespace Zodream\Service;
 
-class DefaultUri extends Uri {
-    public function __construct($url = null) {
-        if (!is_null($url)) {
-            parent::__construct($url);
-            return;
-        }
+class Web extends Application {
 
-        $this->setPath(Request::get('z') ?: $this->getRouteByUrl());
+    public function setPath($path) {
+        return parent::setPath($this->getRealPath($path));
     }
 
-    protected function getRouteByUrl() {
-        $urlParams = explode('.php', Url::getUriWithoutParam());
-        list($routes, $args) = $this->_spiltArrayByNumber(explode('/', trim(end($urlParams), '/\\')));
+    protected function getRealPath($path) {
+        list($routes, $args) = $this->spiltArrayByNumber(explode('/', trim($path, '/')));
         Request::get(true)->set($args);
-        return implode('\\', $routes);
+        $this->path = implode('/', $routes);
     }
 
     /**
@@ -30,7 +18,7 @@ class DefaultUri extends Uri {
      * @param array $routes
      * @return array (routes, values)
      */
-    private function _spiltArrayByNumber(array $routes) {
+    protected function spiltArrayByNumber(array $routes) {
         $values = array();
         for ($i = 0, $len = count($routes); $i < $len; $i++) {
             if (!is_numeric($routes[$i])) {
@@ -47,7 +35,7 @@ class DefaultUri extends Uri {
         }
         return array(
             $routes,
-            $this->_pairValues($values)
+            $this->pairValues($values)
         );
     }
 
@@ -56,7 +44,7 @@ class DefaultUri extends Uri {
      * @param $values
      * @return array
      */
-    private function _pairValues($values) {
+    protected function pairValues($values) {
         $args = array();
         for ($i = 0, $len = count($values); $i < $len; $i += 2) {
             if (isset($values[$i + 1])) {

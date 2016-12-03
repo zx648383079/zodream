@@ -7,7 +7,7 @@ namespace Zodream\Domain\Rest\OAuth\Exception;
  * Date: 2016/11/29
  * Time: 16:59
  */
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Response;
 use Zodream\Infrastructure\Url\Uri;

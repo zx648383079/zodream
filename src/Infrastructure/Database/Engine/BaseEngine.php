@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure\Database\Engine;
  *
  */
 use Zodream\Infrastructure\Base\ConfigObject;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 abstract class BaseEngine extends ConfigObject {
 	
 	protected $driver             = null;

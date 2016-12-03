@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Disk;
 /**
  * 文件操作
  *

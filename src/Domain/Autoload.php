@@ -5,7 +5,7 @@ namespace Zodream\Domain;
  *
  * @author Jason
  */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\Base\MagicObject;
 

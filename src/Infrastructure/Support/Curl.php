@@ -2,9 +2,7 @@
 namespace Zodream\Infrastructure\Support;
 
 use Zodream\Infrastructure\Disk\File;
-use Zodream\Infrastructure\ObjectExpand\JsonExpand;
-use Zodream\Infrastructure\ObjectExpand\XmlExpand;
-use Zodream\Infrastructure\Url\Uri;
+use Zodream\Infrastructure\Http\Component\Uri;
 
 /**
  * MAKE CURL WITH MY KIND

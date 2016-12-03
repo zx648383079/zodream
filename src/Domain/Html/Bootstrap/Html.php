@@ -6,7 +6,7 @@ namespace Zodream\Domain\Html\Bootstrap;
  * Date: 2016/6/4
  * Time: 10:58
  */
-use Zodream\Infrastructure\Html as BaseHtml;
+use Zodream\Infrastructure\Support\Html as BaseHtml;
 
 class Html extends BaseHtml {
 

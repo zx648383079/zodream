@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Http;
+namespace Zodream\Domain\Support;
 
 /**
  * Created by PhpStorm.
@@ -7,8 +7,7 @@ namespace Zodream\Infrastructure\Http;
  * Date: 2016/8/17
  * Time: 9:30
  */
-use Zodream\Infrastructure\Disk\File;
-use Zodream\Infrastructure\Url\Uri;
+use Zodream\Infrastructure\Http\Component\Uri;
 
 class Http {
 

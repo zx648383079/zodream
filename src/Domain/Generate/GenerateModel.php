@@ -21,7 +21,7 @@ SHOW VARIABLES                               //列出 MySQL 系统环境变量�
 SHOW PROCESSLIST                             //列出执行命令。
 SHOW GRANTS FOR user                         //列出某用户权限
  */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 

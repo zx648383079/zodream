@@ -184,6 +184,10 @@ class Column {
     }
 
 
+    /**
+     * @param $arg
+     * @return Column
+     */
     public function default($arg) {
         if (is_string($arg)) {
             $arg = "'{$arg}'";

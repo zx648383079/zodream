@@ -206,6 +206,7 @@ class BladeCompiler extends CompilerEngine {
             if ($method2 === 'compileEscapedEchos') {
                 return 1;
             }
+            return 0;
         });
 
         return $methods;

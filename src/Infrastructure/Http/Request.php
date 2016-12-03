@@ -1,5 +1,5 @@
 <?php 
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Http;
 /**
 * http 请求信息获取类
 * 
@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure;
 */
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request\BaseRequest;
+use Zodream\Service\Config;
 defined('APP_SAFE') || define('APP_SAFE', Config::getInstance()->get('app.safe', true));
 
 final class Request {

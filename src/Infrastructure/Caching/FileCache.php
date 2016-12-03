@@ -5,7 +5,7 @@ namespace Zodream\Infrastructure\Caching;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\File;
 

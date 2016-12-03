@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Disk;
  * Date: 2016/7/29
  * Time: 11:26
  */
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 abstract class FileObject {
     protected $name;
     

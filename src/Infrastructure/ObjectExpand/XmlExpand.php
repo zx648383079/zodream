@@ -33,9 +33,10 @@ class XmlExpand {
     /**
      * 特殊的xml 编码 主要用于微信回复
      * @param array $args
+     * @return string
      */
     public static function specialEncode(array $args, $root = 'xml') {
-        $document = ArrayToXml::createXML($root, static::toSpecialArarry($args))->saveXML();
+        return ArrayToXml::createXML($root, static::toSpecialArarry($args))->saveXML();
     }
 
     /**

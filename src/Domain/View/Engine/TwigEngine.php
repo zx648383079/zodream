@@ -6,6 +6,7 @@ namespace Zodream\Domain\View\Engine;
  * Date: 2016/7/16
  * Time: 15:51
  */
+use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\DomainObject\EngineObject;
 use Twig_Loader_Filesystem;
 use Twig_Environment;
@@ -35,5 +36,17 @@ class TwigEngine implements EngineObject {
      */
     public function get($path, array $data = []) {
         return $this->driver->render($path, $data);
+    }
+
+    /**
+     * COMPILER FILE TO CACHE FILE
+     *
+     * @param File $file
+     * @param File $cacheFile
+     * @return bool
+     */
+    public function compile(File $file, File $cacheFile)
+    {
+        // TODO: Implement compile() method.
     }
 }

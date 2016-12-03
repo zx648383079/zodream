@@ -9,12 +9,11 @@ namespace Zodream\Domain\ThirdParty;
  */
 use Zodream\Domain\Filter\Filters\RequiredFilter;
 use Zodream\Infrastructure\Base\MagicObject;
-use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\Http\Http;
+use Zodream\Service\Config;
+use Zodream\Domain\Support\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
-use Zodream\Infrastructure\Url\Uri;
+use Zodream\Infrastructure\Http\Component\Uri;
 
 abstract class ThirdParty extends MagicObject {
     /**

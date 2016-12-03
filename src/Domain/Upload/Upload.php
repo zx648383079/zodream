@@ -83,7 +83,8 @@ class Upload extends MagicObject {
     public function save() {
         $result = true;
         foreach ($this->_data as $item) {
-            $result = !$item->save($this->directory->childFile($item->getRandomName())) || $result;
+            $item->setFile($this->directory->childFile($item->getRandomName()));
+            $result = !$item->save() || $result;
         }
         return $result;
     }
@@ -96,7 +97,7 @@ class Upload extends MagicObject {
         return $result;
     }
 
-    public function checkSize($min = 10000000, $max = nulll) {
+    public function checkSize($min = 10000000, $max = null) {
         $result = true;
         foreach ($this->_data as $item) {
             $result = !$item->checkSize($min, $max) || $result;
@@ -105,7 +106,7 @@ class Upload extends MagicObject {
     }
     
     public function saveOne($file, $index = 0) {
-        return $this->_data[$index]->save($file);
+        return $this->_data[$index]->setFile($file)->save();
     }
 
     public function getError($index = null) {

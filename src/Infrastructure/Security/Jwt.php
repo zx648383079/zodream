@@ -40,7 +40,7 @@ class Jwt extends BaseSecurity {
         return $this->key;
     }
     
-    public function encode($payload) {
+    public function encrypt($payload) {
         $header = array('typ' => 'JWT', 'alg' => $this->algo); 
         $segments = array(
             $this->urlsafeB64Encode(json_encode($header)), 
@@ -52,7 +52,7 @@ class Jwt extends BaseSecurity {
         return implode('.', $segments);
     }
 
-    public function decode($jwt) { 
+    public function decrypt($jwt) {
         $tks = explode('.', $jwt);
         if (count($tks) != 3) {
             throw new Exception('Wrong number of segments');

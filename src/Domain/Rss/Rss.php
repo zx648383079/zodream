@@ -7,7 +7,7 @@ namespace Zodream\Domain\Rss;
  * Time: 20:42
  */
 use Zodream\Domain\Response\ResponseResult;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 
 class Rss extends BaseRss {
     protected $language = 'zh-CN';
@@ -25,7 +25,7 @@ class Rss extends BaseRss {
 
     public function toString() {
         $out = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
-        $out .= '<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n";
+        $out .= '<rss version="2.0" >' . "\n";
 
         $out .= "<channel>\n";
         $out .= '<title>' . $this->title . "</title>\n";

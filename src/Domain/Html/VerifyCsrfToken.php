@@ -2,7 +2,7 @@
 namespace Zodream\Domain\Html;
 
 use Zodream\Infrastructure\Error\Error;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 

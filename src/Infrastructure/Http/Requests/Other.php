@@ -7,7 +7,7 @@ namespace Zodream\Infrastructure\Http\Requests;
  * Date: 2016/4/3
  * Time: 9:29
  */
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 class Other extends BaseRequest {
 

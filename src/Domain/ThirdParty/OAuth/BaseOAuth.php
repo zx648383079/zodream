@@ -7,7 +7,7 @@ namespace Zodream\Domain\ThirdParty\OAuth;
  * Time: 14:34
  */
 use Zodream\Domain\ThirdParty\ThirdParty;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 
@@ -52,6 +52,7 @@ abstract class BaseOAuth extends ThirdParty  {
             return false;
         }
         $this->set('code', $code);
+        return true;
     }
 
     /**

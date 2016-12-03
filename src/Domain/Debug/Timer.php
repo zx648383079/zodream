@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Debug;
 
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 class Timer {
 	protected $startTime;

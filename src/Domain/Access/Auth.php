@@ -7,7 +7,7 @@ namespace Zodream\Domain\Access;
  */
 use Zodream\Infrastructure\DomainObject\AuthObject;
 use Zodream\Infrastructure\DomainObject\UserObject;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 
 class Auth implements AuthObject {
 

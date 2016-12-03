@@ -1,12 +1,11 @@
 <?php
-namespace Zodream\Infrastructure\Url;
+namespace Zodream\Service\Routing;
 
 /**
  * url生成
  */
-use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\Request;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\Http\Component\Uri;
+use Zodream\Infrastructure\Http\Request;
 
 defined('APP_URL') || define('APP_URL', Url::getRoot());
 class Url {
@@ -103,13 +102,21 @@ class Url {
 	 * @return string
 	 */
 	public static function getRoot($withScript = TRUE) {
-		$root = (self::isSsl() ? 'https' : 'http'). '://'.self::getHost() . '/';
+		$root = (static::isSsl() ? 'https' : 'http'). '://'.static::getHost() . '/';
 		$self = Request::server('script_name');
 		if ($self !== '/index.php' && $withScript) {
 			$root .= ltrim($self, '/');
 		}
 		return $root;
 	}
+
+    /**
+     * GET CURRENT URI
+     * @return string
+     */
+	public static function getCurrentUri() {
+        return ltrim(static::getRoot(false), '/').static::getUri();
+    }
 
 	/**
 	 * 获取host 包括域名和端口 80 隐藏

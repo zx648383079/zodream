@@ -258,7 +258,7 @@ class ArrayExpand {
 	 */
 	public static function split(array $args, $index = 0) {
 		if (count($args) <= $index) {
-			return [null, nulll];
+			return [null, null];
 		}
 		$i = 0;
 		foreach ($args as $key => $item) {
@@ -267,6 +267,7 @@ class ArrayExpand {
 			}
 			$i ++ ;
 		}
+        return [null, null];
 	}
 
 	/**

@@ -1026,6 +1026,7 @@ class Less {
 					return $this->lib_e($items[0]);
 				}
 				$this->throwError("unrecognised input");
+                break;
 			case "string":
 				$arg[1] = "";
 				return $arg;

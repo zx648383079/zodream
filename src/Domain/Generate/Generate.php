@@ -3,9 +3,9 @@ namespace Zodream\Domain\Generate;
 
 use Zodream\Domain\Model\Model;
 use Zodream\Domain\Response\Redirect;
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\Database\Command;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Template;
@@ -391,7 +391,7 @@ class Generate {
 				$result .= '|string:3-'.$match[2];
 				break;
 		}
-		return ltrim($result, '|');
+		return trim($result, '|');
 	}
 
 	/**

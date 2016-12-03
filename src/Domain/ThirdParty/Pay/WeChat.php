@@ -14,7 +14,7 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Request;
 use Zodream\Infrastructure\Url\Uri;
-use Zodream\Infrastructure\Url\Url;
+use Zodream\Service\Routing\Url;
 
 class WeChat extends BasePay {
     /**

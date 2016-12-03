@@ -5,7 +5,7 @@ namespace Zodream\Domain\Image;
  *
  * @author Jason
  */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 
 final class VerifyCode extends WaterMark {
 	const CHARSET     = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';//随机因子

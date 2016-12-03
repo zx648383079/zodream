@@ -23,7 +23,7 @@ class Common extends ThirdParty  {
                 '#key'
             )
         ),
-        'exchange' => array(
+        'exchange1' => array(
             'http://op.juhe.cn/onebox/exchange/query',
             array(
                 '#key'

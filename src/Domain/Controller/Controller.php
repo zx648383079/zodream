@@ -6,8 +6,8 @@ namespace Zodream\Domain\Controller;
  * @author Jason
  * @time 2015-12-19
  */
-use Zodream\Infrastructure\Config;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Config;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\Loader;
 use Zodream\Infrastructure\Traits\LoaderTrait;
 

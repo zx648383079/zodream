@@ -6,8 +6,8 @@ namespace Zodream\Infrastructure\Error;
 * @author Jason
 */
 use Zodream\Domain\Response\ResponseResult;
-use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\Url\Url;
+use Zodream\Service\Factory;
+use Zodream\Service\Routing\Url;
 use Zodream\Infrastructure\Log;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 

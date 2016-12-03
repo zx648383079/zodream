@@ -7,8 +7,8 @@ namespace Zodream\Infrastructure\Http\Requests;
  * Date: 2016/4/3
  * Time: 9:29
  */
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
-use Zodream\Infrastructure\Request;
 
 class Header extends BaseRequest {
     public function __construct() {

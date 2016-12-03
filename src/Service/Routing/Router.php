@@ -1,26 +1,22 @@
 <?php 
-namespace Zodream\Infrastructure\Url;
+namespace Zodream\Service\Routing;
 /**
 * BASE ROUTER
  * 		IT DON'T KNOW HOW TO JUDGE, BU IT'S CHILD KNOW!
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Config;
+use Zodream\Service\Config;
 use Zodream\Infrastructure\DomainObject\RouteObject;
-use Zodream\Infrastructure\Factory;
-use Zodream\Infrastructure\Request;
+use Zodream\Service\Factory;
+use Zodream\Infrastructure\Http\Component\Uri;
+use Zodream\Infrastructure\ Http\Request;
 
 class Router {
 	/**
 	 * @var Route[]
 	 */
 	protected $routes = [];
-	
-	public function getRoute() {
-		return $this->route;
-	}
-
 
 	public function __construct() {
 		$this->load();
@@ -44,10 +40,10 @@ class Router {
 
     /**
      * 路由加载及运行方法
-     * @param string|Url $url
+     * @param string|Uri $url
      * @return Route
      */
-	public function run($url) {
+	public function getRoute($url) {
         Factory::timer()->record('route');
 	    if ($url instanceof Uri) {
 	        $url = $url->getPath();

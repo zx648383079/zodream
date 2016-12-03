@@ -7,7 +7,7 @@ namespace Zodream\Domain\Rest;
  * Time: 18:22
  */
 use Zodream\Domain\Controller\BaseController;
-use Zodream\Infrastructure\Factory;
+use Zodream\Service\Factory;
 use Zodream\Infrastructure\Request;
 
 abstract class RestController extends BaseController  {

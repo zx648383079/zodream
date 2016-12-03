@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure;
+namespace Zodream\Infrastructure\Support;
 /**
  * Created by PhpStorm.
  * User: zx648

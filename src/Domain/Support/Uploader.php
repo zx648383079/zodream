@@ -1,101 +1,36 @@
 <?php
-namespace Zodream\Domain\Upload;
+namespace Zodream\Domain\Support;
 
-/**
- * Created by PhpStorm.
- * User: zx648
- * Date: 2016/6/28
- * Time: 14:17
- */
- use Zodream\Infrastructure\Base\ConfigObject;
- use Zodream\Infrastructure\Disk\File;
- use Zodream\Infrastructure\FileSystem;
- 
-abstract class BaseUpload extends ConfigObject {
-
-    protected $configKey = 'upload';
-
-    protected $configs = [
-        'allowType' => ['png', 'jpg', 'jpeg', 'bmp', 'gif'],
-        'maxSize' => 2000000
-    ];
-
-    protected $name;
-
-    protected $type;
-
-    protected $size;
+use Zodream\Infrastructure\Disk\File;
+class Uploader {
 
     /**
      * @var File
      */
     protected $file;
-    
-    protected $error = null;
-    
-    protected $errorMap = [];
 
-    public function setError($error = 0) {
-        if (empty($error)) {
-            return $this;
-        }
-        if (!is_numeric($error)) {
-            $this->error = $error;
-        }
-        $this->error = $this->errorMap[$error] || $error;
-        return $this;
-    }
+    protected $errorMap = [
+        null,
+        'UPLOAD_ERR_INI_SIZE',
+        'UPLOAD_ERR_FORM_SIZE',
+        'UPLOAD_ERR_PARTIAL',
+        'NO FILE',
+        'FILE IS NULL',
+        'UPLOAD_ERR_NO_TMP_DIR',
+        'UPLOAD_ERR_CANT_WRITE',
+        'UPLOAD_ERR_EXTENSION'
+    ];
 
-    /**
-     * 获取保存后的路径
-     * @return File
-     */
-    public function getFile() {
-        return $this->file;
+    public function __construct($file) {
+        $this->setFile($file);
     }
 
     public function setFile($file) {
-        if ($file instanceof File) {
-            $file = new File($file);
-        }
         $this->file = $file;
-        return $this;
     }
 
-    public function getError() {
-        return $this->error;
-    }
-    
-    public function getName() {
-        return $this->name;
-    }
-    
-    public function setType($type = null) {
-        if (empty($type)) {
-            $type = FileSystem::getExtension($this->name);
-        }
-        $this->type = $type;
-        return $this;
-    }
-    
-    public function getType() {
-        if (empty($this->type)) {
-            $this->setType();
-        }
-        return $this->type;
-    }
-    
-    public function getSize() {
-        return $this->size;
-    }
-    
-
-    /**
-     * 保存到指定路径
-     * @return bool
-     */
     public function save() {
-        return $this->checkDirectory();
+
     }
 
     public function getRandomName($template = null) {
