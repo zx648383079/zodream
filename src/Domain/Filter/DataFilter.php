@@ -1,14 +1,94 @@
 <?php
 namespace Zodream\Domain\Filter;
 
-use Zodream\Domain\Filter\Filters\NoneFilter;
 use Zodream\Infrastructure\DomainObject\FilterObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-defined('PHP_INT_MIN') or define('PHP_INT_MIN', 0);
-defined('PHP_INT_MAX') or define('PHP_INT_MAX', 99999);
+defined('PHP_INT_MIN') || define('PHP_INT_MIN', 0);
+defined('PHP_INT_MAX') || define('PHP_INT_MAX', 99999);
 
 class DataFilter {
+    protected $data = [];
+
+    public function __construct() {
+        static::$errors = [];
+    }
+
+    public function setData(array $data) {
+        $this->data = $data;
+        return $this;
+    }
+
+    protected function getFilters($options) {
+        if (is_string($options)) {
+            $options = self::splitKeyAndFilters($options);
+        }
+        $filters = array();
+        foreach ($options as $key => $value) {
+            if (is_array($value) && is_integer($key)) {
+                $key = array_shift($value);
+            }
+            $filter = self::getFiltersFromOne($value);
+            if (!empty($filter)) {
+                $filters[] = [
+                    $key,
+                    $filter
+                ];
+            }
+        }
+        return $filters;
+    }
+
+    protected function splitKeyAndFilters($option) {
+        $options = explode(';', $option);
+        $results = array();
+        foreach ($options as $key => $value) {
+            $temp = explode(',', $value);
+            $rules = array_pop($temp);
+            $results[] = [
+                empty($temp) ? $key : $temp,
+                $rules
+            ];
+        }
+        return $results;
+    }
+
+    protected function getFiltersFromOne($option) {
+        if (is_string($option)) {
+            $option = explode('|', $option);
+        }
+        $option = (array)$option;
+        $filters = array();
+        $message = null;
+        if (array_key_exists('message', $option)) {
+            $message = $option['message'];
+            unset($option['message']);
+        }
+        foreach ($option as $value) {
+            $filter = self::createFilter($value);
+            if (empty($filter)) {
+                continue;
+            }
+            $filter->setError($message);
+            $filters[] = $filter;
+        }
+        return $filters;
+    }
+
+    /**
+     * @param string $arg
+     * @return FilterObject
+     */
+    public function createFilter($arg) {
+        list($filter, $option) = StringExpand::explode($arg, ':', 2);
+        $filter = strtolower($filter);
+        if (in_array($filter, self::$filterMap)) {
+            $class = 'Zodream\\Domain\\Filter\\Filters\\'.ucfirst($filter).'Filter';
+            return new $class($option);
+        }
+        return null;
+    }
+
     protected static $filterMap = array(
         'confirm', 
 		'email', 
@@ -27,7 +107,7 @@ class DataFilter {
 		'url'
     );
 
-	protected static $error = array();
+	protected static $errors = array();
 
 	/**
 	 * GET ERRORS WHO VALIDATE FAIL
@@ -36,26 +116,26 @@ class DataFilter {
 	 */
 	public static function getError($key = null) {
 		if (empty($key)) {
-			return self::$error;
+			return static::$errors;
 		}
-		if (!array_key_exists($key, self::$error)) {
+		if (!array_key_exists($key, static::$error)) {
 			return array();
 		}
-		return self::$error[$key];
+		return static::$errors[$key];
 	}
 	
 	public static function getFirstError($key) {
-		if (!array_key_exists($key, self::$error)) {
+		if (!array_key_exists($key, static::$errors)) {
 			return null;
 		}
-		return current(self::$error[$key]);
+		return current(static::$errors[$key]);
 	}
 
-	private static function setError($key, $error) {
-		if (!array_key_exists($key, self::$error)) {
-			self::$error[$key] = array();
+	protected static function setError($key, $error) {
+		if (!array_key_exists($key, static::$errors)) {
+            static::$errors[$key] = array();
 		}
-		self::$error[$key][] = $error;
+        static::$errors[$key][] = $error;
 	}
 
 	/**
@@ -103,9 +183,8 @@ class DataFilter {
     
     protected static function runFilterOrValidate($args, $option, $isValidate = true) {
 		$args = (array)$args;
-		$option = (array)$option;
-		self::$error = array();
-    	$filters = self::getFilters($option);
+		static::$error = array();
+    	$filters = static::getFilters($option);
     	if ($isValidate) {
     		return self::runValidate($filters, $args);
     	}
@@ -137,7 +216,7 @@ class DataFilter {
 	 */
     protected static function runValidate(array $filters, array $args) {
     	$results = array();
-    	foreach ($filters as $key => $value) {
+    	foreach ($filters as $value) {
     		$result = true;
     		foreach ($value as $val) {
 				/** @param FilterObject $val  */
@@ -151,59 +230,5 @@ class DataFilter {
     	return !in_array(false, $results);
     }
     
-    protected static function getFilters($options) {
-    	if (is_string($options)) {
-    		$options = self::splitKeyAndFilters($options);
-    	}
-		$filters = array();
-    	foreach ($options as $key => $value) {
-    		$filter = self::getFiltersFromOne($value);
-			if (!empty($filter)) {
-				$filters[$key] = $filter;
-			}
-    	}
-    	return $filters;
-    }
-    
-    protected static function splitKeyAndFilters($option) {
-    	$options = explode(';', $option);
-    	$results = array();
-    	foreach ($options as $key => $value) {
-    		$temp = explode(',', $value, 2);
-    		if (count($temp) == 1) {
-    			$results[$key] = $value;
-    		} else {
-    			$results[$temp[0]] = $temp[1];
-    		}
-    	}
-    	return $results;
-    }
 
-    protected static function getFiltersFromOne($option) {
-    	if (is_string($option)) {
-    		$option = explode('|', $option);
-    	}
-		$filters = array();
-    	foreach ((array)$option as $value) {
-    		$filter = self::createFilter($value);
-			if (!empty($filter)) {
-				$filters[] = $filter;
-			}
-    	}
-    	return $filters;
-    }
-
-	/**
-	 * @param string $arg
-	 * @return FilterObject
-	 */
-    public static function createFilter($arg) {
-        list($filter, $option) = StringExpand::explode($arg, ':', 2);
-        $filter = strtolower($filter);
-        if (in_array($filter, self::$filterMap)) {
-            $class = 'Zodream\\Domain\\Filter\\Filters\\'.ucfirst($filter).'Filter';
-            return new $class($option);
-        }
-        return null;
-    }
 }
