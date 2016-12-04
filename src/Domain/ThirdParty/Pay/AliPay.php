@@ -9,7 +9,7 @@ namespace Zodream\Domain\ThirdParty\Pay;
  */
 use Zodream\Infrastructure\Error\FileException;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Url\Uri;
 use Zodream\Service\Routing\Url;
 

@@ -1,7 +1,7 @@
 <?php
-namespace Zodream\Domain\Rest\OAuth\Grant;
+namespace Zodream\Service\Rest\OAuth\Grant;
 use Zodream\Domain\Rest\OAuth\Exception\OAuthServerException;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 /**
  * Created by PhpStorm.

@@ -12,7 +12,7 @@ use Zodream\Domain\ThirdParty\ThirdParty;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Url\Uri;
 use Zodream\Service\Routing\Url;
 

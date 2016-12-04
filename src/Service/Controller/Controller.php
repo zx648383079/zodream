@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Controller;
+namespace Zodream\Service\Controller;
 /**
  * 控制器基类
  *

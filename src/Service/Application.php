@@ -7,8 +7,6 @@ namespace Zodream\Service;
 * @time 2015-12-19
 */
 use Zodream\Domain\Autoload;
-use Zodream\Service\Config;
-use Zodream\Service\Factory;
 use Zodream\Infrastructure\Event\EventManger;
 
 defined('VERSION') || define('VERSION', 'v3');

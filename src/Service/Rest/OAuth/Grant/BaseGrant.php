@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Rest\OAuth\Grant;
+namespace Zodream\Service\Rest\OAuth\Grant;
 
 /**
  * Created by PhpStorm.
@@ -8,7 +8,7 @@ namespace Zodream\Domain\Rest\OAuth\Grant;
  * Time: 15:47
  */
 use Zodream\Domain\Rest\OAuth\Exception\OAuthServerException;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 abstract class BaseGrant {
 

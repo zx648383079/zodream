@@ -8,7 +8,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  */
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 /**
  * Class Message

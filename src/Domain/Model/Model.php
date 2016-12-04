@@ -10,7 +10,7 @@ use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 abstract class Model extends MagicObject {
 

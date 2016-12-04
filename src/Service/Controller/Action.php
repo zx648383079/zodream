@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Controller;
+namespace Zodream\Service\Controller;
 /**
  * Created by PhpStorm.
  * User: zx648

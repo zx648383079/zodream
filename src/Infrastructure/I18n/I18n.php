@@ -9,7 +9,7 @@ namespace Zodream\Infrastructure\I18n;
 use Zodream\Service\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Base\MagicObject;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 abstract class I18n extends MagicObject {
 

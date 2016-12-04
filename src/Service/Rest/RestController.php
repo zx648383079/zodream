@@ -1,17 +1,16 @@
 <?php
-namespace Zodream\Domain\Rest;
+namespace Zodream\Service\Rest;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/11/28
  * Time: 18:22
  */
-use Zodream\Domain\Controller\BaseController;
+use Zodream\Service\Controller\BaseController;
 use Zodream\Service\Factory;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Requestquest;
 
 abstract class RestController extends BaseController  {
-    protected $version = 'v1';
 
     /**
      * @return string

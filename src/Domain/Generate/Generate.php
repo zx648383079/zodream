@@ -1,13 +1,11 @@
 <?php
 namespace Zodream\Domain\Generate;
 
-use Zodream\Domain\Model\Model;
-use Zodream\Domain\Response\Redirect;
 use Zodream\Service\Config;
 use Zodream\Infrastructure\Database\Command;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Template;
 
 class Generate {

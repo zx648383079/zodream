@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Rest\OAuth\Grant;
+namespace Zodream\Service\Rest\OAuth\Grant;
 
 /**
  * Created by PhpStorm.
@@ -7,7 +7,7 @@ namespace Zodream\Domain\Rest\OAuth\Grant;
  * Date: 2016/11/29
  * Time: 15:46
  */
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 class RefreshTokenGrant extends BaseGrant {
 

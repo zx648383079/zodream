@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Http;
 * @author Jason
 */
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
-use Zodream\Infrastructure\Request\BaseRequest;
+use Zodream\Infrastructure\Http\Request\BaseRequest;
 use Zodream\Service\Config;
 defined('APP_SAFE') || define('APP_SAFE', Config::getInstance()->get('app.safe', true));
 

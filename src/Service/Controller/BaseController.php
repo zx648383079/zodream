@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Controller;
+namespace Zodream\Service\Controller;
 /**
  * 控制器基类
  *
@@ -10,7 +10,7 @@ use Zodream\Domain\Access\Auth;
 use Zodream\Domain\Html\VerifyCsrfToken;
 use Zodream\Service\Config;
 use Zodream\Service\Factory;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Event\EventManger;
 use Zodream\Infrastructure\Response;

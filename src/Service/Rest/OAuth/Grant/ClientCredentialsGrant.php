@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Rest\OAuth\Grant;
+namespace Zodream\Service\Rest\OAuth\Grant;
 /**
  * Created by PhpStorm.
  * User: zx648

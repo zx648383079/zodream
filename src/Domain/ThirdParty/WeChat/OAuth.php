@@ -10,7 +10,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 use Zodream\Domain\Response\RedirectResponse;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 
 /**
  * Class OAuth

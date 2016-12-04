@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Rest\OAuth\Grant;
+namespace Zodream\Service\Rest\OAuth\Grant;
 
 /**
  * Created by PhpStorm.
@@ -8,7 +8,7 @@ namespace Zodream\Domain\Rest\OAuth\Grant;
  * Time: 15:46
  */
 use Zodream\Service\Factory;
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Url\Uri;
 
 class AuthCodeGrant extends BaseGrant {

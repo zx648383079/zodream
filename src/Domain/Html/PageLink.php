@@ -5,7 +5,7 @@ namespace Zodream\Domain\Html;
  * 使用方式:
  * $page = new Page();
  */
-use Zodream\Infrastructure\Request;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Service\Routing\Url;
 
 class PageLink extends Widget {

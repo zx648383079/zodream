@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Rest\OAuth\Exception;
+namespace Zodream\Service\Rest\OAuth\Exception;
 /**
  * Created by PhpStorm.
  * User: zx648
