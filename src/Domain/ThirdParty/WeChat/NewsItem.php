@@ -6,9 +6,9 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Date: 2016/8/20
  * Time: 11:13
  */
-use Zodream\Infrastructure\Base\Object;
+use Zodream\Infrastructure\Base\ZObject;
 
-class NewsItem extends Object {
+class NewsItem extends ZObject {
     protected $title;
     protected $thumb;
     protected $author;

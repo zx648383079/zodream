@@ -6,13 +6,13 @@ namespace Zodream\Infrastructure\Base;
  * Date: 2016/8/20
  * Time: 12:36
  */
-abstract class Object {
+abstract class ZObject {
     /**
-     * @param array|Object $args
+     * @param array|ZObject $args
      * @return $this
      */
     public function parse($args) {
-        if ($args instanceof Object) {
+        if ($args instanceof ZObject) {
             $args = $args->toArray();
         }
         foreach ((array)$args as $key => $item) {

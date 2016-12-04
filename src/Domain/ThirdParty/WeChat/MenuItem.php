@@ -6,9 +6,9 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Date: 2016/8/19
  * Time: 22:37
  */
-use Zodream\Infrastructure\Base\Object;
+use Zodream\Infrastructure\Base\ZObject;
 
-class MenuItem extends Object {
+class MenuItem extends ZObject {
     const CLICK = 'click';
     const VIEW = 'view';
     const SCAN_CODE_MSG = 'scancode_waitmsg';
