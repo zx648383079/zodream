@@ -11,15 +11,13 @@ namespace Zodream\Service;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Zodream\Infrastructure\Response;
 use Zodream\Domain\Debug\Timer;
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Disk\Directory;
-use Zodream\Infrastructure\DomainObject\RouterObject;
-use Zodream\Infrastructure\Error\Error;
-use Zodream\Infrastructure\Http\Header;
+use Zodream\Infrastructure\Http\Requests\Header;
+use Zodream\Infrastructure\Http\Response;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
 use Zodream\Infrastructure\Session\Session;
@@ -35,7 +33,7 @@ class Factory {
      * @param string $key CONFIG'S KEY
      * @param string $default
      * @return object
-     * @throws Error\Exception
+     * @throws \Exception
      */
     public static function getInstance($key, $default = null) {
         if (!array_key_exists($key, static::$_instance)) {
@@ -44,7 +42,7 @@ class Factory {
                 $class = $class['driver'] ?: current($class);
             }
             if (!class_exists($class)) {
-                Error::out($class.'CLASS IS NOT EXCITE!', __FILE__, __LINE__);
+                throw new \InvalidArgumentException($class.'CLASS IS NOT EXCITE!');
             }
             static::$_instance[$key] = new $class;
         }

@@ -59,7 +59,7 @@ class PersonalMenuItem extends MenuItem {
     }
 
     public function toArray() {
-        $data = parent::get();
+        $data = parent::toArray();
         if (!array_key_exists('button', $data)) {
             return $data;
         }

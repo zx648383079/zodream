@@ -120,6 +120,7 @@ class MenuItem extends ZObject {
             $data['media_id'] = $this->mediaId;
             return $data;
         }
+        return $data;
     }
 
 }

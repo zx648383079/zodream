@@ -7,16 +7,28 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Date: 2016/8/22
  * Time: 19:33
  */
-use Zodream\Domain\Response\BaseResponse;
-use Zodream\Domain\Response\ResponseResult;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
+use Zodream\Service\Factory;
 
-class MessageResponse extends BaseResponse {
+class MessageResponse {
 
     protected $data = [];
 
-    public function __construct() {
+    protected $aesKey;
+
+    protected $encryptType;
+
+    protected $appId;
+
+    protected $token;
+
+    public function __construct($token = null, $aesKey = null, $encryptType = null, $appId = null) {
         $this->setCreateTime(time());
+        $this->aesKey = $aesKey;
+        $this->appId = $appId;
+        $this->encryptType = $encryptType;
+        $this->token = $token;
     }
 
     public function setData($name, $value, $isCData = true) {
@@ -179,11 +191,33 @@ class MessageResponse extends BaseResponse {
     }
 
     public function sendContent() {
-        ResponseResult::make($this->makeXml(), 'xml');
-        return parent::sendContent();
+        return Factory::response()->sendXml($this->makeXml())->send();
     }
 
     protected function makeXml() {
-        return XmlExpand::encode($this->data, 'xml');
+        $xml = XmlExpand::encode($this->data, 'xml');
+        if ($this->encryptType != 'aes') {
+            return $xml;
+        }
+        $aes = new Aes($this->aesKey, $this->appId);
+        $encrypt = $aes->encrypt($xml);
+        $timestamp = time();
+        $nonce = StringExpand::random();
+        $tmpArr = array($this->token, $timestamp, $nonce, $encrypt);//比普通公众平台多了一个加密的密文
+        sort($tmpArr, SORT_STRING);
+        $signature = implode($tmpArr);
+        $signature = sha1($signature);
+        return XmlExpand::encode([
+            'Encrypt' => [
+                '@cdata' => $encrypt
+            ],
+            'MsgSignature' => [
+                '@cdata' => $signature
+            ],
+            'TimeStamp' => $timestamp,
+            'Nonce' => [
+                '@cdata' => $nonce
+            ]
+        ], 'xml');
     }
 }

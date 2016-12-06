@@ -20,7 +20,7 @@ use Zodream\Infrastructure\Http\Request;
  * @property string $msgType
  * //消息
  * @property integer $msgId
- * @property string $msgType
+ * //@property string //$msgType
  * //文本
  * @property string $content
  * //图片消息
@@ -51,7 +51,17 @@ class Message extends MagicObject {
 
     protected $token;
 
-    public function __construct($token) {
+    protected $aesKey;
+
+    protected $encryptType;
+
+    protected $appId;
+
+    public function __construct($token, $appId = null, $aesKey = null) {
+        $this->token = $token;
+        $this->aesKey = $aesKey;
+        $this->appId = $appId;
+        $this->encryptType = Request::get('encrypt_type');
         $this->get();
     }
 
@@ -67,7 +77,7 @@ class Message extends MagicObject {
             $this->xml = Request::input();
         }
         if (!empty($this->xml)) {
-            $args = (array)XmlExpand::decode($this->xml, false);
+            $args = $this->getData();
             foreach ($args as $key => $item) {
                 $this->set(lcfirst($key), $item);
             }
@@ -129,5 +139,46 @@ class Message extends MagicObject {
         return $response;
     }
 
+    protected function getData() {
+        $data = (array)XmlExpand::decode($this->xml, false);
+        if ($this->encryptType != 'aes') {
+            return $data;
+        }
+        $encryptStr = $data['Encrypt'];
+        $aes = new Aes($this->aesKey, $this->appId);
+        $this->xml = $aes->decrypt($encryptStr);
+        $this->appId = $aes->getAppId();
+        return (array)XmlExpand::decode($this->xml, false);
+    }
 
+    protected function checkSignature($str = '') {
+        $signature = Request::get('signature');
+        $signature = Request::get('msg_signature', $signature); //如果存在加密验证则用加密验证段
+        $timestamp = Request::get('timestamp');
+        $nonce = Request::get('nonce');
+
+        $token = $this->token;
+        $tmpArr = array($token, $timestamp, $nonce, $str);
+        sort($tmpArr, SORT_STRING);
+        $tmpStr = implode($tmpArr);
+        $tmpStr = sha1($tmpStr);
+        return $tmpStr == $signature;
+    }
+
+    public function valid() {
+        $encryptStr = '';
+        if (Request::isPost()) {
+
+        } elseif (null != ($echoStr = Request::get('echostr'))) {
+            if ($this->checkSignature()) {
+                exit($echoStr);
+            }
+            throw new \Exception('no access');
+        }
+
+        if (!$this->checkSignature($encryptStr)) {
+            throw new \Exception('no access');
+        }
+        return true;
+    }
 }
