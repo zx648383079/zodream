@@ -6,7 +6,6 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Error\Error;
 
 class StringExpand {
     /**
@@ -17,6 +16,21 @@ class StringExpand {
 	public static function value($value) {
 		return is_callable($value) ? call_user_func($value) : $value;
 	}
+    /**
+     * Determine if a given string contains a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|array  $needles
+     * @return bool
+     */
+    public static function contains($haystack, $needles) {
+        foreach ((array) $needles as $needle) {
+            if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	/**
 	 * 拓展str_repeat 重复字符并用字符连接
@@ -28,6 +42,25 @@ class StringExpand {
 	public static function repeat($str, $count, $line = ',') {
 		return substr(str_repeat($str.$line, $count), 0, - strlen($line));
 	}
+
+    /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param  string  $pattern
+     * @param  string  $value
+     * @return bool
+     */
+    public static function is($pattern, $value) {
+        if ($pattern == $value) {
+            return true;
+        }
+        $pattern = preg_quote($pattern, '#');
+        // Asterisks are translated into zero-or-more regular expression wildcards
+        // to make it convenient to check if the strings starts with the given
+        // pattern such as "library/*", making any string check convenient.
+        $pattern = str_replace('\*', '.*', $pattern);
+        return (bool) preg_match('#^'.$pattern.'\z#u', $value);
+    }
 
 	/**
 	 * 生成更加真实的随机字符串
@@ -57,12 +90,13 @@ class StringExpand {
 		return sprintf('%0'.$length.'d', mt_rand(0, pow(10, $length) - 1));
 	}
 
-	/**
-	 * 生成更加真实的随机字节
-	 *
-	 * @param  int  $length
-	 * @return string
-	 */
+    /**
+     * 生成更加真实的随机字节
+     *
+     * @param integer $length
+     * @return string
+     * @throws \ErrorException
+     */
 	public static function randomBytes($length = 16) {
 		if (PHP_MAJOR_VERSION >= 7 || defined('RANDOM_COMPAT_READ_BUFFER')) {
 			return random_bytes($length);
@@ -136,8 +170,8 @@ class StringExpand {
         $str = '';
         $len = 0;
         $max = strlen($pool);
-        while ($id > 0) {
-            $index = $id % $max;
+        while ($arg > 0) {
+            $index = $arg % $max;
             $str = $pool[$index].$str;
             $len ++;
             $arg = floor($arg / $max);

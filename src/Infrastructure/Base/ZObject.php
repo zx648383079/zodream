@@ -6,13 +6,13 @@ namespace Zodream\Infrastructure\Base;
  * Date: 2016/8/20
  * Time: 12:36
  */
-abstract class ZObject {
+abstract class ZObject implements ArrayAble {
     /**
-     * @param array|ZObject $args
+     * @param array|ArrayAble $args
      * @return $this
      */
     public function parse($args) {
-        if ($args instanceof ZObject) {
+        if ($args instanceof ArrayAble) {
             $args = $args->toArray();
         }
         foreach ((array)$args as $key => $item) {
