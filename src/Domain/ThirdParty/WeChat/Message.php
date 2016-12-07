@@ -166,16 +166,21 @@ class Message extends MagicObject {
     }
 
     public function valid() {
-        $encryptStr = '';
-        if (Request::isPost()) {
-
-        } elseif (null != ($echoStr = Request::get('echostr'))) {
+        $echoStr = Request::get('echostr');
+        if (!is_null($echoStr)) {
             if ($this->checkSignature()) {
                 exit($echoStr);
             }
             throw new \Exception('no access');
         }
-
+        $encryptStr = '';
+        if (Request::isPost()) {
+            $data = (array)XmlExpand::decode($this->xml, false);
+            if ($this->encryptType != 'aes') {
+                return $data;
+            }
+            $encryptStr = $data['Encrypt'];
+        }
         if (!$this->checkSignature($encryptStr)) {
             throw new \Exception('no access');
         }
