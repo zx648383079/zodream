@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\DomainObject;
+namespace Zodream\Infrastructure\Interfaces;
 
 interface HtmlObject{
 	/**

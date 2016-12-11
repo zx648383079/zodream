@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Filter\Filters;
 
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 
 class ConfirmFilter extends FilterObject {
     protected $error = '两值不相等！';

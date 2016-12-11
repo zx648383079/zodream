@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\DomainObject;
+namespace Zodream\Infrastructure\Interfaces;
 /**
  * 导出文件的接口
  * Created by PhpStorm.

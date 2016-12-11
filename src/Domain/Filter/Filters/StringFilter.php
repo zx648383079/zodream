@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Filter\Filters;
 
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 
 class StringFilter extends FilterObject {
     protected $error = '不是字符串或长度不对！';

@@ -7,7 +7,7 @@ namespace Zodream\Domain\View\Engine;
  * Time: 15:51
  */
 use Zodream\Infrastructure\Disk\File;
-use Zodream\Infrastructure\DomainObject\EngineObject;
+use Zodream\Infrastructure\Interfaces\EngineObject;
 use Twig_Loader_Filesystem;
 use Twig_Environment;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Base;
+namespace Zodream\Infrastructure\Interfaces;
 /**
  * Created by PhpStorm.
  * User: zx648

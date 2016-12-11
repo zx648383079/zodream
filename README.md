@@ -81,7 +81,7 @@
 
 >> Disk 文件系统管理
 
->> DomainObject 领域模型基类
+>> Interfaces 模型接口
 
 >> Error 错误处理
 

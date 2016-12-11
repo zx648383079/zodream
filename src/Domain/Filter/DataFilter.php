@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Filter;
 
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 defined('PHP_INT_MIN') || define('PHP_INT_MIN', 0);

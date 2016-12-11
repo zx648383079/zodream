@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Filter\Filters;
 
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 
 class IpFilter extends FilterObject {
     protected $error = 'IP格式不正确！';

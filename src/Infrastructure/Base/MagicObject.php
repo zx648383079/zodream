@@ -11,7 +11,7 @@ use ArrayAccess;
 use IteratorAggregate;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 
-class MagicObject extends Object implements ArrayAccess, IteratorAggregate {
+class MagicObject extends ZObject implements ArrayAccess, IteratorAggregate {
 	
 	protected $_data = array();
 

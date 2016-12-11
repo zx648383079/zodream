@@ -179,6 +179,9 @@ class Url {
 		return $self .'?'. Request::server('QUERY_STRING');
 	}
 
+    /**
+     * @return string
+     */
 	public static function getUriWithoutParam() {
 	    $arg = explode('?', self::getUri());
 		return current($arg);
@@ -198,8 +201,26 @@ class Url {
 	
 	/**
 	 * 获取执行脚本的文件    /index.php
+     * @return string
 	 */
 	public static function getScript() {
-		return Request::server('PHP_SELF') ?: Request::server('SCRIPT_NAME'); 
+		return Request::server('SCRIPT_NAME');
 	}
+
+    /**
+     * 获取网址中的虚拟路径
+     * @return string
+     */
+	public static function getVirtualUri() {
+	    $path = Request::server('PATH_INFO');
+	    if (!is_null($path)) {
+	        return $path;
+        }
+        $script = static::getScript();
+        $path = static::getUriWithoutParam();
+        if (strpos($path, $script) === 0) {
+            return substr($path, strlen($script));
+        }
+        return $path;
+    }
 }

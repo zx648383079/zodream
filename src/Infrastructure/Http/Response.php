@@ -8,13 +8,14 @@ namespace Zodream\Infrastructure\Http;
  */
 use Zodream\Domain\Image\Image;
 use Zodream\Infrastructure\Disk\File;
-use Zodream\Infrastructure\DomainObject\ExpertObject;
+use Zodream\Infrastructure\Interfaces\ExpertObject;
 use Zodream\Infrastructure\Error\FileException;
-use Zodream\Infrastructure\Http\Requests\Header;
+use Zodream\Infrastructure\Http\Component\Header;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Component\Uri;
+use Zodream\Service\Config;
 
 class Response {
 
@@ -190,8 +191,6 @@ class Response {
      * @return boolean
      */
     public function send() {
-        Factory::timer()->end();
-        Factory::timer()->log();
         if (empty($this->parameter)) {
             $this->sendHeaders();
             return true;

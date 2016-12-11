@@ -9,11 +9,11 @@ namespace Zodream\Domain\View;
  */
 use LogicException;
 use Zodream\Infrastructure\Traits\ConfigTrait;
-use Zodream\Infrastructure\Routing\Url;
+use Zodream\Service\Routing\Url;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\File;
-use Zodream\Infrastructure\DomainObject\EngineObject;
+use Zodream\Infrastructure\Interfaces\EngineObject;
 use Zodream\Infrastructure\Error\FileException;
 use Zodream\Infrastructure\Support\Html;
 use Zodream\Infrastructure\Base\MagicObject;

@@ -7,7 +7,7 @@ namespace Zodream\Service\Routing;
 * @author Jason
 */
 use Zodream\Service\Config;
-use Zodream\Infrastructure\DomainObject\RouteObject;
+use Zodream\Infrastructure\Interfaces\RouteObject;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\Http\Component\Uri;
 use Zodream\Infrastructure\ Http\Request;

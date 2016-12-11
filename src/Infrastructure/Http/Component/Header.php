@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Http;
+namespace Zodream\Infrastructure\Http\Component;
 
 /**
  * Created by PhpStorm.

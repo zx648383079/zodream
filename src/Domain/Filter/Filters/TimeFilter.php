@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Filter\Filters;
 
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 
 class TimeFilter extends FilterObject {
     protected $error = '不是时间类型！';

@@ -2,7 +2,7 @@
 namespace Zodream\Domain\Filter\Filters;
 
 use Zodream\Domain\Filter\FilterModel;
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 
 class UniqueFilter extends FilterObject {
     protected $error = '不是唯一！';

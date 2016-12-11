@@ -7,7 +7,7 @@ namespace Zodream\Domain\Filter;
  * Time: 21:36
  */
 use Zodream\Domain\Model\Model;
-use Zodream\Infrastructure\DomainObject\FilterObject;
+use Zodream\Infrastructure\Interfaces\FilterObject;
 
 class ModelFilter extends DataFilter {
 

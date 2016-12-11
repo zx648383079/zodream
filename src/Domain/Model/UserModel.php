@@ -6,7 +6,7 @@ namespace Zodream\Domain\Model;
  * Date: 2016/7/12
  * Time: 16:13
  */
-use Zodream\Infrastructure\DomainObject\UserObject;
+use Zodream\Infrastructure\Interfaces\UserObject;
 use Zodream\Service\Factory;
 
 abstract class UserModel extends Model implements UserObject {

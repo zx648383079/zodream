@@ -585,7 +585,7 @@ class ArrayExpand {
 	 * @param array $args
 	 * @return bool|int|string
 	 */
-	public static function inArray($needle,array $args) {
+	public static function inArray($needle, array $args) {
 		foreach ($args as $key => $value) {
 			if (in_array($needle, (array)$value)) {
 				return $key;

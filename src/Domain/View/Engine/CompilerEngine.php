@@ -9,7 +9,7 @@ namespace Zodream\Domain\View\Engine;
  */
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Disk\File;
-use Zodream\Infrastructure\DomainObject\EngineObject;
+use Zodream\Infrastructure\Interfaces\EngineObject;
 
 abstract class CompilerEngine implements EngineObject {
     /**

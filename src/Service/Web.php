@@ -1,16 +1,22 @@
 <?php
 namespace Zodream\Service;
 
+use Zodream\Infrastructure\Http\Request;
+use Zodream\Service\Routing\Url;
+
 class Web extends Application {
 
     public function setPath($path) {
+        if (is_null($path)) {
+            $path = Url::getVirtualUri();
+        }
         return parent::setPath($this->getRealPath($path));
     }
 
     protected function getRealPath($path) {
         list($routes, $args) = $this->spiltArrayByNumber(explode('/', trim($path, '/')));
         Request::get(true)->set($args);
-        $this->path = implode('/', $routes);
+        return implode('/', $routes);
     }
 
     /**

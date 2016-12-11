@@ -1,8 +1,8 @@
 <?php
-namespace Zodream\Infrastructure\DomainObject;
+namespace Zodream\Infrastructure\Interfaces;
 /**
  * Class FilterObject
- * @package Zodream\Infrastructure\DomainObject
+ * @package Zodream\Infrastructure\Interfaces
  */
 abstract class FilterObject {
     protected $_defaultOption = array();
