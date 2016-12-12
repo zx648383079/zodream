@@ -37,4 +37,11 @@ abstract class BaseWeChat extends ThirdParty  {
         return $this->json($this->httpPost($this->getUrl($name),
             $this->jsonEncode($data)));
     }
+
+    protected function getData(array $keys, array $args) {
+        if (in_array('#access_token', $keys) || in_array('access_token', $keys)) {
+            $args['access_token'] = (new AccessToken($args))->getAccessToken();
+        }
+        return parent::getData($keys, $args);
+    }
 }

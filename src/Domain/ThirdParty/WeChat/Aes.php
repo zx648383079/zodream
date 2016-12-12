@@ -58,12 +58,12 @@ class Aes extends BaseSecurity {
      */
     public function decrypt($data) {
         //使用BASE64对需要解密的字符串进行解码
-        $ciphertext_dec = base64_decode($data);
+        $cipherTextDec = base64_decode($data);
         $module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
         $iv = substr($this->key, 0, 16);
         mcrypt_generic_init($module, $this->key, $iv);
         //解密
-        $decrypted = mdecrypt_generic($module, $ciphertext_dec);
+        $decrypted = mdecrypt_generic($module, $cipherTextDec);
         mcrypt_generic_deinit($module);
         mcrypt_module_close($module);
         //去除补位字符
