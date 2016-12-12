@@ -35,6 +35,7 @@ class Application {
     }
 
     public function send() {
+        date_default_timezone_set(Config::getValue('formatter.timezone', 'Etc/GMT-8'));     //这里设置了时区
         Factory::timer()->begin();
         Autoload::getInstance()
             ->setError()

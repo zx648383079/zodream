@@ -1,10 +1,13 @@
 <?php 
 namespace Zodream\Infrastructure\ObjectExpand;
+
 /**
 * time 的扩展
 * 
 * @author Jason
 */
+use Zodream\Service\Config;
+
 class TimeExpand {
 
 	/**
@@ -13,8 +16,10 @@ class TimeExpand {
 	 * @param string $format
 	 * @return string
 	 */
-	public static function format($time = null, $format = 'Y-m-d H:i:s') {
-		date_default_timezone_set('Etc/GMT-8');     //这里设置了时区
+	public static function format($time = null, $format = null) {
+	    if (empty($format)) {
+	        $format = Config::getValue('formatter.datetime');
+        }
 		if (!is_numeric($time)) {
 			$format = $time;
 			$time = time();

@@ -29,6 +29,11 @@ $configs = array(
 		'default' => 'Home@index',                        //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
 		'generate' => 'Zodream\\Domain\\Generate\\Generate@make'
 	),
+    'formatter' => [
+        'date' => 'Y-m-d',
+        'datetime' => 'Y-m-d H:i:s',
+        'timezone' => 'Etc/GMT-8'
+    ],
 	'db'     => array(							//MYSQL数据库的信息
 		'driver'   => Zodream\Infrastructure\Database\Pdo::class,
 		'host'     => '127.0.0.1',                //服务器
