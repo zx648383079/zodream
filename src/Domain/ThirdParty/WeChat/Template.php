@@ -74,13 +74,22 @@ class Template extends BaseWeChat {
     }
 
     /**
-     * @param $toUser
-     * @param $template
-     * @param $url
+     * 发送模板消息
+     * @param string $openId
+     * @param string $template
+     * @param string $url 链接的网址
      * @param array $data   [key => [value, color]]
      * @return bool
      */
-    public function send($toUser, $template, $url, array $data) {
+    public function send($openId, $template, $url, array $data) {
+        foreach ($data as $key => &$item) {
+            if (!is_array($item)) {
+                $item = [
+                    'value' => $item,
+                    'color' => '#777'
+                ];
+            }
+        }
         $arg = $this->jsonPost('send', [
             'touser' => $toUser,
             'template_id' => $template,
