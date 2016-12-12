@@ -7,7 +7,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Date: 2016/8/20
  * Time: 10:23
  */
-use Zodream\Domain\Response\RedirectResponse;
+use Zodream\Infrastructure\Http\Component\Uri;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Http\Request;
@@ -52,11 +52,14 @@ class OAuth extends BaseWeChat {
         ]
     ];
 
+    /**
+     * @return Uri
+     */
     public function login() {
         $state = StringExpand::randomNumber(7);
         Factory::session()->set('state', $state);
         $this->set('state', $state);
-        return new RedirectResponse($this->getUrl('login'));
+        return $this->getUrl('login');
     }
 
     public function callback() {
