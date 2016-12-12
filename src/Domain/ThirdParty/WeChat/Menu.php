@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\ThirdParty\WeChat;
 /**
- * Created by PhpStorm.
+ * 自定义菜单
  * User: zx648
  * Date: 2016/8/19
  * Time: 22:31

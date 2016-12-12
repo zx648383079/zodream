@@ -2,7 +2,7 @@
 namespace Zodream\Domain\ThirdParty\WeChat;
 
 /**
- * Created by PhpStorm.
+ * 素材管理
  * User: zx648
  * Date: 2016/8/20
  * Time: 10:39

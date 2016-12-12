@@ -1,17 +1,12 @@
 <?php
 namespace Zodream\Domain\ThirdParty\WeChat;
-/**
- * Created by PhpStorm.
- * User: zx648
- * Date: 2016/8/22
- * Time: 19:01
- */
+
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Request;
 
 /**
- * Class Message
+ * 消息管理
  * @package Zodream\Domain\ThirdParty\WeChat
  *
  * @property string $toUserName

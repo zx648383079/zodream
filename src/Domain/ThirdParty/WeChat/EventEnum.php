@@ -68,4 +68,18 @@ class EventEnum extends Enum {
      * 模板消息完成后推送的结果
      */
     const TemplateSendJobFinish = 'TEMPLATESENDJOBFINISH';
+
+    /**
+     * 客服接入会话
+     */
+    const KFCreateSession = 'kf_create_session';
+    /**
+     * 客服关闭会话
+     */
+    const KFCloseSession = 'kf_close_session';
+    /**
+     * 客服接入会话
+     */
+    const KFSwitchSession = 'kf_switch_session';
+
 }

@@ -4,6 +4,10 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 
 use Zodream\Service\Factory;
 
+/**
+ * AccessToken
+ * @package Zodream\Domain\ThirdParty\WeChat
+ */
 class AccessToken extends BaseWeChat {
     protected $apiMap = [
         'token' => [

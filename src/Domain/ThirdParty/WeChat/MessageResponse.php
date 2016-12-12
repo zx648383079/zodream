@@ -178,6 +178,22 @@ class MessageResponse {
         return $this->addData('Articles', $data);
     }
 
+    /**
+     * 转发客服， 为空自动转发
+     * @param string $account
+     * @return MessageResponse
+     */
+    public function setService($account = null) {
+        if (!empty($account)) {
+            $this->setData('TransInfo', [
+                'KfAccount' => [
+                    '@cdata' => $account
+                ]
+            ]);
+        }
+        return $this->setType(MessageEnum::Service);
+    }
+
     public function setToUseName($arg) {
         return $this->setData('ToUserName', $arg);
     }

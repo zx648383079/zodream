@@ -29,4 +29,9 @@ class MessageEnum extends Enum {
      * 链接
      */
     const Link = 'link';
+
+    /**
+     * 转发客服
+     */
+    const Service = 'transfer_customer_service';
 }
