@@ -25,6 +25,9 @@ $configs = array(
 		'driver' => Zodream\Domain\Access\Auth::class,        //用户判断
 		'home'  => 'account'                             //用户登录主页
 	),
+    'modules' => array(   //模块
+
+    ),
 	'route'  => array(
 		'default' => 'Home@index',                        //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
 		'generate' => 'Zodream\\Domain\\Generate\\Generate@make'

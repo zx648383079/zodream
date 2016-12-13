@@ -7,7 +7,6 @@ namespace Zodream\Service\Routing;
  */
 use Zodream\Domain\Filter\DataFilter;
 use Zodream\Service\Config;
-use Zodream\Infrastructure\Error\Error;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\Http\Request;
@@ -195,7 +194,7 @@ class Route {
 			$class = $this->getClass($classes);
 		}
 		if (!class_exists($class)) {
-			Error::out($class.' CLASS NOT EXISTS!', __FILE__, __LINE__);
+			throw new \InvalidArgumentException($class.' CLASS NOT EXISTS!');
 		}
 		/** @var BaseController $instance */
 		$instance = new $class;
@@ -209,10 +208,11 @@ class Route {
 	 * @return array|bool
 	 */
 	protected function getController(array $args) {
+	    $prefix = $this->getModule($args);
 		if (empty($args)) {
 			$args = ['home'];
 		}
-		$class = $this->getClass($args);
+		$class = $this->getClass($args, $prefix);
 		if (class_exists($class)) {
 			return [$class, 'index'];
 		}
@@ -220,11 +220,21 @@ class Route {
 		if (empty($args)) {
 			$args = ['home'];
 		}
-		return [$this->getClass($args), $action];
+		return [$this->getClass($args, $prefix), $action];
 	}
 
-	protected function getClass(array $args) {
+	protected function getClass(array $args, $prefix) {
 		$args = array_map('ucfirst', $args);
-		return 'Service\\'.APP_MODULE.'\\'.implode('\\', $args).APP_CONTROLLER;
+		return $prefix.implode('\\', $args).APP_CONTROLLER;
 	}
+
+	protected function getModule(array &$args) {
+	    $modules = Config::getValue('modules', array());
+	    $prefix = 'Service\\'.APP_MODULE;
+	    if (count($args) > 0 && array_key_exists($args[0], $modules)) {
+	        $prefix = $modules[$args[0]];
+	        unset($args[0]);
+        }
+        return trim($prefix, '\\').'\\';
+    }
 }
