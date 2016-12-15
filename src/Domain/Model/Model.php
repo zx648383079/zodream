@@ -53,9 +53,11 @@ abstract class Model extends MagicObject {
 
 	/**
 	 * 表名
-	 * @var string
+	 * @return string
 	 */
-	public static $table;
+	public static function tableName() {
+	    return '';
+    }
 
 	/**
 	 * 主键
@@ -256,7 +258,7 @@ abstract class Model extends MagicObject {
      * @return Record
      */
 	protected function getRecord() {
-		return (new Record())->setTable(static::$table);
+		return (new Record())->setTable(static::tableName());
 	}
 
 	/**
@@ -442,7 +444,7 @@ abstract class Model extends MagicObject {
 	 * @return Query 返回查询结果,
 	 */
 	public static function find() {
-		return (new Query())->from(static::$table);
+		return (new Query())->from(static::tableName());
 	}
 
 	/**
