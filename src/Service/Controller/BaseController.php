@@ -32,12 +32,13 @@ abstract class BaseController extends Action {
 		return [];
 	}
 
-	/**
-	 * 执行方法
-	 * @param string $action
-	 * @param array $vars
-	 * @return string|BaseResponse
-	 */
+    /**
+     * 执行方法
+     * @param string $action
+     * @param array $vars
+     * @return string|BaseResponse
+     * @throws \HttpUrlException
+     */
 	public function runAction($action, array $vars = array()) {
         Factory::timer()->record('controllerStart');
 		$this->action = $action;

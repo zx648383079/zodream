@@ -26,11 +26,10 @@ $configs = array(
 		'home'  => 'account'                             //用户登录主页
 	),
     'modules' => array(   //模块
-
+        'gzd' => 'Zodream\Domain\Generate\Controller'
     ),
 	'route'  => array(
 		'default' => 'Home@index',                        //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
-		'generate' => 'Zodream\\Domain\\Generate\\Generate@make'
 	),
     'formatter' => [
         'date' => 'Y-m-d',
@@ -116,7 +115,6 @@ if (defined('APP_MODULE')) {
 	$configs['view'] = array(                           //视图文件信息
 		'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
 		'suffix' => '.php',
-		//'mode' => 'common'                        //普通表示 $value 直接取值， 而设为其他值这是 $this->get() 等方法取值
 	);
 }
 return $configs;
