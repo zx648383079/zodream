@@ -12,7 +12,11 @@ use Zodream\Service\Factory;
 abstract class UserModel extends Model implements UserObject {
     
     public function getId() {
-        return $this->get($this->primaryKey[0]);
+        $id = 'id';
+        if (in_array($id, $this->primaryKey)) {
+            $id = current($this->primaryKey);
+        }
+        return $this->get($id);
     }
 
     public function login($user) {

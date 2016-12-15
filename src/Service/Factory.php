@@ -12,6 +12,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Zodream\Domain\Debug\Timer;
+use Zodream\Domain\Model\UserModel;
 use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
@@ -97,6 +98,14 @@ class Factory {
      */
     public static function response() {
         return self::getInstance('response', Response::class);
+    }
+
+    /**
+     * GET USER BY SESSION
+     * @return UserModel
+     */
+    public static function user() {
+        return self::getInstance('user');
     }
 
     /**
