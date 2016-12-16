@@ -221,31 +221,46 @@ abstract class Model extends MagicObject {
 
 	/**
 	 * @param string $table
-	 * @param string $link
-	 * @param string $key
+	 * @param string $link $table.$link
+	 * @param string $key $this.$key
 	 * @return array
 	 */
 	public function hasOne($table, $link, $key = null) {
-		if (!is_null($key)) {
-			$key = $link;
-			$link = 'id';
-		}
         if ($table instanceof Model) {
             $table = $table->tableName();
         }
         if (!array_key_exists($table, $this->relations)) {
             $this->setRelation($table, (new Query())
                 ->from($table)
-                ->where([$link => $this->get($key)])
+                ->where($this->getRelationWhere($link, $key))
                 ->one());
         }
         return $this->getRelation($table);
 	}
 
+    /**
+     * GET RELATION WHERE SQL
+     * @param string|array $links
+     * @param string $key
+     * @return array
+     */
+	protected function getRelationWhere($links, $key = null) {
+        if (is_null($key) && !is_array($links)) {
+            $key = in_array('id', $this->primaryKey) ? 'id' : current($this->primaryKey);
+        }
+	    if (!is_array($links)) {
+	        $links = [$links => $key];
+        }
+        foreach ($links as &$item) {
+            $item = $this->get($item);
+        }
+        return $links;
+    }
+
 	/**
 	 * @param string $table
-	 * @param string $link
-	 * @param string $key
+	 * @param string $link $table.$link
+	 * @param string $key $this.$key
 	 * @return array
 	 */
 	public function hasMany($table, $link, $key = 'id') {
@@ -255,7 +270,7 @@ abstract class Model extends MagicObject {
         if (!array_key_exists($table, $this->relations)) {
             $this->setRelation($table, (new Query())
                 ->from($table)
-                ->where([$link => $this->get($key)])
+                ->where($this->getRelationWhere($link, $key))
                 ->all());
         }
         return $this->getRelation($table);
