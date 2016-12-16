@@ -5,8 +5,13 @@ namespace Zodream\Infrastructure\Http;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
-use Zodream\Infrastructure\Http\Request\BaseRequest;
+use Zodream\Infrastructure\Http\Requests\BaseRequest;
+use Zodream\Infrastructure\Http\Requests\Cookie;
+use Zodream\Infrastructure\Http\Requests\Files;
+use Zodream\Infrastructure\Http\Requests\Get;
+use Zodream\Infrastructure\Http\Requests\Header;
+use Zodream\Infrastructure\Http\Requests\Post;
+use Zodream\Infrastructure\Http\Requests\Server;
 use Zodream\Service\Config;
 defined('APP_SAFE') || define('APP_SAFE', Config::getInstance()->get('app.safe', true));
 
@@ -57,7 +62,7 @@ final class Request {
 	 * $_GET
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|Get
 	 */
 	public static function get($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
@@ -67,7 +72,7 @@ final class Request {
 	 * $_POST
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|Post
 	 */
 	public static function post($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
@@ -77,7 +82,7 @@ final class Request {
 	 * $_FILES
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|Files
 	 */
 	public static function files($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
@@ -87,7 +92,7 @@ final class Request {
 	 * $_REQUEST
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|\Zodream\Infrastructure\Http\Requests\Request
 	 */
 	public static function request($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
@@ -97,7 +102,7 @@ final class Request {
 	 * $_COOKIE
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|Cookie
 	 */
 	public static function cookie($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
@@ -115,7 +120,7 @@ final class Request {
 	 * $_SERVER
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|Server
 	 */
 	public static function server($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
@@ -124,7 +129,7 @@ final class Request {
 	/**
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|Header
 	 */
 	public static function header($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);

@@ -6,13 +6,17 @@ namespace Zodream\Domain\Model;
  * @author Jason
  */
 use Zodream\Domain\Filter\ModelFilter;
+use Zodream\Domain\Html\Page;
 use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\Traits\ErrorTrait;
 
 abstract class Model extends MagicObject {
+
+    use ErrorTrait;
 
 	const BEFORE_SAVE = 'before save';
 	const AFTER_SAVE = 'after save';
@@ -20,12 +24,16 @@ abstract class Model extends MagicObject {
 	const AFTER_INSERT = 'after insert';
 	const BEFORE_UPDATE = 'before update';
 	const AFTER_UPDATE = 'after update';
-
-	protected $errors = [];
 	
 	public $isNewRecord = true;
 	
 	protected $_oldData = [];
+
+    /**
+     * GET RELATION
+     * @var array
+     */
+	protected $relations = [];
 
 	/**
 	 * 过滤规则
@@ -222,10 +230,16 @@ abstract class Model extends MagicObject {
 			$key = $link;
 			$link = 'id';
 		}
-		return (new Query())
-			->from($table)
-			->where([$link => $this->get($key)])
-			->one();
+        if ($table instanceof Model) {
+            $table = $table->tableName();
+        }
+        if (!array_key_exists($table, $this->relations)) {
+            $this->setRelation($table, (new Query())
+                ->from($table)
+                ->where([$link => $this->get($key)])
+                ->one());
+        }
+        return $this->getRelation($table);
 	}
 
 	/**
@@ -235,10 +249,16 @@ abstract class Model extends MagicObject {
 	 * @return array
 	 */
 	public function hasMany($table, $link, $key = 'id') {
-		return (new Query())
-			->from($table)
-			->where([$link => $this->get($key)])
-			->all();
+	    if ($table instanceof Model) {
+	        $table = $table->tableName();
+        }
+        if (!array_key_exists($table, $this->relations)) {
+            $this->setRelation($table, (new Query())
+                ->from($table)
+                ->where([$link => $this->get($key)])
+                ->all());
+        }
+        return $this->getRelation($table);
 	}
 
 	public function insert() {
@@ -483,7 +503,7 @@ abstract class Model extends MagicObject {
      * @param int $index
      * @param int $size
      * @param array $parameters
-     * @return \Zodream\Domain\Html\Page
+     * @return Page
      */
     public static function findPage($args,
                                     $index = 0,
@@ -523,7 +543,10 @@ abstract class Model extends MagicObject {
 	 * @param array $parameters
 	 * @return int 返回总数,
 	 */
-	public static function count(array $param = array(), $field = 'id', $parameters = array()) {
+	public static function count(
+	    array $param = array(),
+        $field = 'id',
+        $parameters = array()) {
 		if (!array_key_exists('where', $param)) {
 			$param = array(
 				'where' => $param
@@ -534,31 +557,25 @@ abstract class Model extends MagicObject {
 			->count($field)->limit(1)->scalar();
 	}
 
-	public function getError($key = null) {
-		if (empty($key)) {
-			return $this->errors;
-		}
-		if (!array_key_exists($key, $this->errors)) {
-			return array();
-		}
-		return $this->errors[$key];
-	}
+    /**
+     * Get a specified relationship.
+     *
+     * @param  string  $relation
+     * @return mixed
+     */
+    public function getRelation($relation) {
+        return $this->relations[$relation];
+    }
 
-	public function getFirstError($key) {
-		if (!array_key_exists($key, $this->errors)) {
-			return null;
-		}
-		return current($this->errors[$key]);
-	}
-
-	public function setError($key, $error = null) {
-		if (is_array($key) && is_null($error)) {
-			$this->errors = array_merge($this->errors, $key);
-			return;
-		}
-		if (!array_key_exists($key, $this->errors)) {
-			$this->errors[$key] = array();
-		}
-		$this->errors[$key][] = $error;
-	}
+    /**
+     * Set the specific relationship in the model.
+     *
+     * @param  string  $relation
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setRelation($relation, $value) {
+        $this->relations[$relation] = $value;
+        return $this;
+    }
 }

@@ -7,7 +7,7 @@ namespace Zodream\Domain\Html;
  * Time: 16:24
  */
 use Zodream\Service\Routing\Url;
-use Zodream\Infrastructure\Html;
+use Zodream\Infrastructure\Support\Html;
 
 class ScriptWidget extends Widget {
     protected function run() {

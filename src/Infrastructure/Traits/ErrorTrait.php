@@ -7,36 +7,49 @@ namespace Zodream\Infrastructure\Traits;
  * Time: 11:43
  */
 trait ErrorTrait {
-    private $_errors = [];
-
-    private $_errorNo = 0;
-
-    /**
-     * SET ERROR AND ERRORNO
-     * @param $error
-     * @param $errorNo
-     * @return $this
-     */
-    public function setError($error, $errorNo) {
-        $this->_errors[] = $error;
-        $this->_errorNo = $errorNo;
-        return $this;
-    }
-
-    /**
-     * GET ERROR
-     * @return array
-     */
-    public function getError() {
-        return $this->_errors;
-    }
+    protected $errors = [];
 
     /**
      * HAS ERROR
      * @return bool
      */
     public function hasError() {
-        return !empty($this->_errors);
+        return !empty($this->errors);
+    }
+
+    public function getError($key = null) {
+        if (empty($key)) {
+            return $this->errors;
+        }
+        if (!array_key_exists($key, $this->errors)) {
+            return array();
+        }
+        return $this->errors[$key];
+    }
+
+    public function getFirstError($key) {
+        if (!array_key_exists($key, $this->errors)) {
+            return null;
+        }
+        return current($this->errors[$key]);
+    }
+
+    /**
+     * SET ERROR
+     * @param $key
+     * @param null $error
+     * @return static
+     */
+    public function setError($key, $error = null) {
+        if (is_array($key) && is_null($error)) {
+            $this->errors = array_merge($this->errors, $key);
+            return $this;
+        }
+        if (!array_key_exists($key, $this->errors)) {
+            $this->errors[$key] = array();
+        }
+        $this->errors[$key][] = $error;
+        return $this;
     }
 
     /**
@@ -44,6 +57,6 @@ trait ErrorTrait {
      * @return array
      */
     public function getLastError() {
-        return array_slice($this->_errors, -1);
+        return array_slice($this->errors, -1);
     }
 }

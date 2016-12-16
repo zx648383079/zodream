@@ -1,7 +1,6 @@
 <?php
 namespace Zodream\Service\Rest\OAuth\Grant;
-use Zodream\Domain\Rest\OAuth\Exception\OAuthServerException;
-use Zodream\Infrastructure\Http\Request;
+
 
 /**
  * Created by PhpStorm.
@@ -9,6 +8,9 @@ use Zodream\Infrastructure\Http\Request;
  * Date: 2016/11/29
  * Time: 15:46
  */
+use Zodream\Service\Rest\OAuth\Exception\OAuthServerException;
+use Zodream\Infrastructure\Http\Request;
+
 class PasswordGrant extends BaseGrant {
 
     protected function validateUser() {

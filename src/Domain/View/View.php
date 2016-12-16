@@ -13,7 +13,7 @@ use Zodream\Service\Factory;
 use Zodream\Infrastructure\Http\Component\Uri;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 use Zodream\Infrastructure\Traits\ConditionTrait;
-use Zodream\Infrastructure\Routing\Url;
+use Zodream\Service\Routing\Url;
 
 /**
  * Class View

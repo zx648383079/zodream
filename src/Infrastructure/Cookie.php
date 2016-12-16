@@ -6,6 +6,8 @@ namespace Zodream\Infrastructure;
 * 
 * @author Jason
 */
+use Zodream\Infrastructure\Http\Request;
+use Zodream\Service\Factory;
 
 class Cookie {
 	/**

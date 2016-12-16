@@ -7,10 +7,10 @@ namespace Zodream\Service\Rest\OAuth\Exception;
  * Date: 2016/11/29
  * Time: 16:59
  */
+use Zodream\Infrastructure\Http\Response;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\Http\Request;
-use Zodream\Infrastructure\Response;
-use Zodream\Infrastructure\Url\Uri;
+use Zodream\Infrastructure\Http\Component\Uri;
 
 class OAuthServerException extends \Exception {
     /**
@@ -192,7 +192,6 @@ class OAuthServerException extends \Exception {
     /**
      * Generate a HTTP response.
      *
-     * @param ResponseInterface $response
      * @param bool              $useFragment True if errors should be in the URI fragment instead of query string
      *
      * @return Response
@@ -224,7 +223,6 @@ class OAuthServerException extends \Exception {
     /**
      * Get all headers that have to be send with the error response.
      *
-     * @return array Array with header values
      */
     public function setHttpHeaders() {
 

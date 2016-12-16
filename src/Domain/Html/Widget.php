@@ -7,7 +7,7 @@ namespace Zodream\Domain\Html;
  * Date: 2016/4/29
  * Time: 16:04
  */
-use Zodream\Infrastructure\Html;
+use Zodream\Infrastructure\Support\Html;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;

@@ -6,7 +6,6 @@ namespace Zodream\Domain\Rss;
  * Date: 2016/3/16
  * Time: 20:42
  */
-use Zodream\Domain\Response\ResponseResult;
 use Zodream\Service\Factory;
 
 class Rss extends BaseRss {

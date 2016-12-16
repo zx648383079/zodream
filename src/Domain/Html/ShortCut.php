@@ -15,7 +15,8 @@ class ShortCut implements ExpertObject {
 
     /**
      * Excel constructor.
-     * @param $title     string
+     * @param string $title
+     * @param string $url
      */
     public function __construct($title, $url) {
         $this->title = $title;
