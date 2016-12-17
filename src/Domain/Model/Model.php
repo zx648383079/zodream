@@ -292,7 +292,7 @@ abstract class Model extends MagicObject {
     /**
      * @return Record
      */
-	protected function getRecord() {
+	public static function record() {
 		return (new Record())->setTable(static::tableName());
 	}
 
@@ -305,11 +305,11 @@ abstract class Model extends MagicObject {
 	 * @return int 返回最后插入的ID,
 	 */
 	public function add(array $addData) {
-		return $this->getRecord()->set($addData)->insert();
+		return $this->record()->set($addData)->insert();
 	}
 
-	public function addValues(array $columns, array $values = null) {
-		return $this->getRecord()
+	public static function batchInsert(array $columns, array $values = null) {
+		return static::record()
 			->batchInsert($columns, $values);
 	}
 
@@ -363,7 +363,7 @@ abstract class Model extends MagicObject {
 			return false;
 		}
 		$this->runBehavior(self::BEFORE_UPDATE);
-		$row = $this->getRecord()
+		$row = $this->record()
             ->set($this->getUpdateData())
             ->whereMany($where)
 			->update();
@@ -379,7 +379,7 @@ abstract class Model extends MagicObject {
 	 * @return int
 	 */
 	public function updateBool($filed, $where) {
-		return $this->getRecord()
+		return $this->record()
 			->set(null, "{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END")
 			->whereMany($where)->update();
 	}
@@ -401,7 +401,7 @@ abstract class Model extends MagicObject {
 				$sql[] = "`$key` = `$key` ".$item;
 			}
 		}
-		return $this->getRecord()
+		return $this->record()
 			->set($sql)
 			->whereMany($where)
 			->update();
@@ -465,7 +465,7 @@ abstract class Model extends MagicObject {
 		if (is_null($where)) {
 			$where = $this->getWhereKey();
 		}
-		return $this->getRecord()
+		return $this->record()
 			->whereMany($where)
 			->addParam($parameters)
 			->delete();

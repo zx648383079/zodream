@@ -25,8 +25,6 @@ class Query extends BaseQuery {
 
     protected $union = array();
 
-    protected $offset;
-
     protected $sequence =  array(
         'select',
         'from',
@@ -97,6 +95,10 @@ class Query extends BaseQuery {
         return $this;
     }
 
+    /**
+     * @param string $column
+     * @return static
+     */
     public function count($column = '*') {
         return $this->_selectFunction(__FUNCTION__, $column);
     }
@@ -117,6 +119,11 @@ class Query extends BaseQuery {
         return $this->_selectFunction(__FUNCTION__, $column);
     }
 
+    /**
+     * @param string $name
+     * @param string $column
+     * @return $this
+     */
     private function _selectFunction($name, $column) {
         $this->select[] = "{$name}({$column}) AS {$name}";
         return $this;
@@ -276,19 +283,7 @@ class Query extends BaseQuery {
         return $this;
     }
 
-    public function limit($limit, $length = null) {
-        if (!empty($length)) {
-            $this->offset($limit);
-            $limit = $length;
-        }
-        $this->limit = $limit;
-        return $this;
-    }
 
-    public function offset($offset) {
-        $this->offset = $offset;
-        return $this;
-    }
 
     /**
      * add build value
@@ -299,15 +294,6 @@ class Query extends BaseQuery {
     public function addParam($key, $value = null) {
         $this->set($key, $value);
         return $this;
-    }
-
-    /**
-     * HAS BUILD VALUE
-     * @param string $key
-     * @return bool
-     */
-    public function hasParam($key) {
-        return $this->has($key);
     }
 
     /**
@@ -491,13 +477,6 @@ class Query extends BaseQuery {
             $result[] = $sql;
         }
         return ' ORDER BY '.implode($result, ',');
-    }
-
-    protected function getOffset() {
-        if (empty($this->offset)) {
-            return null;
-        }
-        return ' OFFSET '.intval($this->offset);
     }
 
 

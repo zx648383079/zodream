@@ -15,6 +15,8 @@ abstract class BaseQuery extends BaseSchema  {
 
     protected $limit;
 
+    protected $offset;
+
     protected $operators = array(
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'in', 'not in', 'is', 'is not',
@@ -98,11 +100,34 @@ abstract class BaseQuery extends BaseSchema  {
         return $this->addParam($params);
     }
 
+    public function limit($limit, $length = null) {
+        if (!empty($length)) {
+            $this->offset($limit);
+            $limit = $length;
+        }
+        $this->limit = $limit;
+        return $this;
+    }
+
+    public function offset($offset) {
+        $this->offset = $offset;
+        return $this;
+    }
+
     /**
      * @param $params
      * @return static
      */
     abstract public function addParam($params);
+
+    /**
+     * HAS BUILD VALUE
+     * @param string $key
+     * @return bool
+     */
+    public function hasParam($key) {
+        return $this->has($key);
+    }
 
     protected function getWhere() {
         if (empty($this->where)) {
@@ -272,8 +297,7 @@ abstract class BaseQuery extends BaseSchema  {
         if (is_array($arg)
             && count($arg) == 2
             && is_string($arg[1])
-            && in_array(strtolower($arg['1'],
-                ['int', 'integer', 'numeric', 'bool', 'boolean', 'string', 'float', 'double']))) {
+            && in_array(strtolower($arg['1']), ['int', 'integer', 'numeric', 'bool', 'boolean', 'string', 'float', 'double'])) {
             $tag = $arg[1];
             $arg = $tag;
         }
@@ -380,4 +404,10 @@ abstract class BaseQuery extends BaseSchema  {
         return " LIMIT {$param[0]},{$param[1]}";
     }
 
+    protected function getOffset() {
+        if (empty($this->offset)) {
+            return null;
+        }
+        return ' OFFSET '.intval($this->offset);
+    }
 }
