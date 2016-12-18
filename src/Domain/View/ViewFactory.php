@@ -92,8 +92,8 @@ class ViewFactory extends MagicObject {
             return $file;
         }
         $ext = pathinfo($file, PATHINFO_EXTENSION);
-        if ($ext == 'js' || $ext == 'css') {
-            $file = $ext.'/'. $file;
+        if (strpos($file, '@') === 0 && ($ext == 'js' || $ext == 'css')) {
+            $file = $ext.'/'. substr($file, 1);
         }
         return $this->assetsDirectory.$file;
     }
