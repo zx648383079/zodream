@@ -44,16 +44,21 @@ class MenuItem extends ZObject {
     }
 
     public function setKey($arg) {
+        $this->setType(self::CLICK);
         $this->key = $arg;
         return $this;
     }
 
     public function setUrl($arg) {
+        $this->setType(self::VIEW);
         $this->url = $arg;
         return $this;
     }
 
     public function setMediaId($arg) {
+        if (empty($this->type)) {
+            $this->setType(self::MEDIA);
+        }
         $this->mediaId = $arg;
         return $this;
     }
