@@ -166,6 +166,10 @@ final class Request {
 	public static function isMobile() {
 		return self::Other(__FUNCTION__);
 	}
+
+	public static function isWeChat() {
+        return strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false;
+    }
 	
 	public static function method() {
 		return self::other('method');
