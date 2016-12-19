@@ -10,6 +10,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 use Zodream\Infrastructure\ObjectExpand\Enum;
 
 class EventEnum extends Enum {
+    const Message = 'message';
     /**
      * 普通关注
      * 二维码关注

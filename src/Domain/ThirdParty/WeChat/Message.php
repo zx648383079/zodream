@@ -82,7 +82,7 @@ class Message extends MagicObject {
 
     public function getEvent() {
         if (!$this->isEvent()) {
-            return false;
+            return EventEnum::Message;
         }
         return $this->event;
     }
