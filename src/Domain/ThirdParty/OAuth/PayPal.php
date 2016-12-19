@@ -116,7 +116,7 @@ class PayPal extends BaseOAuth {
 
     /**
      * 获取用户信息
-     * @return array
+     * @return array|false
      */
     public function getInfo() {
         $this->http->addHeaders(array(

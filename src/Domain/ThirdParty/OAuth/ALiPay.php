@@ -40,7 +40,7 @@ class ALiPay extends BaseOAuth {
     );
 
     /**
-     * @return array
+     * @return array|false
      */
     public function callback() {
         if (parent::callback() === false) {
@@ -64,7 +64,7 @@ class ALiPay extends BaseOAuth {
 
     /**
      * 获取用户信息
-     * @return array
+     * @return array|false
      */
     public function getInfo() {
         /**

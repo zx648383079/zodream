@@ -90,7 +90,7 @@ class WeiMoB extends BaseOAuth {
 
     /**
      * 获取用户信息
-     * @return array
+     * @return array|false
      */
     public function getInfo() {
         $args = $this->getJson('info');

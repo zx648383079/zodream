@@ -41,7 +41,7 @@ class GitHub extends BaseOAuth {
     );
 
     /**
-     * @return array
+     * @return array|false
      */
     public function callback() {
         parent::callback();

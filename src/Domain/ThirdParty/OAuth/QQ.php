@@ -104,7 +104,7 @@ class QQ extends BaseOAuth {
     }
 
     /**
-     * @return array
+     * @return array|false
      */
     public function callback() {
         if (parent::callback() === false) {
@@ -146,7 +146,7 @@ class QQ extends BaseOAuth {
     yellow_vip_level	黄钻等级
     level	黄钻等级
     is_yellow_year_vip	标识是否为年费黄钻用户（0：不是； 1：是）
-     * @return array
+     * @return array|false
      */
     public function getInfo() {
         $user = $this->getJson('info');

@@ -58,7 +58,7 @@ class WeChat extends BaseOAuth {
     );
 
     /**
-     * @return array
+     * @return array|false
      */
     public function callback() {
         if (parent::callback() === false) {

@@ -8,13 +8,12 @@ namespace Zodream\Domain\ThirdParty\Pay;
  * Time: 19:07
  */
 use Zodream\Domain\Image\Image;
-use Zodream\Domain\ThirdParty\ThirdParty;
+use Zodream\Domain\Image\QrCode;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Request;
-use Zodream\Infrastructure\Url\Uri;
-use Zodream\Service\Routing\Url;
+use Zodream\Infrastructure\Http\Component\Uri;
 
 class WeChat extends BasePay {
     /**
@@ -221,16 +220,17 @@ class WeChat extends BasePay {
 
     /**
      * 生成预支付订单
-     [
-        'nonce_str' => '',
-        'body' => '',
-        'out_trade_no' => ',
-        'total_fee' => 1,
-        'spbill_create_ip' => '',
-        'time_start' => date('Ymdis')
-     ]
+     * [
+     * 'nonce_str' => '',
+     * 'body' => '',
+     * 'out_trade_no' => ',
+     * 'total_fee' => 1,
+     * 'spbill_create_ip' => '',
+     * 'time_start' => date('Ymdis')
+     * ]
      * @param array $args
      * @return array|bool|mixed|object
+     * @throws \ErrorException
      */
     public function getOrder(array $args = array()) {
         $args = $this->xmlPost('order', $args);
@@ -247,11 +247,12 @@ class WeChat extends BasePay {
     /**
      * 查询订单
      * EXAMPLE:
-    [
-        'out_trade_no' =>
-    ]
+     * [
+     * 'out_trade_no' =>
+     * ]
      * @param array $args
      * @return array|bool|mixed|object
+     * @throws \ErrorException
      */
     public function queryOrder(array $args = array()) {
         $args = $this->xmlPost('query', $args);
@@ -268,6 +269,7 @@ class WeChat extends BasePay {
      * 关闭订单
      * @param array $args
      * @return array|bool|mixed|object
+     * @throws \ErrorException
      */
     public function closeOrder(array $args = array()) {
         $args = $this->xmlPost('close', $args);
@@ -303,7 +305,7 @@ class WeChat extends BasePay {
      * 下载对账单
      * @param string|File $file
      * @param array $args
-     * @return array
+     * @return int
      */
     public function downloadBill($file, array $args = array()) {
         $args = $this->httpPost($this->apiMap['bill'][0], XmlExpand::encode(
@@ -319,6 +321,7 @@ class WeChat extends BasePay {
      * 查询退款
      * @param array $args
      * @return array|bool|mixed|object
+     * @throws \ErrorException
      */
     public function queryRefund(array $args = array()) {
         $args = $this->xmlPost('queryRefund', $args);
@@ -335,6 +338,7 @@ class WeChat extends BasePay {
      * 退款
      * @param array $args
      * @return array|bool|mixed|object
+     * @throws \ErrorException
      */
     public function refundOrder(array $args = array()) {
         $data['sign'] = $this->getSignData('refund', $args);
@@ -368,7 +372,7 @@ class WeChat extends BasePay {
      */
     public function sign($args) {
         if (empty($this->key)) {
-            $this->setError('KEY IS NEED');
+            throw new \InvalidArgumentException('KEY IS NEED');
         }
         ksort($args);
         reset($args);
@@ -395,6 +399,7 @@ class WeChat extends BasePay {
     /**
      * 交易完成回调
      * @return mixed
+     * @throws \ErrorException
      */
     public function callback() {
         $args = $this->xml(Request::input());
@@ -418,7 +423,7 @@ class WeChat extends BasePay {
     public function qrPay(array $arg = array()) {
         $url = new Uri($this->apiMap['qrcode']);
         $url->setData($this->getSignData('qrcode', $arg));
-        return $url->qrcode();
+        return (new QrCode())->create($url);
     }
 
     /**
@@ -440,20 +445,21 @@ class WeChat extends BasePay {
     /**
      * 商户后台系统先调用微信支付的统一下单接口，微信后台系统返回链接参数code_url，商户后台系统将code_url值生成二维码图片
      * @param array $args
-     * @return Image
+     * @return Image|bool
      */
     public function orderQr(array $args = array()) {
         $data = $this->getOrder($args);
         if ($data === false) {
             return false;
         }
-        return $this->getUrl('orderQr', $data)->qrcode();
+        return (new QrCode())->create($this->getUrl('orderQr', $data));
     }
 
     /**
      * 公众号支付 在微信浏览器里面打开H5网页中执行JS调起支付。接口输入输出数据格式为JSON。
      * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
      * @param array $args
+     * @return array
      */
     public function jsPay(array $args = array()) {
         $args['nonce_str'] = StringExpand::random(32);

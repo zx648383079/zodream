@@ -63,7 +63,7 @@ class DouBan extends BaseOAuth {
 
     /**
      * 获取用户信息
-     * @return array
+     * @return array|false
      */
     public function getInfo() {
         $user = $this->getJson('info');

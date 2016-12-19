@@ -80,7 +80,6 @@ abstract class ThirdParty extends MagicObject {
             ->setUrl($url)
             ->request()
             ->get();
-        $this->log(array($url, self::GET, $args));
         return $args;
     }
 
@@ -89,7 +88,6 @@ abstract class ThirdParty extends MagicObject {
             ->request()
             ->setCommonOption()
             ->post($data);
-        $this->log(array($url, $data, self::POST, $args));
         return $args;
     }
 

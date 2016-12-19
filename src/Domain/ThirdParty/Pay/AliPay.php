@@ -8,10 +8,7 @@ namespace Zodream\Domain\ThirdParty\Pay;
  * Time: 15:21
  */
 use Zodream\Infrastructure\Error\FileException;
-use Zodream\Infrastructure\ObjectExpand\JsonExpand;
-use Zodream\Infrastructure\Http\Request;
-use Zodream\Infrastructure\Url\Uri;
-use Zodream\Service\Routing\Url;
+use Zodream\Infrastructure\Http\Component\Uri;
 
 class AliPay extends BasePay {
 
@@ -352,9 +349,10 @@ class AliPay extends BasePay {
 
     /**
      * 根据公钥地址验签
-     * @param $content
-     * @param $sign
+     * @param string $content
+     * @param string $sign
      * @return bool
+     * @throws FileException
      */
     protected function checkRsaByFile($content, $sign) {
         if (!$this->publicKeyFile->exist()) {
@@ -427,12 +425,13 @@ class AliPay extends BasePay {
     /**
      * 查询接口
      * EXMAPLE:
-    [
-        'timestamp' => date('Y-m-d H:i:s'),
-        'out_trade_no' => ''
-    ]
+     * [
+     * 'timestamp' => date('Y-m-d H:i:s'),
+     * 'out_trade_no' => ''
+     * ]
      * @param array $args
      * @return array|bool|mixed
+     * @throws \ErrorException
      */
     public function queryOrder(array $args = array()) {
         $url = new Uri($this->apiMap['query'][0]);
@@ -519,6 +518,6 @@ class AliPay extends BasePay {
     public function getWebPayUrl($arg = array()) {
         $uri = new Uri();
         return $uri->decode($this->getMap('pay')[0])
-            ->setData($this->getSignData('webPay'));
+            ->setData($this->getSignData('webPay', $arg));
     }
 }

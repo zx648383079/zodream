@@ -9,20 +9,23 @@ namespace Zodream\Domain\Image;
  */
 class QrCode extends Image {
 
-	/**
-	 * 生成二维码
-	 * @param string $value
-	 * @param int $level 容错率
-	 * @param int $size 尺寸
-	 */
+    /**
+     * 生成二维码
+     * @param string $value
+     * @param int $level 容错率
+     * @param int $size 尺寸
+     * @return $this
+     */
 	public function create($value, $level = 0 , $size = 6) {
-		$this->image = \QRcode::png($value, false, $level, $size, 2);
+		$this->image = \QRcode::png((string)$value, false, $level, $size, 2);
+		return $this;
 	}
 
-	/**
-	 * 添加LOGO
-	 * @param string|Image|resource $logo
-	 */
+    /**
+     * 添加LOGO
+     * @param string|Image|resource $logo
+     * @return $this
+     */
 	public function addLogo($logo) {
 		if (!$logo instanceof Image) {
 			$logo = new Image($logo);
@@ -40,5 +43,6 @@ class QrCode extends Image {
 			$this->height * $logo->width / $logoWidth
 		);
 		$logo->close();
+		return $this;
 	}
 }

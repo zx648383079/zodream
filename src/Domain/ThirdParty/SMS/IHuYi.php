@@ -49,6 +49,7 @@ class IHuYi extends ThirdParty  {
      * @param $mobile
      * @param $content
      * @return bool
+     * @throws \ErrorException
      */
     public function send($mobile, $content) {
         $data = $this->getJson('url', array(
@@ -64,7 +65,7 @@ class IHuYi extends ThirdParty  {
     }
     /**
      * 发送验证短信
-     * @param sting|integer $mobile
+     * @param string|integer $mobile
      * @param string|integer $code
      * @return bool|integer false|短信ID
      */
@@ -74,7 +75,8 @@ class IHuYi extends ThirdParty  {
 
     /**
      * 余额查询
-     * @return bool|integer
+     * @return bool|int
+     * @throws \ErrorException
      */
     public function balance() {
         $data = $this->getJson('url', array(
