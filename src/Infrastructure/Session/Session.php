@@ -8,6 +8,8 @@ namespace Zodream\Infrastructure\Session;
  * Time: 9:56
  */
 use Zodream\Infrastructure\Base\ConfigObject;
+use Zodream\Infrastructure\Disk\Directory;
+use Zodream\Service\Factory;
 
 class Session extends ConfigObject implements \ArrayAccess {
 
@@ -42,9 +44,9 @@ class Session extends ConfigObject implements \ArrayAccess {
         $this->_setCookieParamsInternal();
         $this->useCookie(true);
         $this->useTransparentSessionID(false);
-        if (is_string($this->configs['savePath']) &&
-            is_dir($this->configs['savePath'])) {
-            $this->savePath(APP_DIR.'/temp');
+        if (is_string($this->configs['directory']) &&
+            is_dir($this->configs['directory'])) {
+            $this->savePath($this->configs['directory']);
         }
         @session_start();
     }
@@ -141,8 +143,11 @@ class Session extends ConfigObject implements \ArrayAccess {
         if (null == $path) {
             return session_save_path();
         }
-        if (is_dir($path)) {
-            return session_save_path($path);
+        if (!$path instanceof Directory) {
+            $path = Factory::root()->childDirectory($path);
+        }
+        if ($path->exist()) {
+            return session_save_path((string)$path);
         }
         return false;
     }

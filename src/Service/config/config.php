@@ -15,7 +15,8 @@ $configs = array(
 		'action'     => 'Action',
 	),
 	'session' => array(
-		'driver' => Zodream\Infrastructure\Session\Session::class
+		'driver' => Zodream\Infrastructure\Session\Session::class,
+        'directory' => null
 	),
 	'cache' => array(
 		'driver' => Zodream\Infrastructure\Caching\FileCache::class,
@@ -50,7 +51,7 @@ $configs = array(
 		'persistent' => false                   //使用持久化连接
 	),
 	'mail'   => array(
-		'driver'   => Zodream\Infrastructure\Mailer::class,
+		'driver'   => \Zodream\Infrastructure\Mailer\Mailer::class,
 		'host'     => 'smtp.zodream.cn',
 		'port'     => 25,
 		'user'     => 'admin@zodream.cn',
@@ -108,12 +109,15 @@ $configs = array(
 		'response' => array(),
 		'download' => array(),
 		'executeSql' => array(),
-	)
+	),
+    'i18n' => array(
+        'directory' => 'Infrastructure/Language'
+    )
 );
 
 if (defined('APP_MODULE')) {
 	$configs['view'] = array(                           //视图文件信息
-		'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
+		'directory' => 'UserInterface/'.APP_MODULE,
 		'suffix' => '.php',
 	);
 }

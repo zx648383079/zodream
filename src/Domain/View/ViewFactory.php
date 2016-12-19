@@ -9,6 +9,7 @@ namespace Zodream\Domain\View;
  */
 use LogicException;
 use Zodream\Infrastructure\Traits\ConfigTrait;
+use Zodream\Service\Factory;
 use Zodream\Service\Routing\Url;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Disk\Directory;
@@ -60,7 +61,7 @@ class ViewFactory extends MagicObject {
     public function __construct() {
         $this->loadConfigs([
             'driver' => null,
-            'directory' => APP_DIR.'/UserInterface/'.APP_MODULE,
+            'directory' => 'UserInterface/'.APP_MODULE,
             'suffix' => '.php',
             'assets' => '/'
         ]);
@@ -100,7 +101,7 @@ class ViewFactory extends MagicObject {
     
     public function setDirectory($directory) {
         if (!$directory instanceof Directory) {
-            $directory = new Directory($directory);
+            $directory = Factory::root()->childDirectory($directory);
         }
         $this->directory = $directory;
         return $this;

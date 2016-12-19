@@ -10,6 +10,7 @@ use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Interfaces\EngineObject;
 use Twig_Loader_Filesystem;
 use Twig_Environment;
+use Zodream\Service\Factory;
 
 class TwigEngine implements EngineObject {
 
@@ -17,12 +18,12 @@ class TwigEngine implements EngineObject {
     
     public function __construct() {
         $config = Config::getValue('twig', [
-            'template' => APP_DIR.'/UserInterface/'.APP_MODULE,
-            'cache' => APP_DIR.'/cache/template'
+            'template' => Factory::root()->childDirectory('UserInterface/'.APP_MODULE),
+            'cache' => Factory::root()->childDirectory('cache/template')
         ]);
-        $loader = new Twig_Loader_Filesystem($config['template']);
+        $loader = new Twig_Loader_Filesystem((string)$config['template']);
         $this->compiler = new Twig_Environment($loader, [
-            'cache' => $config['cache'],
+            'cache' => (string)$config['cache'],
             'debug' => defined('DEBUG') && DEBUG
         ]);
     }

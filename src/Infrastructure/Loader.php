@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure;
 * @author Jason
 */
 use Zodream\Infrastructure\Base\MagicObject;
+use Zodream\Service\Factory;
 
 class Loader extends MagicObject {
 	/**
@@ -23,8 +24,8 @@ class Loader extends MagicObject {
 	 * @param string $plugin
 	 */
 	public function plugin($plugin) {
-		$file = APP_DIR. '/Domain/Plugin/'. $plugin. '.php';
-		if (is_file($file)) {
+		$file = Factory::root()->childFile('Domain/Plugin/'. $plugin. '.php');
+		if ($file->exist()) {
 			include_once($file);
 		}
 		throw new \InvalidArgumentException('Error: Could not load plugin ' . $plugin . '!');

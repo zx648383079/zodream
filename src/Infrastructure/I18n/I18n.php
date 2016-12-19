@@ -10,6 +10,7 @@ use Zodream\Service\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Service\Factory;
 
 abstract class I18n extends MagicObject {
 
@@ -23,7 +24,7 @@ abstract class I18n extends MagicObject {
     protected $directory;
 
     public function __construct() {
-        $this->setDirectory(Config::getValue('i18n.directory', APP_DIR.'/lang/'));
+        $this->setDirectory(Config::getValue('i18n.directory'));
     }
 
 
@@ -34,7 +35,7 @@ abstract class I18n extends MagicObject {
      */
     public function setDirectory($directory) {
         if (!$directory instanceof Directory) {
-            $directory = new Directory($directory);
+            $directory = Factory::root()->childDirectory($directory);
         }
         $this->directory = $directory;
         return $this;

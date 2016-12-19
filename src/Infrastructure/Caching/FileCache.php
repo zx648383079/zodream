@@ -5,9 +5,9 @@ namespace Zodream\Infrastructure\Caching;
 * 
 * @author Jason
 */
-use Zodream\Service\Config;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\File;
+use Zodream\Service\Factory;
 
 class FileCache extends Cache {
 
@@ -30,7 +30,7 @@ class FileCache extends Cache {
 
     public function setDirectory($directory) {
         if (!$directory instanceof Directory) {
-            $directory = new Directory(APP_DIR.'/'.trim($directory, '/'));
+            $directory = Factory::root()->childDirectory($directory);
         }
         $this->directory = $directory;
         return $this;
