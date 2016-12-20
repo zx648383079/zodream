@@ -1,5 +1,6 @@
 <?php
 namespace Zodream\Infrastructure\Disk;
+
 /**
  * THIS IS CLASS DIRECTORY,
  *      IS'S EASY TO USE DIRECTORY.
@@ -7,6 +8,7 @@ namespace Zodream\Infrastructure\Disk;
  * Date: 2016/7/29
  * Time: 11:30
  */
+
 class Directory extends FileObject {
     public function __construct($directory) {
         if ($directory instanceof FileObject) {

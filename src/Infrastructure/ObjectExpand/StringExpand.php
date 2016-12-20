@@ -24,7 +24,7 @@ class StringExpand {
      * @return bool
      */
     public static function contains($haystack, $needles) {
-        foreach ((array) $needles as $needle) {
+        foreach ((array)$needles as $needle) {
             if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
             }

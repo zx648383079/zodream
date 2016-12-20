@@ -56,7 +56,7 @@ abstract class Cache extends ConfigObject implements \ArrayAccess {
 	}
 	
 	public function has($key) {
-		return $this->has($this->filterKey($key));
+		return $this->hasValue($this->filterKey($key));
 	}
 	
 	public function delete($key = null) {
