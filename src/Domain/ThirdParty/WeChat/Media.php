@@ -112,7 +112,7 @@ class Media extends BaseWeChat {
         if ($type == self::VIDEO) {
             $url->setScheme('http');
         }
-        return $url->get()->download($file);
+        return $this->http->setUrl($url)->request()->download($file);
     }
 
     /**

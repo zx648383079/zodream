@@ -35,14 +35,14 @@ class Menu extends BaseWeChat {
      * CREATE MENU
      * @param MenuItem $menu
      * @return bool
+     * @throws \HttpException
      */
     public function create(MenuItem $menu) {
         $args = $this->jsonPost('create', $menu->toArray());
         if ($args['errcode'] == 0) {
             return true;
         }
-        $this->error = $args['errmsg'];
-        return false;
+        throw new \HttpException($args['errmsg']);
     }
 
     public function getMenu() {

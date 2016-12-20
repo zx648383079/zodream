@@ -91,7 +91,7 @@ class Template extends BaseWeChat {
             }
         }
         $arg = $this->jsonPost('send', [
-            'touser' => $toUser,
+            'touser' => $openId,
             'template_id' => $template,
             'url' => $url,
             'data' => $data

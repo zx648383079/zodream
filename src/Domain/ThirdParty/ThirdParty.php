@@ -39,8 +39,6 @@ abstract class ThirdParty extends MagicObject {
      */
     protected $http;
 
-    protected $error;
-
     public function __construct($config = array()) {
         $this->http = new Http();
         if (empty($config)) {
