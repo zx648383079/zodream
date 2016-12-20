@@ -23,7 +23,7 @@ class AccessToken extends BaseWeChat {
     /**
      * GET ACCESS TOKEN AND SAVE CACHE
      * @return string
-     * @throws \HttpException
+     * @throws \Exception
      */
     public function getAccessToken() {
         $key = 'WeChatToken'.$this->get('appid');
@@ -32,7 +32,7 @@ class AccessToken extends BaseWeChat {
         }
         $args = $this->getJson('token');
         if (!array_key_exists('access_token', $args)) {
-            throw new \HttpException(isset($args['errmsg']) ? $args['errmsg'] : 'GET ACCESS TOKEN ERROR!');
+            throw new \Exception(isset($args['errmsg']) ? $args['errmsg'] : 'GET ACCESS TOKEN ERROR!');
         }
         Factory::cache()->set($key, $args['access_token'], $args['expires_in']);
         return $args['access_token'];
