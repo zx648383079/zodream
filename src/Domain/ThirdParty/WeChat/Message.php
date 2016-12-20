@@ -4,6 +4,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Service\Config;
 
 /**
  * 消息管理
@@ -39,6 +40,7 @@ use Zodream\Infrastructure\Http\Request;
  * @property string $event
  */
 class Message extends MagicObject {
+    protected $configKey = 'wechat';
 
     protected $xml;
 
@@ -52,10 +54,14 @@ class Message extends MagicObject {
 
     protected $appId;
 
-    public function __construct($token, $appId = null, $aesKey = null) {
-        $this->token = $token;
-        $this->aesKey = $aesKey;
-        $this->appId = $appId;
+    public function __construct(array $config = array()) {
+        $config = array_merge(Config::getValue($this->configKey, array(
+            'aesKey' => '',
+            'appId' => ''
+        )), $config);
+        $this->token = $config['token'];
+        $this->aesKey = $config['aesKey'];
+        $this->appId = $config['appId'];
         $this->encryptType = Request::get('encrypt_type');
         $this->get();
     }
