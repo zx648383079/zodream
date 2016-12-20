@@ -70,7 +70,7 @@ class Message extends MagicObject {
         if (empty($this->_data)) {
             $this->setData();
         }
-        return parent::get($key, $default);
+        return parent::get(lcfirst($key), $default);
     }
 
     public function setData() {
