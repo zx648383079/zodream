@@ -31,6 +31,9 @@ class AccessToken extends BaseWeChat {
             return Factory::cache()->get($key);
         }
         $args = $this->getJson('token');
+        if (!is_array($args)) {
+            throw new \Exception('HTTP ERROR!');
+        }
         if (!array_key_exists('access_token', $args)) {
             throw new \Exception(isset($args['errmsg']) ? $args['errmsg'] : 'GET ACCESS TOKEN ERROR!');
         }
