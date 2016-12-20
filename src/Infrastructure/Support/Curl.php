@@ -98,12 +98,16 @@ class Curl {
     /**
      * EXECUTE AND CLOSE
      * @return mixed|null
+     * @throws \Exception
      */
     public function execute() {
         $this->result = curl_exec($this->curl);
         $this->header = curl_getinfo($this->curl);
         $this->header['error'] = curl_error($this->curl);
         $this->header['errorNo'] = curl_errno($this->curl);
+        if ($this->result === false) {
+            throw new \Exception($this->header['error']);
+        }
         return $this->result;
     }
 
