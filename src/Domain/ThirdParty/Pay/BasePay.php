@@ -129,11 +129,4 @@ abstract class BasePay extends ThirdParty  {
      * @return mixed
      */
     abstract public function callback();
-
-    public function xml($xml, $isArray = true) {
-        if ($isArray) {
-            return json_decode(json_encode(parent::xml($xml, false)), true);
-        }
-        return parent::xml($xml, $isArray);
-    }
 }

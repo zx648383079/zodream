@@ -8,6 +8,8 @@ namespace Zodream\Domain\ThirdParty\WeChat;
  * Time: 10:39
  */
 use Zodream\Infrastructure\Disk\File;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+
 class Media extends BaseWeChat {
     const IMAGE = 'image';
     const VOICE = 'voice';
@@ -35,15 +37,20 @@ class Media extends BaseWeChat {
             ]
         ],
         'addNews' => [
-            'https://api.weixin.qq.com/cgi-bin/material/add_news',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/material/add_news',
+                '#access_token'
+            ],
+            '#articles',
+            'POST'
         ],
         'uploadImg' => [
             [
                 'https://api.weixin.qq.com/cgi-bin/media/uploadimg',
                 '#access_token'
             ],
-            '#media'
+            '#media',
+            'POST'
         ],
         'addMedia' => [
             [
@@ -73,8 +80,16 @@ class Media extends BaseWeChat {
             'POST'
         ],
         'updateNews' => [
-            'https://api.weixin.qq.com/cgi-bin/material/update_news',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/material/update_news',
+                '#access_token'
+            ],
+            [
+                '#articles',
+                '#media_id',
+                'index'
+            ],
+            'POST'
         ],
         'count' => [
             'https://api.weixin.qq.com/cgi-bin/material/get_materialcount',
@@ -122,7 +137,7 @@ class Media extends BaseWeChat {
      * @return string|bool media_id
      */
     public function addNews(NewsItem $news) {
-        $args = $this->jsonPost('addNews', $news->toArray());
+        $args = $this->getJson('addNews', $news->toArray());
         return array_key_exists('media_id', $args) ? $args['media_id'] : false;
     }
 
@@ -144,7 +159,7 @@ class Media extends BaseWeChat {
             'media' => '@'.$file
         ]);
         if ($type == self::VIDEO) {
-            $args = $this->json($this->http
+            $args = JsonExpand::decode($this->http
                 ->request(false)->post([
                 'description' => json_encode([
                     'title' => $title,
@@ -160,7 +175,7 @@ class Media extends BaseWeChat {
             'media_id' => $mediaId
         ]);
         if (empty($file)) {
-            return $this->json($args);
+            return JsonExpand::decode($args);
         }
         if (!$file instanceof File) {
             $file = new File($file);
@@ -176,7 +191,7 @@ class Media extends BaseWeChat {
     }
 
     public function updateNews(NewsItem $news) {
-        $args = $this->jsonPost('updateNews', $news->toArray());
+        $args = $this->getJson('updateNews', $news->toArray());
         return $args['errcode'] == 0;
     }
 
@@ -192,7 +207,7 @@ class Media extends BaseWeChat {
      * @return array
      */
     public function mediaList($type, $offset = 0, $count = 20) {
-        return $this->jsonPost('mediaList', [
+        return $this->getJson('mediaList', [
             'type' => $type,
             'offset' => $offset,
             'count' => $count

@@ -9,36 +9,73 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 class User extends BaseWeChat {
     protected $apiMap = [
         'createGroup' => [
-            'https://api.weixin.qq.com/cgi-bin/groups/create',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/groups/create',
+                '#access_token'
+            ],
+            '#group',
+            'POST'
         ],
         'getGroup' => [
             'https://api.weixin.qq.com/cgi-bin/groups/get',
             '#access_token'
         ],
         'getGroupId' => [
-            'https://api.weixin.qq.com/cgi-bin/groups/getid',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/groups/getid',
+                '#access_token'
+            ],
+            'openid',
+            'POST'
         ],
         'updateGroup' => [
-            'https://api.weixin.qq.com/cgi-bin/groups/update',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/groups/update',
+                '#access_token'
+            ],
+            '#group',
+            'POST'
         ],
         'moveUser' => [
-            'https://api.weixin.qq.com/cgi-bin/groups/members/update',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/groups/members/update',
+                '#access_token'
+            ],
+            [
+                '#openid',
+                '#to_groupid'
+            ],
+            'POST'
         ],
         'moveUsers' => [
-            'https://api.weixin.qq.com/cgi-bin/groups/members/batchupdate',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/groups/members/batchupdate',
+                '#access_token'
+            ],
+            [
+                '#openid_list',
+                '#to_groupid'
+            ],
+            'POST'
         ],
         'deleteGroup' => [
-            'https://api.weixin.qq.com/cgi-bin/groups/delete',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/groups/delete',
+                '#access_token'
+            ],
+            '#group',
+            'POST'
         ],
         'mark' => [
-            'https://api.weixin.qq.com/cgi-bin/user/info/updateremark',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/user/info/updateremark',
+                '#access_token'
+            ],
+            [
+                '#openid',
+                '#remark'
+            ],
+            'POST'
         ],
         'info' => [
             'https://api.weixin.qq.com/cgi-bin/user/info',
@@ -49,8 +86,12 @@ class User extends BaseWeChat {
             ]
         ],
         'usersInfo' => [
-            'https://api.weixin.qq.com/cgi-bin/user/info/batchget',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/user/info/batchget',
+                '#access_token'
+            ],
+            '#user_list',
+            'POST'
         ],
         'userList' => [
             'https://api.weixin.qq.com/cgi-bin/user/get',
@@ -66,7 +107,7 @@ class User extends BaseWeChat {
      * @return bool|array ['id', 'name']
      */
     public function createGroup($name) {
-        $args = $this->jsonPost('createGroup', [
+        $args = $this->getJson('createGroup', [
                 'group' => ['name' => $name]
             ]);
         if (array_key_exists('group', $args)) {
@@ -87,7 +128,7 @@ class User extends BaseWeChat {
      * @return bool|string groupid
      */
     public function getUserGroup($openId) {
-        $args = $this->jsonPost('getGroupId', [
+        $args = $this->getJson('getGroupId', [
                 'openid' => $openId
             ]);
         if (array_key_exists('groupid', $args)) {
@@ -102,7 +143,7 @@ class User extends BaseWeChat {
      * @return bool
      */
     public function updateGroup($id, $name) {
-        $args = $this->jsonPost('updateGroup', [
+        $args = $this->getJson('updateGroup', [
                 'group' => [
                     'id' => $id,
                     'name' => $name
@@ -112,7 +153,7 @@ class User extends BaseWeChat {
     }
 
     public function moveUserGroup($openId, $group) {
-        $args = $this->jsonPost('moveUser',[
+        $args = $this->getJson('moveUser',[
                 'openid' => $openId,
                 'to_groupid' => $group
             ]);
@@ -120,7 +161,7 @@ class User extends BaseWeChat {
     }
 
     public function moveUsers(array $openId, $group) {
-        $args = $this->jsonPost('moveUsers', [
+        $args = $this->getJson('moveUsers', [
                 'openid_list' => $openId,
                 'to_groupid' => $group
             ]);
@@ -128,7 +169,7 @@ class User extends BaseWeChat {
     }
 
     public function deleteGroup($group) {
-        $args = $this->jsonPost('deleteGroup', [
+        $args = $this->getJson('deleteGroup', [
                 'group' => [
                     'id' => $group
                 ]
@@ -137,7 +178,7 @@ class User extends BaseWeChat {
     }
 
     public function markUser($openId, $remark) {
-        $args = $this->jsonPost('mark', [
+        $args = $this->getJson('mark', [
                 'openid' => $openId,
                 'remark' => $remark
             ]);
@@ -173,7 +214,7 @@ class User extends BaseWeChat {
                 'lang' => 'zh-CN'
             ];
         }
-        return $this->jsonPost('usersInfo', [
+        return $this->getJson('usersInfo', [
                 'user_list' => $data
             ]);
     }

@@ -9,33 +9,57 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 class Template extends BaseWeChat {
     protected $apiMap = [
         'setIndustry' => [
-            'https://api.weixin.qq.com/cgi-bin/template/api_set_industry',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/template/api_set_industry',
+                '#access_token'
+            ],
+            [
+                '#industry_id1',
+                '#industry_id2'
+            ],
+            'POST'
         ],
         'getIndustry' => [
             'https://api.weixin.qq.com/cgi-bin/template/get_industry',
             '#access_token'
         ],
         'addTemplate' => [
-            'https://api.weixin.qq.com/cgi-bin/template/api_add_template',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/template/api_add_template',
+                '#access_token'
+            ],
+            '#template_id_short',
+            'POST'
         ],
         'all' => [
             'https://api.weixin.qq.com/cgi-bin/template/get_all_private_template',
             '#access_token'
         ],
         'delete' => [
-            'https://api,weixin.qq.com/cgi-bin/template/del_private_template',
-            '#access_token'
+            [
+                'https://api,weixin.qq.com/cgi-bin/template/del_private_template',
+                '#access_token'
+            ],
+            '#template_id',
+            'POST'
         ],
         'send' => [
-            'https://api.weixin.qq.com/cgi-bin/message/template/send',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/message/template/send',
+                '#access_token'
+            ],
+            [
+                '#touser',
+                '#template_id',
+                '#url',
+                '#data'
+            ],
+            'POST'
         ]
     ];
 
     public function setIndustry($id1, $id2) {
-        return $this->jsonPost('setIndustry', [
+        return $this->getJson('setIndustry', [
             'industry_id1' => $id1,
             'industry_id2' => $id2
         ]);
@@ -53,7 +77,7 @@ class Template extends BaseWeChat {
      * @return bool|string template_id
      */
     public function addTemplate($id) {
-        $args = $this->jsonPost('addTemplate', [
+        $args = $this->getJson('addTemplate', [
             'template_id_short' => $id
         ]);
         if ($args['errcode'] == 0) {
@@ -67,7 +91,7 @@ class Template extends BaseWeChat {
     }
 
     public function deleteTemplate($id) {
-        $args = $this->jsonPost('delete', [
+        $args = $this->getJson('delete', [
             'template_id' => $id
         ]);
         return $args['errcode'] == 0;
@@ -90,7 +114,7 @@ class Template extends BaseWeChat {
                 ];
             }
         }
-        $arg = $this->jsonPost('send', [
+        $arg = $this->getJson('send', [
             'touser' => $openId,
             'template_id' => $template,
             'url' => $url,

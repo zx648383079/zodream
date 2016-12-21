@@ -9,12 +9,26 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 class Account extends BaseWeChat {
     protected $apiMap = [
         'qrCode' => [
-            'https://api.weixin.qq.com/cgi-bin/qrcode/create',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/qrcode/create',
+                '#access_token'
+            ],
+            [
+                '#action_info',
+                'expire_seconds',
+                'action_name'
+            ]
         ],
         'shortUrl' => [
-            'https://api.weixin.qq.com/cgi-bin/shorturl',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/shorturl',
+                '#access_token'
+            ],
+            [
+                'action' => 'long2short',
+                '#long_url'
+            ],
+            'POST'
         ],
     ];
 
@@ -42,11 +56,11 @@ class Account extends BaseWeChat {
                 $data['action_info']['scene'] = ['scene_str' => $scene];
             }
         }
-        return $this->jsonPost('qrCode', $data);
+        return $this->getJson('qrCode', $data);
     }
 
     public function shortUrl($url) {
-        $args = $this->jsonPost('shortUrl', [
+        $args = $this->getJson('shortUrl', [
             'action' => 'long2short',
             'long_url' => $url
         ]);

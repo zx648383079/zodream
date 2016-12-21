@@ -9,10 +9,12 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 class Menu extends BaseWeChat {
     protected $apiMap = [
         'create' => [
-            'https://api.weixin.qq.com/cgi-bin/menu/create',
             [
+                'https://api.weixin.qq.com/cgi-bin/menu/create',
                 '#access_token'
-            ]
+            ],
+            '#button',
+            'POST'
         ],
         'get' => [
             'https://api.weixin.qq.com/cgi-bin/menu/get',
@@ -38,7 +40,7 @@ class Menu extends BaseWeChat {
      * @throws \Exception
      */
     public function create(MenuItem $menu) {
-        $args = $this->jsonPost('create', $menu->toArray());
+        $args = $this->getJson('create', $menu->toArray());
         if ($args['errcode'] === 0) {
             return true;
         }

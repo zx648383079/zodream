@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Domain\ThirdParty\OAuth;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -70,17 +72,16 @@ class QQ extends BaseOAuth {
     /**
      * @param string $name
      * @param array $args
-     * @param bool $is_array
      * @return array
      */
-    protected function getJson($name, $args = array(), $is_array = true) {
+    protected function getJson($name, $args = array()) {
         $json = $this->getByApi($name, $args);
         if (strpos($json, 'callback') !== false) {
             $leftPos = strpos($json, '(');
             $rightPos = strrpos($json, ')');
             $json  = substr($json, $leftPos + 1, $rightPos - $leftPos -1);
         }
-        return $this->json($json, $is_array);
+        return JsonExpand::decode($json);
     }
 
     /**

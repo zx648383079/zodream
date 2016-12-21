@@ -90,7 +90,7 @@ class NewsItem extends ZObject {
         if (empty($this->articles)) {
             return $this->getArticle();
         }
-        $args = array_splice($this->menu, 0, 8);
+        $args = array_splice($this->articles, 0, 8);
         $data = [
             'articles' => array_map([$this, 'getArray'], $args)
         ];

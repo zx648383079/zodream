@@ -9,8 +9,12 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 class PersonalMenu extends BaseWeChat {
     protected $apiMap = [
         'create' => [
-            'https://api.weixin.qq.com/cgi-bin/menu/addconditional',
-            '#access_token'
+            [
+                'https://api.weixin.qq.com/cgi-bin/menu/addconditional',
+                '#access_token'
+            ],
+            '#button',
+            'POST'
         ],
         'delete' => [
             [
@@ -31,7 +35,7 @@ class PersonalMenu extends BaseWeChat {
     ];
 
     public function create(MenuItem $menu) {
-        $args = $this->jsonPost('create', $menu->toArray());
+        $args = $this->getJson('create', $menu->toArray());
         if (array_key_exists('menuid', $args)) {
             return $args['menuid'];
         }

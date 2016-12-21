@@ -102,7 +102,7 @@ abstract class ThirdParty extends MagicObject {
             return $this->httpPost(
                 $url->decode($map[0][0])
                     ->addData($this->getData((array)$map[0][1], $args)),
-                $this->getData((array)$map[1], $args)
+                $this->getPostData($name, $args)
             );
         }
         $url->decode($map[0]);
@@ -110,7 +110,7 @@ abstract class ThirdParty extends MagicObject {
             return $this->httpGet($url->addData($this->getData((array)$map[1], $args)));
         }
         return $this->httpPost($url,
-            $this->getData((array)$map[1], $args));
+            $this->getPostData($name, $args));
     }
 
 
@@ -133,6 +133,21 @@ abstract class ThirdParty extends MagicObject {
             $uri->addData($this->getData((array)$map[1], $args));
         }
         return $uri;
+    }
+
+    /**
+     * GET POST DATA
+     * @param string $name
+     * @param array $args
+     * @return array|string
+     * @internal param array $data
+     */
+    protected function getPostData($name, array $args) {
+        $map = $this->getMap($name);
+        if (!is_array($map) || count($map) < 2) {
+            return array();
+        }
+        return $this->getData((array)$map[1], $args);
     }
 
     /**
@@ -204,20 +219,12 @@ abstract class ThirdParty extends MagicObject {
         return $data;
     }
 
-    protected function xml($xml, $isArray = true) {
-        return XmlExpand::decode($xml, $isArray);
+    protected function getXml($name, $args = array()) {
+        return XmlExpand::decode($this->getByApi($name, $args));
     }
 
-    protected function json($json, $isArray = true) {
-        return JsonExpand::decode($json, $isArray);
-    }
-
-    protected function getXml($name, $args = array(), $isArray = true) {
-        return $this->xml($this->getByApi($name, $args), $isArray);
-    }
-
-    protected function getJson($name, $args = array(), $isArray = true) {
-        return $this->json($this->getByApi($name, $args), $isArray);
+    protected function getJson($name, $args = array()) {
+        return JsonExpand::decode($this->getByApi($name, $args));
     }
 
     /**
