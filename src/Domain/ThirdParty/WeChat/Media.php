@@ -13,6 +13,7 @@ class Media extends BaseWeChat {
     const VOICE = 'voice';
     const VIDEO = 'video';
     const THUMB = 'thumb';
+    const NEWS = 'news';
 
     protected $apiMap = [
         'uploadTemp' => [
@@ -183,8 +184,15 @@ class Media extends BaseWeChat {
         return $this->getJson('count');
     }
 
+    /**
+     * 获取素材列表
+     * @param string $type
+     * @param int $offset
+     * @param int $count
+     * @return array
+     */
     public function mediaList($type, $offset = 0, $count = 20) {
-        return $this->getJson('mediaList', [
+        return $this->jsonPost('mediaList', [
             'type' => $type,
             'offset' => $offset,
             'count' => $count
