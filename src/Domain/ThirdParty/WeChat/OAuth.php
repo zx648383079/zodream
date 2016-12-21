@@ -30,7 +30,7 @@ class OAuth extends BaseWeChat {
                 'response_type' => 'code',
                 'scope' => 'snsapi_userinfo', // snsapi_base （不弹出授权页面，直接跳转，只能获取用户openid），snsapi_userinfo （弹出授权页面，可通过openid拿到昵称、性别、所在地
                 'state',
-                '#wechat_redirect'
+                //'#wechat_redirect'
             ]
         ],
         'access' => [
@@ -59,7 +59,7 @@ class OAuth extends BaseWeChat {
         $state = StringExpand::randomNumber(7);
         Factory::session()->set('state', $state);
         $this->set('state', $state);
-        return $this->getUrl('login');
+        return $this->getUrl('login')->setFragment('wechat_redirect');
     }
 
     public function callback() {
