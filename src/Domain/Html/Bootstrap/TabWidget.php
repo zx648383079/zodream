@@ -23,10 +23,17 @@ class TabWidget extends Widget {
     protected function run() {
         $data = $this->get();
         $title = $content = null;
+        $hasActive = false;
         foreach ($data['items'] as $key => $item) {
-            $active = count($item) > 2;
-            $title .= $this->getTitle($item['title'] ?: $item[0], $key, $active);
-            $content .= $this->getContent($item['content'] ?: $item[0], $key, $active);
+            list($t, $c, $a) = $this->convert($item, $key);
+            if ($hasActive) {
+                $a = false;
+            }
+            if ($a) {
+                $hasActive = true;
+            }
+            $title .= $this->getTitle($t, $key, $a);
+            $content .= $this->getContent($c, $key, $a);
         }
         unset($data['items']);
         return Html::div(Html::ul($title, [
@@ -35,6 +42,27 @@ class TabWidget extends Widget {
             ]).Html::div($content, [
                 'class' => 'tab-content'
             ]), $data);
+    }
+
+    /**
+     * @param $item
+     * @param $key
+     * @return array
+     */
+    protected function convert($item, $key) {
+        if (!is_array($item)) {
+            return [$key, $item, false];
+        }
+        if (array_key_exists('title', $item)) {
+            return [$item['title'], $item['content'], isset($item['active']) && $item['active']];
+        }
+        if (array_key_exists('content', $item)) {
+            return [$key, $item['content'], isset($item['active']) && $item['active']];
+        }
+        if (is_integer($key)) {
+            return [$item[0], $item[1], isset($item[2]) && $item[2]];
+        }
+        return [$key, $item[0], $item[1]];
     }
 
     protected function getTitle($title, $id, $isActive = false) {
