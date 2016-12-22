@@ -15,7 +15,8 @@ use Zodream\Infrastructure\Http\Response;
 class Route {
 
     const PATTERN = '#{([\w_]+)}#i';
-    const PREFIX = 'Service\\'.APP_MODULE;
+
+    protected $prefix = null;
 
 	protected $uri;
 
@@ -116,6 +117,7 @@ class Route {
 	 * @return Response
 	 */
 	public function run() {
+	    $this->prefix = 'Service\\'.APP_MODULE;
 		return $this->parseResponse($this->runAction());
 	}
 
@@ -226,7 +228,7 @@ class Route {
 
 	protected function getClass(array $args, $prefix = null) {
 	    if (empty($prefix)) {
-	        $prefix = self::PREFIX;
+	        $prefix = $this->prefix;
         }
 		$args = array_map('ucfirst', $args);
 		return trim($prefix, '\\').'\\'.implode('\\', $args).APP_CONTROLLER;
@@ -234,7 +236,7 @@ class Route {
 
 	protected function getModule(array &$args) {
 	    $modules = Config::getValue('modules', array());
-	    $prefix = self::PREFIX;
+	    $prefix = $this->prefix;
 	    if (count($args) > 0 && array_key_exists($args[0], $modules)) {
 	        $prefix = $modules[$args[0]];
 	        unset($args[0]);
