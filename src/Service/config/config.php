@@ -20,7 +20,10 @@ $configs = array(
 	),
 	'cache' => array(
 		'driver' => Zodream\Infrastructure\Caching\FileCache::class,
-		'auto' => false
+		'auto' => false,
+        'directory' => 'data/cache',
+        'extension' => '.cache',
+        'gc' => 10
 	),
 	'auth'   => array(
 		'driver' => Zodream\Domain\Access\Auth::class,        //用户判断
@@ -51,7 +54,7 @@ $configs = array(
 		'persistent' => false                   //使用持久化连接
 	),
 	'mail'   => array(
-		'driver'   => \Zodream\Infrastructure\Mailer\Mailer::class,
+		'driver'   => Zodream\Infrastructure\Mailer\Mailer::class,
 		'host'     => 'smtp.zodream.cn',
 		'port'     => 25,
 		'user'     => 'admin@zodream.cn',
@@ -73,7 +76,7 @@ $configs = array(
 	),
     'log' => array(
         'name' => 'ZoDream',
-        'file' => 'log/app.log'
+        'file' => 'data/log/app.log'
     ),
 	'safe' => array(
 		'csrf' => false,						//是否使用csrf防止表单注入攻击
@@ -112,7 +115,7 @@ $configs = array(
 	),
     'i18n' => array(
         'directory' => 'Infrastructure/Language'
-    )
+    ),
 );
 
 if (defined('APP_MODULE')) {

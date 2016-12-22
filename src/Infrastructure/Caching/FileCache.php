@@ -17,7 +17,7 @@ class FileCache extends Cache {
 	protected $directory;
 
     protected $configs = [
-        'directory' => 'cache/',
+        'directory' => 'data/cache/',
         'extension' => '.cache',
         'gc' => 10
     ];

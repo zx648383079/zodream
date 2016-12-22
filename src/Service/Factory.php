@@ -142,7 +142,7 @@ class Factory {
         if (!array_key_exists('log', static::$_instance)) {
             $args = Config::getValue('log', [
                 'name' => 'ZoDream',
-                'file' => 'log/app.log'
+                'file' => 'data/log/app.log'
             ]);
             $log = new Logger($args['name']);
             $log->pushHandler(new StreamHandler((string)static::root()
