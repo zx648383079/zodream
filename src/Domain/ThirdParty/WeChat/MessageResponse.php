@@ -134,16 +134,22 @@ class MessageResponse {
 
     public function setNews(array $arg) {
         if (!array_key_exists('item', $arg)) {
-            $arg['item'] = $arg;
-        }
-        $arg['item'] = array_map(function ($item) {
-            if (is_array($item)) {
-                return $item;
-            }
-            return [
-                '@cdata' => $item
+            $arg = [
+                'item' => [
+                    $arg
+                ],
             ];
-        }, $arg['item']);
+        }
+        foreach ($arg['item'] as &$item) {
+            foreach ($item as &$value) {
+                if (is_array($value)) {
+                    continue;
+                }
+                $value = [
+                    '@cdata' => $value
+                ];
+            }
+        }
         return $this->setType(MessageEnum::News)
             ->setData('ArticleCount', count($arg['item']), false)
             ->setData('Articles', $arg);
