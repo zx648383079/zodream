@@ -10,6 +10,7 @@ namespace Zodream\Infrastructure\Mailer;
 use Zodream\Infrastructure\Base\ConfigObject;
 
 abstract class BaseMailer extends ConfigObject {
+
 	protected $mail;
 
     protected $configKey = 'mail';

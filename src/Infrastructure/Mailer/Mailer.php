@@ -10,6 +10,10 @@ namespace Zodream\Infrastructure\Mailer;
 use Zodream\Infrastructure\Template;
 
 class Mailer extends BaseMailer {
+
+    protected $configs = [
+        'secure' => 'tls'
+    ];
 	/**
 	 * @var \PHPMailer
 	 */
@@ -21,7 +25,7 @@ class Mailer extends BaseMailer {
 		$this->mail->CharSet = 'UTF-8';
 		$this->mail->isSMTP();
 		$this->mail->SMTPAuth = true;
-		$this->mail->SMTPSecure = 'tls';
+		$this->mail->SMTPSecure = $this->configs['secure'];
 		if (defined('DEBUG') && DEBUG) {
 			$this->mail->SMTPDebug = 1;
 		}

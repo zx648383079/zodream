@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Domain\ThirdParty\OAuth;
-use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 
 /**
  * Created by PhpStorm.
@@ -9,6 +8,8 @@ use Zodream\Infrastructure\ObjectExpand\JsonExpand;
  * Time: 15:25
  *
  */
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+
 class QQ extends BaseOAuth {
 
     /**
