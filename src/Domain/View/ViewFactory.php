@@ -230,7 +230,7 @@ class ViewFactory extends MagicObject {
         return $this->sections[$name];
     }
 
-    public function head() {
+    public function header() {
         $lines = [];
         if (!empty($this->metaTags)) {
             $lines[] = implode("\n", $this->metaTags);
@@ -255,7 +255,7 @@ class ViewFactory extends MagicObject {
         return empty($lines) ? '' : implode("\n", $lines);
     }
 
-    public function foot() {
+    public function footer() {
         $lines = [];
         if (!empty($this->jsFiles[View::HTML_FOOT])) {
             $lines[] = implode("\n", $this->jsFiles[View::HTML_FOOT]);

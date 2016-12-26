@@ -6,9 +6,8 @@ namespace Zodream\Infrastructure\Database\Schema;
  * Date: 2016/8/11
  * Time: 14:50
  */
-use Zodream\Infrastructure\Database\BaseQuery;
 
-class Table extends BaseQuery {
+class Table extends BaseSchema {
 
     const MyISAM = 'MyISAM';
     const HEAP = 'HEAP';
@@ -129,7 +128,7 @@ class Table extends BaseQuery {
      * SET UNIQUE
      * @param string $name
      * @param string $field
-     * @param sting $order
+     * @param string $order
      * @return $this
      */
     public function unique($name, $field, $order = null) {
@@ -144,7 +143,7 @@ class Table extends BaseQuery {
      * @param string $arg
      * @return $this
      */
-    public function check($name, $arg = null) {
+    public function checks($name, $arg = null) {
         if (empty($arg)) {
             $this->checks[] = $name;
         } else {
@@ -202,16 +201,69 @@ class Table extends BaseQuery {
         return $this->command()->execute($this->getTruncateSql());
     }
 
+    /**
+     * 检查表
+     * @return mixed
+     */
+    public function check() {
+        return $this->command()->execute('CHECK TABLE '.$this->tableName.'');
+    }
 
     /**
-     * @param $offset
+     * 优化表
+     * @return mixed
+     */
+    public function optimize() {
+        return $this->command()->execute('OPTIMIZE TABLE '.$this->tableName.'');
+    }
+
+    /**
+     * 修复表
+     * @return mixed
+     */
+    public function repair() {
+        return $this->command()->execute('REPAIR TABLE '.$this->tableName.'');
+    }
+
+    /**
+     * 分析表
+     * @return mixed
+     */
+    public function analyze() {
+        return $this->command()->execute('ANALYZE TABLE '.$this->tableName.'');
+    }
+
+    /**
+     * @param bool $isFull 是否包含完整信息
+     * @return array
+     */
+    public function getAllColumn($isFull = false) {
+        if ($isFull) {
+            return $this->command()->getArray('SHOW FULL COLUMNS FROM '.$this->tableName);
+        }
+        return $this->command()->getArray('SHOW COLUMNS FROM '.$this->tableName);
+    }
+
+    /**
+     * 系统生成的创建表的语句
+     * @return string
+     */
+    public function getCreateTableSql() {
+        $data = $this->command()->getArray('SHOW CREATE TABLE '.$this->tableName);
+        if (empty($data)) {
+            return null;
+        }
+        return $data[0]['Create Table'];
+    }
+
+
+    /**
+     * @param string $offset
+     * @param null $default
      * @return bool|Column
      */
-    public function get($offset) {
-        if (!$this->has($offset)) {
-            return false;
-        }
-        return $this->_data[$offset];
+    public function get($offset = null, $default = null) {
+        return parent::get($offset, false);
     }
 
     /**
@@ -221,7 +273,7 @@ class Table extends BaseQuery {
      */
     public function set($offset, $column = null) {
         if (!$column instanceof Column) {
-            $column = new Column($offset);
+            $column = new Column($this, $offset);
         }
         return $this->_data[$offset] = $column;
     }
@@ -239,7 +291,7 @@ class Table extends BaseQuery {
      * @return string
      */
     public function getTruncateSql() {
-        return "TRUNCATE `{$this->tableName}`;";
+        return "TRUNCATE {$this->tableName};";
     }
 
     /**
@@ -251,7 +303,7 @@ class Table extends BaseQuery {
         foreach ($this->_data as $item) {
             $sql[] = $item->getAlterSql();
         }
-        return "ALTER TABLE `$this->tableName` ".implode(',', $sql).';';
+        return "ALTER TABLE {$this->tableName} ".implode(',', $sql).';';
     }
 
     /**
@@ -259,7 +311,7 @@ class Table extends BaseQuery {
      * @return string
      */
     public function getDropSql() {
-        return "DROP TABLE IF EXISTS `{$this->tableName}`;";
+        return "DROP TABLE IF EXISTS {$this->tableName};";
     }
 
     /**
@@ -267,7 +319,7 @@ class Table extends BaseQuery {
      * @return string
      */
     public function getSql() {
-        $sql = "CREATE DATABASE IF NOT EXISTS `{$this->tableName}` (";
+        $sql = "CREATE TABLE IF NOT EXISTS {$this->tableName} (";
         $column = $this->_data;
         if (!empty($this->primaryKey)) {
             $column[] = "PRIMARY KEY (`{$this->primaryKey}`)";
@@ -285,6 +337,6 @@ class Table extends BaseQuery {
         if ($this->aiBegin > 1) {
             $sql .= ' AUTO_INCREMENT='.$this->aiBegin;
         }
-        return $sql." DEFAULT CHARSET={$this->charset} COMMENT={$this->comment};";
+        return $sql." DEFAULT CHARSET={$this->charset} COMMENT='{$this->comment}';";
     }
 }

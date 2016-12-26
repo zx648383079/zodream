@@ -147,7 +147,7 @@ class MessageBag implements ArrayAble, JsonAble, Countable, JsonSerializable {
      * @return array
      */
     protected function getMessagesForWildcardKey($key, $format) {
-        return collect($this->messages)
+        return (new Collection($this->messages))
             ->filter(function ($messages, $messageKey) use ($key) {
                 return StringExpand::is($key, $messageKey);
             })

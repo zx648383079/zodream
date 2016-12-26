@@ -6,10 +6,16 @@ namespace Zodream\Service\Controller;
  * @author Jason
  * @time 2015-12-19
  */
+use Zodream\Domain\Html\VerifyCsrfToken;
+use Zodream\Infrastructure\Event\EventManger;
+use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\Http\Response;
 use Zodream\Service\Config;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\Loader;
+use Zodream\Domain\Access\Auth;
 use Zodream\Infrastructure\Traits\LoaderTrait;
+use Zodream\Service\Routing\Url;
 
 abstract class Controller extends BaseController {
 	
@@ -51,7 +57,7 @@ abstract class Controller extends BaseController {
         if ($this->canCache && Request::isGet() &&
             (($cache = $this->runCache(get_called_class().
                     $this->action.serialize($arguments))) !== false)) {
-            return new HtmlResponse($cache);
+            return $this->showContent($cache);
         }
         return call_user_func_array(array($this, $action), $arguments);
     }
@@ -89,7 +95,7 @@ abstract class Controller extends BaseController {
     /**
      * 在执行之前做规则验证
      * @param string $action 方法名
-     * @return boolean|BaseResponse
+     * @return boolean|Response
      */
     protected function beforeFilter($action) {
         $rules = $this->rules();
@@ -112,7 +118,7 @@ abstract class Controller extends BaseController {
 
     /**
      * @param string|callable $role
-     * @return bool|RedirectResponse
+     * @return bool|Response
      */
     private function processFilter($role) {
         if (is_callable($role)) {
@@ -177,6 +183,16 @@ abstract class Controller extends BaseController {
      * @return Response
      */
     public function show($name = null, $data = array()) {
+        return $this->showContent($this->renderHtml($name, $data));
+    }
+
+    /**
+     * 生成页面
+     * @param string $name
+     * @param array $data
+     * @return string
+     */
+    protected function renderHtml($name = null, $data = []) {
         if (is_array($name)) {
             $data = $name;
             $name = null;
@@ -188,7 +204,7 @@ abstract class Controller extends BaseController {
             $pattern = 'Service.'.APP_MODULE.'.(.+)'.APP_CONTROLLER;
             $name = preg_replace('/^'.$pattern.'$/', '$1', get_called_class()).'/'.$name;
         }
-        return Factory::response()->sendHtml(Factory::view()->render($name, $data));
+        return Factory::view()->render($name, $data);
     }
 
     /**
@@ -220,7 +236,7 @@ abstract class Controller extends BaseController {
      * 重定向
      * @param string $url
      * @param int $time
-     * @return $this
+     * @return Response
      */
     public function redirect($url, $time = 0) {
         return Factory::response()

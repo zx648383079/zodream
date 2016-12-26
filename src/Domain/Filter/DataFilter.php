@@ -25,6 +25,7 @@ class DataFilter {
         'unique',
         'url'
     );
+
     protected static $error = array();
     /**
      * GET ERRORS WHO VALIDATE FAIL

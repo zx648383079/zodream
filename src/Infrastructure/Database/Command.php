@@ -114,14 +114,17 @@ class Command extends ConfigObject {
      * @return string
      */
     public function addPrefix($table) {
+        if (strpos($table, '`') !== false) {
+            return $table;
+        }
         if (strpos($table, '!') === 0) {
-            return substr($table, 1);
+            return '`'.substr($table, 1).'`';
         }
         $prefix = $this->getEngine()->getConfig('prefix');
         if (empty($prefix)) {
-            return $table;
+            return '`'.$table;
         }
-        return $prefix.StringExpand::firstReplace($table, $prefix);
+        return '`'.$prefix.StringExpand::firstReplace($table, $prefix).'`';
     }
 
     /**

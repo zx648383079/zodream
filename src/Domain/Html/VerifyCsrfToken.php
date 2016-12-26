@@ -1,7 +1,6 @@
 <?php
 namespace Zodream\Domain\Html;
 
-use Zodream\Infrastructure\Error\Error;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Http\Request;
@@ -20,12 +19,13 @@ class VerifyCsrfToken {
 
 	/*
 	 * 验证
+	 * @return bool
 	 */
 	public static function verify() {
 		if (self::get() === Request::request('_csrf')) {
-			return;
+			return true;
 		}
-		Error::out('Csrf验证失败！', __FILE__, __LINE__);
+		throw new \Exception('Csrf验证失败！');
 	}
 
 	/**

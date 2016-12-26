@@ -1,8 +1,12 @@
 <?php
 defined('APP_DIR') or exit();
+echo '<?php';
+?>
+defined('APP_DIR') or exit();
 use Zodream\Domain\Html\Bootstrap\FormWidget;
 /** @var $this \Zodream\Domain\View\View */
-$this->extend('layout/head');
+$this->title = '';
+$this->extend('layout/header');
 ?>
 
 
@@ -11,15 +15,21 @@ $this->extend('layout/head');
 		<h3 class="panel-title">增加</h3>
 	</div>
 	<div class="panel-body">
-		<?=FormWidget::begin($data)
+		<?='<?='?>FormWidget::begin($model)
 		->hidden('id')
-{data}
+    <?php foreach ($data as $item):?>
+        ->'<?=$item?>',
+    <?php endforeach;?>
 		->button()
 		->end();
 		?>
-		<p><?=$error?></p>
+		<p><?='<?='?>$model->getFirstError()?></p>
 	</div>
 </div>
 
 
-<?php $this->extend('layout/foot');?>
+<?php
+echo '<?php';
+?>
+$this->extend('layout/footer');
+?>

@@ -515,27 +515,27 @@ abstract class Model extends MagicObject {
 
     /**
      * @param $args
-     * @param int $index
      * @param int $size
+     * @param string $key
      * @param array $parameters
      * @return Page
      */
-    public static function findPage($args,
-                                    $index = 0,
+    public static function findPage($args = null,
                                     $size = 20,
+                                    $key = 'page',
                                     $parameters = array()) {
-        if (!is_array($args) ||
+        if (!empty($args) && (!is_array($args) ||
             (!array_key_exists('where', $args) &&
                 !array_key_exists('group', $args) &&
                 !array_key_exists('order', $args) &&
-                !array_key_exists('having', $args)) ) {
+                !array_key_exists('having', $args))) ) {
             $args = array(
                 'where' => $args
             );
         }
         $page = static::find()
             ->addParam($parameters)
-            ->load($args)->page($index, $size);
+            ->load($args)->page($size, $key);
         $data = [];
         foreach ($page->getPage() as $item) {
             $model = new static;

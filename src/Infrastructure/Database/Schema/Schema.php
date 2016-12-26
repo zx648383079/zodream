@@ -1,45 +1,100 @@
 <?php
 namespace Zodream\Infrastructure\Database\Schema;
 
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/6/25
  * Time: 9:19
  */
-use Zodream\Infrastructure\Database\Query\BaseQuery;
+use Zodream\Infrastructure\Database\Command;
 
-class Schema extends BaseQuery {
-    
-    public function addParam($params) {
-        
+class Schema {
+    /**
+     * @var Command
+     */
+    private $_command;
+
+    protected $schema = 'zodream';
+
+    protected $charset = 'UTF8';
+
+    public function __construct($schema) {
+        $this->setSchema($schema);
     }
 
     /**
-     * 数据库
-     * @param string $name
-     * @param string $type CREATE or DROP
-     * @return mixed
+     * @return Command
      */
-    public function database($name, $type = 'CREATE') {
-        return $this->command()->execute(strtoupper($type).' DATABASE '.$name);
+    protected function command() {
+        if (!$this->_command instanceof Command) {
+            $this->_command = Command::getInstance();
+        }
+        return $this->_command;
     }
 
-    
-    public function createDatabase($name, $charset = 'UTF8') {
+    public function setSchema($schema) {
+        $this->schema = $schema;
+        return $this;
+    }
+
+    public function setCharset($charset = 'UTF8') {
+        $this->charset = $charset;
+        return $this;
+    }
+
+    public function create() {
         return $this->command()
-            ->execute('CREATE DATABASE IF NOT EXISTS '.$name.' DEFAULT CHARACTER SET '.$charset);
+            ->execute('CREATE SCHEMA IF NOT EXISTS `'.$this->schema.'` DEFAULT CHARACTER SET '.$this->charset);
+    }
+
+    public function update() {
+        return $this->command()
+            ->execute('ALTER SCHEMA `'.$this->schema.'` DEFAULT COLLATE '.$this->charset);
+    }
+
+    public function delete() {
+        return $this->command()
+            ->execute('DROP DATABASE `'.$this->schema.'`');
+    }
+
+    public function clear() {
+        $tables = $this->getAllTable();
+        return $this->command()->execute('DROP TABLE `'.implode('`,`', $tables).'`');
     }
 
     /**
-     * 创建表
-     * @param string $name
-     * @param string $engine
-     * @return mixed
+     * 获取所有数据库名
+     * @return array
      */
-    public function createTable($name, $engine = 'MYISAM') {
-        return $this->command()->execute('CREATE TABLE IF NOT EXISTS '.$this->addPrefix($name).
-            ' ('. $this->getColumns(). ') ENGINE = '.$engine.' DEFAULT CHARSET=UTF8;');
+    public static function getAllDatabase() {
+        return Command::getInstance()->getArray('SHOW DATABASES');
+    }
+
+    /**
+     * 获取表名
+     * @param bool $hasStatus
+     * @return array
+     */
+    public function getAllTable($hasStatus = false) {
+        $this->command()
+            ->changedDatabase($this->schema);
+        if ($hasStatus) {
+            return $this->command()
+                ->getArray('SHOW TABLE STATUS');
+        }
+        $tables = $this->command()
+            ->getArray('SHOW TABLES');
+        foreach ($tables as &$table) {
+            $table = current($table);
+        }
+        return $tables;
+    }
+
+    public function table($name) {
+        $name = $this->command()->addPrefix($name);
+        return new Table("`{$this->schema}`.{$name}");
     }
 
     /**
@@ -50,39 +105,5 @@ class Schema extends BaseQuery {
      */
     public function mergeTable($table, $sql) {
         return $this->command()->execute('CREATE TABLE '.$this->addPrefix($table).' AS '.$sql);
-    }
-
-    /**
-     * 获取所有数据库名
-     */
-    public function getAllDatabase() {
-        return $this->command()
-            ->getArray('SHOW DATABASES');
-    }
-
-    /**
-     * 获取表名
-     * @param string $arg 数据库名 默认是配置文件中的数据库
-     * @return array
-     */
-    public function getAllTable($arg = null) {
-        if (!empty($arg)) {
-            $this->command()
-                ->changedDatabase($arg);
-        }
-        return $this->command()
-            ->getArray('SHOW TABLES');
-    }
-
-    protected function getColumns() {
-        return '';
-    }
-
-    public function getSql() {
-        return '';
-    }
-
-    public function __toString() {
-        return $this->getSql();
     }
 }

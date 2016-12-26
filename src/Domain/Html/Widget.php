@@ -73,10 +73,17 @@ abstract class Widget extends MagicObject {
         if ($tag === 'html') {
             return htmlspecialchars_decode($data);
         }
+        if ($tag === 'img') {
+            return Html::img($data);
+        }
         if ($tag === 'url') {
-            return Html::tag('a', $data, array(
-                'href' => $data
-            ));
+            return Html::a($data, $data);
+        }
+        if ($tag === 'email') {
+            return Html::a($data, 'mailto:'.$data);
+        }
+        if ($tag === 'tel') {
+            return Html::a($data, 'tel:'.$data);
         }
         if ($tag === 'int') {
             return intval($data);

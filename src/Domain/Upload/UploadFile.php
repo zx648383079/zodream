@@ -1,6 +1,5 @@
 <?php
 namespace Zodream\Domain\Upload;
-use phpDocumentor\Reflection\Types\Null_;
 
 /**
  * Created by PhpStorm.

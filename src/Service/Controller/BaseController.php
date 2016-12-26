@@ -6,15 +6,11 @@ namespace Zodream\Service\Controller;
  * @author Jason
  * @time 2015-12-19
  */
-use Zodream\Domain\Access\Auth;
-use Zodream\Domain\Html\VerifyCsrfToken;
-use Zodream\Service\Config;
+use Exception;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\Http\Request;
-use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\Event\EventManger;
-use Zodream\Infrastructure\Response;
-use Zodream\Service\Routing\Url;
+use Zodream\Infrastructure\Http\Response;
 
 abstract class BaseController extends Action {
 	
@@ -36,14 +32,14 @@ abstract class BaseController extends Action {
      * 执行方法
      * @param string $action
      * @param array $vars
-     * @return string|BaseResponse
-     * @throws \HttpUrlException
+     * @return string|Response
+     * @throws \Exception
      */
 	public function runAction($action, array $vars = array()) {
         Factory::timer()->record('controllerStart');
 		$this->action = $action;
 		if (!$this->hasAction($action)) {
-			throw new \HttpUrlException('URI ERROR!');
+			throw new Exception('URI ERROR!');
 		}
 		if (true !==
             ($arg = $this->beforeFilter($action))) {
@@ -66,11 +62,11 @@ abstract class BaseController extends Action {
 			return call_user_func($class);
 		}
 		if (!class_exists($class)) {
-			throw new \HttpUrlException($action. ' CANNOT RUN CLASS!');
+			throw new Exception($action. ' CANNOT RUN CLASS!');
 		}
 		$instance = new $class;
 		if (!$instance instanceof Action) {
-			throw new \HttpUrlException($action. ' IS NOT ACTION!');
+			throw new Exception($action. ' IS NOT ACTION!');
 		}
 		$instance->init();
 		$instance->prepare();
@@ -97,7 +93,7 @@ abstract class BaseController extends Action {
      * @param string $action
      * @param array $vars
      * @return array
-     * @throws \HttpUrlException
+     * @throws Exception
      */
 	protected function getActionArguments($action, $vars = array()) {
         $reflectionObject = new \ReflectionObject($this);
@@ -119,7 +115,7 @@ abstract class BaseController extends Action {
                 $arguments[] = $param->getDefaultValue();
                 continue;
             }
-            throw new \HttpUrlException($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!');
+            throw new Exception($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!');
         }
         return $arguments;
     }

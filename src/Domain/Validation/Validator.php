@@ -23,6 +23,12 @@ class Validator {
     }
 
     public function setRules($args) {
+        foreach ((array)$args as $key => $arg) {
+            $this->rules[] = $this->converterRule($arg, $key);
+        }
+    }
+
+    protected function converterRule($rule, $key = null) {
 
     }
 

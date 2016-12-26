@@ -107,11 +107,4 @@ abstract class FileObject {
         return false;
     }
 
-    /**
-     * GET URL IN WEB ROOT
-     * @return bool|string
-     */
-    public function toUrl() {
-        return $this->getRelative(Request::server('DOCUMENT_ROOT'));
-    }
 }

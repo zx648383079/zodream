@@ -33,7 +33,7 @@ class Column {
 
     public function __construct(Table $table, $field) {
         $this->table = $table;
-        $this->setField($field);
+        $this->setField($field)->int();
     }
 
     public function setField($field) {
@@ -71,7 +71,7 @@ class Column {
     }
 
     protected function addData($index, $arg) {
-        $data[$index] = $arg;
+        $this->data[$index] = $arg;
         return $this;
     }
 
@@ -205,7 +205,7 @@ class Column {
     }
 
     public function pk() {
-        $this->table->pk($this->field);
+        $this->notNull()->table->pk($this->field);
         return $this;
     }
 
@@ -231,14 +231,14 @@ class Column {
     }
 
     public function check($name, $arg = null) {
-        $this->table->check($name, $arg);
+        $this->table->checks($name, $arg);
         return $this;
     }
 
     public function getSql() {
         $sql = implode(' ', $this->data);
-        if (!empty($this->name)) {
-            $sql = "`{$this->name}` ".$sql;
+        if (!empty($this->field)) {
+            $sql = "`{$this->field}` ".$sql;
         }
         return $sql;
     }

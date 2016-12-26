@@ -3,8 +3,7 @@ namespace Zodream\Domain\Validation;
 
 use Exception;
 
-class ValidationException extends Exception
-{
+class ValidationException extends Exception {
     /**
      * The validator instance.
      *

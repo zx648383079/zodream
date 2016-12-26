@@ -1,14 +1,14 @@
 <?php
-namespace Zodream\Service\Rest;
+namespace Zodream\Service\Controller;
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/11/28
  * Time: 18:22
  */
-use Zodream\Service\Controller\BaseController;
+use Zodream\Infrastructure\Http\Response;
 use Zodream\Service\Factory;
-use Zodream\Infrastructure\Http\Requestquest;
+use Zodream\Infrastructure\Http\Request;
 
 abstract class RestController extends BaseController  {
 
@@ -43,7 +43,7 @@ abstract class RestController extends BaseController  {
     /**
      * @param array $data
      * @param int $statusCode
-     * @return \Zodream\Infrastructure\Response
+     * @return Response
      */
     protected function ajax($data, $statusCode = 200) {
         Factory::response()->setStatusCode($statusCode);
@@ -60,7 +60,7 @@ abstract class RestController extends BaseController  {
     /**
      * @param string $error
      * @param int $statusCode
-     * @return \Zodream\Infrastructure\Response
+     * @return Response
      */
     protected function ajaxError($error, $statusCode = 400) {
         return $this->ajax([

@@ -1,17 +1,7 @@
 <?php
-namespace Zodream\Domain\Generate\Controller;
-
-use Zodream\Infrastructure\Http\Request;
-use Zodream\Service\Controller\Controller;
+namespace Zodream\Module\Gzo\Service;
 
 class GenerateController extends Controller {
-    protected function rules() {
-        return [
-            '*' => function() {
-                return Request::ip() === 'unknown';
-            }
-        ];
-    }
 
     public function indexAction() {
         return $this->show('index');
@@ -28,4 +18,6 @@ class GenerateController extends Controller {
     public function controllerAction() {
         return $this->show('controller');
     }
+
+
 }
