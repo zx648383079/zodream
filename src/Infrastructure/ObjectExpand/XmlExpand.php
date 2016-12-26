@@ -21,6 +21,10 @@ class XmlExpand {
         return XmlToArray::createArray($xml);
     }
 
+    public static function specialDecode($xml) {
+        return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)),TRUE);
+    }
+
     /**
      * @param array $args
      * @param string $root
@@ -33,6 +37,7 @@ class XmlExpand {
     /**
      * 特殊的xml 编码 主要用于微信回复
      * @param array $args
+     * @param string $root
      * @return string
      */
     public static function specialEncode(array $args, $root = 'xml') {
@@ -41,11 +46,11 @@ class XmlExpand {
 
     /**
      *
-     * 转化成标准Xaml数组
+     * 转化成标准Xml数组
      * @param string $data
      * @return array
      */
-    protected static function toSpecialArarry($data) {
+    protected static function toSpecialArray($data) {
         if (is_integer($data)) {
             return $data;
         }
@@ -54,7 +59,7 @@ class XmlExpand {
         }
         if (!is_array($data)) {
             return [
-                '@cdata' => $item
+                '@cdata' => $data
             ];
         }
         foreach ($data as $key => &$item) {

@@ -220,7 +220,7 @@ abstract class ThirdParty extends MagicObject {
     }
 
     protected function getXml($name, $args = array()) {
-        return XmlExpand::decode($this->getByApi($name, $args));
+        return XmlExpand::specialDecode($this->getByApi($name, $args));
     }
 
     protected function getJson($name, $args = array()) {
