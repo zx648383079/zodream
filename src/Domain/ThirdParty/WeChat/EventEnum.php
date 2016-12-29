@@ -31,10 +31,13 @@ class EventEnum extends Enum {
     const Location = 'LOCATION';
     /**
      * 自定义菜单 - 点击菜单拉取消息时的事件推送
+     * eventKey
      */
     const Click = 'CLICK';
     /**
      * 自定义菜单 - 点击菜单跳转链接时的事件推送
+     * eventKey
+     * 
      */
     const View = 'VIEW';
     /**

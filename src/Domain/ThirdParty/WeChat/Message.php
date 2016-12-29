@@ -38,6 +38,8 @@ use Zodream\Service\Config;
  * @property string $url
  *
  * @property string $event
+ * //自定义菜单
+ * @property string $eventKey
  */
 class Message extends MagicObject {
     protected $configKey = 'wechat';
