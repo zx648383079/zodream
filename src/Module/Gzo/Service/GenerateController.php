@@ -1,6 +1,8 @@
 <?php
 namespace Zodream\Module\Gzo\Service;
 
+use Zodream\Module\Gzo\Domain\GenerateModel;
+
 class GenerateController extends Controller {
 
     public function indexAction() {
@@ -9,6 +11,14 @@ class GenerateController extends Controller {
 
     public function modelAction() {
         return $this->show('model');
+    }
+
+    public function tableAction() {
+        $tables = GenerateModel::schema()->getAllTable();
+        return $this->ajax([
+            'status' => 1,
+            'tables' => $tables
+        ]);
     }
 
     public function crudAction() {

@@ -7,7 +7,6 @@ namespace Zodream\Infrastructure\Database;
  * Time: 9:07
  */
 use Zodream\Infrastructure\Base\ConfigObject;
-use Zodream\Service\Config;
 use Zodream\Infrastructure\Database\Engine\BaseEngine;
 use Zodream\Infrastructure\Database\Engine\Pdo;
 use Zodream\Infrastructure\Event\EventManger;
@@ -39,9 +38,7 @@ class Command extends ConfigObject {
     public function __construct() {
         Factory::timer()->record('dbInit');
         $this->loadConfigs();
-        if (!array_key_exists($this->currentName, $this->configs)) {
-            $this->currentName = key($this->configs);
-        }
+        $this->getCurrentName();
         if (isset($this->table)) {
             $this->setTable($this->table);
         }
@@ -97,15 +94,36 @@ class Command extends ConfigObject {
     public function getEngine($name = null) {
         Factory::timer()->record('dbGet');
         if (is_null($name)) {
-            $name = $this->currentName;
+            $name = $this->getCurrentName();
         }
         if (array_key_exists($name, $this->engines)) {
             return $this->engines[$name];
         }
-        if (array_key_exists($name, $this->configs)) {
-            return $this->addEngine($name, $this->configs[$name]);
+        if ($this->hasConfig($name)) {
+            return $this->addEngine($name, $this->getConfig($name));
         }
         throw new \InvalidArgumentException($name. ' DOES NOT HAVE CONFIG!');
+    }
+
+    public function getCurrentName() {
+        if (!array_key_exists($this->currentName, $this->configs)) {
+            $this->currentName = key($this->configs);
+        }
+        return $this->currentName;
+    }
+
+    public function getConfig($name = null) {
+        if (is_null($name)) {
+            $name = $this->getCurrentName();
+        }
+        return array_key_exists($name, $this->configs) ? $this->configs[$name] : [];
+    }
+
+    public function hasConfig($name = null) {
+        if (is_null($name)) {
+            return empty($this->configs);
+        }
+        return array_key_exists($name, $this->configs);
     }
 
     /**

@@ -20,7 +20,7 @@ class Schema {
 
     protected $charset = 'UTF8';
 
-    public function __construct($schema) {
+    public function __construct($schema = null) {
         $this->setSchema($schema);
     }
 
@@ -34,7 +34,10 @@ class Schema {
         return $this->_command;
     }
 
-    public function setSchema($schema) {
+    public function setSchema($schema = null) {
+        if (empty($schema)) {
+            $schema = $this->command()->getEngine()->getConfig('database');
+        }
         $this->schema = $schema;
         return $this;
     }
