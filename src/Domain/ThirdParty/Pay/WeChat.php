@@ -452,7 +452,7 @@ class WeChat extends BasePay {
      * @return array
      */
     public function jsPay(array $args = array()) {
-        $args['nonce_str'] = StringExpand::random(32);
+        $args['nonceStr'] = StringExpand::random(32);
         $args['timeStamp'] = time();
         $data = $this->getData($this->apiMap['jsapi'][1], array_merge($this->get(), $args));
         $data['package'] = 'prepay_id='.$data['package']['prepay_id'];
