@@ -18,7 +18,8 @@ abstract class BaseWeChat extends ThirdParty  {
     }
 
     protected function getData(array $keys, array $args) {
-        if (in_array('#access_token', $keys) || in_array('access_token', $keys)) {
+        if ((in_array('#access_token', $keys) || in_array('access_token', $keys))
+            && (!$this->has('access_token') || !array_key_exists('access_token', $args))) {
             $args['access_token'] = (new AccessToken($args))->getAccessToken();
         }
         return parent::getData($keys, $args);
