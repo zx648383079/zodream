@@ -49,7 +49,9 @@ class WeChat extends BasePay {
                 '#notify_url',  //不能带参数
                 '#trade_type',
                 'limit_pay',
-                'sign'
+                'sign',
+                'openid', // JSAPI必须
+                'product_id'  //NATIVE 必须
             ],
             'POST'
         ],
