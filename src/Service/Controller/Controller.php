@@ -155,10 +155,10 @@ abstract class Controller extends BaseController {
             return !Auth::guest() ?: $this->redirect([Config::getValue('auth.home'), 'ReturnUrl' => Url::to()]);
         }
         if ($role === 'p' || $role === 'post') {
-            return Request::isPost() ?: $this->redirect('/', 4, '您不能直接访问此页面！', '400');
+            return Request::isPost() ?: $this->redirectWithMessage('/', '您不能直接访问此页面！', 4,'400');
         }
         if ($role === '!') {
-            return $this->redirect('/', 4, '您访问的页面暂未开放！', '413');
+            return $this->redirectWithMessage('/', '您访问的页面暂未开放！', 4, '413');
         }
         return true;
     }
@@ -230,6 +230,10 @@ abstract class Controller extends BaseController {
                 return Factory::response()->sendJsonp($data);
         }
         return Factory::response()->sendJson($data);
+    }
+
+    public function redirectWithMessage($url, $message, $time = 4, $status = 404) {
+        return $this->redirect($url, $time);
     }
 
     /**

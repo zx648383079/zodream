@@ -30,7 +30,7 @@ $configs = array(
 		'home'  => 'account'                             //用户登录主页
 	),
     'modules' => array(   //模块
-        'gzd' => 'Zodream\Domain\Generate\Controller'
+        'gzo' => 'Zodream\Domain\Generate\Controller'
     ),
 	'route'  => array(
 		'default' => 'Home@index',                        //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any

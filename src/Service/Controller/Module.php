@@ -1,6 +1,6 @@
 <?php
 namespace Zodream\Service\Controller;
-use Zodream\Infrastructure\Disk\Directory;
+
 
 /**
  * 模块基类
@@ -8,6 +8,7 @@ use Zodream\Infrastructure\Disk\Directory;
  * @author Jason
  * @time 2015-12-19
  */
+use Zodream\Infrastructure\Disk\Directory;
 
 abstract class Module extends Action {
 
@@ -33,6 +34,14 @@ abstract class Module extends Action {
      */
     public function getViewPath() {
         return $this->getBasePath()->childDirectory('UserInterface');
+    }
+
+    public function getControllerNamespace() {
+        $class = get_class($this);
+        if (($pos = strrpos($class, '\\')) !== false) {
+            return substr($class, 0, $pos) . '\\Service';
+        }
+        return '';
     }
 
 }

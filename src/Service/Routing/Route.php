@@ -6,7 +6,10 @@ namespace Zodream\Service\Routing;
  * @author Jason
  */
 use Zodream\Domain\Filter\DataFilter;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Service\Config;
+use Zodream\Service\Controller\BaseController;
+use Zodream\Service\Controller\Module;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\Http\Request;
@@ -15,8 +18,6 @@ use Zodream\Infrastructure\Http\Response;
 class Route {
 
     const PATTERN = '#{([\w_]+)}#i';
-
-    protected $prefix = null;
 
 	protected $uri;
 
@@ -117,7 +118,6 @@ class Route {
 	 * @return Response
 	 */
 	public function run() {
-	    $this->prefix = 'Service\\'.APP_MODULE;
 		return $this->parseResponse($this->runAction());
 	}
 
@@ -135,7 +135,7 @@ class Route {
 			return call_user_func($action);
 		}
 		if (strpos($action, '@') === false) {
-			return $this->runClassWithConstruct($action);
+			return $this->runDefault($action);
 		}
 		return $this->runClassAndAction($action);
 	}
@@ -144,7 +144,7 @@ class Route {
 		if (class_exists($action)) {
 			return new $action;
 		}
-		return $this->runController($action);
+		return $this->runDefault($action);
 	}
 
 	/**
@@ -169,7 +169,7 @@ class Route {
 	protected function runClassAndAction($arg) {
 		list($class, $action) = explode('@', $arg);
 		if (!class_exists($class)) {
-			return $this->runController($class, $action);
+			return $this->runController('Service\\'.APP_MODULE.'\\'.$class, $action);
 		}
 		$reflectionClass = new \ReflectionClass( $class );
 		$method = $reflectionClass->getMethod($action);
@@ -182,65 +182,58 @@ class Route {
 		return call_user_func_array(array(new $class, $action), $arguments);
 	}
 
-
-	/**
-	 * 执行 控制器方法
-	 * @param string $class
-	 * @param string $action
-	 * @return mixed
-	 */
-	protected function runController($class = null, $action = null) {
-		$classes = explode('\\', str_replace('/', '\\', $class));
-		if (empty($action)) {
-			list($class, $action) = $this->getController($classes);
-		} else {
-			$class = $this->getClass($classes);
-		}
-		if (!class_exists($class)) {
-			throw new \InvalidArgumentException($class.' CLASS NOT EXISTS!');
-		}
-		/** @var BaseController $instance */
-		$instance = new $class;
-		$instance->init();
-		return call_user_func(array($instance, 'runAction'), $action, $this->action['param']);
-	}
-
-	/**
-	 * 获取控制
-	 * @param array $args
-	 * @return array|bool
-	 */
-	protected function getController(array $args) {
-	    $prefix = $this->getModule($args);
-		if (empty($args)) {
-			$args = ['home'];
-		}
-		$class = $this->getClass($args, $prefix);
-		if (class_exists($class)) {
-			return [$class, 'index'];
-		}
-		$action = array_pop($args);
-		if (empty($args)) {
-			$args = ['home'];
-		}
-		return [$this->getClass($args, $prefix), $action];
-	}
-
-	protected function getClass(array $args, $prefix = null) {
-	    if (empty($prefix)) {
-	        $prefix = $this->prefix;
+	protected function runDefault($path) {
+        if (!empty($path)) {
+            $modules = Config::getValue('modules');
+            foreach ($modules as $key => $module) {
+                if ($this->isMatch($path, $key)) {
+                    return $this->runModule(StringExpand::firstReplace($path, $key), $module);
+                }
+            }
         }
-		$args = array_map('ucfirst', $args);
-		return trim($prefix, '\\').'\\'.implode('\\', $args).APP_CONTROLLER;
-	}
+        list($class, $action) = $this->getClassAndAction($path);
+        return $this->runController('Service\\'.APP_MODULE.'\\'.$class, $action);
+    }
 
-	protected function getModule(array &$args) {
-	    $modules = Config::getValue('modules', array());
-	    $prefix = $this->prefix;
-	    if (count($args) > 0 && array_key_exists($args[0], $modules)) {
-	        $prefix = $modules[$args[0]];
-	        unset($args[0]);
+    protected function isMatch($path, $module) {
+        return strpos($path, $module) === 0;
+    }
+
+    protected function runModule($path, $module) {
+        if (!class_exists($module)) {
+            throw new \Exception($module.' NO EXIST!');
         }
-        return trim($prefix, '\\').'\\';
+        $module = new $module();
+        if (!$module instanceof Module) {
+            throw new \Exception($module.' ERROR!');
+        }
+        list($class, $action) = $this->getClassAndAction($path);
+        Factory::view()->setDirectory($module->getViewPath());
+        $class = $module->getControllerNamespace().'\\'.$class;
+        return $this->runController($class, $action);
+    }
+
+    protected function runController($class, $action) {
+	    $class .= APP_CONTROLLER;
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException($class.' CLASS NOT EXISTS!');
+        }
+        /** @var BaseController $instance */
+        $instance = new $class;
+        $instance->init();
+        return call_user_func(array($instance, 'runAction'), $action, $this->action['param']);
+    }
+
+    protected function getClassAndAction($path) {
+        $path = trim($path, '/');
+        if (empty($path)) {
+            return ['Home', 'index'];
+        }
+        $args = explode('/', $path);
+        if (count($args) == 1) {
+            return [ucfirst($path), 'index'];
+        }
+        $action = array_pop($args);
+        return [implode('\\', array_map('ucfirst', $args)), lcfirst($action)];
     }
 }

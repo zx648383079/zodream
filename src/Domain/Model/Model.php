@@ -130,7 +130,13 @@ abstract class Model extends MagicObject {
 		if ($this->has($key)) {
 			return $this->_data[$key];
 		}
-		return $default;
+		$method = 'get'.ucfirst($key);
+		if (!method_exists($this, $method)) {
+            return $default;
+        }
+		$result = call_user_func([$this, $method]);
+		$this->_data[$key] = $result;
+		return $result;
 	}
 
 	/**

@@ -11,6 +11,7 @@ namespace Zodream\Service;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Zodream\Domain\Access\Auth;
 use Zodream\Domain\Debug\Timer;
 use Zodream\Domain\Model\UserModel;
 use Zodream\Domain\View\ViewFactory;
@@ -106,7 +107,7 @@ class Factory {
      * @return UserModel
      */
     public static function user() {
-        return self::getInstance('user');
+        return Auth::user();
     }
 
     /**

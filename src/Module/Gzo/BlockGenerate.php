@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Domain\Generate;
+namespace Zodream\Module\Gzo;
 
 /**
  * Created by PhpStorm.
