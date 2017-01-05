@@ -18,7 +18,7 @@ use Zodream\Infrastructure\Http\Request;
  * @property string $identity
  * @property string $username
  * @property string $sex
- * @property string #avatar
+ * @property string $avatar
  */
 class OAuth extends BaseWeChat {
     protected $apiMap = [
