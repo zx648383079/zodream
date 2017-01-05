@@ -106,7 +106,8 @@ class Mass extends BaseWeChat {
         return $args['errcode'] == 0;
     }
 
-    public function sendAll(array $data, $groupId = null) {
+    public function sendAll($data, $type = self::TEXT, $groupId = null) {
+        $data = $this->parseData($data, $type);
         $data['filter'] =  empty($groupId) ? [
             'is_to_all' => true
         ] : [
@@ -120,7 +121,8 @@ class Mass extends BaseWeChat {
         throw  new \Exception($args['errmsg']);
     }
 
-    public function send(array $openId, array $data) {
+    public function send(array $openId, $data, $type = self::TEXT) {
+        $data = $this->parseData($data, $type);
         $data['touser'] = array_values($openId);
         $args = $this->getJson('send', $data);
         if ($args['errcode'] === 0) {
@@ -156,5 +158,28 @@ class Mass extends BaseWeChat {
             return $args['msg_status'];
         }
         return false;
+    }
+
+    /**
+     * 转化
+     * @param string|array $arg
+     * @param string $type
+     * @return array
+     */
+    protected function parseData($arg, $type = self::TEXT) {
+        $data = [
+            $type => [],
+            'msgtype' => $type
+        ];
+        if ($type == self::TEXT) {
+            $data[$type] = ['content' => $arg];
+            return $data;
+        }
+        if ($type == self::CARD) {
+            $data[$type] = $arg;
+            return $data;
+        }
+        $data[$type] = ['media_id' => $arg];
+        return $data;
     }
 }
