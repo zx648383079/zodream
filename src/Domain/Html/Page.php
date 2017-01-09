@@ -3,7 +3,10 @@ namespace Zodream\Domain\Html;
 
 use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Http\Request;
-class Page {
+use Zodream\Infrastructure\Interfaces\JsonAble;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
+
+class Page implements JsonAble {
 	private $_total = 0;
 
 	private $_index = 1;
@@ -81,15 +84,6 @@ class Page {
 	}
 
 	/**
-	 * 显示分页链接
-	 * @param array $option
-	 * @throws \Exception
-	 */
-	public function pageLink($option = array()) {
-		echo $this->getLink($option);
-	}
-
-	/**
 	 * 获取分页链接
 	 * @param array $option
 	 * @return string
@@ -106,4 +100,20 @@ class Page {
 	public function __toString() {
 		return $this->getLink();
 	}
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int $options
+     * @return string
+     */
+    public function toJson($options = 0) {
+        return JsonExpand::encode([
+            'total' => $this->getTotal(),
+            'index' => $this->_index,
+            'size' => $this->_pageSize,
+            'key' => $this->_key,
+            'page' => $this->_data
+        ]);
+    }
 }
