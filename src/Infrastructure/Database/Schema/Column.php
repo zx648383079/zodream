@@ -255,4 +255,8 @@ class Column {
         }
         return $sql;
     }
+
+    public function getDropSql() {
+        return "DROP COLUMN `{$this->field}`";
+    }
 }

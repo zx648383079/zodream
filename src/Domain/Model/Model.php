@@ -7,7 +7,6 @@ namespace Zodream\Domain\Model;
  */
 use Zodream\Domain\Filter\ModelFilter;
 use Zodream\Domain\Html\Page;
-use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
@@ -65,6 +64,10 @@ abstract class Model extends MagicObject {
 	 */
 	public static function tableName() {
 	    return '';
+    }
+
+    public static function className() {
+	    return static::class;
     }
 
 	/**
@@ -229,15 +232,14 @@ abstract class Model extends MagicObject {
 	 * @param string $table
 	 * @param string $link $table.$link
 	 * @param string $key $this.$key
-	 * @return array
+	 * @return array|Model
 	 */
 	public function hasOne($table, $link, $key = null) {
         if ($table instanceof Model) {
-            $table = $table->tableName();
+            $table = $table->className();
         }
         if (!array_key_exists($table, $this->relations)) {
-            $this->setRelation($table, (new Query())
-                ->from($table)
+            $this->setRelation($table, $this->getRelationQuery($table)
                 ->where($this->getRelationWhere($link, $key))
                 ->one());
         }
@@ -263,19 +265,32 @@ abstract class Model extends MagicObject {
         return $links;
     }
 
+    /**
+     * GET RELATION QUERY
+     * @param static $table
+     * @return Query
+     */
+    protected function getRelationQuery($table) {
+	    $query = new Query();
+	    if (class_exists($table)) {
+	        return $query->setModelName($table)
+                ->from(call_user_func($table.'::tableName'));
+        }
+	    return $query->from($table);
+    }
+
 	/**
 	 * @param string $table
 	 * @param string $link $table.$link
 	 * @param string $key $this.$key
-	 * @return array
+	 * @return array|Model[]
 	 */
 	public function hasMany($table, $link, $key = 'id') {
 	    if ($table instanceof Model) {
-	        $table = $table->tableName();
+	        $table = $table->className();
         }
         if (!array_key_exists($table, $this->relations)) {
-            $this->setRelation($table, (new Query())
-                ->from($table)
+            $this->setRelation($table, $this->getRelationQuery($table)
                 ->where($this->getRelationWhere($link, $key))
                 ->all());
         }
@@ -485,7 +500,9 @@ abstract class Model extends MagicObject {
 	 * @return Query 返回查询结果,
 	 */
 	public static function find() {
-		return (new Query())->from(static::tableName());
+		return (new Query())
+            ->setModelName(static::className())
+            ->from(static::tableName());
 	}
 
 	/**
@@ -504,19 +521,11 @@ abstract class Model extends MagicObject {
 				'where' => $param
 			);
 		}
-		$data = static::find()
+		return static::find()
 			->load($param)
 			->select($field)
 			->addParam($parameters)
 			->all();
-		$args = [];
-		foreach ($data as $item) {
-			$model = new static;
-			$model->set($item);
-			$model->isNewRecord = false;
-			$args[] = $model;
-		}
-		return $args;
 	}
 
     /**

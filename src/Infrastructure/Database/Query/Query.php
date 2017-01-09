@@ -289,7 +289,7 @@ class Query extends BaseQuery {
      * add build value
      * @param string|array $key
      * @param string $value
-     * @return static
+     * @return Query
      */
     public function addParam($key, $value = null) {
         $this->set($key, $value);
@@ -313,7 +313,7 @@ class Query extends BaseQuery {
 
     /**
      * @param bool $isArray
-     * @return array|object
+     * @return array|object[]
      */
     public function all($isArray = true) {
         if ($isArray) {

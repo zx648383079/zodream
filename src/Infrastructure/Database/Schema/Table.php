@@ -16,6 +16,10 @@ class Table extends BaseSchema {
     const MRG_MYISAM = 'MRG_MYISAM';
     const InnoDB = 'InnoDB';
     const INNOBASE = 'INNOBASE';
+    /**
+     * @var Column[]
+     */
+    protected $_data = array();
 
     protected $tableName;
 
@@ -198,7 +202,15 @@ class Table extends BaseSchema {
      * @return mixed
      */
     public function alert() {
-        return $this->command()->execute($this->getTruncateSql());
+        return $this->command()->execute($this->getAlertSql());
+    }
+
+    /**
+     * DROP COLUMN
+     * @return mixed
+     */
+    public function dropColumn() {
+        return $this->command()->execute($this->getDropColumnSql());
     }
 
     /**
@@ -306,6 +318,14 @@ class Table extends BaseSchema {
         return "ALTER TABLE {$this->tableName} ".implode(',', $sql).';';
     }
 
+    //DROP COLUMN
+    public function getDropColumnSql() {
+        $sql = [];
+        foreach ($this->_data as $item) {
+            $sql[] = $item->getDropSql();
+        }
+        return "ALTER TABLE {$this->tableName} ".implode(',', $sql).';';
+    }
     /**
      * GET DROP TABLE SQL
      * @return string
