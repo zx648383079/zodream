@@ -38,7 +38,7 @@ class Curl {
         if (!$url instanceof Uri) {
             $url = new Uri($url);
         }
-        if ($verifySSL && $url->isSSL()) {
+        if (!$verifySSL && $url->isSSL()) {
             $this->setOption(CURLOPT_SSL_VERIFYPEER, FALSE)
                 ->setOption(CURLOPT_SSL_VERIFYHOST, FALSE)
                 ->setOption(CURLOPT_SSLVERSION, 1);
