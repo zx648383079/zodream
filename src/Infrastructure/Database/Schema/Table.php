@@ -1,11 +1,13 @@
 <?php
 namespace Zodream\Infrastructure\Database\Schema;
+
 /**
  * Created by PhpStorm.
  * User: zx648
  * Date: 2016/8/11
  * Time: 14:50
  */
+use Zodream\Infrastructure\Database\Query\Query;
 
 class Table extends BaseSchema {
 
@@ -39,16 +41,35 @@ class Table extends BaseSchema {
 
     protected $comment = null;
 
+    /**
+     * @var Schema
+     */
+    protected $schema;
+
     public function __construct(
         $table,
         $data = [],
         $engine = self::MyISAM,
         $charset = 'UTF8'
     ) {
-        $this->tableName = $this->addPrefix($table);
+        $this->setTableName($table);
         $this->_data = $data;
         $this->engine = $engine;
         $this->charset = $charset;
+    }
+
+    public function setSchema(Schema $schema) {
+        $this->schema = $schema;
+        return $this;
+    }
+
+    public function getTableName() {
+        return $this->tableName;
+    }
+
+    public function setTableName($table) {
+        $this->tableName = $this->addPrefix($table);
+        return $this;
     }
 
     /**
@@ -358,5 +379,17 @@ class Table extends BaseSchema {
             $sql .= ' AUTO_INCREMENT='.$this->aiBegin;
         }
         return $sql." DEFAULT CHARSET={$this->charset} COMMENT='{$this->comment}';";
+    }
+
+    /**
+     * @return array
+     */
+    public function getForeignKeys() {
+        return (new Query())
+            ->from('information_schema.key_column_usage')
+            ->where([
+                'CONSTRAINT_SCHEMA' => $this->schema->getSchema(),
+                'TABLE_NAME' => $this->getTableName()
+            ])->all();
     }
 }

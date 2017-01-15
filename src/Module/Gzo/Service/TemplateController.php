@@ -1,6 +1,8 @@
 <?php
 namespace Zodream\Module\Gzo\Service;
 
+use Zodream\Infrastructure\Database\Schema\Schema;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Module\Gzo\Domain\GenerateModel;
 
 class TemplateController extends Controller {
@@ -55,6 +57,12 @@ class TemplateController extends Controller {
      */
     protected function makeModel($name, $table, array $columns, $module) {
         $data = GenerateModel::getFill($columns);
+        $foreignKeys = (new Schema())->table($table)->getForeignKeys();
+        foreach ($foreignKeys as &$item) {
+            $item['table'] = StringExpand::firstReplace('zd_', '', $item['REFERENCED_TABLE_NAME']);
+            $item['column'] = $item['COLUMN_NAME'];
+            $item['key'] = $item['REFERENCED_COLUMN_NAME'];
+        }
         return $this->renderHtml('Model', [
             'name' => $name,
             'table' => $table,
@@ -62,7 +70,8 @@ class TemplateController extends Controller {
             'pk' => $data[0],
             'labels' => $data[2],
             'property' => $data[3],
-            'module' => $module
+            'module' => $module,
+            'foreignKeys' => $foreignKeys
         ]);
     }
 

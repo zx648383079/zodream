@@ -39,4 +39,11 @@ class <?=$name.APP_MODEL?> extends Model {
         <?php endforeach;?>
         ];
 	}
+
+<?php foreach ($foreignKeys as $item):?>
+    public function get<?=ucfirst($item['table'])?>() {
+        return $this->hasOne('<?=$item['table']?>', '<?=$item['key']?>', '<?=$item['column']?>');
+    }
+
+<?php endforeach;?>
 }

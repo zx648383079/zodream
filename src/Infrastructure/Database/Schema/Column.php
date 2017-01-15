@@ -32,8 +32,12 @@ class Column {
     protected $table;
 
     public function __construct(Table $table, $field) {
+        $this->setTable($table)->setField($field)->int();
+    }
+
+    public function setTable(Table $table) {
         $this->table = $table;
-        $this->setField($field)->int();
+        return $this;
     }
 
     public function setField($field) {

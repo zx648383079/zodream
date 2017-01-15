@@ -42,6 +42,10 @@ class Schema {
         return $this;
     }
 
+    public function getSchema() {
+        return $this->schema;
+    }
+
     public function setCharset($charset = 'UTF8') {
         $this->charset = $charset;
         return $this;
@@ -95,9 +99,13 @@ class Schema {
         return $tables;
     }
 
+    /**
+     * @param string $name
+     * @return Table
+     */
     public function table($name) {
-        $name = $this->command()->addPrefix($name);
-        return new Table("`{$this->schema}`.{$name}");
+        return (new Table($name))
+            ->setSchema($this);
     }
 
     /**
