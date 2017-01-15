@@ -4,33 +4,74 @@ namespace Zodream\Domain\ThirdParty\SMS;
 use Zodream\Domain\ThirdParty\ThirdParty;
 
 class ALiDaYu extends ThirdParty {
+
+    protected $baseMap = [
+        'http://gw.api.taobao.com/router/rest',
+        [
+            '#app_key',
+            'target_app_key',
+            'sign_method' => 'md5',
+            'sign',
+            'session',
+            '#timestamp',
+            'format' => 'json',
+            'v' => '2.0',
+            'partner_id',
+            'simplify',
+        ],
+        'POST'
+    ];
+
     protected $apiMap = [
         'send' => [
-            'http://gw.api.taobao.com/router/rest',
-            [
-                'method' => 'alibaba.aliqin.fc.sms.num.send',
-                '#app_key',
-                'target_app_key',
-                'sign_method' => 'md5',
-                'sign',
-                'session',
-                '#timestamp',
-                'format' => 'json',
-                'v' => '2.0',
-                'partner_id',
-                'simplify',
-
-
-                'extend',
-                'sms_type' => 'normal',
-                '#sms_free_sign_name',
-                'sms_param',   //值必须为字符串
-                '#rec_num',
-                '#sms_template_code'
-            ],
-            'POST'
-        ]
+            'method' => 'alibaba.aliqin.fc.sms.num.send',
+            'extend',
+            'sms_type' => 'normal',
+            '#sms_free_sign_name',
+            'sms_param',   //值必须为字符串
+            '#rec_num',
+            '#sms_template_code'
+        ],
+        'query' => [
+            'method' => 'alibaba.aliqin.fc.sms.num.query',
+            'extend',
+            'sms_type' => 'normal',
+            '#sms_free_sign_name',
+            'sms_param',   //值必须为字符串
+            '#rec_num',
+            '#sms_template_code'
+        ],
+        'voice' => [
+            'method' => 'alibaba.aliqin.fc.voice.num.doublecall',
+            'session_time_out',
+            'extend',
+            '#caller_num',
+            '#caller_show_num',
+            '#called_num',
+            '#called_show_num'
+        ],
+        'tts' => [
+            'method' => 'alibaba.aliqin.fc.tts.num.singlecall',
+            'extend',
+            'tts_param',
+            '#called_num',
+            '#called_show_num',
+            '#tts_code'
+        ],
+        'singleCall' => [
+            'method' => 'alibaba.aliqin.fc.voice.num.singlecall',
+            'extend',
+            '#called_num',
+            '#called_show_num',
+            '#voice_code'
+        ],
     ];
+
+    public function getMap($name) {
+        $data =$this->baseMap;
+        $data[1] = array_merge($data, parent::getMap($name));
+        return $data;
+    }
 
     protected function getPostData($name, array $args) {
         $data = parent::getPostData($name, $args);
