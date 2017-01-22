@@ -4,6 +4,7 @@ namespace Zodream\Domain\ThirdParty\WeChat;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\Traits\EventTrait;
 use Zodream\Service\Config;
 
 /**
@@ -42,11 +43,12 @@ use Zodream\Service\Config;
  * @property string $eventKey
  */
 class Message extends MagicObject {
+
+    use EventTrait;
+
     protected $configKey = 'wechat';
 
     protected $xml;
-
-    protected $events = [];
 
     protected $token;
 
@@ -115,33 +117,6 @@ class Message extends MagicObject {
         return $this->get('ToUserName');
     }
 
-    public function on($event, callable $func) {
-        if (!array_key_exists($event, $this->events)) {
-            $this->events[$event] = [];
-        }
-        $this->events[$event][] = $func;
-        return $this;
-    }
-
-    public function run($event = null) {
-        if (empty($event)) {
-            $event = $this->getEvent();
-        }
-        if (!array_key_exists($event, $this->events)) {
-            return null;
-        }
-        $response = new MessageResponse();
-        $response->setFromUseName($this->getTo())
-            ->setToUseName($this->getFrom());
-        foreach ($this->events[$event] as $item) {
-            if (!is_callable($item)) {
-                continue;
-            }
-            call_user_func($item, $this, $response);
-        }
-        return $response;
-    }
-
     protected function getData() {
         $data = (array)XmlExpand::decode($this->xml, false);
         if ($this->encryptType != 'aes') {
@@ -188,5 +163,12 @@ class Message extends MagicObject {
             throw new \Exception('no access');
         }
         return true;
+    }
+
+    public function run() {
+        $response = new MessageResponse();
+        $response->setFromUseName($this->getTo())
+            ->setToUseName($this->getFrom());
+        $this->invoke($this->getEvent(), [$this, $response]);
     }
 }
