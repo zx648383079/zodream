@@ -45,8 +45,6 @@ class Spider {
         return $this;
     }
 
-
-
     public function getHtml() {
         $curl = new Curl($this->url);
         $this->invoke(self::INIT, [$curl]);
