@@ -196,7 +196,7 @@ class Command extends ConfigObject {
     }
 
     public function setCache($sql, $data) {
-        if (!$this->allowCache || DEBUG) {
+        if (!$this->allowCache || (defined('DEBUG') && DEBUG)) {
             return;
         }
         Factory::cache()->set('data/'.md5($this->currentName.$sql), serialize($data), 3600);

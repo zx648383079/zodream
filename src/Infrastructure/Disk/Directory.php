@@ -39,6 +39,23 @@ class Directory extends FileObject {
     }
 
     /**
+     * @param string $regex
+     * @return FileObject[]
+     */
+    public function searchChildren($regex = null) {
+        $files = [];
+        foreach ($this->children() as $file) {
+            if (empty($regex) || preg_match($regex, $file->getName(), $match)) {
+                $files[] = $file;
+            }
+            if ($file instanceof Directory) {
+                $files = array_merge($files, $file->searchChildren($regex));
+            }
+        }
+        return $files;
+    }
+
+    /**
      * CREATE DIRECTORY
      * @return bool
      */
@@ -113,7 +130,7 @@ class Directory extends FileObject {
     }
 
     /**
-     * FILE IN CHILDREN 
+     * FILE IN CHILDREN
      * @param string $name
      * @return bool
      */
@@ -152,7 +169,7 @@ class Directory extends FileObject {
     }
 
     /**
-     * GET DIRECTORY BY NAME 
+     * GET DIRECTORY BY NAME
      * @param $name
      * @return static
      */
