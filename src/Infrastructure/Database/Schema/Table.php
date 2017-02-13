@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure\Database\Schema;
  * Time: 14:50
  */
 use Zodream\Infrastructure\Database\Query\Query;
+use Zodream\Infrastructure\Database\Query\Record;
 
 class Table extends BaseSchema {
 
@@ -391,5 +392,12 @@ class Table extends BaseSchema {
                 'CONSTRAINT_SCHEMA' => $this->schema->getSchema(),
                 'TABLE_NAME' => $this->getTableName()
             ])->all();
+    }
+
+    /**
+     * @return Record
+     */
+    public function record() {
+        return (new Record())->setTable($this->tableName);
     }
 }

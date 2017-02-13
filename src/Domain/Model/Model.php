@@ -297,6 +297,9 @@ abstract class Model extends MagicObject {
         return $this->getRelation($table);
 	}
 
+    /**
+     * @return bool|int
+     */
 	public function insert() {
 		if (!$this->validate()) {
 			return false;
