@@ -179,6 +179,19 @@ class Column {
         return $this-$this->addData(self::KIND, 'TIME');
     }
 
+    /**
+     * 时间戳
+     * @param integer $arg
+     * @return Column
+     */
+    public function timestamp($arg = null) {
+        $sql = 'TIMESTAMP';
+        if (!empty($arg)) {
+            $sql .= '('.intval($arg).')';
+        }
+        return $this->addData(self::KIND, $sql);
+    }
+
     public function year() {
         return $this-$this->addData(self::KIND, 'YEAR');
     }

@@ -29,33 +29,4 @@ class AuthorizeController extends Controller {
             'state' => $state
         ]));
     }
-
-    public function tokenAction() {
-        $data = Request::post('grant_type,code,redirect_uri,client_id');
-        if ($data['grant_type'] !== 'authorization_code') {
-            return;
-        }
-
-        return $this->ajax([
-            'access_token' => $token,
-            'token_type' => '',
-            'expires_in' => 3600,
-            'refresh_token' => '',
-            //'scope'
-        ]);
-    }
-
-    public function refreshAction() {
-        $data = Request::post('grant_type,refresh_token,scope');
-        if ($data['grant_type'] !== 'refresh_token') {
-            return;
-        }
-        return $this->ajax([
-            'access_token' => $token,
-            'token_type' => '',
-            'expires_in' => 3600,
-            'refresh_token' => '',
-            //'scope'
-        ]);
-    }
 }
