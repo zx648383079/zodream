@@ -454,6 +454,7 @@ class WeChat extends BasePay {
      * @return array
      */
     public function jsPay(array $args = array()) {
+        $args['appId'] = $this->get('appid'); //防止微信返回appid
         $args['nonceStr'] = StringExpand::random(32);
         $args['timeStamp'] = time();
         $data = $this->getData($this->apiMap['jsapi'][1], array_merge($this->get(), $args));
