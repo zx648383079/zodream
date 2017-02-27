@@ -75,6 +75,9 @@ class Record extends BaseQuery  {
      * @return int 返回最后插入的ID,
      */
     public function insert() {
+        if (empty($this->_data)) {
+            return $this->command()->insert(null, 'NULL'); // 获取自增值
+        }
         $addFields = implode('`,`', array_keys($this->_data));
         return $this->command()
             ->insert("`{$addFields}`", StringExpand::repeat('?', count($this->_data)),
