@@ -72,12 +72,4 @@ class Html {
 
         return $expandedLinks;
     }
-
-    public function toJson() {
-        return JsonExpand::decode($this->data);
-    }
-
-    public function toXml() {
-        return XmlExpand::decode($this->data);
-    }
 }
