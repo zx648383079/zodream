@@ -7,6 +7,7 @@ namespace Zodream\Infrastructure\ObjectExpand;
 * @author Jason
 */
 use Zodream\Service\Config;
+use Zodream\Service\Factory;
 
 class TimeExpand {
 
@@ -117,19 +118,19 @@ class TimeExpand {
 			$differ = 1;
 		}
 		$tokens = array (
-				31536000 => '年',
-				2592000  => '月',
-				604800   => '周',
-				86400    => '天',
-				3600     => '小时',
-				60       => '分钟',
-				1        => '秒钟'
+				31536000 => '{time} year ago',
+				2592000  => '{time} month ago',
+				604800   => '{time} week ago',
+				86400    => '{time} day ago',
+				3600     => '{time} hour ago',
+				60       => '{time} minute ago',
+				1        => '{time} second ago'
 		);
 	
 		foreach ($tokens as $unit => $text) {
 			if ($differ < $unit) continue;
 			$numberOfUnits = floor($differ / $unit);
-			return $numberOfUnits.' '.$text.'前';
+			return Factory::i18n()->translate($text, ['time' => $numberOfUnits]);
 		}
 		return self::format($time);
 	}

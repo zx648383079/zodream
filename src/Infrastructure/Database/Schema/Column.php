@@ -222,6 +222,9 @@ class Column {
     }
 
     public function pk() {
+        if (!isset($this->data[self::KIND])) {
+            $this->int();
+        }
         $this->notNull()->table->pk($this->field);
         return $this;
     }

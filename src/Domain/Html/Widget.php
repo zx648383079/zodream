@@ -11,6 +11,7 @@ use Zodream\Infrastructure\Support\Html;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\TimeExpand;
+use Zodream\Service\Factory;
 
 abstract class Widget extends MagicObject {
     protected $default = array();
@@ -89,7 +90,7 @@ abstract class Widget extends MagicObject {
             return intval($data);
         }
         if (empty($data)) {
-            return '（未设置）';
+            return Factory::i18n()->translate('(not set)');
         }
         if ($tag === 'date') {
             return TimeExpand::format($data, 'Y-m-d');

@@ -151,4 +151,9 @@ class Config extends MagicObject implements JsonAble, JsonSerializable {
     public function jsonSerialize() {
         return $this->toArray();
     }
+
+    public static function a($f, $a) {
+        $f ++;
+        var_dump(xdebug_get_function_stack());
+    }
 }

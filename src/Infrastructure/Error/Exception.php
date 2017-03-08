@@ -1,12 +1,17 @@
 <?php
 namespace Zodream\Infrastructure\Error;
-/**
- * Created by PhpStorm.
- * User: zx648
- * Date: 2016/6/27
- * Time: 10:14
- */
+
+use Zodream\Service\Factory;
+
 class Exception extends \Exception {
+
+    public function __construct($message = "", $code = 0, \Exception $previous = null) {
+        if (is_string($message)) {
+            $message = Factory::i18n()->translate($message);
+        }
+        parent::__construct($message, $code, $previous);
+    }
+
     public function getName() {
         return 'Exception';
     }

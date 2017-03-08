@@ -16,7 +16,7 @@ abstract class I18n extends MagicObject {
 
     protected $fileName = 'zodream';
 
-    protected $language = 'ZH-CN';
+    protected $language = 'zh-cn';
 
     /**
      * @var Directory
@@ -24,7 +24,9 @@ abstract class I18n extends MagicObject {
     protected $directory;
 
     public function __construct() {
-        $this->setDirectory(Config::getValue('i18n.directory'));
+        $configs = Config::getValue('i18n');
+        $this->setDirectory($configs['directory']);
+        $this->setLanguage($configs['language']);
     }
 
 
@@ -62,7 +64,7 @@ abstract class I18n extends MagicObject {
             preg_match('/[\w-]+/', $language, $match);
             $arg = $match[0];
         }
-        $this->language = strtoupper($arg);
+        $this->language = strtolower($arg);
         return $this;
     }
 

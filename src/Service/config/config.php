@@ -114,7 +114,9 @@ $configs = array(
 		'executeSql' => array(),
 	),
     'i18n' => array(
-        'directory' => 'Infrastructure/Language'
+        'driver' => Zodream\Infrastructure\I18n\PhpSource::class,
+        'directory' => 'data/languages',
+        'language' => ''//'zh-cn',
     ),
 );
 

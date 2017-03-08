@@ -10,14 +10,14 @@ namespace Zodream\Module\OAuth\Domain;
  * @property string $expires
  * @property string $scope
  */
-class OauthRefreshTokenModel extends BaseModel {
+class OAuthAccessTokenModel extends BaseModel {
     public static function tableName() {
-        return 'oauth_refresh_token';
+        return 'oauth_access_token';
     }
 
     public static function createTable() {
         $table = static::getTable();
-        $table->set('refresh_token')->varchar(40)->pk();
+        $table->set('access_token')->varchar(40)->pk();
         $table->set('client_id')->notNull()->varchar(80);
         $table->set('user_id')->varchar(255);
         $table->set('expires')->notNull()->timestamp();
