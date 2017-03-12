@@ -152,4 +152,11 @@ class Factory {
         }
         return static::$_instance['log'];
     }
+
+    /**
+     * @return \Zodream\Infrastructure\Log\Logger
+     */
+    public static function logger() {
+        return self::getInstance('logger', \Zodream\Infrastructure\Log\Logger::class);
+    }
 }

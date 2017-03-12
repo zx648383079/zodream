@@ -39,23 +39,6 @@ class Directory extends FileObject {
     }
 
     /**
-     * @param string $regex
-     * @return FileObject[]
-     */
-    public function searchChildren($regex = null) {
-        $files = [];
-        foreach ($this->children() as $file) {
-            if (empty($regex) || preg_match($regex, $file->getName(), $match)) {
-                $files[] = $file;
-            }
-            if ($file instanceof Directory) {
-                $files = array_merge($files, $file->searchChildren($regex));
-            }
-        }
-        return $files;
-    }
-
-    /**
      * CREATE DIRECTORY
      * @return bool
      */
@@ -89,19 +72,24 @@ class Directory extends FileObject {
      */
     public function children() {
         $files = [];
+        $this->map(function ($file) use (&$files) {
+            $files[] = $file;
+        });
+        return $files;
+    }
+
+    public function map(callable $callback) {
         $handle = opendir($this->fullName);
         while (false !== ($name = readdir($handle))) {
             if ($name == '.' || $name == '..') {
                 continue;
             }
             $file = $this->fullName.'/'.$name;
-            if (is_dir($file)) {
-                $files[] = new static($file);
-                continue;
+            $result = call_user_func($callback, is_dir($file) ? new static($file) : new File($file));
+            if ($result === false) {
+                break;
             }
-            $files[] = new File($file);
         }
-        return $files;
     }
 
     /**
@@ -253,9 +241,9 @@ class Directory extends FileObject {
      */
     public function move($file) {
         $result = true;
-        foreach ($this->children() as $item) {
+        $this->map(function (FileObject $item) use (&$result, $file) {
             $result = $result && $item->move($file. '/'. $item->getName());
-        }
+        });
         return $result;
     }
 
@@ -266,9 +254,9 @@ class Directory extends FileObject {
      */
     public function copy($file) {
         $result = true;
-        foreach ($this->children() as $item) {
+        $this->map(function (FileObject $item) use (&$result, $file) {
             $result = $result && $item->copy($file. '/'. $item->getName());
-        }
+        });
         return $result;
     }
 
@@ -277,9 +265,9 @@ class Directory extends FileObject {
      * @return bool
      */
     public function delete() {
-        foreach ($this->children() as $item) {
+        $this->map(function (FileObject $item) {
             $item->delete();
-        }
+        });
         return rmdir($this->fullName);
     }
 }

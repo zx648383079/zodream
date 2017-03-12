@@ -51,7 +51,7 @@ t f bool                    true false
 [] array                    array()
  **/
 
-class Template {
+class Template extends BaseTemplate {
 
 	protected $beginTag = '{';
 
