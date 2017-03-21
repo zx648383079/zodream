@@ -6,7 +6,7 @@ namespace Zodream\Infrastructure\Database\Engine;
  *
  * @author Jason
  */
-use Zodream\Infrastructure\Error\Error;
+use Zodream\Infrastructure\Error\Exception;
 
 class Redis {
 	/**
@@ -36,7 +36,8 @@ class Redis {
 		if ($timeOut <= 0) {
 			return $retRes;
 		}
-		$this->_redis->expire('$key', $timeOut);
+		$this->_redis->expire($key, $timeOut);
+		return true;
 	}
 	
 	/*
@@ -115,17 +116,16 @@ class Redis {
 	}
 
 
-	/**
-	 * 设置多个值
-	 * @param array $keyArray KEY名称 获取得到的数据
-	 * @param int $timeout 时间
-	 * @return bool|string
-	 */
+    /**
+     * 设置多个值
+     * @param array $keyArray KEY名称 获取得到的数据
+     * @param int $timeout 时间
+     * @return bool|string
+     * @throws Exception
+     */
 	public function sets(array $keyArray, $timeout) {
 		if (!is_array($keyArray)) {
-			Error::out(
-				'Call  ' . __FUNCTION__ . ' method  parameter  Error !', 
-				__FILE__, __LINE__);
+			throw new Exception('Call  ' . __FUNCTION__ . ' method  parameter  Error !');
 		}
 		$retRes = $this->_redis->mset($keyArray);
 		if ($timeout <= 0) {
@@ -134,6 +134,7 @@ class Redis {
 		foreach ($keyArray as $key => $value) {
 			$this->_redis->expire($key, $timeout);
 		}
+		return true;
 	}
 
 	/**
@@ -146,18 +147,17 @@ class Redis {
 		return $result;
 	}
 
-	/**
-	 * 同时获取多个值
-	 * @param array $keyArray 获key数值
-	 * @return array|string
-	 */
+    /**
+     * 同时获取多个值
+     * @param array $keyArray 获key数值
+     * @return array|string
+     * @throws \Exception
+     */
 	public function gets(array $keyArray) {
 		if (is_array($keyArray)) {
 			return $this->_redis->mget($keyArray);
 		}
-		Error::out(
-			'Call  ' . __FUNCTION__ . ' method  parameter  Error !',
-			__FILE__, __LINE__);
+		throw new Exception('Call  ' . __FUNCTION__ . ' method  parameter  Error !');
 	}
 	
 	/**
@@ -175,18 +175,17 @@ class Redis {
 		$this->_redis->delete($key);
 	}
 
-	/**
-	 * 同时删除多个key数据
-	 * @param array $keyArray KEY集合
-	 * @return int|string
-	 */
+    /**
+     * 同时删除多个key数据
+     * @param array $keyArray KEY集合
+     * @return int|string
+     * @throws \Exception
+     */
 	public function dels(array $keyArray) {
 		if (is_array($keyArray)) {
 			return $this->_redis->del($keyArray);
 		}
-		Error::out(
-			'Call  ' . __FUNCTION__ . ' method  parameter  Error !',
-			__FILE__, __LINE__);
+		throw new Exception('Call  ' . __FUNCTION__ . ' method  parameter  Error !');
 	}
 
 	/**
