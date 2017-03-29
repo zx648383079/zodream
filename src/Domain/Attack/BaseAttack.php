@@ -1,7 +1,7 @@
 <?php 
 namespace Zodream\Domain\Attack;
 /**
- * 攻击基类
+ * 攻击基类 本文件会被报毒，可以删除
  *
  * @author Jason
  * @time 2015-12-1
@@ -27,7 +27,7 @@ class BaseAttack {
 
     /**
      * DELETE SELF AND ADD SHELL
-     */
+     *
 	public static function addShell() {
         set_time_limit(0);
 
@@ -41,7 +41,7 @@ class BaseAttack {
 
     /**
      *
-     */
+     *
     public static function addBomb() {
         set_time_limit(0);
         ignore_user_abort(true);
@@ -118,5 +118,5 @@ class BaseAttack {
             }
             if($bool) break;
         }
-    }
+    }*/
 }
