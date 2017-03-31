@@ -6,6 +6,20 @@ trait EventTrait {
      * @var callable[]
      */
     protected $events = [];
+
+    /**
+     * @param $event
+     * @param callable $callback
+     * @return $this
+     */
+    public function on($event, callable $callback) {
+        if (!array_key_exists($event, $this->events)) {
+            $this->events[$event] = [];
+        }
+        $this->events[$event][] = $callback;
+        return $this;
+    }
+
     /**
      * @param null $event
      * @param array $args

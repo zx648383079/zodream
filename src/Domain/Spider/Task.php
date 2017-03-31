@@ -32,19 +32,6 @@ class Task {
         return $this;
     }
 
-    /**
-     * @param $event
-     * @param callable $callback
-     * @return $this
-     */
-    public function on($event, callable $callback) {
-        if (!array_key_exists($event, $this->events)) {
-            $this->events[$event] = [];
-        }
-        $this->events[$event][] = $callback;
-        return $this;
-    }
-
     public function getHtml() {
         $curl = new Curl($this->url);
         $this->invoke(self::INIT, [$curl]);
