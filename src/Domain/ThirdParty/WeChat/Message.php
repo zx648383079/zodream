@@ -94,6 +94,11 @@ class Message extends MagicObject {
         if (!$this->isEvent()) {
             return EventEnum::Message;
         }
+        // ADD SCAN SUBSCRIBE EVENT
+        if ($this->event == EventEnum::Subscribe
+            && strpos($this->event, 'qrscene_') === 0) {
+            return EventEnum::ScanSubscribe;
+        }
         return $this->event;
     }
 

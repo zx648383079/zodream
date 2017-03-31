@@ -1,7 +1,11 @@
 <?php
 namespace Zodream\Infrastructure\Traits;
 
+defined('DEFAULT_EVENT') || define('DEFAULT_EVENT', '__default__');
+
 trait EventTrait {
+
+
     /**
      * @var callable[]
      */
@@ -30,7 +34,7 @@ trait EventTrait {
             $event = $this->getEvent();
         }
         if (!array_key_exists($event, $this->events)) {
-            return $this;
+            return $this->invokeDefault($args);
         }
         foreach ($this->events[$event] as $item) {
             if (!is_callable($item)) {
@@ -39,5 +43,17 @@ trait EventTrait {
             call_user_func_array($item, $args);
         }
         return $this;
+    }
+
+    /**
+     * INVOKE THE DEFAULT
+     * @param array|null $args
+     * @return $this
+     */
+    public function invokeDefault(array $args = null) {
+        if (!array_key_exists(DEFAULT_EVENT, $this->events)) {
+            return $this;
+        }
+        return $this->invoke(DEFAULT_EVENT, $args);
     }
 }
