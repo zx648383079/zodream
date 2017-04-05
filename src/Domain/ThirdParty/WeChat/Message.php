@@ -2,6 +2,7 @@
 namespace Zodream\Domain\ThirdParty\WeChat;
 
 use Zodream\Infrastructure\Base\MagicObject;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Traits\EventTrait;
@@ -96,7 +97,8 @@ class Message extends MagicObject {
         }
         // ADD SCAN SUBSCRIBE EVENT
         if ($this->event == EventEnum::Subscribe
-            && strpos($this->event, 'qrscene_') === 0) {
+            && strpos($this->eventKey, 'qrscene_') === 0) {
+            $this->eventKey = StringExpand::firstReplace($this->eventKey, 'qrscene_');
             return EventEnum::ScanSubscribe;
         }
         return $this->event;
