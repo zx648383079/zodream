@@ -172,10 +172,15 @@ class Message extends MagicObject {
         return true;
     }
 
+    /**
+     * 无法回复时自动返回success
+     * @return string
+     */
     public function run() {
         $response = new MessageResponse();
         $response->setFromUseName($this->getTo())
             ->setToUseName($this->getFrom());
         $this->invoke($this->getEvent(), [$this, $response]);
+        return 'success';
     }
 }
