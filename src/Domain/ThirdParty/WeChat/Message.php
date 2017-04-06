@@ -174,13 +174,16 @@ class Message extends MagicObject {
 
     /**
      * 无法回复时自动返回success
-     * @return string
+     * @return MessageResponse
      */
     public function run() {
-        $response = new MessageResponse();
+        $response = new MessageResponse($this->token,
+            $this->aesKey,
+            $this->encryptType,
+            $this->appId);
         $response->setFromUseName($this->getTo())
             ->setToUseName($this->getFrom());
         $this->invoke($this->getEvent(), [$this, $response]);
-        return 'success';
+        return $response;//'success';
     }
 }

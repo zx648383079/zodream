@@ -4,8 +4,10 @@ namespace Zodream\Domain\ThirdParty\WeChat\Platform;
 
 use Zodream\Domain\ThirdParty\WeChat\Aes;
 use Zodream\Infrastructure\Base\MagicObject;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Traits\EventTrait;
+use Zodream\Service\Config;
 
 /**
  * 推送给平台授权相关通知
@@ -19,6 +21,8 @@ use Zodream\Infrastructure\Traits\EventTrait;
  * @property string $authorizationCodeExpiredTime  授权码过期时间
  */
 class Notify extends MagicObject {
+    protected $configKey = 'wechat.platform';
+
     use EventTrait;
     const component_verify_ticket = 'component_verify_ticket';
     const unauthorized = 'unauthorized';
@@ -26,6 +30,22 @@ class Notify extends MagicObject {
     const authorized = 'authorized';
 
     protected $xml;
+
+    protected $aesKey;
+
+    protected $encryptType;
+
+    protected $appId;
+
+    public function __construct(array $config = array()) {
+        $config = array_merge(Config::getValue($this->configKey, array(
+            'aesKey' => '',
+            'appId' => ''
+        )), $config);
+        $this->aesKey = $config['aesKey'];
+        $this->appId = $config['appId'];
+        $this->get();
+    }
 
     public function get($key = null, $default = null) {
         if (empty($this->_data)) {
@@ -61,7 +81,7 @@ class Notify extends MagicObject {
     }
 
     public function run() {
-        $this->invoke($this->getEvent(), [$this, $response]);
+        $this->invoke($this->getEvent(), [$this]);
         return 'success';
     }
 }

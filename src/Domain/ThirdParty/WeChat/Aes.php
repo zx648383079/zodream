@@ -16,6 +16,8 @@ class Aes extends BaseSecurity {
 
     protected $appId;
 
+    protected $blockSize = 32;
+
     public function __construct($key, $appId = null) {
         $this->key = base64_decode($key . '=');
         $this->appId = $appId;
@@ -39,7 +41,7 @@ class Aes extends BaseSecurity {
         $module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
         $iv = substr($this->key, 0, 16);
         //使用自定义的填充方式对明文进行补位填充
-        $data = $this->pkcs7Pad($data);
+        $data = $this->pkcs7Pad($data, $this->blockSize);
         mcrypt_generic_init($module, $this->key, $iv);
         //加密
         $data = mcrypt_generic($module, $data);
@@ -67,7 +69,7 @@ class Aes extends BaseSecurity {
         mcrypt_generic_deinit($module);
         mcrypt_module_close($module);
         //去除补位字符
-        $result = $this->pkcs7UnPad($decrypted);
+        $result = $this->pkcs7UnPad($decrypted, $this->blockSize);
         //去除16位随机字符串,网络字节序和AppId
         if (strlen($result) < 16) {
             throw new \InvalidArgumentException('LENGTH < 16');

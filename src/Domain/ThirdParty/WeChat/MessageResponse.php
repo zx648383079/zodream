@@ -23,7 +23,10 @@ class MessageResponse {
 
     protected $token;
 
-    public function __construct($token = null, $aesKey = null, $encryptType = null, $appId = null) {
+    public function __construct($token = null,
+                                $aesKey = null,
+                                $encryptType = null,
+                                $appId = null) {
         $this->setCreateTime(time());
         $this->aesKey = $aesKey;
         $this->appId = $appId;
