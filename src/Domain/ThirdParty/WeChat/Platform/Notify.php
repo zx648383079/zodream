@@ -8,6 +8,7 @@ use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Traits\EventTrait;
 use Zodream\Service\Config;
+use Zodream\Service\Factory;
 
 /**
  * 推送给平台授权相关通知
@@ -71,6 +72,10 @@ class Notify extends MagicObject {
         return $this->xml;
     }
 
+    public function getEvent() {
+        return $this->infoType;
+    }
+
     protected function getData() {
         $data = (array)XmlExpand::decode($this->xml, false);
         $encryptStr = $data['Encrypt'];
@@ -89,7 +94,7 @@ class Notify extends MagicObject {
     }
 
     public function run() {
-        $this->invoke($this->infoType, [$this]);
+        $this->invoke($this->getEvent(), [$this]);
         return 'success';
     }
 }

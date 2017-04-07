@@ -47,7 +47,7 @@ class Manage extends BasePlatform {
             ],
             [
                 '#component_appid',
-                '#authorization_code'
+                '#authorization_code' // 在授权通知里接收
             ],
             'POST'
         ],
@@ -152,13 +152,6 @@ class Manage extends BasePlatform {
      */
     public function login() {
         return $this->getUrl('login');
-    }
-
-    /**
-     * 5.授权返回
-     */
-    public function callback() {
-        $this->set('authorization_code', Request::get('code'));
     }
 
     public function getAccessToken() {

@@ -228,10 +228,12 @@ class Directory extends FileObject {
      * ADD DIRECTORY IN DIRECTORY
      * @param string $name
      * @param int $mode
-     * @return bool
+     * @return Directory
      */
     public function addDirectory($name, $mode = 0777) {
-        return mkdir($this->getChild($name), $mode);
+        $dir = $this->getChild($name);
+        mkdir($dir, $mode);
+        return new Directory($dir);
     }
 
     /**
