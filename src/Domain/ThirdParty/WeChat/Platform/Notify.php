@@ -76,7 +76,6 @@ class Notify extends MagicObject {
         $encryptStr = $data['Encrypt'];
         $aes = new Aes($this->aesKey, $this->appId);
         $this->xml = $aes->decrypt($encryptStr);
-        $this->appId = $aes->getAppId();
         return (array)XmlExpand::decode($this->xml, false);
     }
 
