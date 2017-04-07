@@ -13,7 +13,6 @@ use Zodream\Service\Config;
  * 推送给平台授权相关通知
  * @package Zodream\Domain\ThirdParty\WeChat\Platform
  * @property string $componentVerifyTicket
- * @property string $appId
  * @property string $createTime
  * @property string $infoType  unauthorized是取消授权，updateauthorized是更新授权，authorized是授权成功通知
  * @property string $authorizerAppid 公众号
@@ -24,10 +23,10 @@ class Notify extends MagicObject {
     protected $configKey = 'wechat.platform';
 
     use EventTrait;
-    const component_verify_ticket = 'component_verify_ticket';
-    const unauthorized = 'unauthorized';
-    const updateauthorized = 'updateauthorized';
-    const authorized = 'authorized';
+    const TYPE_ComponentVerifyTicket = 'component_verify_ticket';
+    const TYPE_Unauthorized = 'unauthorized';
+    const TYPE_UpdateAuthorized = 'updateauthorized';
+    const TYPE_Authorized = 'authorized';
 
     protected $xml;
 
@@ -45,6 +44,7 @@ class Notify extends MagicObject {
         $this->aesKey = $config['aesKey'];
         $this->appId = $config['appId'];
         $this->get();
+        $this->setComponentVerifyTicket();
     }
 
     public function get($key = null, $default = null) {
@@ -80,8 +80,17 @@ class Notify extends MagicObject {
         return (array)XmlExpand::decode($this->xml, false);
     }
 
+    public function setComponentVerifyTicket() {
+        if ($this->infoType != self::TYPE_ComponentVerifyTicket) {
+            return $this;
+        }
+        Factory::cache()->set('WeChatThirdComponentVerifyTicket',
+            $this->componentVerifyTicket);
+        return $this;
+    }
+
     public function run() {
-        $this->invoke($this->getEvent(), [$this]);
+        $this->invoke($this->infoType, [$this]);
         return 'success';
     }
 }

@@ -1,161 +1,105 @@
 <?php
 namespace Zodream\Domain\ThirdParty\WeChat\Platform;
 
-use Zodream\Domain\ThirdParty\WeChat\BaseWeChat;
-use Zodream\Infrastructure\Http\Component\Uri;
-/**
- * 微信第三方平台开放
- * User: zx648
- * Date: 2017/4/5
- * Time: 19:34
- */
-class OAuth extends BaseWeChat {
 
+use Zodream\Infrastructure\Http\Component\Uri;
+use Zodream\Service\Factory;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Infrastructure\Http\Request;
+
+/**
+ * 网页授权
+ * @package Zodream\Domain\ThirdParty\WeChat\Platform
+ * @property string $identity
+ * @property string $username
+ * @property string $sex
+ * @property string $avatar
+ */
+class OAuth extends BasePlatform {
     protected $apiMap = [
         'login' => [
-            'https://mp.weixin.qq.com/cgi-bin/componentloginpage',
+            'https://open.weixin.qq.com/connect/oauth2/authorize',
             [
-                '!component_appid',
-                '!pre_auth_code',
-                '!redirect_uri'
+                '#appid',
+                '#redirect_uri',
+                'response_type' => 'code',
+                'scope' => 'snsapi_userinfo', // snsapi_base （不弹出授权页面，直接跳转，只能获取用户openid），snsapi_userinfo （弹出授权页面，可通过openid拿到昵称、性别、所在地
+                'state',
+                '#component_appid'
+                //'#wechat_redirect'
             ]
         ],
-        'token' => [ //json
-            'https://api.weixin.qq.com/cgi-bin/component/api_component_token',
+        'access' => [
+            'https://api.weixin.qq.com/sns/oauth2/component/access_token',
             [
-                '!component_appid',
-                '!component_appsecret',
-                '!component_verify_ticket'
-            ],
-            'POST'
-        ],
-        'pre_auth_code' => [  //json
-            [
-                'https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode',
-                '!component_access_token'
-            ],
-            '!component_appid',
-            'POST'
-        ],
-        'access_token' => [ //json
-            [
-                'https://api.weixin.qq.com/cgi-bin/component/api_query_auth',
-                '!component_access_token'
-            ],
-            [
-                '!component_appid',
-                '!authorization_code'
-            ],
-            'POST'
+                '#appid',
+                '#component_access_token',
+                '#code',
+                'grant_type' => 'authorization_code',
+                '#component_appid',
+            ]
         ],
         'refresh_token' => [
+            'https://api.weixin.qq.com/sns/oauth2/component/refresh_token',
             [
-                'https:// api.weixin.qq.com /cgi-bin/component/api_authorizer_token',
-                '!component_access_token'
-            ],
-            [
-                '!component_appid',
-                '!authorizer_appid',
-                '!authorizer_refresh_token',
-            ],
-            'POST'
+                '#appid',
+                '#component_access_token',
+                '#refresh_token',
+                'grant_type' => 'refresh_token',
+                '#component_appid',
+            ]
         ],
         'info' => [
+            'https://api.weixin.qq.com/sns/userinfo',
             [
-                'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info',
-                '!component_access_token'
-            ],
-            [
-                '!component_appid',
-                '!authorizer_appid',
-            ],
-            'POST'
-        ],
-        'getOption' => [
-            [
-                'https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_option',
-                '!component_access_token'
-            ],
-            [
-                '!component_appid',
-                '!authorizer_appid',
-                '!option_name'
-            ],
-            'POST'
-        ],
-        'setOption' => [
-            [
-                'https://api.weixin.qq.com/cgi-bin/component/api_set_authorizer_option',
-                '!component_access_token'
-            ],
-            [
-                '!component_appid',
-                '!authorizer_appid',
-                '!option_name',
-                '!option_value'
-            ],
-            'POST'
-        ],
+                '#access_token',
+                '#openid',
+                'lang' => 'zh_CN'
+            ]
+        ]
     ];
 
     /**
-     * 2.获取令牌
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getToken() {
-        $key = 'WeChatThirdToken';
-        if (Factory::cache()->has($key)) {
-            return Factory::cache()->get($key);
-        }
-        $args = $this->getJson('token');
-        if (!is_array($args)) {
-            throw new \Exception('HTTP ERROR!');
-        }
-        if (!array_key_exists('component_access_token', $args)) {
-            throw new \Exception(isset($args['errmsg']) ? $args['errmsg'] : 'GET ACCESS TOKEN ERROR!');
-        }
-        Factory::cache()->set($key, $args['component_access_token'], $args['expires_in']);
-        return $args['component_access_token'];
-    }
-
-    /**
-     * 3.获取预授权码
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getPreAuthCode() {
-        $key = 'WeChatThirdPreAuthCode';
-        if (Factory::cache()->has($key)) {
-            return Factory::cache()->get($key);
-        }
-        $args = $this->getJson('pre_auth_code');
-        if (!is_array($args)) {
-            throw new \Exception('HTTP ERROR!');
-        }
-        if (!array_key_exists('pre_auth_code', $args)) {
-            throw new \Exception(isset($args['errmsg']) ? $args['errmsg'] : 'GET ACCESS TOKEN ERROR!');
-        }
-        Factory::cache()->set($key, $args['pre_auth_code'], $args['expires_in']);
-        return $args['pre_auth_code'];
-    }
-
-    /**
-     * 4.进入授权页面
      * @return Uri
      */
     public function login() {
-        return $this->getUrl('login');
+        $state = StringExpand::randomNumber(7);
+        Factory::session()->set('state', $state);
+        $this->set('state', $state);
+        return $this->getUrl('login')->setFragment('wechat_redirect');
     }
 
-    /**
-     * 5.授权返回
-     */
     public function callback() {
-
+        $state = Request::get('state');
+        if (empty($state) || $state != Factory::session()->get('state')) {
+            return false;
+        }
+        $code = Request::get('code');
+        if (empty($code)) {
+            return false;
+        }
+        $access = $this->getJson('access', [
+            'code' => $code
+        ]);
+        if (!is_array($access) || !array_key_exists('openid', $access)) {
+            return false;
+        }
+        $access['identity'] = $access['openid'];
+        $this->set($access);
+        return $access;
     }
 
-    public function getAccessToken() {
-
+    public function info() {
+        $user = $this->getJson('info');
+        if (!is_array($user) || !array_key_exists('nickname', $user)) {
+            return false;
+        }
+        $user['username'] = $user['nickname'];
+        $user['avatar'] = $user['headimgurl'];
+        $user['sex'] = $user['sex'] == 2 ? '女' : '男';
+        $user['identity'] = isset($user['unionid']) ? $user['unionid'] : $user['openid'];
+        $this->set($user);
+        return $user;
     }
+
 }

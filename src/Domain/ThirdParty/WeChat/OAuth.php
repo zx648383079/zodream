@@ -42,6 +42,14 @@ class OAuth extends BaseWeChat {
                 'grant_type' => 'authorization_code'
             ]
         ],
+        'refresh_token' => [
+            'https://api.weixin.qq.com/sns/oauth2/refresh_token',
+            [
+                '#appid',
+                '#refresh_token',
+                'grant_type' => 'refresh_token',
+            ]
+        ],
         'info' => [
             'https://api.weixin.qq.com/sns/userinfo',
             [

@@ -14,6 +14,7 @@ use Zodream\Domain\Support\Http;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Component\Uri;
+use Zodream\Service\Factory;
 
 abstract class ThirdParty extends MagicObject {
     /**
@@ -78,6 +79,7 @@ abstract class ThirdParty extends MagicObject {
             ->setUrl($url)
             ->request()
             ->get();
+        Factory::log()->info(sprintf('HTTP GET %s => %s', $url, $args));
         return $args;
     }
 
@@ -86,6 +88,7 @@ abstract class ThirdParty extends MagicObject {
             ->request()
             ->setCommonOption()
             ->post($data);
+        Factory::log()->info(sprintf('HTTP POST %s + %s => %s', $url, JsonExpand::encode($data), $args));
         return $args;
     }
 
