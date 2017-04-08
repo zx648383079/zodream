@@ -14,6 +14,7 @@ use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
 use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Http\Response;
+use Zodream\Service\Rest\OAuth\Grant\RefreshTokenGrant;
 
 class Route {
 
@@ -199,13 +200,22 @@ class Route {
         return strpos($path, $module) === 0;
     }
 
-    protected function runModule($path, $module) {
-        if (!class_exists($module)) {
-            throw new \Exception($module.' NO EXIST!');
+    protected function getRealModule($module) {
+	    if (class_exists($module)) {
+	        return $module;
         }
+        $module = rtrim($module, '\\').'\Module';
+	    if (class_exists($module)) {
+	        return $module;
+        }
+        throw new \Exception($module.' Module NO EXIST!');
+    }
+
+    protected function runModule($path, $module) {
+	    $module = $this->getRealModule($module);
         $module = new $module();
         if (!$module instanceof Module) {
-            throw new \Exception($module.' ERROR!');
+            return $this->runClass($module, $path);
         }
         list($class, $action) = $this->getClassAndAction($path);
         Factory::view()->setDirectory($module->getViewPath());
@@ -218,10 +228,20 @@ class Route {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException($class.' CLASS NOT EXISTS!');
         }
-        /** @var BaseController $instance */
-        $instance = new $class;
-        $instance->init();
-        return call_user_func(array($instance, 'runAction'), $action, $this->action['param']);
+        $this->runClass($class, $action);
+    }
+
+    protected function runClass($instance, $action) {
+	    if (is_string($instance)) {
+	        $instance = new $instance;
+        }
+        if (method_exists($instance, 'init')) {
+	        $instance->init();
+        }
+        if (method_exists($instance, 'runAction')) {
+            return call_user_func(array($instance, 'runAction'), $action, $this->action['param']);
+        }
+        throw new \Exception('UNKNOWN CLASS');
     }
 
     protected function getClassAndAction($path) {

@@ -7,6 +7,7 @@ namespace Zodream\Module\Gzo;
  * Time: 19:22
  */
 use Zodream\Service\Controller\Module as BaseModule;
+
 class Module extends BaseModule {
 
 }

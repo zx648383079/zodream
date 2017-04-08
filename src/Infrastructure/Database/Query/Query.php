@@ -245,7 +245,7 @@ class Query extends BaseQuery {
     /**
      * ORDER SQL
      * @param array|string $args
-     * @return static
+     * @return Query
      */
     public function order($args) {
         if (!is_array($args)) {

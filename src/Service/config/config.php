@@ -1,4 +1,5 @@
 <?php
+use Zodream\Infrastructure\Http\Request;
 /**
  * 配置文件模板
  *
@@ -29,9 +30,6 @@ $configs = array(
 		'driver' => Zodream\Domain\Access\Auth::class,        //用户判断
 		'home'  => 'account'                             //用户登录主页
 	),
-    'modules' => array(   //模块
-        'gzo' => 'Zodream\Domain\Generate\Controller'
-    ),
 	'route'  => array(
 		'default' => 'Home@index',                        //注册路由， (?<参数>值) 参数为方法接收的参数 值为正则表达式 或 :num :any
 	),
@@ -125,5 +123,10 @@ if (defined('APP_MODULE')) {
 		'directory' => 'UserInterface/'.APP_MODULE,
 		'suffix' => '.php',
 	);
+}
+if (in_array(Request::ip(), ['unknown', '::1', '127.0.0.1'])){
+    $configs['modules'] = array(   //模块
+        'gzo' => 'Zodream\Module\Gzo'
+    );
 }
 return $configs;
