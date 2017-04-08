@@ -33,7 +33,7 @@ class Command extends ConfigObject {
      */
     protected $engines = [];
 
-    protected $currentName = '__default';
+    protected $currentName = '__default__';
 
     public function __construct() {
         Factory::timer()->record('dbInit');
@@ -66,11 +66,15 @@ class Command extends ConfigObject {
     }
 
     /**
-     * @param string $name
-     * @param array|BaseEngine $configs
+     * @param string|array|BaseEngine $name
+     * @param array|BaseEngine|null $configs
      * @return BaseEngine
      */
-    public function addEngine($name, $configs) {
+    public function addEngine($name, $configs = null) {
+        if (!is_string($name) && !is_numeric($name)) {
+            $configs = $name;
+            $name = $this->currentName;
+        }
         if (array_key_exists($name, $this->engines)) {
             $this->engines[$name]->close();
         }

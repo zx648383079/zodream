@@ -1,7 +1,13 @@
 <?php
 namespace Zodream\Service\Controller;
 
-class ModuleController extends Controller {
+abstract class ModuleController extends Controller {
+
+    /**
+     * Module config setting
+     */
+    public function configAction() {}
+
     /**
      * ajax 成功返回
      * @param null $data
