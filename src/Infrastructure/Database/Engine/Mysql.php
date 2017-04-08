@@ -6,6 +6,7 @@ namespace Zodream\Infrastructure\Database\Engine;
 * @author Jason
 */
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Service\Factory;
 
 class Mysql extends BaseEngine {
     /**
@@ -98,6 +99,8 @@ class Mysql extends BaseEngine {
             StringExpand::bindParam($sql, $key + 1, $item, is_numeric($item) ? 'INT' : 'STR');
         }
         $this->result = mysql_query($sql, $this->driver);
+        Factory::log()->info(sprintf('MYSQL: %s => %s', $sql,
+            $this->getError()));
         return $this->result;
     }
 

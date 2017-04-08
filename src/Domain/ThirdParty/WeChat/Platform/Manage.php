@@ -151,7 +151,17 @@ class Manage extends BasePlatform {
      * @return Uri
      */
     public function login() {
+        $this->set('pre_auth_code', $this->getPreAuthCode());
         return $this->getUrl('login');
+    }
+
+    public function callback() {
+        $code = Request::get('auth_code');
+        if (empty($code)) {
+            throw new \Exception('AUTH CODE ERROR!');
+        }
+        $this->set('authorization_code', $code);
+        return $this->getAccessToken();
     }
 
     public function getAccessToken() {

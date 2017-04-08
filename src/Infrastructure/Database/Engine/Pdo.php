@@ -1,6 +1,7 @@
 <?php 
 namespace Zodream\Infrastructure\Database\Engine;
 
+use Zodream\Service\Factory;
 /**
 * pdo
 * 
@@ -115,6 +116,7 @@ class Pdo extends BaseEngine {
 		} catch (\PDOException  $ex) {
 			$this->error = $ex->getMessage();
 		}
+		Factory::log()->info(sprintf('PDO: %s => %s', $sql, $this->error));
 		return $this->result;
 	}
 	

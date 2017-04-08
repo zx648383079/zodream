@@ -77,6 +77,7 @@ class Notify extends MagicObject {
     }
 
     protected function getData() {
+        Factory::log()->info('WECHAT NOTIFY: '.$this->xml);
         $data = (array)XmlExpand::decode($this->xml, false);
         $encryptStr = $data['Encrypt'];
         $aes = new Aes($this->aesKey, $this->appId);

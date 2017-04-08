@@ -147,16 +147,11 @@ class Factory {
             ]);
             $log = new Logger($args['name']);
             $log->pushHandler(new StreamHandler((string)static::root()
-                ->childFile($args['file']), Logger::WARNING));
+                ->childFile($args['file']),
+                defined('DEBUG') && DEBUG ? Logger::DEBUG : Logger::WARNING
+                ));
             static::$_instance['log'] = $log;
         }
         return static::$_instance['log'];
-    }
-
-    /**
-     * @return \Zodream\Infrastructure\Log\Logger
-     */
-    public static function logger() {
-        return self::getInstance('logger', \Zodream\Infrastructure\Log\Logger::class);
     }
 }

@@ -88,7 +88,8 @@ abstract class ThirdParty extends MagicObject {
             ->request()
             ->setCommonOption()
             ->post($data);
-        Factory::log()->info(sprintf('HTTP POST %s + %s => %s', $url, JsonExpand::encode($data), $args));
+        Factory::log()->info(sprintf('HTTP POST %s + %s => %s', $url,
+            is_array($data) ? JsonExpand::encode($data) : $data, $args));
         return $args;
     }
 

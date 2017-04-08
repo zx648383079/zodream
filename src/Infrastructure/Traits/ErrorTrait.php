@@ -38,17 +38,26 @@ trait ErrorTrait {
      * SET ERROR
      * @param $key
      * @param null $error
-     * @return static
+     * @return false
      */
     public function setError($key, $error = null) {
         if (is_array($key) && is_null($error)) {
             $this->errors = array_merge($this->errors, $key);
-            return $this;
+            return false;
         }
         if (!array_key_exists($key, $this->errors)) {
             $this->errors[$key] = array();
         }
         $this->errors[$key][] = $error;
+        return false;
+    }
+
+    /**
+     * clear error
+     * @return $this
+     */
+    public function clearError() {
+        $this->errors = [];
         return $this;
     }
 

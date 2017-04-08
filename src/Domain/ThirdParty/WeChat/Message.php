@@ -125,6 +125,7 @@ class Message extends MagicObject {
     }
 
     protected function getData() {
+        Factory::log()->info('WECHAT MESSAGE: '.$this->xml);
         $data = (array)XmlExpand::decode($this->xml, false);
         if ($this->encryptType != 'aes') {
             return $data;

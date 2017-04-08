@@ -1,5 +1,7 @@
 <?php 
 namespace Zodream\Infrastructure\Database\Engine;
+
+use Zodream\Service\Factory;
 /**
 * mysqli 
 * 
@@ -131,6 +133,8 @@ class Mysqli extends BaseEngine {
 		}
 		$this->prepare($sql);
 		$this->bind($parameters);
+        Factory::log()->info(sprintf('MYSQLI: %s => %s', $sql,
+            $this->getError()));
 		return $this->result->execute();
 	}
 
