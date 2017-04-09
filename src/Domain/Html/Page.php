@@ -3,10 +3,11 @@ namespace Zodream\Domain\Html;
 
 use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\Interfaces\ArrayAble;
 use Zodream\Infrastructure\Interfaces\JsonAble;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 
-class Page implements JsonAble {
+class Page implements JsonAble, ArrayAble {
 	private $_total = 0;
 
 	private $_index = 1;
@@ -39,10 +40,10 @@ class Page implements JsonAble {
 	 */
 	public function setTotal($total) {
 		if ($total instanceof Query) {
-			$this->_total = $total->count()->scalar();
+			$this->_total = intval($total->count()->scalar());
 			return $this;
 		}
-		$this->_total = $total;
+		$this->_total = intval($total);
 		return $this;
 	}
 
@@ -108,12 +109,21 @@ class Page implements JsonAble {
      * @return string
      */
     public function toJson($options = 0) {
-        return JsonExpand::encode([
+        return JsonExpand::encode($this->toArray());
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray() {
+        return [
             'total' => $this->getTotal(),
-            'index' => $this->_index,
+            'page' => $this->_index,
             'size' => $this->_pageSize,
             'key' => $this->_key,
-            'page' => $this->_data
-        ]);
+            'page_list' => $this->_data
+        ];
     }
 }

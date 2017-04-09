@@ -86,6 +86,12 @@ abstract class Model extends MagicObject {
 		
 	}
 
+    /**
+     * 转载数据
+     * @param null $data
+     * @param null $key
+     * @return bool
+     */
 	public function load($data = null, $key = null) {
 		if (is_string($data)) {
 			$key = $data;

@@ -17,6 +17,11 @@ trait ErrorTrait {
         return !empty($this->errors);
     }
 
+    /**
+     * 获取所有错误消息
+     * @param string $key
+     * @return array
+     */
     public function getError($key = null) {
         if (empty($key)) {
             return $this->errors;
@@ -27,7 +32,15 @@ trait ErrorTrait {
         return $this->errors[$key];
     }
 
-    public function getFirstError($key) {
+    /**
+     * 获取第一条错误消息
+     * @param string $key
+     * @return mixed|null
+     */
+    public function getFirstError($key = null) {
+        if (empty($key)) {
+            $key = key($this->errors);
+        }
         if (!array_key_exists($key, $this->errors)) {
             return null;
         }
