@@ -99,6 +99,14 @@ class Manage extends BasePlatform {
             ],
             'POST'
         ],
+        'clear' => [
+            [
+                'https://api.weixin.qq.com/cgi-bin/component/clear_quota',
+                '#component_access_token'
+            ],
+            '#component_appid',
+            'POST'
+        ]
     ];
 
     /**
@@ -160,6 +168,7 @@ class Manage extends BasePlatform {
         if (empty($code)) {
             throw new \Exception('AUTH CODE ERROR!');
         }
+        Factory::log()->info('WECHAT AUTH CODE: '. $code);
         $this->set('authorization_code', $code);
         return $this->getAccessToken();
     }

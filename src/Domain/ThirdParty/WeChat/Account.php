@@ -30,6 +30,14 @@ class Account extends BaseWeChat {
             ],
             'POST'
         ],
+        'clear' => [
+            [
+                'https://api.weixin.qq.com/cgi-bin/clear_quota',
+                '#access_token'
+            ],
+            '#appid',
+            'POST'
+        ]
     ];
 
     /**
