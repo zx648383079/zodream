@@ -174,8 +174,11 @@ class Session extends ConfigObject implements \ArrayAccess {
         return count($_SESSION);
     }
 
-    public function get($key, $defaultValue = null) {
+    public function get($key = null, $defaultValue = null) {
         $this->open();
+        if (empty($key)) {
+            return $_SESSION;
+        }
         return isset($_SESSION[$key]) ? $_SESSION[$key] : $defaultValue;
     }
 

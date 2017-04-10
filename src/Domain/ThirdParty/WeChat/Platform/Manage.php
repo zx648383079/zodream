@@ -53,7 +53,7 @@ class Manage extends BasePlatform {
         ],
         'refresh_token' => [
             [
-                'https:// api.weixin.qq.com /cgi-bin/component/api_authorizer_token',
+                'https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token',
                 '#component_access_token'
             ],
             [

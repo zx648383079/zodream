@@ -74,6 +74,7 @@ $configs = array(
 	),
     'log' => array(
         'name' => 'ZoDream',
+        'level' => 'debug',
         'file' => 'data/log/app.log'
     ),
 	'safe' => array(

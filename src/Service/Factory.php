@@ -141,14 +141,11 @@ class Factory {
      */
     public static function log() {
         if (!array_key_exists('log', static::$_instance)) {
-            $args = Config::getValue('log', [
-                'name' => 'ZoDream',
-                'file' => 'data/log/app.log'
-            ]);
+            $args = Config::getValue('log');
             $log = new Logger($args['name']);
             $log->pushHandler(new StreamHandler((string)static::root()
                 ->childFile($args['file']),
-                defined('DEBUG') && DEBUG ? Logger::DEBUG : Logger::WARNING
+                $args['level']
                 ));
             static::$_instance['log'] = $log;
         }
