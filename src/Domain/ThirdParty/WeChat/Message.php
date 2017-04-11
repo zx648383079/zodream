@@ -7,6 +7,7 @@ use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Traits\EventTrait;
 use Zodream\Service\Config;
+use Zodream\Service\Factory;
 
 /**
  * 消息管理
