@@ -102,11 +102,11 @@ class Route {
      * @return bool
      */
     public function canRun($url) {
-        if (preg_match('#'.$this->uri.'#', $url, $match, PREG_OFFSET_CAPTURE)) {
-            Request::get(true)->set($match);
-            return true;
+        if (!preg_match('#'.$this->uri.'#', $url, $match)) {
+            return false;
         }
-        return false;
+        Request::get(true)->set($match);
+        return true;
     }
 
     public function filter($key, $pattern) {
