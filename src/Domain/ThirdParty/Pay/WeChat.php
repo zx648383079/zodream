@@ -189,6 +189,30 @@ class WeChat extends BasePay {
                 'signType' => 'MD5',
                 'paySign'
             ]
+        ],
+        'declareOrder' => [  //海关申报
+            'https://api.mch.weixin.qq.com/cgi-bin/mch/customs/customdeclareorder',
+            [
+                'sign',
+                '#appid',
+                '#mch_id',
+                '#out_trade_no',
+                '#transaction_id',
+                '#customs',
+                'mch_customs_no',
+                'duty',
+                //拆单或重新报关时必传
+                'sub_order_no',
+                'fee_type',
+                'order_fee',
+                'transport_fee',
+                'product_fee',
+                //微信缺少用户信息时必传，如果商户上传了用户信息，则以商户上传的信息为准,
+                'cert_type',
+                'cert_id',
+                'name'
+            ],
+            'POST'
         ]
     ];
 
@@ -461,6 +485,23 @@ class WeChat extends BasePay {
         $data['package'] = 'prepay_id='.$data['package']['prepay_id'];
         $data['paySign'] = $this->sign($data);
         return $data;
+    }
 
+    /**
+     * 报关
+     * @param array $args
+     * @return array|mixed
+     * @throws \ErrorException
+     */
+    public function declareOrder(array $args = array()) {
+        $args = $this->getXml('declareOrder', $args);
+        if ($args['return_code'] != 'SUCCESS') {
+            throw new \ErrorException($args['return_msg']);
+        }
+        if (!$this->verify($args, $args['sign'])) {
+            throw new \InvalidArgumentException('数据验签失败！');
+        }
+        $this->set($args);
+        return $args;
     }
 }
