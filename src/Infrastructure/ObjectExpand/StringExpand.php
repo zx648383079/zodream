@@ -264,6 +264,17 @@ class StringExpand {
 		return preg_replace('/'.$search.'$/', $replace, $arg, 1);
 	}
 
+    /**
+     * Convert a value to studly caps case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function studly($value) {
+        $value = ucwords(str_replace(['-', '_'], ' ', $value));
+        return str_replace(' ', '', $value);
+    }
+
 	/**
 	 * UTF8字符串的长度
 	 * @param string $str

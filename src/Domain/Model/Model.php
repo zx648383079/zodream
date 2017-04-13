@@ -11,6 +11,7 @@ use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\ErrorTrait;
 
 abstract class Model extends MagicObject {
@@ -139,7 +140,7 @@ abstract class Model extends MagicObject {
 		if ($this->has($key)) {
 			return $this->_data[$key];
 		}
-		$method = 'get'.ucfirst($key);
+		$method = 'get'. StringExpand::studly($key);
 		if (!method_exists($this, $method)) {
             return $default;
         }
