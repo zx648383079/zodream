@@ -14,5 +14,5 @@ interface JsonAble {
      * @param  int  $options
      * @return string
      */
-    public function toJson($options = 0);
+    public function toJson($options = JSON_UNESCAPED_UNICODE);
 }

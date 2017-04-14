@@ -71,6 +71,8 @@ class OAuth extends BaseWeChat {
     }
 
     public function callback() {
+        Factory::log()
+            ->info('WECHAT CALLBACK: '.var_export($_GET, true));
         $state = Request::get('state');
         if (empty($state) || $state != Factory::session()->get('state')) {
             return false;

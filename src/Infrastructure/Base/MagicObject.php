@@ -9,9 +9,11 @@ namespace Zodream\Infrastructure\Base;
 use ArrayIterator;
 use ArrayAccess;
 use IteratorAggregate;
+use Zodream\Infrastructure\Interfaces\JsonAble;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 
-class MagicObject extends ZObject implements ArrayAccess, IteratorAggregate {
+class MagicObject extends ZObject implements ArrayAccess, JsonAble, IteratorAggregate {
 	
 	protected $_data = array();
 
@@ -148,5 +150,15 @@ class MagicObject extends ZObject implements ArrayAccess, IteratorAggregate {
 
     public function toArray() {
         return $this->get();
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int $options
+     * @return string
+     */
+    public function toJson($options = JSON_UNESCAPED_UNICODE) {
+        return JsonExpand::encode($this->toArray(), $options);
     }
 }

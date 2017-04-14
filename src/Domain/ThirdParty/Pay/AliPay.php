@@ -413,6 +413,8 @@ class AliPay extends BasePay {
      * @return mixed
      */
     public function callback() {
+        Factory::log()
+            ->info('ALIPAY CALLBACK: '.var_export($_POST, true));
         $data = $_POST;//Requests::isPost() ? $_POST : $_GET;
         if (!array_key_exists('sign', $data) || 
             !$this->verify($data, $data['sign'])) {

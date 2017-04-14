@@ -419,6 +419,8 @@ class WeChat extends BasePay {
      */
     public function callback() {
         $args = XmlExpand::specialDecode(Request::input());
+        Factory::log()
+            ->info('WECHAT PAY CALLBACK: '.Request::input());
         if (!is_array($args)) {
             throw new \InvalidArgumentException('非法数据');
         }

@@ -43,6 +43,8 @@ abstract class BaseOAuth extends ThirdParty  {
     }
 
     public function callback() {
+        Factory::log()
+            ->info(strtoupper($this->configKey).' CALLBACK: '.var_export($_GET, true));
         $state = Request::get('state');
         if (empty($state) || $state != Factory::session()->get('state')) {
             return false;
