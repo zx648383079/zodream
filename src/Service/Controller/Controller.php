@@ -39,7 +39,7 @@ abstract class Controller extends BaseController {
 		}
 	}
 
-	public function runAction($action, array $vars = array()) {
+	public function runMethod($action, array $vars = array()) {
         if ($this->canCSRFValidate
             && Request::isPost()
             && !VerifyCsrfToken::verify()) {
@@ -49,7 +49,7 @@ abstract class Controller extends BaseController {
             && Request::isGet()) {
             VerifyCsrfToken::create();
         }
-        return parent::runAction($action, $vars);
+        return parent::runMethod($action, $vars);
     }
 
     protected function runActionMethod($action, $vars = array()) {

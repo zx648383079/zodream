@@ -238,8 +238,8 @@ class Route {
         if (method_exists($instance, 'init')) {
 	        $instance->init();
         }
-        if (method_exists($instance, 'runAction')) {
-            return call_user_func(array($instance, 'runAction'), $action, $this->action['param']);
+        if (method_exists($instance, 'runMethod')) {
+            return call_user_func(array($instance, 'runMethod'), $action, $this->action['param']);
         }
         throw new \Exception('UNKNOWN CLASS');
     }

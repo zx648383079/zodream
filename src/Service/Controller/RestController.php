@@ -58,13 +58,29 @@ abstract class RestController extends BaseController  {
     }
 
     /**
-     * @param string $error
-     * @param int $statusCode
+     * ajax 成功返回
+     * @param null $data
      * @return Response
      */
-    protected function ajaxError($error, $statusCode = 400) {
+    public function ajaxSuccess($data = null) {
         return $this->ajax([
-            'error' => $error
-        ], $statusCode);
+            'code' => 0,
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * ajax 失败返回
+     * @param string $message
+     * @param int $code
+     * @return Response
+     */
+    public function ajaxFailure($message = '', $code = 1) {
+        return $this->ajax(array(
+            'code' => $code,
+            'status' => 'failure',
+            'msg' => $message
+        ));
     }
 }

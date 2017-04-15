@@ -35,10 +35,10 @@ abstract class BaseController extends Action {
      * @return string|Response
      * @throws \Exception
      */
-	public function runAction($action, array $vars = array()) {
+	public function runMethod($action, array $vars = array()) {
         Factory::timer()->record('controllerStart');
 		$this->action = $action;
-		if (!$this->hasAction($action)) {
+		if (!$this->hasMethod($action)) {
 			throw new Exception('URI ERROR!');
 		}
 		if (true !==
@@ -46,17 +46,26 @@ abstract class BaseController extends Action {
 			return $arg;
 		}
 		if (array_key_exists($action, $this->actions())) {
-			return $this->runClassAction($action);
+			return $this->runClassMethod($action);
 		}
 		$this->prepare();
 		EventManger::getInstance()->run('runController', $vars);
-		$result = $this->runActionMethod($action.APP_ACTION, $vars);
+		$result = $this->runActionMethod($this->getActionName($action), $vars);
 		$this->finalize();
         Factory::timer()->record('controllerEnd');
 		return $result;
 	}
+
+    /**
+     * 获取
+     * @param $action
+     * @return string
+     */
+	protected function getActionName($action) {
+	    return $action.APP_ACTION;
+    }
 	
-	private function runClassAction($action) {
+	private function runClassMethod($action) {
 		$class = $this->actions()[$action];
 		if (is_callable($class)) {
 			return call_user_func($class);
@@ -134,7 +143,7 @@ abstract class BaseController extends Action {
 		if (is_string($controller)) {
 			$controller = new $controller;
 		}
-		return $controller->runAction($actionName, $parameters);
+		return $controller->runMethod($actionName, $parameters);
 	}
 	
 	/**
@@ -142,7 +151,7 @@ abstract class BaseController extends Action {
 	 * @param string $action
 	 * @return boolean
 	 */
-	public function hasAction($action) {
+	public function hasMethod($action) {
 		return array_key_exists($action, $this->actions())
         || method_exists($this, $action.APP_ACTION);
 	}
