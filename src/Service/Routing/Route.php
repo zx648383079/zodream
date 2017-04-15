@@ -249,13 +249,13 @@ class Route {
         if (empty($path)) {
             return ['Home', 'index'];
         }
-        $args = explode('/', $path);
+        $args = array_map(function ($arg) {
+            return StringExpand::studly($arg);
+        }, explode('/', $path));
         if (count($args) == 1) {
             return [ucfirst($path), 'index'];
         }
-        $args = array_map(function ($arg) {
-            return StringExpand::studly($arg);
-        }, $args);
+
         $action = array_pop($args);
         return [implode('\\', $args), lcfirst($action)];
     }
