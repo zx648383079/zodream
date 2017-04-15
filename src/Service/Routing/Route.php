@@ -253,7 +253,10 @@ class Route {
         if (count($args) == 1) {
             return [ucfirst($path), 'index'];
         }
+        $args = array_map(function ($arg) {
+            return StringExpand::studly($arg);
+        }, $args);
         $action = array_pop($args);
-        return [implode('\\', array_map('ucfirst', $args)), lcfirst($action)];
+        return [implode('\\', $args), lcfirst($action)];
     }
 }
