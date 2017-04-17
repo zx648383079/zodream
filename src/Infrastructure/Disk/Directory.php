@@ -193,11 +193,12 @@ class Directory extends FileObject {
      * ADD FILE IN DIRECTORY
      * @param string $name
      * @param string $data
-     * @return int
+     * @return File
      */
     public function addFile($name, $data) {
         $file = new File($this->getChild($name));
-        return $file->write($data);
+        $file->write($data);
+        return $file;
     }
 
     /**
@@ -232,7 +233,9 @@ class Directory extends FileObject {
      */
     public function addDirectory($name, $mode = 0777) {
         $dir = $this->getChild($name);
-        mkdir($dir, $mode);
+        if (!is_dir($dir)) {
+            mkdir($dir, $mode);
+        }
         return new Directory($dir);
     }
 

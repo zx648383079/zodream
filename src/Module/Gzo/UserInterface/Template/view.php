@@ -1,6 +1,6 @@
 <?php
 defined('APP_DIR') or exit();
-$convers = [
+$converters = [
     'content' => 'html',
     'thumb' => 'img',
     'image' => 'img',
@@ -28,7 +28,7 @@ $this->extend('layout/header');
                 'data' => $model,
 				'items' => [
             <?php foreach ($data as $item):?>
-                '<?=$item?>' => '<?=ucwords(str_replace('_', ' ', $item)).(in_array($item, $convers) ? ':'.$convers[$item] : '')?>',
+                '<?=$item?>' => '<?=ucwords(str_replace('_', ' ', $item)).(in_array($item, $converters) ? ':'.$converters[$item] : '')?>',
             <?php endforeach;?>
             ]
 		])?>

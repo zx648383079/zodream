@@ -2,8 +2,11 @@
 defined('APP_DIR') or exit();
 echo '<?php';
 ?>
+<?php if (isset($is_module) && $is_module):?>
+namespace Module\<?=$module?>\Domain\Model;
+<?php else:?>
 namespace Domain\Model\<?=$module?>;
-
+<?php endif;?>
 use Domain\Model\Model;
 /**
  * Class <?=$name.APP_MODEL?>

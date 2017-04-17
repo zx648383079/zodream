@@ -2,10 +2,20 @@
 defined('APP_DIR') or exit();
 echo '<?php';
 ?>
+<?php if (isset($is_module) && $is_module):?>
+namespace Module\<?=$module?>\Service;
+
+use Module\<?=$module?>\Domain\Model\<?=$name.APP_MODEL?>;
+use Module\ModuleController;
+
+class HomeController extends ModuleController {
+<?php else:?>
 namespace Service\<?=$module?>;
 
 use Domain\Model\<?=$name.APP_MODEL?>;
+
 class <?=$name.APP_CONTROLLER?> extends Controller {
+<?php endif;?>
 	protected $rules = array(
 		'*' => '@'
 	);

@@ -197,14 +197,23 @@ abstract class Controller extends BaseController {
             $data = $name;
             $name = null;
         }
+        return Factory::view()->render($this->getViewFile($name), $data);
+    }
+
+    /**
+     * 获取视图文件路径
+     * @param string $name
+     * @return string
+     */
+    protected function getViewFile($name = null) {
         if (is_null($name)) {
             $name = $this->action;
         }
         if (strpos($name, '/') !== 0) {
-            $pattern = 'Service.'.APP_MODULE.'.(.+)'.APP_CONTROLLER;
+            $pattern = '.*?Service.'.APP_MODULE.'(.+)'.APP_CONTROLLER;
             $name = preg_replace('/^'.$pattern.'$/', '$1', get_called_class()).'/'.$name;
         }
-        return Factory::view()->render($name, $data);
+        return $name;
     }
 
     /**

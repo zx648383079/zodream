@@ -3,7 +3,7 @@ namespace Zodream\Module\Gzo\Service;
 
 use Zodream\Module\Gzo\Domain\GenerateModel;
 
-class GenerateController extends Controller {
+class HomeController extends Controller {
 
     public function indexAction() {
         return $this->show('index');
@@ -28,6 +28,4 @@ class GenerateController extends Controller {
     public function controllerAction() {
         return $this->show('controller');
     }
-
-
 }

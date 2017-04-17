@@ -115,9 +115,9 @@ abstract class BaseController extends Action {
                 $arguments[] = $vars[$name];
                 continue;
             }
-            $value = Request::get($name);
+            $value = $this->setActionArguments($name);
             if (!is_null($value)){
-                $arguments[] = Request::get($name);
+                $arguments[] = $value;
                 continue;
             }
             if ($param->isDefaultValueAvailable()) {
@@ -127,6 +127,15 @@ abstract class BaseController extends Action {
             throw new Exception($action.' ACTION`S '.$name, ' DOES NOT HAVE VALUE!');
         }
         return $arguments;
+    }
+
+    /**
+     * 设置方法的注入值来源
+     * @param $name
+     * @return array|string  返回null时取默认值
+     */
+    protected function setActionArguments($name) {
+        return Request::get($name);
     }
 
 	/**

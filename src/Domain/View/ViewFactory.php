@@ -119,7 +119,7 @@ class ViewFactory extends MagicObject {
             $file = $this->directory->childFile($file.$this->configs['suffix']);
         }
         if (!$file->exist()) {
-            throw new FileException($file->getName().' FILE NOT FIND!');
+            throw new FileException($file);
         }
         if (!$this->engine instanceof EngineObject) {
             return new View($this, $file);

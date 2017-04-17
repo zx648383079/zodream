@@ -48,4 +48,15 @@ abstract class ModuleController extends Controller {
         $arg = parent::getActionName($action.'Ajax');
         return method_exists($this, $arg) ? $arg : $action;
     }
+
+    protected function getViewFile($name = null) {
+        if (is_null($name)) {
+            $name = $this->action;
+        }
+        if (strpos($name, '/') !== 0) {
+            $pattern = '.*?Service.(.+)'.APP_CONTROLLER;
+            $name = preg_replace('/^'.$pattern.'$/', '$1', get_called_class()).'/'.$name;
+        }
+        return $name;
+    }
 }

@@ -2,25 +2,113 @@
 namespace Zodream\Module\Gzo\Service;
 
 use Zodream\Infrastructure\Database\Schema\Schema;
+use Zodream\Infrastructure\Disk\Directory;
+use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Module\Gzo\Domain\GenerateModel;
+use Zodream\Service\Factory;
 
 class TemplateController extends Controller {
 
-    public function indexAction() {
-        return $this->show('index');
+    public function indexAction($module,
+                                $table,
+                                $name = null,
+                                $hasController = true,
+                                $hasView = true,
+                                $hasModel = true) {
+        if (empty($name)) {
+            $name = StringExpand::studly($name);
+        }
+        $columns = GenerateModel::schema()->table($table)->getAllColumn(true);
+        if ($hasController) {
+            $this->controllerAction($module, $name);
+        }
+        if ($hasModel) {
+            $this->createModel(Factory::root()->addDirectory('Domain')
+                ->addDirectory('Model')->addDirectory($module),
+                $table, $module, $name, $columns, true);
+        }
+        if ($hasView) {
+            $this->createView(Factory::root()
+                ->addDirectory('UserInterface')
+                ->addDirectory($module), $name, $columns);
+        }
+        return $this->ajaxSuccess();
     }
 
-    public function configAction() {
-        return $this->show('config');
+    public function configAction($name, $data) {
+        Factory::root()->addDirectory('Service')
+            ->addDirectory('config')
+            ->addFile($name.'.php', $this->makeConfig($data));
+        return $this->ajaxSuccess();
     }
 
-    public function modelAction() {
-        return $this->show('model');
+    public function modelAction($module, $table) {
+        $root = Factory::root()->addDirectory('Domain')
+            ->addDirectory('Model')->addDirectory($module);
+        $this->createModel($root, $table, $module);
+        return $this->ajaxSuccess();
     }
 
-    public function controllerAction() {
-        return $this->show('controller');
+    public function controllerAction($module, $name = 'Home') {
+        $root = Factory::root()->addDirectory('Service')
+            ->addDirectory($module);
+        if (!$root->hasFile('Controller.php')) {
+            $root->addFile('Controller.php', $this->baseController($module));
+        }
+        $this->createController($root, $name, $module);
+        return $this->ajaxSuccess();
+    }
+
+    public function moduleAction($module, $table) {
+        $root = Factory::root()->addDirectory('Module')
+            ->addDirectory($module);
+        $root->addFile('Module.php', $this->renderHtml('Module.php', [
+            'module' => $module
+        ]));
+        $modelRoot = $root->addDirectory('Domain')
+            ->addDirectory('Model');
+        $controllerRoot = $root->addDirectory('Service');
+        $viewRoot = $root->addDirectory('UserInterface');
+        foreach ((array)$table as $item) {
+            $columns = GenerateModel::schema()->table($item)->getAllColumn(true);
+            $name = StringExpand::studly($item);
+            $this->createController($controllerRoot, $name, $module, true);
+            $this->createModel($modelRoot, $item, $module, $name, $columns, true);
+            $this->createView($viewRoot, $name, $columns);
+        }
+        return $this->ajaxSuccess();
+    }
+
+    protected function createController(Directory $root, $name, $module, $is_module = false) {
+        $root->addFile($name.APP_CONTROLLER.'.php', $this->makeController($name, $module, $is_module));
+    }
+
+    protected function createModel(Directory $root,
+                                   $table,
+                                   $module,
+                                   $name = null,
+                                   array $columns = [],
+                                   $is_module = false) {
+        if (empty($columns)) {
+            $columns = GenerateModel::schema()->table($table)->getAllColumn(true);
+        }
+        if (empty($name)) {
+            $name = StringExpand::studly($table);
+        }
+        $root->addFile($name.APP_MODEL.'.php', $this->makeModel($name, $table, $columns, $module, $is_module));
+    }
+
+    protected function createView(Directory $root, $name, array $columns) {
+        if (!$root->hasDirectory('layout')) {
+            $root->addDirectory('layout')
+                ->addFile('header.php', $this->renderHtml('header.php'))
+                ->getDirectory()->addFile('footer.php', $this->renderHtml('footer.php'));
+        }
+        $root = $root->addDirectory($name);
+        $root->addFile('index.php', $this->viewIndex($name, $columns));
+        $root->addFile('add.php', $this->viewEdit($name, $columns));
+        $root->addFile('detail.php', $this->viewDetail($name, $columns));
     }
 
     /**
@@ -38,12 +126,14 @@ class TemplateController extends Controller {
      * 生成控制器
      * @param string $name
      * @param string $module
+     * @param bool $is_module
      * @return bool
      */
-    protected function makeController($name, $module) {
+    protected function makeController($name, $module, $is_module = false) {
         return $this->renderHtml('Controller', [
             'module' => $module,
-            'name' => $name
+            'name' => $name,
+            'is_module' => $is_module
         ]);
     }
 
@@ -53,9 +143,10 @@ class TemplateController extends Controller {
      * @param string $table
      * @param array $columns
      * @param $module
+     * @param bool $is_module
      * @return bool
      */
-    protected function makeModel($name, $table, array $columns, $module) {
+    protected function makeModel($name, $table, array $columns, $module, $is_module = false) {
         $data = GenerateModel::getFill($columns);
         $foreignKeys = (new Schema())->table($table)->getForeignKeys();
         foreach ($foreignKeys as &$item) {
@@ -71,17 +162,9 @@ class TemplateController extends Controller {
             'labels' => $data[2],
             'property' => $data[3],
             'module' => $module,
-            'foreignKeys' => $foreignKeys
+            'foreignKeys' => $foreignKeys,
+            'is_module' => $is_module
         ]);
-    }
-
-    /**
-     * 是有 _ 的表名采用驼峰法表示
-     * @param string $table
-     * @return string
-     */
-    protected function getName($table) {
-        return str_replace(' ', '', ucwords(str_replace('_', ' ', $table)));
     }
 
     /**
@@ -134,7 +217,7 @@ class TemplateController extends Controller {
      * @param array $columns
      * @return bool
      */
-    private function viewView($name, array $columns) {
+    protected function viewDetail($name, array $columns) {
         $data = [];
         foreach ($columns as $key => $value) {
             $data[] = $value['Field'];
@@ -167,6 +250,10 @@ class TemplateController extends Controller {
             default:
                 return "text('{$value['Field']}', ['label' => '{$value['Field']}'{$required}])";
         }
+    }
+
+    protected function setActionArguments($name) {
+        return Request::request($name);
     }
 
 }
