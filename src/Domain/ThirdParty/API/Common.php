@@ -57,6 +57,15 @@ class Common extends ThirdParty  {
                 'order'   //desc：按时间由新到旧排列， asc：按时间由旧到新排列。 不填默认返回倒序（大小写不敏感） 
             )
         ),
+        'kuaidi100' => [ // 企业版
+            'http://poll.kuaidi100.com/poll/query.do',
+            [
+                '#customer',
+                'sign',
+                '#param'
+            ],
+            'POST'
+        ],
         'exchange' => array(
             'http://apis.baidu.com/apistore/currencyservice/currency',
             array(
@@ -104,5 +113,25 @@ class Common extends ThirdParty  {
         return $this->getJson('taoBaoIP', array(
             'ip' => $ip
         ));
+    }
+
+    public function kuaiDi100(array $data) {
+        $param = [
+            'com' => $data['com'] . '',
+            'num' => $data['num'] . ''
+        ];
+        if (array_key_exists('from', $data)) {
+            $param['from'] = $data['from'] . '';
+        }
+        if (array_key_exists('to', $data)) {
+            $param['from'] = $data['to'] . '';
+        }
+        $param = json_encode($param);
+        $sign = strtoupper(md5($param.$data['key'].$data['customer']));
+        return $this->getJson('kuaidi100', [
+            'customer' => $data['customer'],
+            'sign' => $sign,
+            'param' => $param
+        ]);
     }
 }
