@@ -216,7 +216,9 @@ class MessageResponse {
     }
 
     public function sendContent() {
-        return Factory::response()->sendXml($this->makeXml())->send();
+        $xml = $this->makeXml();
+		Factory::log()->info('MESSAGE RESPONSE:'.$xml);
+        return Factory::response()->sendXml($xml)->send();
     }
 
     protected function makeXml() {
