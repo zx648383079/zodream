@@ -357,7 +357,7 @@ class WeChat extends BasePay {
      * @throws \ErrorException
      */
     public function refundOrder(array $args = array()) {
-        $data['sign'] = $this->getSignData('refund', $args);
+        $data = $this->getSignData('refund', $args);
         //第一种方法，cert 与 key 分别属于两个.pem文件
         //默认格式为PEM，可以注释
         //curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');

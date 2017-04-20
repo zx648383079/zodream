@@ -41,7 +41,7 @@ class XmlExpand {
      * @return string
      */
     public static function specialEncode(array $args, $root = 'xml') {
-        return ArrayToXml::createXML($root, static::toSpecialArarry($args))->saveXML();
+        return ArrayToXml::createXML($root, static::toSpecialArray($args))->saveXML();
     }
 
     /**
@@ -66,7 +66,7 @@ class XmlExpand {
             if (strpos($key, '@') === 0) {
                 continue;
             }
-            $item = static::toSpecialArarry($item);
+            $item = static::toSpecialArray($item);
         }
         return $data;
     }
