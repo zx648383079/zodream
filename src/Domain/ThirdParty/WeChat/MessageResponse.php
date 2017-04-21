@@ -162,6 +162,10 @@ class MessageResponse {
                             $description = null,
                             $picUrl = null,
                             $url = null) {
+        if (!array_key_exists('ArticleCount', $this->data)) {
+            $this->setType(MessageEnum::News)
+                ->setData('ArticleCount', 0, false);
+        }
         $data = [];
         if (!empty($title)) {
             $data['Title'] = [
