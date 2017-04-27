@@ -75,7 +75,7 @@ $configs = array(
     'log' => array(
         'name' => 'ZoDream',
         'level' => 'debug',
-        'file' => 'data/log/app.log'
+        'file' => sprintf('data/log/%s.log', date('Y-m-d'))
     ),
 	'safe' => array(
 		'csrf' => false,						//是否使用csrf防止表单注入攻击
