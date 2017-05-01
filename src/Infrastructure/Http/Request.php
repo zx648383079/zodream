@@ -154,6 +154,10 @@ final class Request {
 	public static function ip() {
 		return self::Other(__FUNCTION__);
 	}
+
+    public static function host() {
+        return self::Other(__FUNCTION__);
+    }
 	
 	public static function os() {
 		return self::Other(__FUNCTION__);

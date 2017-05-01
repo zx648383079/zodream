@@ -152,7 +152,7 @@ abstract class Controller extends BaseController {
             return Auth::guest() ?: $this->redirect('/');
         }
         if ($role === '@') {
-            return !Auth::guest() ?: $this->redirect([Config::getValue('auth.home'), 'ReturnUrl' => Url::to()]);
+            return $this->checkUser() ?: $this->redirect([Config::getValue('auth.home'), 'ReturnUrl' => Url::to()]);
         }
         if ($role === 'p' || $role === 'post') {
             return Request::isPost() ?: $this->redirectWithMessage('/', '您不能直接访问此页面！', 4,'400');
@@ -161,6 +161,14 @@ abstract class Controller extends BaseController {
             return $this->redirectWithMessage('/', '您访问的页面暂未开放！', 4, '413');
         }
         return true;
+    }
+
+    /**
+     * 验证用户
+     * @return bool
+     */
+    protected function checkUser() {
+        return !Auth::guest();
     }
 
     /**

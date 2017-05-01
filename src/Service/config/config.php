@@ -9,7 +9,7 @@ use Zodream\Infrastructure\Http\Request;
 $configs = array(
 	'app'    => array(                           //网站信息
 		'title'      => 'ZoDream',
-		'host'       => 'http://localhost/',        //主目录
+		'host'       => 'localhost',        //主目录
 		'model'      => 'Model',                     //后缀
 		'form'       => 'Form',
 		'controller' => 'Controller',

@@ -9,6 +9,7 @@ namespace Zodream\Service;
 use Zodream\Domain\Autoload;
 use Zodream\Infrastructure\Event\EventManger;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Service\Routing\Url;
 
 defined('VERSION') || define('VERSION', 'v3');
 defined('APP_DIR') || define('APP_DIR', Request::server('DOCUMENT_ROOT'));
@@ -37,6 +38,7 @@ class Application {
 
     public function send() {
         date_default_timezone_set(Config::getValue('formatter.timezone', 'Etc/GMT-8'));     //这里设置了时区
+        Url::setHost(Config::getValue('app.host'));
         Factory::timer()->begin();
         Autoload::getInstance()
             ->setError()

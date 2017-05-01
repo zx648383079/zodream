@@ -172,6 +172,7 @@ class View {
         foreach ((array)$name as $item) {
             echo $this->factory->render($item, $data);
         }
+        return $this;
     }
     
     public function __set($name, $value) {

@@ -36,6 +36,27 @@ class Other extends BaseRequest {
     }
 
     /**
+     * 获取host 和port
+     * @return string
+     */
+    public function getHost() {
+        $host = Request::server('HTTP_X_FORWARDED_HOST'); // 防止通过局域网代理取得ip值
+        if (!empty($host)) {
+            return $host;
+        }
+        $host = Request::server('HTTP_HOST');
+        if (!empty($host)) {
+            return $host;
+        }
+        $host = Request::server('SERVER_NAME');
+        $port = Request::server('SERVER_PORT');
+        if (!empty($port) && $port != 80) {
+            $host .= ':'.$port;
+        }
+        return $host;
+    }
+
+    /**
      * 获取真实IP
      * @return string IP,
      */

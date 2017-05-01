@@ -89,7 +89,8 @@ class ViewFactory extends MagicObject {
      * @return string
      */
     public function getAssetFile($file) {
-        if (strpos($file, '/') === 0 || strpos($file, '//') !== false) {
+        if (strpos($file, '/') === 0
+            || strpos($file, '//') !== false) {
             return $file;
         }
         $ext = pathinfo($file, PATHINFO_EXTENSION);
@@ -165,6 +166,7 @@ class ViewFactory extends MagicObject {
         } else {
             $this->linkTags[$key] = Html::link($url, $options);
         }
+        return $this;
     }
 
     public function registerCss($css, $key = null) {
@@ -176,11 +178,13 @@ class ViewFactory extends MagicObject {
         $key = $key ?: $url;
         $options['rel'] = 'stylesheet';
         $this->cssFiles[$key] = Html::link($this->getAssetFile($url), $options);
+        return $this;
     }
 
     public function registerJs($js, $position = View::HTML_FOOT, $key = null) {
         $key = $key ?: md5($js);
         $this->js[$position][$key] = $js;
+        return $this;
     }
 
     public function registerJsFile($url, $options = [], $key = null) {
@@ -188,6 +192,7 @@ class ViewFactory extends MagicObject {
         $position = ArrayExpand::remove($options, 'position', View::HTML_FOOT);
         $options['src'] = Url::to($this->getAssetFile($url));
         $this->jsFiles[$position][$key] = Html::script(null, $options);
+        return $this;
     }
 
     /**

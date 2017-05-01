@@ -9,6 +9,23 @@ use Zodream\Infrastructure\Http\Request;
 
 defined('APP_URL') || define('APP_URL', Url::getRoot());
 class Url {
+    private static $_host;
+
+    public static function setHost($host) {
+        self::$_host = $host;
+    }
+
+    /**
+     * 获取host 包括域名和端口 80 隐藏
+     * @return string
+     */
+    public static function getHost() {
+        if (empty(self::$_host)) {
+            static::setHost(Request::host());
+        }
+        return self::$_host;
+    }
+
 	/**
 	 * 上个页面网址
 	 *
@@ -118,26 +135,7 @@ class Url {
         return ltrim(static::getRoot(false), '/').static::getUri();
     }
 
-	/**
-	 * 获取host 包括域名和端口 80 隐藏
-	 * @return string
-	 */
-	public static function getHost() {
-		$host = Request::server('HTTP_X_FORWARDED_HOST'); // 防止通过局域网代理取得ip值
-		if (!empty($host)) {
-			return $host;
-		}
-		$host = Request::server('HTTP_HOST');
-		if (!empty($host)) {
-			return $host;
-		}
-		$host = Request::server('SERVER_NAME');
-		$port = Request::server('SERVER_PORT');
-		if (!empty($port) && $port != 80) {
-			$host .= ':'.$port;
-		}
-		return $host;
-	}
+
 
 	/**判断是否带url段
 	 * @param string $search
