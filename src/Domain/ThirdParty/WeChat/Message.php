@@ -186,6 +186,6 @@ class Message extends MagicObject {
         $response->setFromUseName($this->getTo())
             ->setToUseName($this->getFrom());
         $this->invoke($this->getEvent(), [$this, $response]);
-        return $response;//'success';
+        return $response;
     }
 }

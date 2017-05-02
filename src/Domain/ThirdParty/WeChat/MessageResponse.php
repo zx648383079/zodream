@@ -219,7 +219,22 @@ class MessageResponse {
         return $this->setData('CreateTime', $arg, false);
     }
 
+    /**
+     * 判断是否需要发送内容
+     * @return bool
+     */
+    public function isEmpty() {
+        return !isset($this->data['MsgType']);
+    }
+
+    /**
+     * 自动回复内容
+     * @return bool
+     */
     public function sendContent() {
+        if ($this->isEmpty()) {
+            return Factory::response()->sendHtml('success')->send();
+        }
         $xml = $this->makeXml();
 		Factory::log()->info('MESSAGE RESPONSE:'.$xml);
         return Factory::response()->sendXml($xml)->send();
