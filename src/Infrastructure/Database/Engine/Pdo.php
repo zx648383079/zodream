@@ -9,6 +9,11 @@ use Zodream\Service\Factory;
 */
 class Pdo extends BaseEngine {
 
+    const MYSQL = 'mysql';
+    const MSSQL = 'dblib';
+    const ORACLE = 'oci';
+    const SQLSRV = 'sqlsrv';
+
 	/**
 	 * @var \PDO
 	 */
@@ -24,9 +29,7 @@ class Pdo extends BaseEngine {
 			//$this->driver = new \PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $pwd ,
 			//                     array(\PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES {$coding}"));
 			$this->driver = new \PDO (
-				'mysql:host='. $this->configs['host'].
-				';port='.$this->configs['port'].
-				';dbname='.$this->configs['database'], 
+				$this->getDsn(),
 				$this->configs['user'],
 				$this->configs['password'],
 				array(
@@ -35,15 +38,43 @@ class Pdo extends BaseEngine {
     				\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // 默认是PDO::FETCH_BOTH, 4
 				)
 			);
-			$this->driver->exec ('SET NAMES '.$this->configs['encoding']);
-			$this->driver->query ( "SET character_set_client={$this->configs['encoding']}" );
-			$this->driver->query ( "SET character_set_connection={$this->configs['encoding']}" );
-			$this->driver->query ( "SET character_set_results={$this->configs['encoding']}" );
+			if ($this->getType() == self::MYSQL) {
+                $this->driver->exec ('SET NAMES '.$this->configs['encoding']);
+                $this->driver->query ( "SET character_set_client={$this->configs['encoding']}" );
+                $this->driver->query ( "SET character_set_connection={$this->configs['encoding']}" );
+                $this->driver->query ( "SET character_set_results={$this->configs['encoding']}" );
+            }
 		} catch (\PDOException $ex) {
 			throw $ex;
 		}
 	}
-	
+
+	public function getDsn() {
+	    if ($this->getType() == self::SQLSRV) {
+	        return sprintf('sqlsrv:server=%s;Database=%s',
+                $this->configs['host'],
+                $this->configs['database']
+            );
+        }
+        return sprintf('%s:host=%s;port=%s;dbname=%s',
+            $this->getType(),
+            $this->configs['host'],
+            $this->configs['port'],
+            $this->configs['database']
+        );
+    }
+
+    /**
+     * 获取连接数据库的类型
+     * @return string
+     */
+	public function getType() {
+	    if (!array_key_exists('type', $this->configs)
+            || empty($this->configs['type'])) {
+	        return self::MYSQL;
+        }
+        return strtolower($this->configs['type']);
+    }
 	
 	/**
 	 * 获取最后修改的id

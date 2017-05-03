@@ -144,7 +144,7 @@ class Command extends ConfigObject {
         }
         $prefix = $this->getEngine()->getConfig('prefix');
         if (empty($prefix)) {
-            return '`'.$table;
+            return '`'.$table.'`';
         }
         return '`'.$prefix.StringExpand::firstReplace($table, $prefix).'`';
     }

@@ -21,6 +21,7 @@ abstract class BaseEngine extends ConfigObject {
 	
 	
 	protected $configs = array(
+	    'type'     => 'mysql',                //数据库类型
 		'host'     => 'localhost',                //服务器
 		'port'     => '3306',						//端口
 		'database' => 'test',				//数据库
