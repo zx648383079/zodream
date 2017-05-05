@@ -192,8 +192,7 @@ class Tree {
 	 * @param array $items
 	 * @return array
 	 */
-	public function getTree($items)
-	{
+	public function getTree($items) {
 	
 		$tree     = array(); //格式化好的树
 	
@@ -202,8 +201,6 @@ class Tree {
 		foreach ($items as $value) {
 			$newItems[$value['id']] = $value;
 		}
-	
-	
 		foreach ($newItems as $key => $item) {
 			if (isset($newItems[$item['pid']])) {
 				$newItems[$item['pid']]['son'][] = &$newItems[$key];
