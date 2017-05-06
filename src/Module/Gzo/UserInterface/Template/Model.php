@@ -11,6 +11,7 @@ namespace Domain\Model\<?=$module?>;
 use Domain\Model\Model;
 /**
  * Class <?=$name.APP_MODEL?>
+
 <?php foreach ($property as $key => $item):?>
  * @property <?=$item?> $<?=$key?>
 
