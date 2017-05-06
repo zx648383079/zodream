@@ -2,6 +2,7 @@
 defined('APP_DIR') or exit();
 echo '<?php';
 ?>
+
 /**
 * 配置文件模板
 * 

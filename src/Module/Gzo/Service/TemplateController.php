@@ -36,7 +36,7 @@ class TemplateController extends Controller {
         return $this->ajaxSuccess();
     }
 
-    public function configAction($name, $data) {
+    public function confAction($name, $data) {
         Factory::root()->addDirectory('Service')
             ->addDirectory('config')
             ->addFile($name.'.php', $this->makeConfig($data));
@@ -63,7 +63,7 @@ class TemplateController extends Controller {
     public function moduleAction($module, $table) {
         $root = Factory::root()->addDirectory('Module')
             ->addDirectory($module);
-        $root->addFile('Module.php', $this->renderHtml('Module.php', [
+        $root->addFile('Module.php', $this->renderHtml('Module', [
             'module' => $module
         ]));
         $modelRoot = $root->addDirectory('Domain')
@@ -102,8 +102,8 @@ class TemplateController extends Controller {
     protected function createView(Directory $root, $name, array $columns) {
         if (!$root->hasDirectory('layout')) {
             $root->addDirectory('layout')
-                ->addFile('header.php', $this->renderHtml('header.php'))
-                ->getDirectory()->addFile('footer.php', $this->renderHtml('footer.php'));
+                ->addFile('header.php', $this->renderHtml('header'))
+                ->getDirectory()->addFile('footer.php', $this->renderHtml('footer'));
         }
         $root = $root->addDirectory($name);
         $root->addFile('index.php', $this->viewIndex($name, $columns));
@@ -203,7 +203,7 @@ class TemplateController extends Controller {
     protected function viewEdit($name, array $columns) {
         $data = [];
         foreach ($columns as $value) {
-            $data = $this->_viewForm($value);
+            $data[] = $this->_viewForm($value);
         }
         return $this->renderHtml('add', array(
             'data'   => $data,

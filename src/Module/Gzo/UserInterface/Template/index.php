@@ -2,6 +2,7 @@
 defined('APP_DIR') or exit();
 echo '<?php';
 ?>
+
 defined('APP_DIR') or exit();
 use Zodream\Infrastructure\Html;
 use Zodream\Domain\Html\Bootstrap\TableWidget;
@@ -16,7 +17,7 @@ $this->extend('layout/header');
 	</div>
 </div>
 
-<?='<?='?>\Zodream\Domain\Html\Bootstrap\TableWidget::show([
+<?='<?='?>TableWidget::show([
     'page' => $page,
     'columns' => [
 <?php foreach ($data as $key => $item):?>

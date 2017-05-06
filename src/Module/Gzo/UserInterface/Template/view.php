@@ -11,6 +11,7 @@ $converters = [
 ];
 echo '<?php';
 ?>
+
 defined('APP_DIR') or exit();
 use Zodream\Domain\Html\Bootstrap\DetailWidget;
 /** @var $this \Zodream\Domain\View\View */
@@ -27,9 +28,9 @@ $this->extend('layout/header');
         <?='<?='?>DetailWidget::show([
                 'data' => $model,
 				'items' => [
-            <?php foreach ($data as $item):?>
+<?php foreach ($data as $item):?>
                 '<?=$item?>' => '<?=ucwords(str_replace('_', ' ', $item)).(in_array($item, $converters) ? ':'.$converters[$item] : '')?>',
-            <?php endforeach;?>
+<?php endforeach;?>
             ]
 		])?>
 	</div>

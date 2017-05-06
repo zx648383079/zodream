@@ -2,6 +2,7 @@
 defined('APP_DIR') or exit();
 echo '<?php';
 ?>
+
 <?php if (isset($is_module) && $is_module):?>
 namespace Module\<?=$module?>\Domain\Model;
 <?php else:?>
@@ -12,6 +13,7 @@ use Domain\Model\Model;
  * Class <?=$name.APP_MODEL?>
 <?php foreach ($property as $key => $item):?>
  * @property <?=$item?> $<?=$key?>
+
 <?php endforeach;?>
  */
 class <?=$name.APP_MODEL?> extends Model {
@@ -21,25 +23,25 @@ class <?=$name.APP_MODEL?> extends Model {
 
 <?php if (isset($pk) && !empty($pk)):?>
 	protected $primaryKey = [
-    <?php foreach ($pk as $item):?>
+<?php foreach ($pk as $item):?>
         '<?=$item?>',
-    <?php endforeach;?>
+<?php endforeach;?>
     ];
 <?php endif;?>
 
 	protected function rules() {
 		return [
-    <?php foreach ($rules as $key => $item):?>
+<?php foreach ($rules as $key => $item):?>
             '<?=$key?>' => '<?=$item?>',
-    <?php endforeach;?>
+<?php endforeach;?>
         ];
 	}
 
 	protected function labels() {
 		return [
-        <?php foreach ($labels as $key => $item):?>
+<?php foreach ($labels as $key => $item):?>
             '<?=$key?>' => '<?=$item?>',
-        <?php endforeach;?>
+<?php endforeach;?>
         ];
 	}
 

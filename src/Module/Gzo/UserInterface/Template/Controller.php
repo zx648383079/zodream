@@ -2,6 +2,7 @@
 defined('APP_DIR') or exit();
 echo '<?php';
 ?>
+
 <?php if (isset($is_module) && $is_module):?>
 namespace Module\<?=$module?>\Service;
 
