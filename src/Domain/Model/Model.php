@@ -7,33 +7,31 @@ namespace Zodream\Domain\Model;
  */
 use Zodream\Domain\Filter\ModelFilter;
 use Zodream\Domain\Html\Page;
+use Zodream\Domain\Model\Concerns\AutoModel;
+use Zodream\Domain\Model\Concerns\HasAttributes;
+use Zodream\Domain\Model\Concerns\HasRelation;
 use Zodream\Infrastructure\Database\Query\Record;
-use Zodream\Infrastructure\Event\Action;
 use Zodream\Infrastructure\Base\MagicObject;
-use Zodream\Infrastructure\Http\Request;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\ErrorTrait;
+use Zodream\Infrastructure\Traits\EventTrait;
 
 abstract class Model extends MagicObject {
 
     use ErrorTrait;
+    use AutoModel;
+    use EventTrait;
+    use HasRelation;
+    use HasAttributes;
 
-	const BEFORE_SAVE = 'before save';
-	const AFTER_SAVE = 'after save';
-	const BEFORE_INSERT = 'before insert';
-	const AFTER_INSERT = 'after insert';
-	const BEFORE_UPDATE = 'before update';
-	const AFTER_UPDATE = 'after update';
-	
-	public $isNewRecord = true;
-	
-	protected $_oldData = [];
+    const BEFORE_SAVE = 'before save';
+    const AFTER_SAVE = 'after save';
+    const BEFORE_INSERT = 'before insert';
+    const AFTER_INSERT = 'after insert';
+    const BEFORE_UPDATE = 'before update';
+    const AFTER_UPDATE = 'after update';
 
-    /**
-     * GET RELATION
-     * @var array
-     */
-	protected $relations = [];
+    public $isNewRecord = true;
+
 
 	/**
 	 * 过滤规则
@@ -48,14 +46,6 @@ abstract class Model extends MagicObject {
 	 * @return array
 	 */
 	protected function labels() {
-		return [];
-	}
-
-	/**
-	 * 行为
-	 * @return array
-	 */
-	protected function behaviors() {
 		return [];
 	}
 
@@ -79,96 +69,12 @@ abstract class Model extends MagicObject {
 		'id'
 	];
 
-	protected $hidden = []; //隐藏
-
-	protected $visible = [];  //显示
-
-    protected $append = []; //追加
-
 	public function __construct() {
 		$this->init();
 	}
 	
 	public function init() {
 		
-	}
-
-    /**
-     * 转载数据
-     * @param null $data
-     * @param null $key
-     * @return bool
-     */
-	public function load($data = null, $key = null) {
-		if (is_string($data)) {
-			$key = $data;
-            $data = null;
-		}
-		if (Request::isPost()) {
-			$data = Request::post($key);
-		}
-		if (empty($data)) {
-			return false;
-		}
-		$this->set($data);
-		return true;
-	}
-
-	public function set($key, $value = null){
-		if (empty($key)) {
-			return $this;
-		}
-		$this->setOldData();
-		if (!is_array($key)) {
-			$key = [$key => $value];
-		}
-		foreach ($key as $k => $item) {
-			if (property_exists($this, $k)) {
-				$this->$k = $item;
-				continue;
-			}
-			$this->_data[$k] = $item;
-		}
-		return $this;
-	}
-	
-	protected function setOldData() {
-		if ($this->isNewRecord || !empty($this->_oldData)) {
-			return;
-		}
-		$this->_oldData = $this->_data;
-	}
-
-	public function get($key = null, $default = null){
-		if (is_null($key)) {
-			return $this->_data;
-		}
-		if ($this->has($key)) {
-			return $this->_data[$key];
-		}
-		$method = 'get'. StringExpand::studly($key);
-		if (!method_exists($this, $method)) {
-            return $default;
-        }
-		$result = call_user_func([$this, $method]);
-		$this->_data[$key] = $result;
-		return $result;
-	}
-
-	/**
-	 * @param string|array $key
-	 * @return bool
-	 */
-	public function has($key = null) {
-		if (!is_array($key)) {
-			return parent::has($key);
-		}
-		foreach ($key as $item) {
-			if (array_key_exists($item, $this->_data)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -184,30 +90,14 @@ abstract class Model extends MagicObject {
 	}
 
 	public function save() {
-		$this->runBehavior(self::BEFORE_SAVE);
+		$this->invoke(self::BEFORE_SAVE, [$this]);
 		if ($this->isNewRecord) {
 			$row = $this->insert();
 		} else {
 			$row = $this->update();
 		}
-		$this->runBehavior(self::BEFORE_SAVE);
+		$this->invoke(self::BEFORE_SAVE, [$this]);
 		return $row;
-	}
-
-	protected function runBehavior($key) {
-		if (empty($key)) {
-			return;
-		}
-		$behaviors = $this->behaviors();
-		if (!array_key_exists($key, $behaviors)) {
-			return;
-		}
-		if (!is_array($behaviors[$key])) {
-			$behaviors[$key] = [$behaviors[$key]];
-		}
-		foreach ($behaviors[$key] as $item) {
-			(new Action($item))->run($this);
-		}
 	}
 
 	/**
@@ -241,74 +131,6 @@ abstract class Model extends MagicObject {
 		return $data;
 	}
 
-	/**
-	 * @param string $table
-	 * @param string $link $table.$link
-	 * @param string $key $this.$key
-	 * @return array|Model
-	 */
-	public function hasOne($table, $link, $key = null) {
-        if ($table instanceof Model) {
-            $table = $table->className();
-        }
-        if (!array_key_exists($table, $this->relations)) {
-            $this->setRelation($table, $this->getRelationQuery($table)
-                ->where($this->getRelationWhere($link, $key))
-                ->one());
-        }
-        return $this->getRelation($table);
-	}
-
-    /**
-     * GET RELATION WHERE SQL
-     * @param string|array $links
-     * @param string $key
-     * @return array
-     */
-	protected function getRelationWhere($links, $key = null) {
-        if (is_null($key) && !is_array($links)) {
-            $key = in_array('id', $this->primaryKey) ? 'id' : current($this->primaryKey);
-        }
-	    if (!is_array($links)) {
-	        $links = [$links => $key];
-        }
-        foreach ($links as &$item) {
-            $item = $this->get($item);
-        }
-        return $links;
-    }
-
-    /**
-     * GET RELATION QUERY
-     * @param static $table
-     * @return Query
-     */
-    protected function getRelationQuery($table) {
-	    $query = new Query();
-	    if (class_exists($table)) {
-	        return $query->setModelName($table)
-                ->from(call_user_func($table.'::tableName'));
-        }
-	    return $query->from($table);
-    }
-
-	/**
-	 * @param string $table
-	 * @param string $link $table.$link
-	 * @param string $key $this.$key
-	 * @return array|Model[]
-	 */
-	public function hasMany($table, $link, $key = 'id') {
-	    if ($table instanceof Model) {
-	        $table = $table->className();
-        }
-        if (!array_key_exists($table, $this->relations)) {
-            $this->setRelation($table, $this->getRelationQuery($table)
-                ->where($this->getRelationWhere($link, $key))
-                ->all());
-        }
-        return $this->getRelation($table);
-	}
 
     /**
      * @return bool|int
@@ -317,12 +139,12 @@ abstract class Model extends MagicObject {
 		if (!$this->validate()) {
 			return false;
 		}
-		$this->runBehavior(self::BEFORE_INSERT);
+		$this->invoke(self::BEFORE_INSERT, [$this]);
 		$row = $this->add($this->getValues());
 		if (!empty($row)) {
 			$this->set('id', $row);
 		}
-		$this->runBehavior(self::AFTER_INSERT);
+		$this->invoke(self::AFTER_INSERT, [$this]);
 		return $row;
 	}
 
@@ -331,23 +153,6 @@ abstract class Model extends MagicObject {
      */
 	public static function record() {
 		return (new Record())->setTable(static::tableName());
-	}
-
-	/**
-	 * 新增记录
-	 *
-	 * @access public
-	 *
-	 * @param array $addData 需要添加的集合
-	 * @return int 返回最后插入的ID,
-	 */
-	public function add(array $addData) {
-		return $this->record()->set($addData)->insert();
-	}
-
-	public static function batchInsert(array $columns, array $values = null) {
-		return static::record()
-			->batchInsert($columns, $values);
 	}
 
 	/**
@@ -399,61 +204,13 @@ abstract class Model extends MagicObject {
 		if (!$this->validate()) {
 			return false;
 		}
-		$this->runBehavior(self::BEFORE_UPDATE);
+		$this->invoke(self::BEFORE_UPDATE, [$this]);
 		$row = $this->record()
             ->set($this->getUpdateData())
             ->whereMany($where)
 			->update();
-		$this->runBehavior(self::AFTER_UPDATE);
+		$this->invoke(self::AFTER_UPDATE, [$this]);
 		return $row;
-	}
-
-	/**
-	 * 设置bool值
-	 *
-	 * @param string $filed
-	 * @param string $where
-	 * @return int
-	 */
-	public function updateBool($filed, $where) {
-		return $this->record()
-			->set(null, "{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END")
-			->whereMany($where)->update();
-	}
-
-	/**
-	 * int加减
-	 *
-	 * @param string|string $filed
-	 * @param string $where
-	 * @param integer $num
-	 * @return int
-	 */
-	public function updateOne($filed, $where, $num = 1) {
-		$sql = array();
-		foreach ((array)$filed as $key => $item) {
-			if (is_numeric($key)) {
-				$sql[] = "`$item` = `$item` ".$this->getNumber($num);
-			} else {
-				$sql[] = "`$key` = `$key` ".$item;
-			}
-		}
-		return $this->record()
-			->set($sql)
-			->whereMany($where)
-			->update();
-	}
-
-	/**
-	 * 获取加或减
-	 * @param string|int $num
-	 * @return string
-	 */
-	protected function getNumber($num) {
-		if ($num >= 0) {
-			$num = '+'.$num;
-		}
-		return $num;
 	}
 
 	/**
@@ -603,132 +360,4 @@ abstract class Model extends MagicObject {
 			->count($field)->limit(1)->scalar();
 	}
 
-    /**
-     * Get a specified relationship.
-     *
-     * @param  string  $relation
-     * @return mixed
-     */
-    public function getRelation($relation) {
-        return $this->relations[$relation];
-    }
-
-    /**
-     * Set the specific relationship in the model.
-     *
-     * @param  string  $relation
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function setRelation($relation, $value) {
-        $this->relations[$relation] = $value;
-        return $this;
-    }
-
-
-    /**
-     * Get the hidden attributes for the model.
-     *
-     * @return array
-     */
-    public function getHidden() {
-        return $this->hidden;
-    }
-
-    /**
-     * Set the hidden attributes for the model.
-     *
-     * @param  array  $hidden
-     * @return $this
-     */
-    public function setHidden(array $hidden){
-        $this->hidden = $hidden;
-
-        return $this;
-    }
-
-    /**
-     * Add hidden attributes for the model.
-     *
-     * @param  array|string|null  $attributes
-     * @return void
-     */
-    public function addHidden($attributes = null) {
-        $this->hidden = array_merge(
-            $this->hidden, is_array($attributes) ? $attributes : func_get_args()
-        );
-    }
-
-    /**
-     * Get the visible attributes for the model.
-     *
-     * @return array
-     */
-    public function getVisible() {
-        return $this->visible;
-    }
-
-    /**
-     * Set the visible attributes for the model.
-     *
-     * @param  array  $visible
-     * @return $this
-     */
-    public function setVisible(array $visible){
-        $this->visible = $visible;
-        return $this;
-    }
-
-    /**
-     * Add visible attributes for the model.
-     *
-     * @param  array|string|null  $attributes
-     * @return void
-     */
-    public function addVisible($attributes = null) {
-        $this->visible = array_merge(
-            $this->visible, is_array($attributes) ? $attributes : func_get_args()
-        );
-    }
-
-    /**
-     * Make the given, typically hidden, attributes visible.
-     *
-     * @param  array|string  $attributes
-     * @return $this
-     */
-    public function makeVisible($attributes) {
-        $this->hidden = array_diff($this->hidden, (array) $attributes);
-        if (! empty($this->visible)) {
-            $this->addVisible($attributes);
-        }
-        return $this;
-    }
-
-    /**
-     * Make the given, typically visible, attributes hidden.
-     *
-     * @param  array|string  $attributes
-     * @return $this
-     */
-    public function makeHidden($attributes) {
-        $attributes = (array) $attributes;
-        $this->visible = array_diff($this->visible, $attributes);
-        $this->hidden = array_unique(array_merge($this->hidden, $attributes));
-        return $this;
-    }
-
-    protected function getArrayAbleItems(array $values) {
-        if (count($this->getVisible()) > 0) {
-            $values = array_intersect_key($values, array_flip($this->getVisible()));
-        }
-        if (count($this->getHidden()) > 0) {
-            $values = array_diff_key($values, array_flip($this->getHidden()));
-        }
-        return $values;
-    }
-
-    public function toArray() {
-        return $this->getArrayAbleItems($this->get());
-    }
 }

@@ -88,7 +88,7 @@ class MagicObject extends ZObject implements ArrayAccess, JsonAble, IteratorAggr
 	 * 删除键 目前只支持一维
 	 * @param string $tag
 	 */
-	public function delete($tag) {
+	public function del($tag) {
 		foreach (func_get_args() as $value) {
 			unset($this->_data[$value]);
 		}
@@ -134,7 +134,7 @@ class MagicObject extends ZObject implements ArrayAccess, JsonAble, IteratorAggr
 	}
 
 	public function offsetUnset($offset) {
-		$this->delete($offset);
+		$this->del($offset);
 	}
 
 	/**

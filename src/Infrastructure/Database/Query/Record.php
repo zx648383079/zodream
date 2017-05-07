@@ -140,6 +140,50 @@ class Record extends BaseQuery  {
     }
 
     /**
+     * 设置bool值
+     *
+     * @param string $filed
+     * @return int
+     */
+    public function updateBool($filed) {
+        $this->_data[] = "{$filed} = CASE WHEN {$filed} = 1 THEN 0 ELSE 1 END";
+        return $this->update();
+    }
+
+    /**
+     * int加减
+     *
+     * @param string|string $filed
+     * @param integer $num
+     * @return int
+     */
+    public function updateOne($filed, $num = 1) {
+        $sql = array();
+        foreach ((array)$filed as $key => $item) {
+            if (is_numeric($key)) {
+                $sql[] = "`$item` = `$item` ".$this->_getNumber($num);
+            } else {
+                $sql[] = "`$key` = `$key` ".$item;
+            }
+        }
+        return $this->record()
+            ->set($sql)
+            ->update();
+    }
+
+    /**
+     * 获取加或减
+     * @param string|int $num
+     * @return string
+     */
+    private function _getNumber($num) {
+        if ($num >= 0) {
+            $num = '+'.$num;
+        }
+        return $num;
+    }
+
+    /**
      * INSERT OR REPLACE
      * @return mixed
      */
@@ -152,13 +196,9 @@ class Record extends BaseQuery  {
 
     /**
      * DELETE RECORD
-     * @param null $tag
      * @return mixed
      */
-    public function delete($tag = null) {
-        if (func_num_args() > 0) {
-            return call_user_func_array('parent::delete', func_get_args());
-        }
+    public function delete() {
         return $this->command()
             ->delete($this->getWhere().$this->getLimit(), $this->parameters);
     }
