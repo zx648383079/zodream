@@ -1,5 +1,8 @@
 <?php
 namespace Zodream\Domain\ThirdParty\OAuth;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+use Zodream\Service\Factory;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -30,6 +33,18 @@ class WeChat extends BaseOAuth {
                'state'
            )
        ),
+        'webLogin' => [
+            'http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js',
+            [
+                'id' => 'login_container',
+                '#appid',
+                'scope' => 'snsapi_login',
+                '#redirect_uri',
+                '#state',
+                'style' => 'black',
+                'href'
+            ]
+        ],
         'access' => array(
             'https://api.weixin.qq.com/sns/oauth2/access_token',
             array(
@@ -103,5 +118,20 @@ class WeChat extends BaseOAuth {
         $user['identity'] = isset($user['unionid']) ? $user['unionid'] : $user['openid'];
         $this->set($user);
         return $user;
+    }
+
+    public function webLogin(array $args = []) {
+        $state = StringExpand::randomNumber(7);
+        Factory::session()->set('state', $state);
+        $this->set('state', $state);
+        $url = $this->apiMap['webLogin'][0];
+        $data = json_encode($this->getData($this->apiMap['webLogin'][1], $this->merge($args)));
+        return <<<HTML
+<script src="{$url}"></script>
+<script>
+var obj = new WxLogin({$data});
+</script>
+HTML;
+
     }
 }

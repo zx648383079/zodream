@@ -44,6 +44,15 @@ class MagicObject extends ZObject implements ArrayAccess, JsonAble, IteratorAggr
 		return $result;
 	}
 
+    /**
+     * 合并数组并返回新数组
+     * @param array $data
+     * @return array
+     */
+	public function merge(array $data) {
+	    return array_merge($this->_data, $data);
+    }
+
 	/**
 	 * 如果$key不存在则继续寻找下一个,默认是作为key寻找，支持 @值
 	 * @param $key
