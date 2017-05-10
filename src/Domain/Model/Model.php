@@ -5,11 +5,11 @@ namespace Zodream\Domain\Model;
  *
  * @author Jason
  */
-use Zodream\Domain\Filter\ModelFilter;
 use Zodream\Domain\Html\Page;
 use Zodream\Domain\Model\Concerns\AutoModel;
 use Zodream\Domain\Model\Concerns\HasAttributes;
 use Zodream\Domain\Model\Concerns\HasRelation;
+use Zodream\Domain\Model\Concerns\ValidateData;
 use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Traits\ErrorTrait;
@@ -17,11 +17,7 @@ use Zodream\Infrastructure\Traits\EventTrait;
 
 abstract class Model extends MagicObject {
 
-    use ErrorTrait;
-    use AutoModel;
-    use EventTrait;
-    use HasRelation;
-    use HasAttributes;
+    use ErrorTrait, AutoModel, EventTrait, HasRelation, HasAttributes, ValidateData;
 
     const BEFORE_SAVE = 'before save';
     const AFTER_SAVE = 'after save';
@@ -33,13 +29,7 @@ abstract class Model extends MagicObject {
     public $isNewRecord = true;
 
 
-	/**
-	 * 过滤规则
-	 * @return array
-	 */
-	protected function rules() {
-		return [];
-	}
+
 
 	/**
 	 * 标签
@@ -100,18 +90,7 @@ abstract class Model extends MagicObject {
 		return $row;
 	}
 
-	/**
-	 * 验证
-	 * @param array $rules
-	 * @return bool
-	 */
-	public function validate($rules = array()) {
-		if (empty($rules)) {
-			$rules = $this->rules();
-		}
-		$result = ModelFilter::validate($this, $rules);
-		return $result && empty($this->errors);
-	}
+
 
 	/**
 	 * @param bool $all 是否包含主键唯一等字段的值
@@ -140,7 +119,9 @@ abstract class Model extends MagicObject {
 			return false;
 		}
 		$this->invoke(self::BEFORE_INSERT, [$this]);
-		$row = $this->add($this->getValues());
+		$row = static::record()
+            ->set($this->getValues())
+            ->insert();
 		if (!empty($row)) {
 			$this->set('id', $row);
 		}
@@ -359,5 +340,4 @@ abstract class Model extends MagicObject {
 			->addParam($parameters)
 			->count($field)->limit(1)->scalar();
 	}
-
 }

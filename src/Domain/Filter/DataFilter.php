@@ -27,6 +27,10 @@ class DataFilter {
     );
 
     protected static $error = array();
+
+    public static function clearError() {
+        static::$error = [];
+    }
     /**
      * GET ERRORS WHO VALIDATE FAIL
      * @param string $key
@@ -77,14 +81,18 @@ class DataFilter {
      *      a => int|string,
      *      b => string
      * ]
-     * 4. [
-     *      a => 233,
-     *      b => gg
-     * ], a,int:|string;b,string
-     * @return array|bool
+     * @return array
      */
     public static function filter($args, $option) {
-        return self::runFilterOrValidate($args, $option, false);
+        $args = (array)$args;
+        static::clearError();
+        foreach ((array)$option as $key => $rule) {
+            if (is_integer($key) && is_array($rule)) {
+                $key = array_shift($rule);
+            }
+            $args = static::filterOne($args, $key, static::getFilters($rule));
+        }
+        return $args;
     }
     /**
      * 验证
@@ -93,84 +101,55 @@ class DataFilter {
      * @return bool
      */
     public static function validate($args, $option) {
-        return self::runFilterOrValidate($args, $option, true);
+        $args = (array)$args;
+        static::clearError();
+        $result = true;
+        foreach ((array)$option as $key => $rule) {
+            if (is_integer($key) && is_array($rule)) {
+                $key = array_shift($rule);
+            }
+            $result = $result && static::validateOne($args, $key, static::getFilters($rule));
+        }
+        return true;
     }
 
-    protected static function runFilterOrValidate($args, $option, $isValidate = true) {
-        $args = (array)$args;
-        $option = (array)$option;
-        self::$error = array();
-        $filters = self::getFilters($option);
-        if ($isValidate) {
-            return self::runValidate($filters, $args);
-        }
-        return self::runFilter($filters, $args);
-    }
     /**
-     * @param array $filters
      * @param array $args
-     * @return array
-     */
-    protected static function runFilter(array $filters, array $args) {
-        $results = array();
-        foreach ($filters as $key => $value) {
-            $result = isset($args[$key]) ? $args[$key] : null;
-            foreach ($value as $val) {
-                /**	@param FilterObject $val */
-                $result = $val->filter($result, $args);
-            }
-            $results[$key] = $result;
-        }
-        return $results;
-    }
-    /**
-     * @param array $filters
-     * @param array $args
+     * @param array|string $keys
+     * @param FilterObject[] $filters
      * @return bool
      */
-    protected static function runValidate(array $filters, array $args) {
-        $results = array();
-        foreach ($filters as $key => $value) {
-            $result = true;
-            foreach ($value as $val) {
-                /** @param FilterObject $val  */
+    public static function filterOne($args, $keys, array $filters) {
+        foreach ((array)$keys as $key) {
+            foreach ($filters as $val) {
+                if (array_key_exists($key, $args)) {
+                    $args[$key] = $val->filter($args[$key]);
+                }
+            }
+        }
+        return $args;
+    }
+
+    /**
+     * @param array $args
+     * @param array|string $keys
+     * @param FilterObject[] $filters
+     * @return bool
+     */
+    public static function validateOne($args, $keys, array $filters) {
+        $result = true;
+        foreach ((array)$keys as $key) {
+            foreach ($filters as $val) {
                 if (!$val->validate(isset($args[$key]) ? $args[$key] : null, $args)) {
-                    self::setError($key, $val->getError());
+                    static::setError($key, $val->getError());
                     $result = false;
                 }
             }
-            $results[$key] = $result;
         }
-        return !in_array(false, $results);
+        return $result;
     }
 
-    protected static function getFilters($options) {
-        if (is_string($options)) {
-            $options = self::splitKeyAndFilters($options);
-        }
-        $filters = array();
-        foreach ($options as $key => $value) {
-            $filter = self::getFiltersFromOne($value);
-            if (!empty($filter)) {
-                $filters[$key] = $filter;
-            }
-        }
-        return $filters;
-    }
 
-    protected static function splitKeyAndFilters($option) {
-        $options = explode(';', $option);
-        $results = array();
-        foreach ($options as $key => $value) {
-            $temp = explode(',', $value, 2);
-            if (count($temp) == 1) {
-                $results[$key] = $value;
-            } else {
-                $results[$temp[0]] = $temp[1];
-            }
-        }
-        return $results;
-    }
     protected static function getFiltersFromOne($option) {
         if (is_string($option)) {
             $option = explode('|', $option);
@@ -184,17 +163,48 @@ class DataFilter {
         }
         return $filters;
     }
+
     /**
      * @param string $arg
      * @return FilterObject
+     * @throws \ErrorException
      */
     public static function createFilter($arg) {
         list($filter, $option) = StringExpand::explode($arg, ':', 2);
         $filter = strtolower($filter);
-        if (in_array($filter, self::$filterMap)) {
+        if (in_array($filter, static::$filterMap)) {
             $class = 'Zodream\\Domain\\Filter\\Filters\\'.ucfirst($filter).'Filter';
             return new $class($option);
         }
-        return null;
+        throw new \ErrorException(sprintf(' %s is error filter', $filter));
+    }
+
+    /**
+     * @param string $arg
+     * @return FilterObject|string
+     */
+    protected static function getFilter($arg) {
+        $message = null;
+        $arg = (array)$arg;
+        if (array_key_exists('message', $arg)) {
+            $message = $arg['message'];
+        }
+        $filter = static::createFilter($arg[0]);
+        if (empty($filter)) {
+            return $arg[0];
+        }
+        $filter->setError($message);
+        return $filter;
+    }
+
+    /**
+     * @param array|string $arg
+     * @return array
+     */
+    public static function getFilters($arg) {
+        if (is_array($arg)) {
+            return [static::getFilter($arg)];
+        }
+        return self::getFiltersFromOne($arg);
     }
 }

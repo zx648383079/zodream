@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Domain\Model\Concerns;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
+
 /**
  * Created by PhpStorm.
  * User: ZoDream
