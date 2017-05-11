@@ -34,7 +34,8 @@ trait ValidateData {
 
     private function _validateOne($key, $rule) {
         $method = is_array($rule) ? current($rule) : $rule;
-        if (!is_string($method) || !method_exists($this, $method)) {
+        if (!is_callable($method) &&
+            (!is_string($method) || !method_exists($this, $method))) {
             DataFilter::clearError();
             if (DataFilter::validateOne($this, $key, DataFilter::getFilters($rule))) {
                 return true;
@@ -43,8 +44,11 @@ trait ValidateData {
             return false;
         }
         $result = true;
+        if (is_string($method)) {
+            $method = [$this, $method];
+        }
         foreach ((array)$key as $k) {
-            if (false !== call_user_func([$this, $method], $this->get($k))) {
+            if (false !== call_user_func($method, $this->get($k))) {
                 continue;
             }
             $result = false;;

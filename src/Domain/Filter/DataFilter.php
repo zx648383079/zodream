@@ -156,10 +156,11 @@ class DataFilter {
         }
         $filters = array();
         foreach ((array)$option as $value) {
-            $filter = self::createFilter($value);
-            if (!empty($filter)) {
-                $filters[] = $filter;
+            if (empty($value)) {
+                continue;
             }
+            $filter = self::createFilter($value);
+            $filters[] = $filter;
         }
         return $filters;
     }
