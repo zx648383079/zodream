@@ -17,10 +17,16 @@ class Get extends BaseRequest {
         }
         // SET ARGV TO GET PARAM, IF NO '=' , VALUE IS '', YOU CAN USE IS_NULL JUDGE
         $args = Request::server('argv');
+        if (empty($args)) {
+            return;
+        }
+        array_shift($args);
         foreach ($args as $k => $arg) {
-            list($key, $item) = StringExpand::explode($arg, '=', 2, '');
+            list($key, $item) = StringExpand::explode($arg, ':', 2, '');
             $this->_data[$k] = $arg;
-            $this->_data[$key] = $item;
+            if ($arg != $key) {
+                $this->_data[$key] = $item;
+            }
         }
     }
 }

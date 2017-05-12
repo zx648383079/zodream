@@ -14,7 +14,7 @@ class Column {
 
     const AI = 2;
 
-    const DEFAULT = 3;
+    const _DEFAULT_ = 3;
 
     const COMMENT = 4;
 
@@ -197,7 +197,7 @@ class Column {
     }
 
     public function enum(array $args) {
-        return $this->addData(self::DEFAULT, 'ENUM(\''.implode("', '", $args)."')");
+        return $this->addData(self::_DEFAULT_, 'ENUM(\''.implode("', '", $args)."')");
     }
 
 
@@ -205,11 +205,11 @@ class Column {
      * @param $arg
      * @return Column
      */
-    public function default($arg) {
+    public function defaultVal($arg) {
         if (is_string($arg)) {
             $arg = "'{$arg}'";
         }
-        return $this->addData(self::DEFAULT, 'DEFAULT '.$arg);
+        return $this->addData(self::_DEFAULT_, 'DEFAULT '.$arg);
     }
 
     public function comment($arg) {

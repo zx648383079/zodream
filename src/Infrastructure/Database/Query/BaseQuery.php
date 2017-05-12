@@ -185,7 +185,10 @@ abstract class BaseQuery extends BaseSchema  {
         }
         // [[], 'or']
         if (is_array($arg[0])) {
-            $arg[0] = '('.$this->getCondition($arg[0]).')';
+            /** 修改允许通过数组添加条件 by 2017/05/13 */
+            $arg[0] = !is_integer(key($arg[0]))
+                ? $this->getCondition($arg[0])
+                :  ('('.$this->getCondition($arg[0]).')');
         }
         $length = count($arg);
         if ($length == 1) {

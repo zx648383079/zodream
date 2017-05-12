@@ -20,6 +20,8 @@ class Schema {
 
     protected $charset = 'UTF8';
 
+    protected $collationName = 'utf8_general_ci'; // 校对集
+
     public function __construct($schema = null) {
         $this->setSchema($schema);
     }
@@ -46,19 +48,38 @@ class Schema {
         return $this->schema;
     }
 
+    /**
+     * 编码
+     * @param string $charset
+     * @return $this
+     */
     public function setCharset($charset = 'UTF8') {
         $this->charset = $charset;
         return $this;
     }
 
+    /**
+     * 校对集
+     * @param string $collationName
+     * @return $this
+     */
+    public function setCollationName($collationName) {
+        $this->collationName = $collationName;
+        return $this;
+    }
+
     public function create() {
         return $this->command()
-            ->execute('CREATE SCHEMA IF NOT EXISTS `'.$this->schema.'` DEFAULT CHARACTER SET '.$this->charset);
+            ->execute(sprintf('CREATE SCHEMA IF NOT EXISTS `%s` DEFAULT CHARACTER SET %s COLLATE %s',
+                $this->schema,
+                $this->charset, $this->collationName));
     }
 
     public function update() {
         return $this->command()
-            ->execute('ALTER SCHEMA `'.$this->schema.'` DEFAULT COLLATE '.$this->charset);
+            ->execute(sprintf('ALTER SCHEMA `%s`  DEFAULT CHARACTER SET %s  DEFAULT COLLATE %s',
+                $this->schema,
+                $this->charset, $this->collationName));
     }
 
     public function delete() {

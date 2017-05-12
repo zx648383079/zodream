@@ -64,12 +64,24 @@ class Table extends BaseSchema {
         return $this;
     }
 
+    /**
+     * 原始
+     * @return mixed
+     */
     public function getTableName() {
         return $this->tableName;
     }
 
+    /**
+     * 正式表名，添加前缀
+     * @return string
+     */
+    public function getTable() {
+        return $this->addPrefix($this->tableName);
+    }
+
     public function setTableName($table) {
-        $this->tableName = $this->addPrefix($table);
+        $this->tableName = $table;
         return $this;
     }
 
@@ -240,7 +252,7 @@ class Table extends BaseSchema {
      * @return mixed
      */
     public function check() {
-        return $this->command()->execute('CHECK TABLE '.$this->tableName.'');
+        return $this->command()->execute('CHECK TABLE '.$this->getTable().'');
     }
 
     /**
@@ -248,7 +260,7 @@ class Table extends BaseSchema {
      * @return mixed
      */
     public function optimize() {
-        return $this->command()->execute('OPTIMIZE TABLE '.$this->tableName.'');
+        return $this->command()->execute('OPTIMIZE TABLE '.$this->getTable().'');
     }
 
     /**
@@ -256,7 +268,7 @@ class Table extends BaseSchema {
      * @return mixed
      */
     public function repair() {
-        return $this->command()->execute('REPAIR TABLE '.$this->tableName.'');
+        return $this->command()->execute('REPAIR TABLE '.$this->getTable().'');
     }
 
     /**
@@ -264,7 +276,7 @@ class Table extends BaseSchema {
      * @return mixed
      */
     public function analyze() {
-        return $this->command()->execute('ANALYZE TABLE '.$this->tableName.'');
+        return $this->command()->execute('ANALYZE TABLE '.$this->getTable().'');
     }
 
     /**
@@ -273,9 +285,9 @@ class Table extends BaseSchema {
      */
     public function getAllColumn($isFull = false) {
         if ($isFull) {
-            return $this->command()->getArray('SHOW FULL COLUMNS FROM '.$this->tableName);
+            return $this->command()->getArray('SHOW FULL COLUMNS FROM '.$this->getTable());
         }
-        return $this->command()->getArray('SHOW COLUMNS FROM '.$this->tableName);
+        return $this->command()->getArray('SHOW COLUMNS FROM '.$this->getTable());
     }
 
     /**
@@ -283,7 +295,7 @@ class Table extends BaseSchema {
      * @return string
      */
     public function getCreateTableSql() {
-        $data = $this->command()->getArray('SHOW CREATE TABLE '.$this->tableName);
+        $data = $this->command()->getArray('SHOW CREATE TABLE '.$this->getTable());
         if (empty($data)) {
             return null;
         }
@@ -325,7 +337,7 @@ class Table extends BaseSchema {
      * @return string
      */
     public function getTruncateSql() {
-        return "TRUNCATE {$this->tableName};";
+        return sprintf('TRUNCATE %s;', $this->getTable());
     }
 
     /**
@@ -337,7 +349,9 @@ class Table extends BaseSchema {
         foreach ($this->_data as $item) {
             $sql[] = $item->getAlterSql();
         }
-        return "ALTER TABLE {$this->tableName} ".implode(',', $sql).';';
+        return sprintf('ALTER TABLE %s %s;',
+            $this->getTable(),
+            implode(',', $sql));
     }
 
     //DROP COLUMN
@@ -346,14 +360,16 @@ class Table extends BaseSchema {
         foreach ($this->_data as $item) {
             $sql[] = $item->getDropSql();
         }
-        return "ALTER TABLE {$this->tableName} ".implode(',', $sql).';';
+        return sprintf('ALTER TABLE %s %s;',
+            $this->getTable(),
+            implode(',', $sql));
     }
     /**
      * GET DROP TABLE SQL
      * @return string
      */
     public function getDropSql() {
-        return "DROP TABLE IF EXISTS {$this->tableName};";
+        return sprintf('DROP TABLE IF EXISTS %s;', $this->getTable());
     }
 
     /**
@@ -361,7 +377,7 @@ class Table extends BaseSchema {
      * @return string
      */
     public function getSql() {
-        $sql = "CREATE TABLE IF NOT EXISTS {$this->tableName} (";
+        $sql = "CREATE TABLE IF NOT EXISTS {$this->getTable()} (";
         $column = $this->_data;
         if (!empty($this->primaryKey)) {
             $column[] = "PRIMARY KEY (`{$this->primaryKey}`)";
@@ -390,7 +406,7 @@ class Table extends BaseSchema {
             ->from('information_schema.key_column_usage')
             ->where([
                 'CONSTRAINT_SCHEMA' => $this->schema->getSchema(),
-                'TABLE_NAME' => $this->getTableName()
+                'TABLE_NAME' => $this->getTable()
             ])->all();
     }
 
@@ -398,6 +414,6 @@ class Table extends BaseSchema {
      * @return Record
      */
     public function record() {
-        return (new Record())->setTable($this->tableName);
+        return (new Record())->setTable($this->getTable());
     }
 }
