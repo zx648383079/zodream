@@ -20,16 +20,16 @@ abstract class UserModel extends Model implements UserObject {
     }
 
     public function login($user) {
-        $this->runBehavior(static::BEFORE_LOGIN);
+        $this->invoke(static::BEFORE_LOGIN, [$this]);
         Factory::session()->set('user', $user);
-        $this->runBehavior(static::AFTER_LOGIN);
+        $this->invoke(static::AFTER_LOGIN, [$this]);
         return true;
     }
     
     public function logout() {
-        $this->runBehavior(static::BEFORE_LOGOUT);
+        $this->invoke(static::BEFORE_LOGOUT, [$this]);
         Factory::session()->destroy();
-        $this->runBehavior(static::AFTER_LOGOUT);
+        $this->invoke(static::AFTER_LOGOUT, [$this]);
         unset($this);
         return true;
     }

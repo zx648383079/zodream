@@ -215,17 +215,11 @@ abstract class Model extends MagicObject {
 				'where' => $param
 			];
 		}
-		$data = static::find()
+		return static::find()
 			->load($param)
 			->select($field)
 			->addParam($parameters)
 			->one();
-		if (empty($data)) {
-			return false;
-		}
-		$model->set($data);
-		$model->isNewRecord = false;
-		return $model;
 	}
 
 	/**
@@ -302,18 +296,9 @@ abstract class Model extends MagicObject {
                 'where' => $args
             );
         }
-        $page = static::find()
+        return static::find()
             ->addParam($parameters)
             ->load($args)->page($size, $key);
-        $data = [];
-        foreach ($page->getPage() as $item) {
-            $model = new static;
-            $model->set($item);
-            $model->isNewRecord = false;
-            $args[] = $model;
-        }
-        $page->setPage($data);
-        return $page;
     }
 
 

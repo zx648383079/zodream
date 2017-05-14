@@ -43,4 +43,9 @@ class Query extends BaseQuery {
         }
         return $args;
     }
+
+    public function scalar() {
+        $this->asArray();
+        return parent::scalar();
+    }
 }
