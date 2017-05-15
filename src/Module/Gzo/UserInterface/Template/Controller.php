@@ -9,7 +9,7 @@ namespace Module\<?=$module?>\Service;
 use Module\<?=$module?>\Domain\Model\<?=$name.APP_MODEL?>;
 use Module\ModuleController;
 
-class HomeController extends ModuleController {
+class <?=$name.APP_CONTROLLER?> extends ModuleController {
 <?php else:?>
 namespace Service\<?=$module?>;
 

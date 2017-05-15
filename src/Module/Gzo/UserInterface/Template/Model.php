@@ -22,7 +22,7 @@ class <?=$name.APP_MODEL?> extends Model {
         return '<?=$table?>';
     }
 
-<?php if (isset($pk) && !empty($pk)):?>
+<?php if (isset($pk) && !empty($pk) && !(count($pk) == 1 && $pk[0] == 'id')):?>
 	protected $primaryKey = [
 <?php foreach ($pk as $item):?>
         '<?=$item?>',
