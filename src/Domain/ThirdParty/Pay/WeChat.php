@@ -149,7 +149,7 @@ class WeChat extends BasePay {
             ]
         ],
         'qrcode' => [ //生成支付二维码
-            'weixin：//wxpay/bizpayurl',
+            'weixin://wxpay/bizpayurl',
             [
                 '#appid', // 微信分配的公众账号ID
                 '#mch_id',
@@ -174,8 +174,8 @@ class WeChat extends BasePay {
             ]
         ],
         'orderQr' => [  //先生成预支付订单再生成二维码
-            'weixin：//wxpay/bizpayurl',
-            'sr'
+            'weixin://wxpay/bizpayurl',
+            'qr'
         ],
         'jsapi' => [  // 公众号支付 网页端调起支付API
             '',
@@ -439,9 +439,9 @@ class WeChat extends BasePay {
      * @return Image
      */
     public function qrPay(array $arg = array()) {
-        $url = new Uri($this->apiMap['qrcode']);
+        $url = new Uri($this->apiMap['qrcode'][0]);
         $url->setData($this->getSignData('qrcode', $arg));
-        return (new QrCode())->create($url);
+        return (new QrCode())->create((string)$url);
     }
 
     /**
@@ -463,14 +463,19 @@ class WeChat extends BasePay {
     /**
      * 商户后台系统先调用微信支付的统一下单接口，微信后台系统返回链接参数code_url，商户后台系统将code_url值生成二维码图片
      * @param array $args
-     * @return Image|bool
+     * @return bool|Image
+     * @throws \Exception
      */
     public function orderQr(array $args = array()) {
         $data = $this->getOrder($args);
         if ($data === false) {
             return false;
         }
-        return (new QrCode())->create($this->getUrl('orderQr', $data));
+        if (array_key_exists('code_url', $data)) {
+            return (new QrCode())->create($data['code_url']);
+        }
+        throw new \Exception('unkown');
+        //return (new QrCode())->create($this->getUrl('orderQr', $data));
     }
 
     /**
