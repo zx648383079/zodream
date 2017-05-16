@@ -28,6 +28,7 @@ class Tree implements JsonAble {
 
     const NORMAL = 'normal';
     const LINEAR = 'linear';
+    const ID_AS_KEY = 'id as key';
 
     /* 结果集 */
     protected $result = [];
@@ -53,6 +54,14 @@ class Tree implements JsonAble {
      */
     public function makeTree(){
         return $this->_makeTreeCore(0, $this->data, self::NORMAL);
+    }
+
+    /**
+     * 生成以ID 作为键的数组
+     * @return array
+     */
+    public function makeIdTree(){
+        return $this->_makeTreeCore(0, $this->data, self::ID_AS_KEY);
     }
 
     /**
@@ -87,7 +96,7 @@ class Tree implements JsonAble {
      */
     private function _makeTreeCore($index, $data, $type = self::LINEAR) {
         $args = [];
-        foreach($data[$index] as $id=>$item) {
+        foreach($data[$index] as $id => $item) {
             if ($type == self::NORMAL) {
                 if (isset($data[$id])) {
                     $item[$this->config['expanded_key']] = $this->config['expanded'];
@@ -96,6 +105,14 @@ class Tree implements JsonAble {
                     $item[$this->config['leaf_key']] = true;
                 }
                 $args[] = $item;
+            } elseif ($type == self::ID_AS_KEY) {
+                if (isset($data[$id])) {
+                    $item[$this->config['expanded_key']] = $this->config['expanded'];
+                    $item[$this->config['children_key']] = $this->_makeTreeCore($id, $data, $type);
+                } else {
+                    $item[$this->config['leaf_key']] = true;
+                }
+                $args[$id] = $item;
             } elseif ($type == self::LINEAR) {
                 $parent_id = $item[$this->config['parent_key']];
                 $this->level[$id] = $index == 0 ? 0 : $this->level[$parent_id]+1;
