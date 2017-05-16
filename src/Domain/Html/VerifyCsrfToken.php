@@ -7,14 +7,15 @@ use Zodream\Infrastructure\Http\Request;
 
 class VerifyCsrfToken {
 	/**
-	 * 生成Csrf
+	 * 生成 token
 	 * @return string
      */
 	public static function create() {
-		$csrf = StringExpand::random(10);
-		Factory::session()->set('_csrf', $csrf);
-		Factory::view()->set('_csrf', $csrf);
-		return $csrf;
+        $token = StringExpand::random(10);
+		Factory::session()->set('_token', $token);
+		Factory::response()->header->setCookie('XSRF-TOKEN', $token);
+		Factory::view()->set('_token', $token);
+		return $token;
 	}
 
 	/*
@@ -22,17 +23,27 @@ class VerifyCsrfToken {
 	 * @return bool
 	 */
 	public static function verify() {
-		if (self::get() === Request::request('_csrf')) {
+		if (self::get() === static::getTokenFromRequest()) {
 			return true;
 		}
-		throw new \Exception('Csrf验证失败！');
+		throw new \Exception(' token 验证失败！');
 	}
 
+    protected static function getTokenFromRequest() {
+        $token = Request::request('_token') ?: Request::header('X-CSRF-TOKEN');
+
+        if (! $token && $header = Request::header('X-XSRF-TOKEN')) {
+            $token = $header;
+        }
+
+        return $token;
+    }
+
 	/**
-	 * 获取已经生成的Csrf
+	 * 获取已经生成的 token
 	 * @return string
 	 */
 	public static function get() {
-		return Factory::session()->get('_csrf');
+		return Factory::session()->get('_token');
 	}
 }

@@ -92,9 +92,15 @@ class FileCache extends Cache {
      * @return File
      */
 	public function getCacheFile($key) {
-        $this->directory->create();
-		return $this->directory->childFile($key.$this->configs['extension']);
+        $file = $this->directory->childFile($this->path($key));
+        $file->getDirectory()->create();
+		return $file;
 	}
+
+    protected function path($key) {
+        $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
+        return implode('/', $parts).'/'.$hash.$this->configs['extension'];
+    }
 	
 	public function gc($force = false, $expiredOnly = true) {
         if ($force || mt_rand(0, 1000000) < $this->getGC()) {

@@ -9,10 +9,20 @@ class Stream {
     protected $file;
 
     public function __construct($file, $useLocking = false) {
+        $this->useLocking = $useLocking;
+        if (is_resource($file)) {
+            $this->setStream($file);
+            return;
+        }
         if (!$file instanceof File) {
             $file = new File($file);
         }
         $this->file = $file;
+    }
+
+    public function setStream($stream) {
+        $this->stream = $stream;
+        return $this;
     }
 
     public function open($mode = 'a') {
