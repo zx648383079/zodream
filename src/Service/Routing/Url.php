@@ -6,6 +6,7 @@ namespace Zodream\Service\Routing;
  */
 use Zodream\Infrastructure\Http\Component\Uri;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Service\Config;
 
 defined('APP_URL') || define('APP_URL', Url::getRoot());
 class Url {
@@ -21,7 +22,7 @@ class Url {
      */
     public static function getHost() {
         if (empty(self::$_host)) {
-            static::setHost(Request::host());
+            static::setHost(Config::getValue('app.host') ?: Request::host());
         }
         return self::$_host;
     }
@@ -42,7 +43,7 @@ class Url {
      * @param bool $complete
      * @return string|Uri
      */
-	public static function to($file = null, $extra = null, $complete = false) {
+	public static function to($file = null, $extra = null, $complete = true) {
         if (is_string($file) &&
             ($file === '#' || strpos($file, 'javascript:') === 0)) {
             return $file;
