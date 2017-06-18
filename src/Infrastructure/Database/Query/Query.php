@@ -59,7 +59,10 @@ class Query extends BaseQuery {
         return $this;
     }
 
-    public function load(array $args) {
+    public function load($args = []) {
+        if (empty($args)) {
+            return $this;
+        }
         foreach ($args as $key => $item) {
             $tag = strtolower(is_integer($key) ? array_shift($item) : $key);
             if (!in_array($tag, $this->sequence) || empty($item)) {
@@ -76,6 +79,9 @@ class Query extends BaseQuery {
      */
     public function select($field = '*') {
         $this->select = [];
+        if (!is_array($field)) {
+            $field = func_get_args();
+        }
         return $this->andSelect($field);
     }
     

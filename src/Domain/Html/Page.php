@@ -1,20 +1,19 @@
 <?php
 namespace Zodream\Domain\Html;
 
+use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\Database\Query\Query;
 use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Interfaces\ArrayAble;
 use Zodream\Infrastructure\Interfaces\JsonAble;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 
-class Page implements JsonAble, ArrayAble {
+class Page extends MagicObject implements JsonAble, ArrayAble {
 	private $_total = 0;
 
 	private $_index = 1;
 	
 	private $_pageSize = 20;
-	
-	private $_data = array();
 
 	private $_key = 'page';
 

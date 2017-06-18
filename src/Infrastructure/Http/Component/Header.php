@@ -363,6 +363,24 @@ class Header extends ZObject implements IteratorAggregate {
     }
 
     /**
+     * 设置强迫客户端认证 根据后两个参数判断 Basic、 Digest
+     * @param string $realm
+     * @param string $qop
+     * @param string $nonce
+     * @param string $opaque
+     * @return Header
+     */
+    public function setWWWAuthenticate($realm, $qop = 'auth', $nonce = null, $opaque = null) {
+        if (empty($nonce) && empty($opaque)) {
+            $content = sprintf('Basic realm="%s"', $realm);
+        } else {
+            $content = sprintf('Digest realm="%s" qop="%s" nonce="%s" opaque="%s"',
+                $realm, $qop, $nonce, $opaque);
+        }
+        return $this->set('WWW-Authenticate', $content);
+    }
+
+    /**
      * 文件传输编码
      * @param string $encoding
      * @return Header

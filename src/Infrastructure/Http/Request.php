@@ -219,4 +219,12 @@ final class Request {
 		$arg = self::server('HTTP_USER_AGENT', '');
 		return stripos($arg, 'Shockwave') !== false || stripos($arg, 'Flash') !== false;
 	}
+
+    /**
+     * 只能获取基础验证的账号密码
+     * @return array [username, password]
+     */
+	public static function auth() {
+        return self::other('auth');
+    }
 }

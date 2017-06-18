@@ -25,6 +25,39 @@ class Other extends BaseRequest {
     }
 
     /**
+     * 只支持basic
+     * @return array
+     */
+    public function getAuth() {
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
+            return [$_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']];
+        }
+        return [null, null];
+    }
+
+    protected function http_digest_parse($txt) {
+        // protect against missing data
+        $needed_parts = array(
+            'nonce' => 1,
+            'nc' => 1,
+            'cnonce' => 1,
+            'qop' => 1,
+            'username' => 1,
+            'uri'=> 1,
+            'response' => 1);
+        $data = array();
+
+        preg_match_all('@(\w+)=([\'"]?)([a-zA-Z0-9=./\_-]+)\2@', $txt, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $m) {
+            $data[$m[1]] = $m[3];
+            unset($needed_parts[$m[1]]);
+        }
+
+        return $needed_parts ? false : $data;
+    }
+
+    /**
      * 获取提交的方法
      * @return string
      */

@@ -2,6 +2,7 @@
 namespace Zodream\Domain\Model\Concerns;
 
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 /**
  * Created by PhpStorm.
@@ -43,6 +44,11 @@ trait AutoModel {
             $key = [$key => $value];
         }
         foreach ($key as $k => $item) {
+            $method = sprintf('set%sAttribute', StringExpand::studly($k));
+            if (method_exists($this, $method)) {
+                $this->{$method}($item);
+                continue;
+            }
             if (property_exists($this, $k)) {
                 $this->$k = $item;
                 continue;

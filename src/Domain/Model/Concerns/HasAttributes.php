@@ -1,7 +1,7 @@
 <?php
 namespace Zodream\Domain\Model\Concerns;
-use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 /**
  * Created by PhpStorm.
  * User: ZoDream
@@ -23,7 +23,7 @@ trait HasAttributes {
         if ($this->has($key)) {
             return $this->_data[$key];
         }
-        $method = 'get'. StringExpand::studly($key);
+        $method = sprintf('get%sAttribute', StringExpand::studly($key));
         if (!method_exists($this, $method)) {
             return $default;
         }

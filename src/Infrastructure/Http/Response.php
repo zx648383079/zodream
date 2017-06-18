@@ -372,4 +372,29 @@ class Response {
         $this->header->setRedirect($url, $time);
         return $this;
     }
+
+    /**
+     * 基本验证
+     * @return $this
+     */
+    public function sendBasicAuth() {
+        $this->setStatusCode(401);
+        $this->header->setWWWAuthenticate(Config::getValue('app.name'));
+        return $this;
+    }
+
+    /**
+     * 摘要验证
+     * @return $this
+     */
+    public function sendDigestAuth() {
+        $this->setStatusCode(401);
+        $name = Config::getValue('app.name');
+        $this->header->setWWWAuthenticate(
+            $name,
+            'auth',
+            StringExpand::random(6),
+            md5($name));
+        return $this;
+    }
 }

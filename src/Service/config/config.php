@@ -8,6 +8,7 @@ use Zodream\Infrastructure\Http\Request;
  */
 $configs = array(
 	'app'    => array(                           //网站信息
+        'name'       => 'ZoDream',               //应用程序名称
 		'title'      => 'ZoDream',
 		'host'       => 'localhost',        //主目录
 		'model'      => 'Model',                     //后缀
