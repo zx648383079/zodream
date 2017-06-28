@@ -252,4 +252,8 @@ abstract class ThirdParty extends MagicObject {
     public function __call($name, $arg) {
         return $this->getByApi($name, isset($arg[0]) ? $arg[0] : array());
     }
+
+    public static function __callStatic($method, $parameters) {
+        return (new static)->$method(...$parameters);
+    }
 }

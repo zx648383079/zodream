@@ -9,7 +9,7 @@
     - [支付宝支付](#pay-alipay)
 - [第三方短信](#sms)
     - [阿里大于](#sms-alidayu)
-    - [i互亿](#pay-ihuyi)
+    - [i互亿](#sms-ihuyi)
 
 <a name="oauth"></a>
 ## 第三方登录
