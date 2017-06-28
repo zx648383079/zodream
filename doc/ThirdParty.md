@@ -1,5 +1,19 @@
-## 第三方登录
+# 第三方接口目录
 
+- [第三方登录](#oauth)
+    - [QQ](#oauth-qq)
+    - [微信](#oauth-wechat)
+    - [微博](#oauth-weibo)
+- [第三方支付](#pay)
+    - [微信支付](#pay-wechat)
+    - [支付宝支付](#pay-alipay)
+- [第三方短信](#sms)
+    - [阿里大于](#sms-alidayu)
+    - [i互亿](#pay-ihuyi)
+
+<a name="oauth"></a>
+## 第三方登录
+<a name="oauth-qq"></a>
 ### QQ 
 
 配置
@@ -23,6 +37,7 @@ $oauth->callback();
 $oauth->getInfo();
 ```
 
+<a name="oauth-wechat"></a>
 ### 微信
 
 配置
@@ -46,6 +61,7 @@ $oauth->callback();
 $oauth->getInfo();
 ```
 
+<a name="oauth-weibo"></a>
 ### 微博
 
 配置
@@ -69,9 +85,10 @@ $oauth->callback();
 $oauth->getInfo();
 ```
 
-
+<a name="pay"></a>
 ## 支付
 
+<a name="pay-wechat"></a>
 ### 微信APP支付
 
 配置
@@ -118,6 +135,7 @@ if (empty($data)) {
 die($pay->appCallbackReturn()); //成功时输出
 ```
 
+<a name="pay-alipay"></a>
 ### 支付宝APP支付
 
 配置
@@ -150,4 +168,54 @@ $pay->getMobilePayOrder([
 $pay = new AliPay();
 $data = $pay->callback();
 die('success'); //成功时输出
+```
+
+<a name="sms"></a>
+## 第三方短信
+<a name="sms-alidayu"></a>
+### 阿里大于
+
+配置
+```PHP
+'sms' => array(
+    'app_key' => '',
+    'secret' => '',
+)
+```
+
+发送短信
+```PHP
+$sms = new ALiDaYu();
+$sms->send('手机号', '模板id', [模板参数], '签名');
+```
+
+
+<a name="sms-ihuyi"></a>
+### i互亿
+
+配置
+```PHP
+'sms' => array(
+    'account' => '账号',
+    'password' => '密码',
+)
+```
+
+发送验证码
+```PHP
+$sms = new IHuYi();
+$sms->set('template', '{code}'); // 设置验证码模板
+$sms->sendCode('13412341234', '123456');
+```
+
+发送短信
+```PHP
+$sms = new IHuYi();
+$sms->send('13412341234', '');
+```
+
+查询余额
+```PHP
+$sms = new IHuYi();
+$sms->balance();
 ```

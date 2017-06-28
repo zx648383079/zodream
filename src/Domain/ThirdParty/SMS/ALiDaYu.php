@@ -79,10 +79,11 @@ class ALiDaYu extends ThirdParty {
         return $data;
     }
 
-    public function send($templateId, $data, $signName = '阿里大于') {
+    public function send($mobile, $templateId, $data, $signName = '阿里大于') {
         $args = $this->getJson('send', [
             'sms_template_code' => $templateId,
             'sms_free_sign_name' => $signName,
+            'rec_num' => $mobile,
             'sms_param' => is_array($data) ? json_encode($data) : $data
         ]);
         if (array_key_exists('error_response', $args)) {
