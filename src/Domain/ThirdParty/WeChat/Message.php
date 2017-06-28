@@ -105,10 +105,18 @@ class Message extends MagicObject {
         return $this->event;
     }
 
+    /**
+     * 判断是否是事件推送
+     * @return bool
+     */
     public function isEvent() {
         return $this->msgType == 'event';
     }
 
+    /**
+     * 判断是否是消息推送
+     * @return bool
+     */
     public function isMessage() {
         return !$this->isEvent();
     }
@@ -117,10 +125,18 @@ class Message extends MagicObject {
         return $this->xml;
     }
 
+    /**
+     * 来源者
+     * @return string
+     */
     public function getFrom() {
         return $this->get('FromUserName');
     }
 
+    /**
+     * 接收方
+     * @return string
+     */
     public function getTo() {
         return $this->get('ToUserName');
     }
@@ -138,6 +154,20 @@ class Message extends MagicObject {
         return (array)XmlExpand::decode($this->xml, false);
     }
 
+    /**
+     * 当前操作是否是验证
+     * @return bool
+     */
+    public function isValid() {
+        return Request::get()->has('signature')
+            || Request::get()->has('msg_signature');
+    }
+
+    /**
+     * 验证
+     * @param string $str
+     * @return bool
+     */
     protected function checkSignature($str = '') {
         $signature = Request::get('signature');
         $signature = Request::get('msg_signature', $signature); //如果存在加密验证则用加密验证段
@@ -152,6 +182,9 @@ class Message extends MagicObject {
         return $tmpStr == $signature;
     }
 
+    /**
+     * 验证
+     */
     public function valid() {
         $echoStr = Request::get('echostr');
         if (!is_null($echoStr)) {
