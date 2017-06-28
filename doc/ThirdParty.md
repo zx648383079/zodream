@@ -10,6 +10,9 @@
 - [第三方短信](#sms)
     - [阿里大于](#sms-alidayu)
     - [i互亿](#sms-ihuyi)
+- [微信公众号](WeChat.md)
+- [其他](#other)
+    - [搜索](#other-search)
 
 <a name="oauth"></a>
 ## 第三方登录
@@ -198,13 +201,13 @@ $sms->send('手机号', '模板id', [模板参数], '签名');
 'sms' => array(
     'account' => '账号',
     'password' => '密码',
+    'template' => '{code}',   // 设置验证码模板
 )
 ```
 
 发送验证码
 ```PHP
 $sms = new IHuYi();
-$sms->set('template', '{code}'); // 设置验证码模板
 $sms->sendCode('13412341234', '123456');
 ```
 
@@ -218,4 +221,17 @@ $sms->send('13412341234', '');
 ```PHP
 $sms = new IHuYi();
 $sms->balance();
+```
+
+<a name="other"></a>
+## 其他
+
+
+<a name="other-search"></a>
+### 搜索
+
+百度链接提交
+```PHP
+$seach = new Search();
+$seach->putBaiDu(['site' => '', 'token' => '']);
 ```
