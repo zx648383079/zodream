@@ -9,7 +9,9 @@ use Zodream\Infrastructure\Http\Request;
 use Zodream\Service\Config;
 
 defined('APP_URL') || define('APP_URL', Url::getRoot());
+
 class Url {
+
     private static $_host;
 
     public static function setHost($host) {
@@ -22,7 +24,8 @@ class Url {
      */
     public static function getHost() {
         if (empty(self::$_host)) {
-            static::setHost(Config::getValue('app.host') ?: Request::host());
+            // 出现配置循环 bug
+            static::setHost(/*Config::getValue('app.host') ?: */Request::host());
         }
         return self::$_host;
     }
