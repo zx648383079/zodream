@@ -8,7 +8,6 @@ class ImageCompare extends Image {
      * @return bool
      */
 	public function compare(Image $image) {
-
 		$hash1 = $this->getHashValue();
 		$hash2 = $image->getHashValue();
 		if (strlen($hash1) !== strlen($hash2)) {
@@ -16,8 +15,8 @@ class ImageCompare extends Image {
 		}
 		$count = 0;
 		$len = strlen($hash1);
-		for($i = 0; $i < $len; $i++) {
-			if($hash1[$i] !== $hash2[$i]) {
+		for ($i = 0; $i < $len; $i++) {
+			if ($hash1[$i] !== $hash2[$i]) {
 				$count++;
 			}
 		}
