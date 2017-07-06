@@ -2,6 +2,7 @@
 namespace Zodream\Domain\Image;
 
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+
 class Image {
 	
 	protected $allowTypes = array(
