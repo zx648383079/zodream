@@ -49,7 +49,7 @@ abstract class Controller extends BaseController {
 
         $registered_uris = preg_split('/\s+/', $registeredUriString);
         foreach ($registered_uris as $registered_uri) {
-            if (Config::getValue('require_exact_redirect_uri')) {
+            if (Config::get('require_exact_redirect_uri')) {
                 if (strcmp($inputUri, $registered_uri) === 0) {
                     return true;
                 }

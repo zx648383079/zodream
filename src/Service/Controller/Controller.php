@@ -32,10 +32,10 @@ abstract class Controller extends BaseController {
 	function __construct($loader = null) {
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 		if (is_bool($this->canCache)) {
-			$this->canCache = Config::getValue('cache.auto', false);
+			$this->canCache = Config::get('cache.auto', false);
 		}
 		if (is_bool($this->canCSRFValidate)) {
-			$this->canCSRFValidate = Config::getValue('safe.csrf', false);
+			$this->canCSRFValidate = Config::get('safe.csrf', false);
 		}
 	}
 
@@ -152,7 +152,7 @@ abstract class Controller extends BaseController {
             return Auth::guest() ?: $this->redirect('/');
         }
         if ($role === '@') {
-            return $this->checkUser() ?: $this->redirect([Config::getValue('auth.home'), 'ReturnUrl' => Url::to()]);
+            return $this->checkUser() ?: $this->redirect([Config::get('auth.home'), 'ReturnUrl' => Url::to()]);
         }
         if ($role === 'p' || $role === 'post') {
             return Request::isPost() ?: $this->redirectWithMessage('/', '您不能直接访问此页面！', 4,'400');

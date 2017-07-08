@@ -16,3 +16,16 @@
         'password' => '1'            // 密码
     ),
 ```
+
+<a name="setting"></a>
+## 使用
+
+依赖 [PHPMailer](https://github.com/PHPMailer/PHPMailer)
+
+```PHP
+use Zodream\Infrastructure\Mailer\Mailer;
+
+
+Mailer::addAddress('email', 'name')->send('subject', 'body'): bool;
+
+```

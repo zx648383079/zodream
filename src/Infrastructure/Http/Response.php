@@ -100,7 +100,7 @@ class Response {
 
     public function __construct($parameter = null, $statusCode = 200, array $headers = array()) {
         $this->header = new Header();
-        $headers['Content-Security-Policy'] = Config::getValue('safe.csp');
+        $headers['Content-Security-Policy'] = Config::get('safe.csp');
         if (defined('DEBUG') && DEBUG) {
             $headers['Access-Control-Allow-Origin'] = '*'; //ajax 跨域
         }
@@ -379,7 +379,7 @@ class Response {
      */
     public function sendBasicAuth() {
         $this->setStatusCode(401);
-        $this->header->setWWWAuthenticate(Config::getValue('app.name'));
+        $this->header->setWWWAuthenticate(Config::get('app.name'));
         return $this;
     }
 
@@ -389,7 +389,7 @@ class Response {
      */
     public function sendDigestAuth() {
         $this->setStatusCode(401);
-        $name = Config::getValue('app.name');
+        $name = Config::get('app.name');
         $this->header->setWWWAuthenticate(
             $name,
             'auth',

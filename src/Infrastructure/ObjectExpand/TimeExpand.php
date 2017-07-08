@@ -19,7 +19,7 @@ class TimeExpand {
 	 */
 	public static function format($time = null, $format = null) {
 	    if (empty($format)) {
-	        $format = Config::getValue('formatter.datetime');
+	        $format = Config::get('formatter.datetime');
         }
 		if (!is_numeric($time)) {
 			$format = $time;

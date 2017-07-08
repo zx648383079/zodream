@@ -14,6 +14,12 @@
 - [其他](#other)
     - [搜索](#other-search)
 
+
+## 特别说明
+
+    所有错误都通过 throw new \ErrorException();
+    请注意使用 try 捕获
+
 <a name="oauth"></a>
 ## 第三方登录
 <a name="oauth-qq"></a>
@@ -30,8 +36,7 @@
 
 跳转网址
 ```PHP
-$oauth = new QQ();
-$oauth->login();
+$uri = QQ::login();
 ```
 
 回调
@@ -54,8 +59,7 @@ $oauth->getInfo();
 
 跳转网址
 ```PHP
-$oauth = new WeChat();
-$oauth->login()
+$uri = QQ::login();
 ```
 
 回调
@@ -78,8 +82,7 @@ $oauth->getInfo();
 
 跳转网址
 ```PHP
-$oauth = new WeiBo();
-$oauth->login();
+$uri = QQ::login();
 ```
 
 回调
@@ -207,20 +210,17 @@ $sms->send('手机号', '模板id', [模板参数], '签名');
 
 发送验证码
 ```PHP
-$sms = new IHuYi();
-$sms->sendCode('13412341234', '123456');
+IHuYi::sendCode('13412341234', '123456'): bool|ErrorException;
 ```
 
 发送短信
 ```PHP
-$sms = new IHuYi();
-$sms->send('13412341234', '');
+IHuYi::send('13412341234', '');
 ```
 
 查询余额
 ```PHP
-$sms = new IHuYi();
-$sms->balance();
+IHuYi::balance();
 ```
 
 <a name="other"></a>
@@ -232,6 +232,5 @@ $sms->balance();
 
 百度链接提交
 ```PHP
-$seach = new Search();
-$seach->putBaiDu(['site' => '', 'token' => '']);
+Search::putBaiDu(['site' => '', 'token' => '']);
 ```

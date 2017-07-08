@@ -439,7 +439,7 @@ class Image {
 	 */
 	public function saveAs($output = null, $type = null) {
 		$this->setRealType($type);
-		return call_user_func('image'.$this->realType, $this->image, $output);
+		return call_user_func('image'.$this->realType, $this->image, (string)$output);
 	}
 	
 	public function close() {
@@ -461,4 +461,8 @@ class Image {
 	public function __destruct() {
 		$this->close();
 	}
+
+    public static function __callStatic($method, $parameters) {
+        return (new static)->$method(...$parameters);
+    }
 }

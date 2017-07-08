@@ -37,8 +37,8 @@ class Application {
     }
 
     public function send() {
-        date_default_timezone_set(Config::getValue('formatter.timezone', 'Etc/GMT-8'));     //这里设置了时区
-        Url::setHost(Config::getValue('app.host'));
+        date_default_timezone_set(Config::get('formatter.timezone', 'Etc/GMT-8'));     //这里设置了时区
+        Url::setHost(Config::get('app.host'));
         Factory::timer()->begin();
         Autoload::getInstance()
             ->setError()

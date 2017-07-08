@@ -17,7 +17,7 @@ class TwigEngine implements EngineObject {
     protected $compiler;
     
     public function __construct() {
-        $config = Config::getValue('twig', [
+        $config = Config::get('twig', [
             'template' => Factory::root()->childDirectory('UserInterface/'.APP_MODULE),
             'cache' => Factory::root()->childDirectory('cache/template')
         ]);

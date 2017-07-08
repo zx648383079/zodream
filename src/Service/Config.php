@@ -14,7 +14,7 @@ class Config extends BaseConfig {
 	use SingletonPattern;
 
 	private function __construct($args = array()) {
-		$this->reset($args);
+        $this->reset($args);
 	}
 
     /**
@@ -56,28 +56,18 @@ class Config extends BaseConfig {
 	}
 
 	/**
-	 * 静态方法获取
-	 * @param null $key
-	 * @param null $default
-	 * @return array|string
-	 */
-	public static function getValue($key = null, $default = null) {
-		return static::getInstance()
-            ->get($key, $default);
-	}
-
-	public static function setValue($key, $value = null) {
-        return static::getInstance()
-            ->set($key, $value);
-    }
-
-	/**
-	 *
 	 * @param string $method
 	 * @param array $value
 	 * @return mixed
 	 */
 	public static function __callStatic($method, $value) {
+	    if (false === static::getInstance()) {
+	        // 初始化未完成时
+	        return null;
+        }
+	    if (in_array($method, ['get', 'set'])) {
+	        return static::getInstance()->{$method}(...$value);
+        }
 		return static::getInstance()->getMultidimensional($method, $value);
 	}
 }

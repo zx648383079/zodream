@@ -19,8 +19,8 @@ class Mailer extends BaseMailer {
 	 */
 	protected $mail;
 	
-	public function __construct() {
-	    $this->loadConfigs();
+	public function __construct($config = array()) {
+        $this->loadConfigs($config);
 		$this->mail          = new \PHPMailer;
 		$this->mail->CharSet = 'UTF-8';
 		$this->mail->isSMTP();
@@ -174,4 +174,8 @@ class Mailer extends BaseMailer {
 			$this->mail->$name = $value;
 		}
 	}
+
+    public static function __callStatic($method, $parameters) {
+        return (new static)->$method(...$parameters);
+    }
 }

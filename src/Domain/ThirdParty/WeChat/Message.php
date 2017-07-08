@@ -61,7 +61,7 @@ class Message extends MagicObject {
     protected $appId;
 
     public function __construct(array $config = array()) {
-        $config = array_merge(Config::getValue($this->configKey, array(
+        $config = array_merge(Config::get($this->configKey, array(
             'aesKey' => '',
             'appId' => ''
         )), $config);

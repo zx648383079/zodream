@@ -25,7 +25,7 @@ class Url {
     public static function getHost() {
         if (empty(self::$_host)) {
             // 出现配置循环 bug
-            static::setHost(/*Config::getValue('app.host') ?: */Request::host());
+            static::setHost(/*Config::get('app.host') ?: */Request::host());
         }
         return self::$_host;
     }
