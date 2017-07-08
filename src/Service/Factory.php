@@ -40,7 +40,7 @@ class Factory {
      */
     public static function getInstance($key, $default = null) {
         if (!array_key_exists($key, static::$_instance)) {
-            $class = Config::get($key, $default);
+            $class = Config::getInstance()->get($key, $default);
             if (is_array($class)) {
                 $class = $class['driver'] ?: current($class);
             }
@@ -141,7 +141,7 @@ class Factory {
      */
     public static function log() {
         if (!array_key_exists('log', static::$_instance)) {
-            $args = Config::get('log');
+            $args = Config::log();
             $log = new Logger($args['name']);
             $log->pushHandler(new StreamHandler((string)static::root()
                 ->childFile($args['file']),

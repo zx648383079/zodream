@@ -23,7 +23,7 @@ class Router {
 	}
 	
 	protected function load() {
-		$configs = Config::get('route', []);
+		$configs = Config::route([]);
 		$file = array_key_exists('file', $configs) ? $configs['file'] : null;
 		unset($configs['file'], $configs['driver']);
 		foreach ($configs as $key => $item) {

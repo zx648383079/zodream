@@ -12,8 +12,10 @@ use Zodream\Infrastructure\Http\Requests\Get;
 use Zodream\Infrastructure\Http\Requests\Header;
 use Zodream\Infrastructure\Http\Requests\Post;
 use Zodream\Infrastructure\Http\Requests\Server;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Service\Config;
-defined('APP_SAFE') || define('APP_SAFE', Config::getInstance()->get('app.safe', true));
+
+defined('APP_SAFE') || define('APP_SAFE', Config::app('safe', true));
 
 final class Request {
 
@@ -144,6 +146,35 @@ final class Request {
 	public static function other($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
 	}
+
+    /**
+     *
+     */
+	public static function path() {
+        $pattern = trim(static::server('PHP_SELF'), '/');
+        return $pattern == '' ? '/' : $pattern;
+    }
+
+    /**
+     * 解密路径
+     * @return string
+     */
+    public static function decodedPath() {
+        return rawurldecode(static::path());
+    }
+
+    /**
+     * 判断是否网址
+     * @return bool
+     */
+    public static function is() {
+        foreach (func_get_args() as $pattern) {
+            if (StringExpand::is($pattern, static::decodedPath())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	
 	public static function isCli() {

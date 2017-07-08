@@ -10,6 +10,7 @@ use Zodream\Infrastructure\Base\ConfigObject;
 use Zodream\Infrastructure\Database\Engine\BaseEngine;
 use Zodream\Infrastructure\Database\Engine\Pdo;
 use Zodream\Infrastructure\Event\EventManger;
+use Zodream\Service\Config;
 use Zodream\Service\Factory;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\Traits\SingletonPattern;

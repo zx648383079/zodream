@@ -20,7 +20,7 @@ class EventManger {
     );
 
     protected function __construct() {
-        $configs = Config::get('event', array());
+        $configs = Config::event(array());
         if (!isset($configs['canAble']) || !$configs['canAble']) {
             $this->canAble = false;
             return;

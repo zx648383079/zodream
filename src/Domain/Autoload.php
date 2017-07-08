@@ -16,7 +16,7 @@ class Autoload extends MagicObject {
 	protected $_registerAlias = false;
 	
 	private function __construct() {
-		$this->set(Config::getInstance()->get('alias', array()));
+		$this->set(Config::alias([]));
 	}
 	/**
 	 * 注册别名

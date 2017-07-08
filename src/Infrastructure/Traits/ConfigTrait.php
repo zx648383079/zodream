@@ -24,7 +24,7 @@ trait ConfigTrait {
         if (empty($this->configKey)) {
             return;
         }
-        $configs = Config::get($this->configKey, $default);
+        $configs = Config::{$this->configKey}($default);
         if (is_array($configs)) {
             $this->setConfigs($configs);
         }

@@ -24,7 +24,7 @@ abstract class I18n extends MagicObject {
     protected $directory;
 
     public function __construct() {
-        $configs = Config::get('i18n');
+        $configs = Config::i18n();
         $this->setDirectory($configs['directory']);
         $this->setLanguage($configs['language']);
     }

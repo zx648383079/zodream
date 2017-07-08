@@ -58,7 +58,7 @@ class Route {
 		// fluent routing. In that case, we set a default closure, to be executed
 		// if the user never explicitly sets an action to handle the given uri.
 		if (empty($action)) {
-			return ['uses' => Config::get('route.default', 'home/index')];
+			return ['uses' => Config::route('default', 'home/index')];
 		}
 
 
@@ -185,7 +185,7 @@ class Route {
 
 	protected function runDefault($path) {
         if (!empty($path)) {
-            $modules = Config::get('modules');
+            $modules = Config::modules();
             foreach ($modules as $key => $module) {
                 if ($this->isMatch($path, $key)) {
                     return $this->runModule(StringExpand::firstReplace($path, $key), $module);

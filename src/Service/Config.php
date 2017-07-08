@@ -52,8 +52,19 @@ class Config extends BaseConfig {
 	}
 
 	public function __call($method, $value) {
-		$this->getMultidimensional($method, $value);
-	}
+	    if (empty($value)) {
+	        return $this->get($method);
+        }
+        $param = end($value);
+	    if (!is_string($param)) {
+	        $param = array_pop($value);
+	        return $this->get($method.'.'.
+                implode('.', $value),
+                $param);
+        }
+        return $this->get($method.'.'.implode('.', $value));
+
+    }
 
 	/**
 	 * @param string $method
@@ -65,9 +76,6 @@ class Config extends BaseConfig {
 	        // 初始化未完成时
 	        return null;
         }
-	    if (in_array($method, ['get', 'set'])) {
-	        return static::getInstance()->{$method}(...$value);
-        }
-		return static::getInstance()->getMultidimensional($method, $value);
+        return static::getInstance()->{$method}(...$value);
 	}
 }
