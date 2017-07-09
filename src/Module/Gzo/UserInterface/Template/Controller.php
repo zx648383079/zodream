@@ -30,7 +30,7 @@ class <?=$name.APP_CONTROLLER?> extends Controller {
 	}
 
     public function add<?=APP_ACTION?>($id = null) {
-        $model = $id > 0 ? <?=$name.APP_MODEL?>::findOne($id) : new <?=$name.APP_MODEL?>();
+        $model = <?=$name.APP_MODEL?>::findOrNew($id);
         if ($model->load() && $model->save()) {
             return $this->redirect(['<?=$name?>']);
         }
@@ -40,12 +40,12 @@ class <?=$name.APP_CONTROLLER?> extends Controller {
 	}
 
     public function delete<?=APP_ACTION?>($id) {
-        <?=$name.APP_MODEL?>::findOne($id)->delete();
+        <?=$name.APP_MODEL?>::where(['id' => $id])->delete();
         return $this->redirect(['<?=$name?>']);
 	}
 
     public function view<?=APP_ACTION?>($id) {
-		$model = <?=$name.APP_MODEL?>::findOne($id);
+		$model = <?=$name.APP_MODEL?>::find($id);
         return $this->show([
             'model' => $model
         ]);

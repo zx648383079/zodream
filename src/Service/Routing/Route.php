@@ -228,7 +228,7 @@ class Route {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException($class.' CLASS NOT EXISTS!');
         }
-        $this->runClass($class, $action);
+        return $this->runClass($class, $action);
     }
 
     protected function runClass($instance, $action) {

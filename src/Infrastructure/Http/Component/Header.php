@@ -236,7 +236,7 @@ class Header extends ZObject implements IteratorAggregate {
             return $this;
         }
         if (empty($time)) {
-            return $this->set('Location', $url);
+            return $this->set('Location', (string)$url);
         }
         return $this->set('Refresh', $time.';url='.$url);
     }

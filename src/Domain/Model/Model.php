@@ -59,7 +59,10 @@ abstract class Model extends MagicObject {
 		'id'
 	];
 
-	public function __construct() {
+	public function __construct($data = []) {
+	    if (!empty($data)) {
+	        $this->load($data);
+        }
 		$this->init();
 	}
 	
@@ -194,6 +197,17 @@ abstract class Model extends MagicObject {
 		return $row;
 	}
 
+    /**
+     * 初始化并保存到数据库
+     * @param array $data
+     * @return static
+     */
+	public static function create(array $data) {
+	    $model = new static($data);
+	    $model->save();
+	    return $model;
+    }
+
 	/**
 	 * SELECT ONE BY QUERY
 	 * 查询一条数据
@@ -205,7 +219,7 @@ abstract class Model extends MagicObject {
 	 * @param array $parameters
 	 * @return static|boolean
      */
-	public static function findOne($param, $field = '*', $parameters = array()) {
+	public static function find($param, $field = '*', $parameters = array()) {
 		$model = new static;
 		if (is_numeric($param)) {
 			$param = [$model->primaryKey[0] => $param];
@@ -215,12 +229,27 @@ abstract class Model extends MagicObject {
 				'where' => $param
 			];
 		}
-		return static::find()
+		return static::query()
 			->load($param)
 			->select($field)
 			->addParam($parameters)
 			->one();
 	}
+
+    /**
+     * 查找或新增
+     * @param $param
+     * @param string $field
+     * @param array $parameters
+     * @return bool|Model|static
+     */
+	public static function findOrNew($param, $field = '*', $parameters = array()) {
+	    $model = static::find($param, $field, $parameters);
+	    if (empty($model)) {
+	        return new static();
+        }
+        return $model;
+    }
 
 	/**
 	 * 删除数据
@@ -247,82 +276,14 @@ abstract class Model extends MagicObject {
 	 *
 	 * @return Query 返回查询结果,
 	 */
-	public static function find() {
+	public static function query() {
 		return (new Query())
             ->setModelName(static::className())
             ->from(static::tableName());
 	}
 
-	/**
-	 * @param array $param
-	 * @param string $field
-	 * @param array $parameters
-	 * @return static[]
-	 */
-	public static function findAll($param = array(), $field = '*', $parameters = array()) {
-		if (!is_array($param) ||
-			(!array_key_exists('where', $param) &&
-				!array_key_exists('group', $param) &&
-				!array_key_exists('order', $param) &&
-				!array_key_exists('having', $param)) ) {
-			$param = array(
-				'where' => $param
-			);
-		}
-		return static::find()
-			->load($param)
-			->select($field)
-			->addParam($parameters)
-			->all();
-	}
 
-    /**
-     * @param $args
-     * @param int $size
-     * @param string $key
-     * @param array $parameters
-     * @return Page
-     */
-    public static function findPage($args = null,
-                                    $size = 20,
-                                    $key = 'page',
-                                    $parameters = array()) {
-        if (!empty($args) && (!is_array($args) ||
-            (!array_key_exists('where', $args) &&
-                !array_key_exists('group', $args) &&
-                !array_key_exists('order', $args) &&
-                !array_key_exists('having', $args))) ) {
-            $args = array(
-                'where' => $args
-            );
-        }
-        return static::find()
-            ->addParam($parameters)
-            ->load($args)->page($size, $key);
+	public static function __callStatic($method, $arguments) {
+        return static::query()->$method(...$arguments);
     }
-
-
-	/**
-	 * 总记录
-	 *
-	 * @access public
-	 *
-	 * @param array|null $param 条件
-	 * @param string $field 默认为id
-	 * @param array $parameters
-	 * @return int 返回总数,
-	 */
-	public static function count(
-	    array $param = array(),
-        $field = 'id',
-        $parameters = array()) {
-		if (!array_key_exists('where', $param)) {
-			$param = array(
-				'where' => $param
-			);
-		}
-		return static::find()->load($param)
-			->addParam($parameters)
-			->count($field)->limit(1)->scalar();
-	}
 }

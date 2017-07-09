@@ -44,8 +44,40 @@ class Query extends BaseQuery {
         return $args;
     }
 
+    /**
+     * 取一个值
+     * @return bool|int|string
+     */
     public function scalar() {
         $this->asArray();
         return parent::scalar();
+    }
+
+    /**
+     * 更新
+     * @param array $args
+     * @return int
+     */
+    public function update(array $args) {
+        $data = [];
+        foreach ($args as $key => $value) {
+            if (is_integer($key)) {
+                $data[] = $value;
+                continue;
+            }
+            $data[] = "`{$key}` = ?";
+            $this->addParam($value);
+        }
+        return $this->command()
+            ->update(implode(',', $data), $this->getWhere().$this->getLimit(), $this->get());
+    }
+
+    /**
+     * 删除
+     * @return int
+     */
+    public function delete() {
+        return $this->command()
+            ->delete($this->getWhere().$this->getLimit(), $this->get());
     }
 }
