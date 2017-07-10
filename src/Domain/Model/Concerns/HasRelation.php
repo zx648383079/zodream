@@ -3,6 +3,7 @@ namespace Zodream\Domain\Model\Concerns;
 
 use Zodream\Domain\Model\Model;
 use Zodream\Domain\Model\Query;
+use Zodream\Domain\Model\Relations\Relation;
 
 /**
  * Created by PhpStorm.
@@ -21,7 +22,7 @@ trait HasRelation {
      * @param string $table
      * @param string $link $table.$link
      * @param string $key $this.$key
-     * @return array|Model
+     * @return Relation
      */
     public function hasOne($table, $link, $key = null) {
         if ($table instanceof Model) {
@@ -72,7 +73,7 @@ trait HasRelation {
      * @param string $table
      * @param string $link $table.$link
      * @param string $key $this.$key
-     * @return array|Model[]
+     * @return Relation
      */
     public function hasMany($table, $link, $key = 'id') {
         if ($table instanceof Model) {
@@ -90,7 +91,7 @@ trait HasRelation {
      * Get a specified relationship.
      *
      * @param  string  $relation
-     * @return mixed
+     * @return Relation
      */
     public function getRelation($relation) {
         return $this->relations[$relation];
@@ -100,10 +101,10 @@ trait HasRelation {
      * Set the specific relationship in the model.
      *
      * @param  string  $relation
-     * @param  mixed  $value
+     * @param  Relation  $value
      * @return $this
      */
-    public function setRelation($relation, $value) {
+    public function setRelation($relation, Relation $value) {
         $this->relations[$relation] = $value;
         return $this;
     }

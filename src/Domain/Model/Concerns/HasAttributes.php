@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Domain\Model\Concerns;
 
+use Zodream\Domain\Model\Relations\Relation;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 /**
  * Created by PhpStorm.
@@ -24,12 +25,18 @@ trait HasAttributes {
             return $this->_data[$key];
         }
         $method = sprintf('get%sAttribute', StringExpand::studly($key));
-        if (!method_exists($this, $method)) {
+        if (method_exists($this, $method)) {
+            $result = call_user_func([$this, $method]);
+            return $this->_data[$key] = $result;
+        }
+        if (!method_exists($this, $key)) {
             return $default;
         }
-        $result = call_user_func([$this, $method]);
-        $this->_data[$key] = $result;
-        return $result;
+        $result = call_user_func([$this, $key]);
+        if ($result instanceof Relation) {
+            $result = $result->getResults();
+        }
+        return $this->_data[$key] = $result;
     }
 
     /**

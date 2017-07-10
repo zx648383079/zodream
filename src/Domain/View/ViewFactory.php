@@ -109,6 +109,15 @@ class ViewFactory extends MagicObject {
     }
 
     /**
+     * 判断模板文件是否存在
+     * @param string $file
+     * @return bool
+     */
+    public function exist($file) {
+        return $this->directory->hasFile($file.$this->configs['suffix']);
+    }
+
+    /**
      * MAKE VIEW
      * @param string|File $file
      * @return View
@@ -143,7 +152,8 @@ class ViewFactory extends MagicObject {
      * @throws \Exception
      */
     public function render($file, array $data = array(), callable $callback = null) {
-        return $this->set($data)->make($file)
+        return $this->set($data)
+            ->make($file)
             ->render($callback);
     }
 

@@ -100,6 +100,15 @@ final class Request {
 		return self::getValue(__FUNCTION__, $name, $default);
 	}
 
+    /**
+     * 判断是否有值
+     * @param string $key
+     * @return bool
+     */
+	public static function has($key) {
+	    return static::request(true)->has($key);
+    }
+
 	/**
 	 * $_COOKIE
 	 * @param string $name
