@@ -5,8 +5,18 @@ use Zodream\Infrastructure\Database\Query\Query as BaseQuery;
 
 class Query extends BaseQuery {
 
+    protected $relations = [];
+
     protected $modelName;
     protected $isArray = false;
+
+    public function with($relations) {
+        if (!is_array($relations)) {
+            $relations = func_get_args();
+        }
+        $this->relations = array_merge($this->relations, $relations);
+        return $this;
+    }
 
     public function setModelName($model) {
         if ($model instanceof Model) {

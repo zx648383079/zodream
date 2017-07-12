@@ -27,6 +27,17 @@ class Auth implements AuthObject {
 		return static::$identity;
 	}
 
+    /**
+     * 用户id
+     * @return int
+     */
+	public static function id() {
+	    if (empty(static::user())) {
+	        return false;
+        }
+        return static::user()->getId();
+    }
+
 	/**
 	 * 获取登录
 	 * @return bool|UserObject

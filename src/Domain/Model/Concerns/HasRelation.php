@@ -101,10 +101,10 @@ trait HasRelation {
      * Set the specific relationship in the model.
      *
      * @param  string  $relation
-     * @param  Relation  $value
+     * @param  mixed  $value
      * @return $this
      */
-    public function setRelation($relation, Relation $value) {
+    public function setRelation($relation, $value) {
         $this->relations[$relation] = $value;
         return $this;
     }

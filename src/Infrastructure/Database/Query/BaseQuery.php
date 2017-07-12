@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure\Database\Query;
  */
 use Zodream\Infrastructure\Database\Schema\BaseSchema;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;
+use Closure;
 
 abstract class BaseQuery extends BaseSchema  {
 
@@ -36,6 +37,24 @@ abstract class BaseQuery extends BaseSchema  {
     public function where($condition, $params = array()) {
         $this->where = [$condition];
         return $this->addParam($params);
+    }
+
+    /**
+     * 条件语句
+     * @param bool $condition
+     * @param Closure $trueFunc
+     * @param Closure|null $falseFunc
+     * @return $this
+     */
+    public function when($condition, Closure $trueFunc, Closure $falseFunc = null) {
+        if ($condition) {
+            $trueFunc($this);
+            return $this;
+        }
+        if (!empty($falseFunc)) {
+            $falseFunc($this);
+        }
+        return $this;
     }
 
     /**
