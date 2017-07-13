@@ -1,10 +1,11 @@
 <?php
 namespace Zodream\Module\OAuth\Domain;
+use Zodream\Infrastructure\ObjectExpand\TimeExpand;
 
 /**
  * Class OauthClientModel
  * @package Zodream\Module\OAuth\Domain
- * @property string $access_token
+ * @property string $refresh_token
  * @property string $client_id
  * @property string $user_id
  * @property string $expires
@@ -23,5 +24,30 @@ class OAuthRefreshTokenModel extends BaseModel {
         $table->set('expires')->notNull()->timestamp();
         $table->set('scope')->varchar(200);
         return $table->create();
+    }
+
+    /**
+     * @param string $token
+     * @return static
+     */
+    public static function findByToken($token) {
+        return static::where(['refresh_token' => $token,
+            'expires' => ['<=', TimeExpand::timestamp()]])
+            ->one();
+    }
+
+    /**
+     * 刷新并生成 access token
+     * @return bool|OAuthAccessTokenModel
+     */
+    public function refreshToken() {
+        if (!$this->delete()) {
+            return false;
+        }
+        $this->isNewRecord = true;
+        $this->refresh_token = $this->generateAccessToken();
+        $this->expires = TimeExpand::timestamp(time() + 3600);
+        $this->save();
+        return OAuthAccessTokenModel::createToken($this->client_id, $this->user_id);
     }
 }

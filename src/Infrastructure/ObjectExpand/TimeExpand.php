@@ -31,6 +31,18 @@ class TimeExpand {
 		return date($format, $time);
 	}
 
+    /**
+     * 获取mysql 时间戳
+     * @param null $time
+     * @return string
+     */
+	public static function timestamp($time = null) {
+        if (is_null($time)) {
+            $time = time();
+        }
+	    return date('Y-m-d H:i:s', $time);
+    }
+
 	const TODAY = 0;
 	const YESTERDAY = 1;
 	const WEEK = 2;

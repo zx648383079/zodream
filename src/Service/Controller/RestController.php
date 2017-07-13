@@ -12,6 +12,7 @@ use Zodream\Infrastructure\Http\Request;
 
 abstract class RestController extends BaseController  {
 
+    protected $canCSRFValidate = false;
     /**
      * @return string
      */
@@ -37,7 +38,7 @@ abstract class RestController extends BaseController  {
         if (in_array(Request::method(), $rules[$action])) {
             return true;
         }
-        return $this->ajaxError('ERROE REQUEST METHOD!');
+        return $this->ajaxFailure('ERROE REQUEST METHOD!');
     }
 
     /**
@@ -64,7 +65,7 @@ abstract class RestController extends BaseController  {
      */
     public function ajaxSuccess($data = null) {
         return $this->ajax([
-            'code' => 0,
+            'code' => 200,
             'status' => 'success',
             'data' => $data
         ]);
@@ -72,15 +73,22 @@ abstract class RestController extends BaseController  {
 
     /**
      * ajax 失败返回
-     * @param string $message
+     * @param string|array $message
      * @param int $code
      * @return Response
      */
-    public function ajaxFailure($message = '', $code = 1) {
+    public function ajaxFailure($message = '', $code = 400) {
+        if (is_array($message)) {
+            return $this->ajax(array(
+                'code' => $code,
+                'status' => 'failure',
+                'errors' => $message
+            ));
+        }
         return $this->ajax(array(
             'code' => $code,
             'status' => 'failure',
-            'msg' => $message
+            'message' => $message
         ));
     }
 }

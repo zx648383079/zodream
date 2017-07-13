@@ -21,16 +21,26 @@ class AuthorizeController extends Controller {
         $redirect_uri,
         $scope = null,
         $state = null) {
+        $uri = new Uri($redirect_uri);
         if ($response_type != 'code') {
-            return;
+            return $this->redirect($uri->addData([
+                'error' => 'error response_type',
+                'state' => $state
+            ]));
         }
 
         $model = OAuthClientModel::findOne(['client_id' => $client_id]);
         if (empty($model)) {
-            return;
+            return $this->redirect($uri->addData([
+                'error' => 'error client_id',
+                'state' => $state
+            ]));
         }
         if (stripos($redirect_uri, $model->redirect_uri) !== 0) {
-            return;
+            return $this->redirect($uri->addData([
+                'error' => 'error redirect_uri',
+                'state' => $state
+            ]));
         }
         if (Auth::guest()) {
             return $this->show();
@@ -43,9 +53,8 @@ class AuthorizeController extends Controller {
         if ($history < 0) {
             return $this->show();
         }
-
         $code = StringExpand::random();
-        $uri = new Uri($redirect_uri);
+
         return $this->redirect($uri->addData([
             'code' => $code,
             'state' => $state

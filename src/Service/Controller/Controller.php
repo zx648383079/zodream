@@ -29,7 +29,7 @@ abstract class Controller extends BaseController {
      */
     protected $canCSRFValidate;
 	
-	function __construct($loader = null) {
+	public function __construct($loader = null) {
 		$this->loader = $loader instanceof Loader ? $loader : new Loader();
 		if (is_bool($this->canCache)) {
 			$this->canCache = Config::cache('auto', false);

@@ -13,11 +13,11 @@ abstract class ModuleController extends Controller {
     /**
      * ajax 成功返回
      * @param null $data
-     * @return \Zodream\Infrastructure\Http\Response
+     * @return Response
      */
     public function ajaxSuccess($data = null) {
         return $this->ajax([
-            'code' => 0,
+            'code' => 200,
             'status' => 'success',
             'data' => $data
         ]);
@@ -25,15 +25,22 @@ abstract class ModuleController extends Controller {
 
     /**
      * ajax 失败返回
-     * @param string $message
+     * @param string|array $message
      * @param int $code
-     * @return \Zodream\Infrastructure\Http\Response
+     * @return Response
      */
-    public function ajaxFailure($message = '', $code = 1) {
+    public function ajaxFailure($message = '', $code = 400) {
+        if (is_array($message)) {
+            return $this->ajax(array(
+                'code' => $code,
+                'status' => 'failure',
+                'errors' => $message
+            ));
+        }
         return $this->ajax(array(
             'code' => $code,
             'status' => 'failure',
-            'msg' => $message
+            'message' => $message
         ));
     }
 
