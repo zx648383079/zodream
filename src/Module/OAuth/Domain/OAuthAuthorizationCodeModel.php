@@ -26,4 +26,17 @@ class OAuthAuthorizationCodeModel extends BaseModel {
         $table->set('scope')->varchar(200);
         return $table->create();
     }
+
+
+    /**
+     *
+     * @param $code
+     * @return bool|static
+     */
+    public static function exchange($code) {
+        $model = static::find(['authorization_code' => $code]);
+        $model->delete();
+        if ($model->)
+        return $model;
+    }
 }

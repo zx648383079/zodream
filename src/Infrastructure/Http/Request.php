@@ -254,7 +254,32 @@ final class Request {
 	public static function isPjax() {
 		return self::isAjax() && !empty(self::server('HTTP_X_PJAX'));
 	}
-	
+
+    /**
+     * 判断是否期望返回JSON
+     * @return bool
+     */
+    public static function expectsJson() {
+        return (static::isAjax() && !static::isPjax()) || static::wantsJson();
+    }
+
+    /**
+     * 请求头判断 接受类型为 JSON
+     * @return bool
+     */
+	public static function wantsJson() {
+	    $accept = static::header('ACCEPT');
+	    if (empty($accept)) {
+	        return false;
+        }
+        $args = explode(';');
+	    return StringExpand::contains($args[0], ['/json', '+json']);
+    }
+
+    /**
+     * 是否是 flas
+     * @return bool
+     */
 	public static function isFlash() {
 		$arg = self::server('HTTP_USER_AGENT', '');
 		return stripos($arg, 'Shockwave') !== false || stripos($arg, 'Flash') !== false;
