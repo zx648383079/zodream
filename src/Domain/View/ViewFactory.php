@@ -15,7 +15,7 @@ use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Disk\Directory;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Interfaces\EngineObject;
-use Zodream\Infrastructure\Error\FileException;
+use Zodream\Infrastructure\Disk\FileException;
 use Zodream\Infrastructure\Support\Html;
 use Zodream\Infrastructure\Base\MagicObject;
 use Zodream\Infrastructure\ObjectExpand\ArrayExpand;

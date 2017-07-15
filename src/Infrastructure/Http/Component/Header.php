@@ -81,7 +81,7 @@ class Header extends ZObject implements IteratorAggregate {
      *
      * @throws \InvalidArgumentException When the $format is invalid
      *
-     * @return array
+     * @return Cookie[]
      */
     public function getCookies($format = self::COOKIES_FLAT) {
         if (!in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
@@ -327,7 +327,7 @@ class Header extends ZObject implements IteratorAggregate {
      * @param int|string $length
      * @return Header
      */
-    public function sendContentLength($length) {
+    public function setContentLength($length) {
         return $this->set('Content-Length', $length);
     }
 

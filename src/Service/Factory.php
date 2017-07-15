@@ -18,11 +18,13 @@ use Zodream\Domain\View\ViewFactory;
 use Zodream\Infrastructure\Caching\Cache;
 use Zodream\Infrastructure\Caching\FileCache;
 use Zodream\Infrastructure\Disk\Directory;
+use Zodream\Infrastructure\Exceptions\Handler;
 use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\Http\Requests\Header;
 use Zodream\Infrastructure\Http\Response;
 use Zodream\Infrastructure\I18n\I18n;
 use Zodream\Infrastructure\I18n\PhpSource;
+use Zodream\Infrastructure\Interfaces\ExceptionHandler;
 use Zodream\Infrastructure\Session\Session;
 use Zodream\Service\Routing\Router;
 
@@ -124,6 +126,13 @@ class Factory {
      */
     public static function timer() {
         return self::getInstance('timer', Timer::class);
+    }
+
+    /**
+     * @return ExceptionHandler
+     */
+    public static function handler() {
+        return self::getInstance('exception', Handler::class);
     }
 
     /**

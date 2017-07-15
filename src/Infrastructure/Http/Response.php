@@ -9,13 +9,14 @@ namespace Zodream\Infrastructure\Http;
 use Zodream\Domain\Image\Image;
 use Zodream\Infrastructure\Disk\File;
 use Zodream\Infrastructure\Interfaces\ExpertObject;
-use Zodream\Infrastructure\Error\FileException;
+use Zodream\Infrastructure\Disk\FileException;
 use Zodream\Infrastructure\Http\Component\Header;
 use Zodream\Infrastructure\ObjectExpand\JsonExpand;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Infrastructure\ObjectExpand\XmlExpand;
 use Zodream\Infrastructure\Http\Component\Uri;
 use Zodream\Service\Config;
+use Zodream\Service\Factory;
 
 class Response {
 
@@ -220,7 +221,7 @@ class Response {
      * @param array|string $data
      * @return Response
      */
-    public function sendJson($data) {
+    public function json($data) {
         $this->header->setContentType('json');
         if (!is_array($data)) {
             return $this->setParameter($data);
@@ -233,8 +234,8 @@ class Response {
      * @param array $data
      * @return Response
      */
-    public function sendJsonp(array $data) {
-       return $this->sendJson(
+    public function jsonp(array $data) {
+       return $this->json(
            Request::get('callback', 'jsonpReturn').
            '('.JsonExpand::encode($data).');'
        );
@@ -245,7 +246,7 @@ class Response {
      * @param array|string $data
      * @return Response
      */
-    public function sendXml($data) {
+    public function xml($data) {
         $this->header->setContentType('xml');
         if (!is_array($data)) {
             return $this->setParameter($data);
@@ -258,12 +259,22 @@ class Response {
      * @param string|callable $data
      * @return Response
      */
-    public function sendHtml($data) {
+    public function html($data) {
         $this->header->setContentType('html');
         return $this->setParameter(StringExpand::value($data));
     }
 
-    public function sendRss($data) {
+    /**
+     * 响应页面
+     * @param $file
+     * @param array $data
+     * @return Response
+     */
+    public function view($file, array $data = []) {
+        return $this->html(Factory::view()->render($file, $data));
+    }
+
+    public function rss($data) {
         $this->header->setContentType('rss');
         return $this->setParameter(StringExpand::value($data));
     }
@@ -275,7 +286,7 @@ class Response {
      * @return Response
      * @throws FileException
      */
-    public function sendFile(File $file, $speed = 512) {
+    public function file(File $file, $speed = 512) {
         $args = [
             'file' => $file,
             'speed' => intval($speed),
@@ -349,12 +360,22 @@ class Response {
         );
     }
 
-    public function sendImage(Image $image) {
+    /**
+     * 响应图片
+     * @param Image $image
+     * @return Response
+     */
+    public function image(Image $image) {
         $this->header->setContentType('image', $image->getRealType());
         return $this->setParameter($image);
     }
 
-    public function sendExport(ExpertObject $expert) {
+    /**
+     * 响应导出
+     * @param ExpertObject $expert
+     * @return Response
+     */
+    public function export(ExpertObject $expert) {
         $this->header->setContentType($expert->getName());
         $this->header->setContentDisposition($expert->getName());
         $this->header->setCacheControl('must-revalidate,post-check=0,pre-check=0');
@@ -368,7 +389,7 @@ class Response {
      * @param int $time
      * @return $this
      */
-    public function sendRedirect($url, $time = 0) {
+    public function redirect($url, $time = 0) {
         $this->header->setRedirect($url, $time);
         return $this;
     }
@@ -377,7 +398,7 @@ class Response {
      * 基本验证
      * @return $this
      */
-    public function sendBasicAuth() {
+    public function basicAuth() {
         $this->setStatusCode(401);
         $this->header->setWWWAuthenticate(Config::app('name'));
         return $this;
@@ -387,7 +408,7 @@ class Response {
      * 摘要验证
      * @return $this
      */
-    public function sendDigestAuth() {
+    public function digestAuth() {
         $this->setStatusCode(401);
         $name = Config::app('name');
         $this->header->setWWWAuthenticate(

@@ -193,4 +193,8 @@ class View {
         }
         throw new \BadMethodCallException($name.' METHOD NOT FIND!');
     }
+
+    public function __toString() {
+        return $this->render();
+    }
 }

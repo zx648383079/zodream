@@ -8,6 +8,7 @@ namespace Zodream\Infrastructure\Error;
 use Exception;
 use ErrorException;
 use Zodream\Service\Config;
+use Zodream\Service\Factory;
 
 class Error {
 
@@ -28,16 +29,15 @@ class Error {
     /**
      * Convert PHP errors to ErrorException instances.
      *
-     * @param  int  $level
-     * @param  string  $message
-     * @param  string  $file
-     * @param  int  $line
-     * @param  array  $context
+     * @param  int $level
+     * @param  string $message
+     * @param  string $file
+     * @param  int $line
      * @return void
-     *
-     * @throws \ErrorException
+     * @throws ErrorException
+     * @internal param array $context
      */
-    public function handleError($level, $message, $file = '', $line = 0, $context = []) {
+    public function handleError($level, $message, $file = '', $line = 0) {
         if (error_reporting() & $level) {
             throw new \ErrorException($message, 0, $level, $file, $line);
         }
@@ -77,10 +77,11 @@ class Error {
     /**
      * Render an exception as an HTTP response and send it.
      *
+     * @param Exception $e
      * @return void
      */
     protected function renderHttpResponse(Exception $e) {
-        $this->getExceptionHandler()->render($this->app['request'], $e)->send();
+        $this->getExceptionHandler()->render($e)->send();
     }
 
     /**
@@ -118,6 +119,6 @@ class Error {
     }
 
     protected function getExceptionHandler() {
-        return $this->app->make(ExceptionHandler::class);
+        return Factory::handler();
     }
 }

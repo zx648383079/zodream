@@ -6,8 +6,10 @@ use HttpException;
 use Zodream\Domain\Model\ModelNotFoundException;
 use Zodream\Domain\Validation\ValidationException;
 use Zodream\Domain\Access\AuthenticationException;
+use Zodream\Infrastructure\Error\NotFoundHttpException;
 use Zodream\Infrastructure\Http\HttpResponseException;
 use Zodream\Infrastructure\Http\Request;
+use Zodream\Infrastructure\Http\Response;
 use Zodream\Infrastructure\Interfaces\ExceptionHandler;
 use Zodream\Service\Factory;
 
@@ -87,8 +89,7 @@ class Handler implements ExceptionHandler {
      * @param  \Exception  $e
      * @return \Exception
      */
-    protected function prepareException(Exception $e)
-    {
+    protected function prepareException(Exception $e) {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
@@ -103,8 +104,7 @@ class Handler implements ExceptionHandler {
      * @param  ValidationException  $e
      * @return Response
      */
-    protected function convertValidationExceptionToResponse(
-        ValidationException $e) {
+    protected function convertValidationExceptionToResponse(ValidationException $e) {
         if ($e->response) {
             return $e->response;
         }
@@ -113,7 +113,7 @@ class Handler implements ExceptionHandler {
 
         if (Request::expectsJson()) {
             return Factory::response()->setStatusCode(422)
-                ->sendJson($errors);
+                ->json($errors);
         }
 
 
@@ -126,7 +126,13 @@ class Handler implements ExceptionHandler {
      * @return Response
      */
     protected function prepareResponse(Exception $e){
+        $status = $e->getCode();
 
+        if (Factory::view()->exist("errors/{$status}")) {
+            return Factory::response()->setStatusCode($status)
+                ->view("errors/{$status}", ['exception' => $e]);
+        }
+        return Factory::response();
     }
 
     /**
@@ -149,9 +155,14 @@ class Handler implements ExceptionHandler {
         return $e instanceof HttpException;
     }
 
+    public function unauthenticated(AuthenticationException $e) {
+        return Factory::response()->redirect([Config::auth('home'), 'ReturnUrl' => Url::to()]);
+    }
+
     /**
      * Render an exception to the console.
      *
+     * @param $output
      * @param  \Exception $e
      * @return void
      */

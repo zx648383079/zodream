@@ -24,7 +24,8 @@ interface ExceptionHandler {
     /**
      * Render an exception to the console.
      *
-     * @param  \Exception  $e
+     * @param $output
+     * @param  \Exception $e
      * @return void
      */
     public function renderForConsole($output, Exception $e);

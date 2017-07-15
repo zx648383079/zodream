@@ -41,8 +41,7 @@ class Application {
         Url::setHost(Config::app('host'));
         Factory::timer()->begin();
         Autoload::getInstance()
-            ->setError()
-            ->shutDown();
+            ->bindError();
         //Cookie::restore();
         EventManger::runEventAction('appRun');
         return Factory::router()->getRoute($this->path)

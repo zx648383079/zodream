@@ -5,6 +5,7 @@ namespace Zodream\Domain;
  *
  * @author Jason
  */
+use Zodream\Infrastructure\Error\Error;
 use Zodream\Service\Config;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use Zodream\Infrastructure\Base\MagicObject;
@@ -46,23 +47,11 @@ class Autoload extends MagicObject {
 
 	/**
 	 * 自定义错误输出
-	 * @param int $level
 	 * @return $this
 	 */
-	public function setError($level = null) {
-		if (is_null($level)) {
-			$level = defined('DEBUG') && DEBUG ? E_ALL : 0;
-		}
-		error_reporting($level);
-		set_error_handler('Zodream\Infrastructure\Error\Error::outByError');          //自定义错误输出
-		return $this;
-	}
-	
-	/**
-	 * 自定义程序结束时输出
-	 */
-	public function shutDown() {
-		register_shutdown_function('Zodream\Infrastructure\Error\Error::outByShutDown');   //程序结束时输出
+	public function bindError() {
+	    $error = new Error();
+	    $error->bootstrap();
 		return $this;
 	}
 	

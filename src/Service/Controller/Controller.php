@@ -230,7 +230,7 @@ abstract class Controller extends BaseController {
      * @return Response
      */
     public function showContent($html) {
-        return Factory::response()->sendHtml($html);
+        return Factory::response()->html($html);
     }
 
     /**
@@ -242,11 +242,11 @@ abstract class Controller extends BaseController {
     public function ajax($data, $type = 'json') {
         switch (strtolower($type)) {
             case 'xml':
-                return Factory::response()->sendXml($data);
+                return Factory::response()->xml($data);
             case 'jsonp':
-                return Factory::response()->sendJsonp($data);
+                return Factory::response()->jsonp($data);
         }
-        return Factory::response()->sendJson($data);
+        return Factory::response()->json($data);
     }
 
     public function redirectWithMessage($url, $message, $time = 4, $status = 404) {
@@ -261,7 +261,7 @@ abstract class Controller extends BaseController {
      */
     public function redirect($url, $time = 0) {
         return Factory::response()
-            ->sendRedirect(Url::to($url), $time);
+            ->redirect(Url::to($url), $time);
     }
 
     public function goHome() {

@@ -1,13 +1,7 @@
 <?php
-namespace Zodream\Infrastructure\Error;
+namespace Zodream\Infrastructure\Disk;
 
-/**
- * Created by PhpStorm.
- * User: zx648
- * Date: 2016/8/3
- * Time: 9:37
- */
-use Zodream\Infrastructure\Disk\FileObject;
+use Exception;
 
 class FileException extends Exception {
 
