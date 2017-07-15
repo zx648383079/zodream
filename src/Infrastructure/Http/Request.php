@@ -277,7 +277,7 @@ final class Request {
     }
 
     /**
-     * 是否是 flas
+     * 是否是 flash
      * @return bool
      */
 	public static function isFlash() {
@@ -291,5 +291,17 @@ final class Request {
      */
 	public static function auth() {
         return self::other('auth');
+    }
+
+    /**
+     * 获取 token
+     * @return string|null
+     */
+    public static function bearerToken() {
+        $header = static::header('Authorization', '');
+        if (StringExpand::startsWith($header, 'Bearer ')) {
+            return substr($header, 7);
+        }
+        return null;
     }
 }

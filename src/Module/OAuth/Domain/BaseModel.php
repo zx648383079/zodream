@@ -8,6 +8,7 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 /**
  * Class OauthClientModel
  * @package Zodream\Module\OAuth\Domain
+ *
  */
 abstract class BaseModel extends Model {
 
@@ -31,5 +32,9 @@ abstract class BaseModel extends Model {
      */
     public static function generateAccessToken() {
         return bin2hex(StringExpand::randomBytes(20));
+    }
+
+    public function isExpire() {
+        return strtotime($this->expires) >= time();
     }
 }

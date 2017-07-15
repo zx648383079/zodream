@@ -17,6 +17,7 @@ class PasswordController extends Controller {
         if ($data['grant_type'] !== 'password') {
             return;
         }
+
         return $this->ajax([
             'access_token' => $token,
             'token_type' => '',

@@ -12,6 +12,9 @@ namespace Zodream\Module\OAuth\Domain;
  * @property string $scope
  */
 class OAuthAuthorizationCodeModel extends BaseModel {
+
+    protected $primaryKey = ['authorization_code'];
+
     public static function tableName() {
         return 'oauth_authorization_code';
     }
@@ -27,16 +30,26 @@ class OAuthAuthorizationCodeModel extends BaseModel {
         return $table->create();
     }
 
+    public static function findByCode($code) {
+        return static::find(['authorization_code' => $code]);
+    }
 
     /**
-     *
-     * @param $code
-     * @return bool|static
+     * 换取access token
+     * @return bool|OAuthAccessTokenModel
      */
-    public static function exchange($code) {
-        $model = static::find(['authorization_code' => $code]);
-        $model->delete();
-        if ($model->)
-        return $model;
+    public function exchange() {
+        if (!$this->isExpire()) {
+            return false;
+        }
+        return OAuthAccessTokenModel::createToken($this->client_id, $this->user_id);
+    }
+
+    /**
+     * 生成刷新码
+     * @return OAuthRefreshTokenModel
+     */
+    public function createRefreshToken() {
+        return OAuthRefreshTokenModel::createToken($this->client_id, $this->user_id);
     }
 }

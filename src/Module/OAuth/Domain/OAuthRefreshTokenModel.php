@@ -12,6 +12,9 @@ use Zodream\Infrastructure\ObjectExpand\TimeExpand;
  * @property string $scope
  */
 class OAuthRefreshTokenModel extends BaseModel {
+
+    protected $primaryKey = ['refresh_token'];
+
     public static function tableName() {
         return 'oauth_refresh_token';
     }
@@ -46,8 +49,19 @@ class OAuthRefreshTokenModel extends BaseModel {
         }
         $this->isNewRecord = true;
         $this->refresh_token = $this->generateAccessToken();
-        $this->expires = TimeExpand::timestamp(time() + 3600);
+        $this->expires = TimeExpand::timestamp(time() + 3600 * 24 * 365);
         $this->save();
         return OAuthAccessTokenModel::createToken($this->client_id, $this->user_id);
+    }
+
+    public static function createToken($client_id, $user_id) {
+        static::where(['client_id' => $client_id, 'user_id' => $user_id])
+            ->delete();
+        return static::create([
+            'refresh_token' => static::generateAccessToken(),
+            'user_id' => $user_id,
+            'client_id' => $client_id,
+            'expires' => TimeExpand::timestamp(time() + 3600 * 24 * 365)
+        ]);
     }
 }

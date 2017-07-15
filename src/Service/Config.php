@@ -78,4 +78,12 @@ class Config extends BaseConfig {
         }
         return static::getInstance()->{$method}(...$value);
 	}
+
+    /**
+     * 判断是否是调试模式
+     * @return bool
+     */
+	public static function isDebug() {
+	    return defined('DEBUG') && DEBUG;
+    }
 }
