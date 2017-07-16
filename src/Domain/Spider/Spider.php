@@ -42,7 +42,7 @@ class Spider {
         return $this;
     }
 
-    public function switch(callable $callback) {
+    public function each(callable $callback) {
         if (!is_array($this->data)) {
             return $this->map($callback);
         }
