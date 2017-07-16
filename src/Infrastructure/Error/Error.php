@@ -12,15 +12,18 @@ use Zodream\Service\Factory;
 
 class Error {
 
+    /**
+     * 启动 如果有 xdebug 就用 xdebug
+     */
     public function bootstrap() {
+        if (Config::isDebug() && function_exists('xdebug_get_function_stack')) {
+            error_reporting(E_ALL);
+            return;
+        }
         error_reporting(-1);
-
         set_error_handler([$this, 'handleError']);
-
         set_exception_handler([$this, 'handleException']);
-
         register_shutdown_function([$this, 'handleShutdown']);
-
         if (! Config::isDebug()) {
             ini_set('display_errors', 'Off');
         }

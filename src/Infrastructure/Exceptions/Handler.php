@@ -127,12 +127,15 @@ class Handler implements ExceptionHandler {
      */
     protected function prepareResponse(Exception $e){
         $status = $e->getCode();
-
+        Factory::response()->setStatusCode(404);
         if (Factory::view()->exist("errors/{$status}")) {
-            return Factory::response()->setStatusCode($status)
+            return Factory::response()
                 ->view("errors/{$status}", ['exception' => $e]);
         }
-        return Factory::response();
+        if (property_exists($e, '')) {
+            return Factory::response()->html($e->xdebug_message);
+        }
+        return Factory::response()->html($e->getMessage());
     }
 
     /**
