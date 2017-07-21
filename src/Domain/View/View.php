@@ -20,20 +20,20 @@ use Zodream\Service\Routing\Url;
  * @package Zodream\Domain\View
  * @property string $title
  * 
- * @method registerMetaTag($content, $options = array(), $key = null) 
- * @method registerLinkTag($url, $options = array(), $key = null)
- * @method registerCss($css, $key = null)
- * @method registerCssFile($url, $options = array(), $key = null)
- * @method registerJs($js, $position = 'html body end', $key = null)
- * @method registerJsFile($url, $options = [], $key = null)
- * @method getAssetFile($file)
- * @method get($key, $default = null)
- * @method set($key, $value = null)
+ * @method ViewFactory registerMetaTag($content, $options = array(), $key = null)
+ * @method ViewFactory registerLinkTag($url, $options = array(), $key = null)
+ * @method ViewFactory registerCss($css, $key = null)
+ * @method ViewFactory registerCssFile($url, $options = array(), $key = null)
+ * @method ViewFactory registerJs($js, $position = 'html body end', $key = null)
+ * @method ViewFactory registerJsFile($url, $options = [], $key = null)
+ * @method ViewFactory getAssetFile($file)
+ * @method ViewFactory get($key, $default = null)
+ * @method ViewFactory set($key, $value = null)
  * @method string header()
  * @method string footer()
- * @method start($name)
- * @method stop()
- * @method section($name, $default = null)
+ * @method ViewFactory start($name)
+ * @method ViewFactory stop()
+ * @method ViewFactory section($name, $default = null)
  */
 class View {
 
@@ -168,6 +168,14 @@ class View {
         return Url::to($file, $extra, true);
     }
 
+    /**
+     * 获取资源文件路径
+     * @param $file
+     * @return string|Uri
+     */
+    public function asset($file) {
+        return $this->url($this->factory->getAssetFile($file));
+    }
     public function extend($name, $data = array()) {
         foreach ((array)$name as $item) {
             echo $this->factory->render($item, $data);

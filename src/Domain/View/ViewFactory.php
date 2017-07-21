@@ -89,6 +89,9 @@ class ViewFactory extends MagicObject {
      * @return string
      */
     public function getAssetFile($file) {
+        if (is_file($file)) {
+            return (new AssetFile($file))->getUrl();
+        }
         if (strpos($file, '/') === 0
             || strpos($file, '//') !== false) {
             return $file;

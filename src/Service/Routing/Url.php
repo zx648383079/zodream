@@ -109,10 +109,10 @@ class Url {
     }
 
     protected static function addScript($path) {
-	    if (strpos($path, '.') > 0) {
+	    if (strpos($path, '.') > 0
+            || strpos($path, '/') === 0) {
 	        return $path;
         }
-        $path = ltrim($path, '/');
         $name = Request::server('script_name');
         if ($name === '/index.php') {
             return '/'.$path;

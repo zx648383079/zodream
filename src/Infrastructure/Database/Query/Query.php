@@ -102,27 +102,48 @@ class Query extends BaseQuery {
     }
 
     /**
+     * 统计
      * @param string $column
-     * @return static
+     * @return integer
      */
     public function count($column = '*') {
-        return $this->_selectFunction(__FUNCTION__, $column);
+        return $this->_selectFunction(__FUNCTION__, $column)->scalar();
     }
 
+    /**
+     * 最大值
+     * @param $column
+     * @return bool|string
+     */
     public function max($column)  {
-        return $this->_selectFunction(__FUNCTION__, $column);
+        return $this->_selectFunction(__FUNCTION__, $column)->scalar();
     }
 
+    /**
+     * 最小值
+     * @param $column
+     * @return bool|int|string
+     */
     public function min($column)  {
-        return $this->_selectFunction(__FUNCTION__, $column);
+        return $this->_selectFunction(__FUNCTION__, $column)->scalar();
     }
 
+    /**
+     * 平均值
+     * @param $column
+     * @return bool|int|string
+     */
     public function avg($column)  {
-        return $this->_selectFunction(__FUNCTION__, $column);
+        return $this->_selectFunction(__FUNCTION__, $column)->scalar();
     }
 
+    /**
+     * 总和
+     * @param $column
+     * @return bool|int|string
+     */
     public function sum($column)  {
-        return $this->_selectFunction(__FUNCTION__, $column);
+        return $this->_selectFunction(__FUNCTION__, $column)->scalar();
     }
 
     /**
