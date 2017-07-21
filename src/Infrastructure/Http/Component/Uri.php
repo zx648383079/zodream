@@ -139,6 +139,7 @@ class Uri {
     }
 
     /**
+     * 设置
      * @param string|array $arg
      * @return $this
      */
@@ -156,6 +157,7 @@ class Uri {
     }
 
     /**
+     * 添加
      * @param string|array $key
      * @param string $value
      * @return $this
@@ -169,6 +171,24 @@ class Uri {
             return $this;
         }
         $this->data[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * 移除键
+     * @param $keys
+     * @return $this
+     */
+    public function removeData($keys) {
+        if (!is_array($keys)) {
+            $keys = func_get_args();
+        }
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $this->data)) {
+                continue;
+            }
+            unset($this->data[$key]);
+        }
         return $this;
     }
 

@@ -92,7 +92,7 @@ class Page extends MagicObject implements JsonAble, ArrayAble {
 	public function getLink($option = array()) {
 		$option['total'] = $this->_total;
 		$option['pageSize'] = $this->_pageSize;
-		$option['index'] = $this->_index;
+		$option['page'] = $this->_index;
 		$option['key'] = $this->_key;
 		return PageLink::show($option);
 	}

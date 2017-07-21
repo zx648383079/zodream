@@ -48,7 +48,8 @@ class Url {
      */
 	public static function to($file = null, $extra = null, $complete = true) {
         if (is_string($file) &&
-            ($file === '#' || strpos($file, 'javascript:') === 0)) {
+            ($file === '#'
+                || strpos($file, 'javascript:') === 0)) {
             return $file;
         }
 	    if (!$file instanceof Uri) {
