@@ -122,6 +122,14 @@ class PageLink extends Widget {
 		return null;
 	}
 
+    /**
+     * 获取省略
+     * @return string
+     */
+	protected function getOmit() {
+	    return $this->replaceTemplate(null, $this->get('omit'));
+    }
+
 	/**
 	 * 分页数字列表
 	 * @return string
@@ -149,14 +157,14 @@ class PageLink extends Widget {
 			$i = $this->pageTotal - $this->get('length') + 1;
 			$length = $this->pageTotal - 1;
 		}
-		if ($this->get('page') > $lastList+ 1 && $i > 2) {
-			$linkPage .= $this->replaceTemplate(null, $this->get('omit'));
+		if ($this->get('page') > $lastList + 1 && $i > 2) {
+			$linkPage .= $this->getOmit();
 		}
 		for (; $i <= $length; $i ++) {
 			$linkPage .= $this->replaceLine($i);
 		}
 		if ($this->get('page') < $this->pageTotal - $lastList && $length < $this->pageTotal - 1) {
-			$linkPage .= $this->replaceTemplate(null, $this->get('omit'));
+			$linkPage .= $this->getOmit();
 		}
 		$linkPage .= $this->replaceLine($this->pageTotal);
 		return $linkPage;
