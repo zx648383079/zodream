@@ -204,6 +204,14 @@ class Uri {
     }
 
     /**
+     * 判断是否有值
+     * @return bool
+     */
+    public function hasData() {
+        return !empty($this->data);
+    }
+
+    /**
      * @param string $arg
      * @return $this
      */

@@ -186,14 +186,18 @@ class PageLink extends Widget {
 	 * @return string
 	 */
 	protected function getGoToPage() {
+	    $uri = Url::to()
+            ->removeData($this->get('key'));
+	    if (!$uri->hasData()) {
+	        $uri .= '?';
+        }
 		return str_ireplace([
 		    '{url}',
             '{page}',
             '{pageTotal}',
             '{key}'
         ], [
-            (string)Url::to()
-                ->removeData($this->get('key')),
+            (string)$uri,
             $this->get('page'),
             $this->pageTotal,
             $this->get('key')
