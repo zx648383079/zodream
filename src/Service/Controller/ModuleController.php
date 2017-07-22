@@ -13,14 +13,19 @@ abstract class ModuleController extends Controller {
     /**
      * ajax 成功返回
      * @param null $data
+     * @param null $message
      * @return Response
      */
-    public function ajaxSuccess($data = null) {
-        return $this->ajax([
+    public function jsonSuccess($data = null, $message = null) {
+        if (!is_array($message)) {
+            $message = ['message' => $message];
+        }
+
+        return $this->json(array_merge(array(
             'code' => 200,
             'status' => 'success',
             'data' => $data
-        ]);
+        ), $message));
     }
 
     /**
@@ -29,15 +34,15 @@ abstract class ModuleController extends Controller {
      * @param int $code
      * @return Response
      */
-    public function ajaxFailure($message = '', $code = 400) {
+    public function jsonFailure($message = '', $code = 400) {
         if (is_array($message)) {
-            return $this->ajax(array(
+            return $this->json(array(
                 'code' => $code,
                 'status' => 'failure',
                 'errors' => $message
             ));
         }
-        return $this->ajax(array(
+        return $this->json(array(
             'code' => $code,
             'status' => 'failure',
             'message' => $message
@@ -45,15 +50,20 @@ abstract class ModuleController extends Controller {
     }
 
     protected function getActionName($action) {
-        if (Request::isAjax()) {
+        if (Request::expectsJson()) {
             return $this->getAjaxActionName($action);
         }
         return parent::getActionName($action);
     }
 
     protected function getAjaxActionName($action) {
-        $arg = parent::getActionName($action.'Ajax');
-        return method_exists($this, $arg) ? $arg : $action;
+        $arg = parent::getActionName($action).'Json';
+        return method_exists($this, $arg) ? $arg : parent::getActionName($action);
+    }
+
+    public function hasMethod($action) {
+        return array_key_exists($action, $this->actions())
+            || method_exists($this, $this->getActionName($action));
     }
 
     protected function getViewFile($name = null) {

@@ -126,7 +126,8 @@ abstract class Model extends MagicObject {
             ->set($this->getValues())
             ->insert();
 		if (!empty($row)) {
-			$this->set('id', $row);
+			$this->set(current($this->primaryKey), $row);
+            $this->setOldData();
 		}
 		$this->invoke(self::AFTER_INSERT, [$this]);
 		return $row;
@@ -174,25 +175,24 @@ abstract class Model extends MagicObject {
 	/**
 	 * 修改记录
 	 *
-	 * @param array|string $where 条件 默认使用AND 连接
-	 * @param array $args 需要修改的内容
 	 * @return int 返回影响的行数,
 	 */
-	public function update($where = null, $args = null) {
-		if (is_null($where)) {
-			$where = $this->getWhereKey();
-		}
-		if (is_array($args)) {
-			$this->set($args);
-		}
+	public function update() {
 		if (!$this->validate()) {
 			return false;
 		}
+		$data = $this->getUpdateData();
+		if (empty($data)) {
+		    return true;
+        }
 		$this->invoke(self::BEFORE_UPDATE, [$this]);
 		$row = $this->record()
-            ->set($this->getUpdateData())
-            ->whereMany($where)
+            ->set($data)
+            ->whereMany($this->getWhereKey())
 			->update();
+        if (!empty($row)) {
+            $this->setOldData();
+        }
 		$this->invoke(self::AFTER_UPDATE, [$this]);
 		return $row;
 	}
@@ -255,18 +255,16 @@ abstract class Model extends MagicObject {
 	 * 删除数据
 	 * DELETE QUERY
 	 *
-	 * @param string|array $where 条件
-	 * @param array $parameters
 	 * @return int 返回影响的行数,
 	 */
-	public function delete($where = null, $parameters = array()) {
-		if (is_null($where)) {
-			$where = $this->getWhereKey();
-		}
-		return $this->record()
-			->whereMany($where)
-			->addParam($parameters)
+	public function delete() {
+		$row = $this->record()
+			->whereMany($this->getWhereKey())
 			->delete();
+		if (!empty($row)) {
+		    $this->initOldData();
+        }
+        return $row;
 	}
 
 	/**

@@ -272,7 +272,7 @@ final class Request {
 	    if (empty($accept)) {
 	        return false;
         }
-        $args = explode(';');
+        $args = explode(';', $accept);
 	    return StringExpand::contains($args[0], ['/json', '+json']);
     }
 

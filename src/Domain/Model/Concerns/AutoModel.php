@@ -39,7 +39,6 @@ trait AutoModel {
         if (empty($key)) {
             return $this;
         }
-        $this->setOldData();
         if (!is_array($key)) {
             $key = [$key => $value];
         }
@@ -58,10 +57,27 @@ trait AutoModel {
         return $this;
     }
 
-    protected function setOldData() {
-        if ($this->isNewRecord || !empty($this->_oldData)) {
-            return;
+    /**
+     * 设置旧值
+     * @param null $data
+     * @return $this
+     */
+    public function setOldData($data = null) {
+        if (is_null($data)) {
+            $data = $this->_data;
         }
-        $this->_oldData = $this->_data;
+        $this->isNewRecord = false;
+        $this->_oldData = array_merge($this->_oldData, $data);
+        return $this;
+    }
+
+    /**
+     * 初始化旧值
+     * @return $this
+     */
+    public function initOldData() {
+        $this->isNewRecord = true;
+        $this->_oldData = [];
+        return $this;
     }
 }

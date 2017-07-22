@@ -47,8 +47,7 @@ class Query extends BaseQuery {
         foreach ($data as $item) {
             /** @var $model Model */
             $model = new $this->modelName;
-            $model->set($item);
-            $model->isNewRecord = false;
+            $model->setOldData($item)->set($item);
             $args[] = $model;
         }
         return $args;

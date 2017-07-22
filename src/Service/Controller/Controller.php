@@ -152,7 +152,7 @@ abstract class Controller extends BaseController {
             return Auth::guest() ?: $this->redirect('/');
         }
         if ($role === '@') {
-            return $this->checkUser() ?: $this->redirect([Config::auth('home'), 'ReturnUrl' => Url::to()]);
+            return $this->checkUser() ?: $this->redirect([Config::auth('home'), 'redirect_uri' => Url::to()]);
         }
         if ($role === 'p' || $role === 'post') {
             return Request::isPost() ?: $this->redirectWithMessage('/', '您不能直接访问此页面！', 4,'400');
@@ -239,7 +239,7 @@ abstract class Controller extends BaseController {
      * @param string $type
      * @return Response
      */
-    public function ajax($data, $type = 'json') {
+    public function json($data, $type = 'json') {
         switch (strtolower($type)) {
             case 'xml':
                 return Factory::response()->xml($data);

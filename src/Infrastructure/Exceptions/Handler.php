@@ -159,7 +159,7 @@ class Handler implements ExceptionHandler {
     }
 
     public function unauthenticated(AuthenticationException $e) {
-        return Factory::response()->redirect([Config::auth('home'), 'ReturnUrl' => Url::to()]);
+        return Factory::response()->redirect([Config::auth('home'), 'redirect_uri' => Url::to()]);
     }
 
     /**
