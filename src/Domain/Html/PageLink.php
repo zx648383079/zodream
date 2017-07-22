@@ -60,8 +60,10 @@ class PageLink extends Widget {
 	 * @return string
 	 */
 	public function getHtml() {
-	    $this->getPageTotal();
-        return str_ireplace(array(
+	   if ($this->getPageTotal() < 2) {
+	       return null;
+       }
+       return str_ireplace(array(
 				'{total}',
 				'{pageSize}',
 				'{start}',
@@ -135,9 +137,6 @@ class PageLink extends Widget {
 	 * @return string
 	 */
 	protected function getPageList() {
-		if ($this->pageTotal < 2) {
-			return null;
-		}
 		$linkPage = '';
 		$linkPage .= $this->replaceLine(1);
 		$lastList = floor($this->get('length') / 2);
