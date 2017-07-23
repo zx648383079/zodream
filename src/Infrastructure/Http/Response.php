@@ -223,9 +223,6 @@ class Response {
      */
     public function json($data) {
         $this->header->setContentType('json');
-        if (!is_array($data)) {
-            return $this->setParameter($data);
-        }
         return $this->setParameter(JsonExpand::encode($data));
     }
 

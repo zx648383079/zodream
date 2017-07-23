@@ -42,7 +42,7 @@ class Auth implements AuthObject {
      * 获取 记住我 cookie key
      * @return string
      */
-    public function getRememberName() {
+    public static function getRememberName() {
         return 'remember_'.Config::auth('session_key', 'user').'_'.sha1(static::class);
     }
 
@@ -105,7 +105,7 @@ class Auth implements AuthObject {
 	    if (empty(static::user())) {
 	        return false;
         }
-        return static::user()->getId();
+        return static::user()->getIdentity();
     }
 
 	/**
@@ -156,6 +156,6 @@ class Auth implements AuthObject {
         static::user()
             ->setRememberToken(StringExpand::random(60));
         Factory::session()->destroy();
-        throw new AuthenticationException();
+        //throw new AuthenticationException();
     }
 }

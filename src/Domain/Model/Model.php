@@ -9,6 +9,7 @@ use Zodream\Domain\Html\Page;
 use Zodream\Domain\Model\Concerns\AutoModel;
 use Zodream\Domain\Model\Concerns\HasAttributes;
 use Zodream\Domain\Model\Concerns\HasRelation;
+use Zodream\Domain\Model\Concerns\HasTimestamps;
 use Zodream\Domain\Model\Concerns\ValidateData;
 use Zodream\Infrastructure\Database\Query\Record;
 use Zodream\Infrastructure\Base\MagicObject;
@@ -17,7 +18,7 @@ use Zodream\Infrastructure\Traits\EventTrait;
 
 abstract class Model extends MagicObject {
 
-    use ErrorTrait, AutoModel, EventTrait, HasRelation, HasAttributes, ValidateData;
+    use ErrorTrait, AutoModel, EventTrait, HasRelation, HasAttributes, ValidateData, HasTimestamps;
 
     const BEFORE_SAVE = 'before save';
     const AFTER_SAVE = 'after save';
@@ -25,6 +26,20 @@ abstract class Model extends MagicObject {
     const AFTER_INSERT = 'after insert';
     const BEFORE_UPDATE = 'before update';
     const AFTER_UPDATE = 'after update';
+
+    /**
+     * The name of the "created at" column.
+     *
+     * @var string
+     */
+    const CREATED_AT = 'created_at';
+
+    /**
+     * The name of the "updated at" column.
+     *
+     * @var string
+     */
+    const UPDATED_AT = 'updated_at';
 
     public $isNewRecord = true;
 
@@ -84,6 +99,9 @@ abstract class Model extends MagicObject {
 
 	public function save() {
 		$this->invoke(self::BEFORE_SAVE, [$this]);
+		if ($this->usesTimestamps()) {
+            $this->updateTimestamps();
+        }
 		if ($this->isNewRecord) {
 			$row = $this->insert();
 		} else {
@@ -220,6 +238,9 @@ abstract class Model extends MagicObject {
 	 * @return static|boolean
      */
 	public static function find($param, $field = '*', $parameters = array()) {
+	    if (empty($param)) {
+	        return false;
+        }
 		$model = new static;
 		if (is_numeric($param)) {
 			$param = [$model->primaryKey[0] => $param];

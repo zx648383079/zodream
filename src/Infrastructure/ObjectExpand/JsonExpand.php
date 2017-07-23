@@ -1,5 +1,7 @@
 <?php
 namespace Zodream\Infrastructure\ObjectExpand;
+use Zodream\Infrastructure\Interfaces\JsonAble;
+
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -18,11 +20,14 @@ class JsonExpand {
     }
 
     /**
-     * @param array $args
+     * @param array|JsonAble $args
      * @param int $option 默认不编码成 多字节 Unicode \u XXX
      * @return string
      */
-    public static function encode(array $args, $option = JSON_UNESCAPED_UNICODE) {
+    public static function encode($args, $option = JSON_UNESCAPED_UNICODE) {
+        if ($args instanceof JsonAble) {
+            return $args->toJson();
+        }
         return json_encode($args, $option);
     }
 }

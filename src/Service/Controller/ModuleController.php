@@ -20,7 +20,9 @@ abstract class ModuleController extends Controller {
         if (!is_array($message)) {
             $message = ['message' => $message];
         }
-
+        if ($data instanceof ArrayAble) {
+            $data = $data->toArray();
+        }
         return $this->json(array_merge(array(
             'code' => 200,
             'status' => 'success',

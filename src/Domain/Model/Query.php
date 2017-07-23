@@ -2,13 +2,27 @@
 namespace Zodream\Domain\Model;
 
 use Zodream\Infrastructure\Database\Query\Query as BaseQuery;
+use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
 class Query extends BaseQuery {
 
     protected $relations = [];
 
     protected $modelName;
+
+    /**
+     * @var Model
+     */
+    protected $model;
+
     protected $isArray = false;
+
+    public function getModel() {
+        if (!$this->model instanceof Model) {
+            $this->model = new $this->modelName;
+        }
+        return $this->model;
+    }
 
     public function with($relations) {
         if (!is_array($relations)) {
@@ -20,6 +34,7 @@ class Query extends BaseQuery {
 
     public function setModelName($model) {
         if ($model instanceof Model) {
+            $this->model = $model;
             $model = $model->className();
         }
         $this->modelName = $model;
@@ -88,5 +103,17 @@ class Query extends BaseQuery {
     public function delete() {
         return $this->command()
             ->delete($this->getWhere().$this->getLimit(), $this->get());
+    }
+
+    /***
+     * 使用 model 中的方法
+     * @param $name
+     * @param $arguments
+     * @return $this
+     */
+    public function __call($name, $arguments) {
+        $method = 'scope'.StringExpand::studly($name);
+        call_user_func([$this->getModel(), $method], $this, ...$arguments);
+        return $this;
     }
 }

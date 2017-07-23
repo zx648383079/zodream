@@ -40,6 +40,18 @@ trait HasAttributes {
     }
 
     /**
+     * 判断是否为空
+     * @param null $key
+     * @return bool
+     */
+    public function isEmpty($key = null) {
+        if (is_null($key)) {
+            return count($this->_data) == 0;
+        }
+        return !$this->has($key) || empty($this->_data[$key]);
+    }
+
+    /**
      * @param string|array $key
      * @return bool
      */

@@ -39,7 +39,7 @@ class Page extends MagicObject implements JsonAble, ArrayAble {
 	 */
 	public function setTotal($total) {
 		if ($total instanceof Query) {
-			$this->_total = intval($total->count()->scalar());
+			$this->_total = intval($total->count());
 			return $this;
 		}
 		$this->_total = intval($total);
@@ -120,9 +120,9 @@ class Page extends MagicObject implements JsonAble, ArrayAble {
         return [
             'total' => $this->getTotal(),
             'page' => $this->_index,
-            'size' => $this->_pageSize,
+            'pageSize' => $this->_pageSize,
             'key' => $this->_key,
-            'page_list' => $this->_data
+            'pagelist' => $this->_data
         ];
     }
 }

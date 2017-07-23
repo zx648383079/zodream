@@ -14,6 +14,16 @@ trait ValidateData {
     }
 
     /**
+     * 判断是否有列名
+     * @param $key
+     *
+     * @return bool
+     */
+    public function hasColumn($key) {
+        return array_key_exists($key, $this->rules());
+    }
+
+    /**
      * 验证
      * @param array $rules
      * @return bool

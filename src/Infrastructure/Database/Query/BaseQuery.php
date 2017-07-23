@@ -35,6 +35,9 @@ abstract class BaseQuery extends BaseSchema  {
      * @return static
      */
     public function where($condition, $params = array()) {
+        if (empty($condition)) {
+            return $this;
+        }
         $this->where = [$condition];
         return $this->addParam($params);
     }
