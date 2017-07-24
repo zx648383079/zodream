@@ -422,25 +422,26 @@ class Image {
 	}
 
 	/**
+     * 保存，如果路径不存在则输出
 	 * @return bool
 	 */
 	public function save() {
-		if (!empty($this->file)) {
-			return call_user_func('image'.$this->realType, $this->image, $this->file);
-		}
-		return false;
+		return $this->saveAs($this->file);
 	}
 
 	/**
 	 * 另存为
-	 * @param string $output 如果为null 表示输出
+	 * @param string|null $output 如果为null 表示输出
 	 * @param string $type
 	 * @return bool
 	 */
-	public function saveAs($output = null, $type = null) {
-		$this->setRealType($type);
-		return call_user_func('image'.$this->realType, $this->image, (string)$output);
-	}
+    public function saveAs($output = null, $type = null) {
+        $this->setRealType($type);
+        if (!is_null($output)) {
+            $output = (string)$output;
+        }
+        return call_user_func('image'.$this->realType, $this->image, $output);
+    }
 	
 	public function close() {
 		if (!empty($this->image)) {

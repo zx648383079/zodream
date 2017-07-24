@@ -5,7 +5,9 @@ namespace Zodream\Domain\Image;
  *
  * @author Jason
  */
+use Zodream\Infrastructure\Security\Hash;
 use Zodream\Infrastructure\Traits\ConfigTrait;
+use Zodream\Service\Factory;
 
 class Captcha extends WaterMark {
 
@@ -22,7 +24,8 @@ class Captcha extends WaterMark {
         'fontColor' => '',   //指定字体颜色, 可以是数组
         'fontFamily' => null,  //指定的字体
         'width' => 100,
-        'height' => 30
+        'height' => 30,
+        'sensitive' => true,   // 大小写敏感
     ];
 
 	/**
@@ -63,6 +66,10 @@ class Captcha extends WaterMark {
 		for ($i = 0; $i < $this->configs['length']; $i ++) {
             $this->code .= $charset[mt_rand(0, $_len)];
         }
+        Factory::session()->set('captcha', [
+            'sensitive' => $this->configs['sensitive'],
+            'key'       => Hash::make($this->configs['sensitive'] ? $this->code : strtolower($this->code))
+        ]);
         return $this;
 	}
 	
@@ -91,7 +98,7 @@ class Captcha extends WaterMark {
 					$this->code[$i],
 					$x * $i + mt_rand(1, 5),
 					($this->height - $this->configs['fontSize']) / 2 ,
-					$this->$this->configs['fontSize'],
+					$this->configs['fontSize'],
 					$this->getColorWithRGB($this->_getTextFont($i)),
 					$this->configs['fontFamily'],
 					mt_rand(-30, 30)
@@ -145,4 +152,21 @@ class Captcha extends WaterMark {
 			);
 		}
 	}
+
+    /**
+     * 验证
+     * @param string $value
+     * @return bool
+     */
+    public function verify($value) {
+        if (!Factory::session()->has('captcha')) {
+            return false;
+        }
+        $data = Factory::session()->get('captcha');
+        if (!$data['sensitive']) {
+            $value = strtolower($value);
+        }
+        Factory::session()->delete('captcha');
+        return Hash::verify($value, $data['key']);
+    }
 }
