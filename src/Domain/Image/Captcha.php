@@ -30,7 +30,9 @@ class Captcha extends WaterMark {
 	 * @return string
 	 */
 	public function getCode() {
-		$this->_createCode();
+        if (empty($this->code)) {
+            $this->createCode();
+        }
 		return $this->code;
 	}
 
@@ -40,6 +42,7 @@ class Captcha extends WaterMark {
 	 * @return $this
 	 */
 	public function generate($level = 0) {
+	    $this->getCode();
 		$this->loadConfigs();
         $this->width = $this->configs['width'];
         $this->height = $this->configs['height'];
@@ -48,17 +51,19 @@ class Captcha extends WaterMark {
 		$this->_createLine($level);
 		return $this;
 	}
-	
-	
-	/**
-	 * 生成随机码
-	 */
-	private function _createCode() {
+
+
+    /**
+     * 生成随机码
+     * @return $this
+     */
+	public function createCode() {
 		$charset = $this->configs['characters'];
 		$_len   = strlen($charset)-1;
 		for ($i = 0; $i < $this->configs['length']; $i ++) {
             $this->code .= $charset[mt_rand(0, $_len)];
         }
+        return $this;
 	}
 	
 	/**
