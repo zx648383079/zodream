@@ -28,4 +28,5 @@ class HomeController extends Controller {
     public function controllerAction() {
         return $this->show('controller');
     }
+
 }
