@@ -8,15 +8,15 @@ namespace Zodream\Infrastructure\Security;
  */
 class Hash {
 
-    protected static $round = 10;
+    protected static $rounds = 10;
 
     /**
      * 生成hash值
      * @param string $value
-     * @param array $option
+     * @param array $options
      * @return bool|string
      */
-    public static function make($value, $option = array()) {
+    public static function make($value, $options = array()) {
         return password_hash($value, PASSWORD_BCRYPT, ['cost' => static::cost($options)]);
     }
 
