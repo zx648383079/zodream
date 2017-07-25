@@ -24,8 +24,4 @@ trait SingletonPattern {
 		}
 		return static::$instance;
 	}
-	
-	public static function __callStatic($action, $arguments) {
-        return static::getInstance()->{$action}(...$arguments);
-	}
 }

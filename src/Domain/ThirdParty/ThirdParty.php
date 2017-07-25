@@ -254,6 +254,7 @@ abstract class ThirdParty extends MagicObject {
     }
 
     public static function __callStatic($method, $parameters) {
-        return (new static)->$method(...$parameters);
+        return call_user_func_array([
+            new static, $method], $parameters);
     }
 }

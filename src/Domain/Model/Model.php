@@ -303,6 +303,7 @@ abstract class Model extends MagicObject {
 
 
 	public static function __callStatic($method, $arguments) {
-        return static::query()->$method(...$arguments);
+		return call_user_func_array([
+           	static::query(), $method], $arguments);
     }
 }

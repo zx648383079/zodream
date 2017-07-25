@@ -113,7 +113,8 @@ class Query extends BaseQuery {
      */
     public function __call($name, $arguments) {
         $method = 'scope'.StringExpand::studly($name);
-        call_user_func([$this->getModel(), $method], $this, ...$arguments);
+        array_unshift($arguments, $this);
+        call_user_func_array([$this->getModel(), $method], $arguments);
         return $this;
     }
 }

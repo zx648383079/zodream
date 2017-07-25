@@ -120,7 +120,4 @@ class NewsItem extends ZObject {
         ];
     }
 
-    public static function __callStatic($method, $parameters) {
-        return (new static)->$method(...$parameters);
-    }
 }

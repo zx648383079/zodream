@@ -76,7 +76,8 @@ class Config extends BaseConfig {
 	        // 初始化未完成时
 	        return null;
         }
-        return static::getInstance()->{$method}(...$value);
+        return call_user_func_array([
+            static::getInstance(), $method], $value);
 	}
 
     /**

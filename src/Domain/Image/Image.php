@@ -462,8 +462,4 @@ class Image {
 	public function __destruct() {
 		$this->close();
 	}
-
-    public static function __callStatic($method, $parameters) {
-        return (new static)->$method(...$parameters);
-    }
 }
