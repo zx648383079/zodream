@@ -46,7 +46,7 @@ class Response {
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
-        307 => 'Temporary Redirect',
+        307 => 'Temporary Redirect', // 重定向不会把POST 转为GET
         308 => 'Permanent Redirect',    // RFC7238
         400 => 'Bad Requests',
         401 => 'Unauthorized',
