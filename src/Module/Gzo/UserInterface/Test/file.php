@@ -6,72 +6,58 @@ use Zodream\Infrastructure\ObjectExpand\StringExpand;
 /** @var $this Zodream\Domain\View\View */
 /** @var $file \Zodream\Infrastructure\Disk\File */
 require $file->getFullName();
-if (!class_exists($className)) {
+if (!class_exists($className)) :
     die("Error: cannot find class($className). \n");
-}
+endif;
 $reflector = new ReflectionClass($className);
 
 $methods = $reflector->getMethods(ReflectionMethod::IS_PUBLIC);
 
 $objName = StringExpand::studly($className);
-
-$code = "<?php
+echo '<?php';
+?>
 /**
  * PhpUnderControl" . $objName. "Test
  *
  * 针对 $filePath $className 类的PHPUnit单元测试
  *
- * @author: zodream " . date('Ymd') . "
+ * @author: zodream <?=date('Ymd')?>
  */
 
-";
+//require_once dirname(__FILE__) . '/test_env.php';
 
-if (file_exists(dirname(__FILE__) . '/test_env.php')) {
-    $code .= "require_once dirname(__FILE__) . '/test_env.php';
-";
-} else {
-    $code .= "//require_once dirname(__FILE__) . '/test_env.php';
-";
-}
-
+<?php
 $initWay = "new $className()";
-if (method_exists($className, '__construct')) {
+if (method_exists($className, '__construct')) :
     $constructMethod = new ReflectionMethod($className, '__construct');
-    if (!$constructMethod->isPublic()) {
-        if (is_callable(array($className, 'getInstance'))) {
+    if (!$constructMethod->isPublic()) :
+        if (is_callable(array($className, 'getInstance'))) :
             $initWay = "$className::getInstance()";
-        } else if(is_callable(array($className, 'newInstance'))) {
+        elseif(is_callable(array($className, 'newInstance'))) :
             $initWay = "$className::newInstance()";
-        } else {
+        else:
             $initWay = 'NULL';
-        }
-    }
-}
+        endif;
+    endif;
+endif;
+?>
+use PHPUnit_Framework_TestCase;
 
-$code .= "
-if (!class_exists('$className')) {
-    require dirname(__FILE__) . '/$filePath';
-}
+class <?=$objName?>Test extends PHPUnit_Framework_TestCase {
 
-class PhpUnderControl" . $objName . "Test extends PHPUnit_Framework_TestCase
-{
-    public \$$objName;
+    public $instance;
 
-    protected function setUp()
-    {
+    protected function setUp() {
         parent::setUp();
-
-        \$this->$objName = $initWay;
+        $this->$instance = <?=$initWay?>;
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown() {
+
     }
 
-";
-
-foreach ($methods as $method) {
-    if($method->class != $className) continue;
+<?php foreach ($methods as $method) : ?>
+    <?php if($method->class != $className) continue;
 
     $fun = $method->name;
     $Fun = ucfirst($fun);
@@ -83,11 +69,11 @@ foreach ($methods as $method) {
     $isStatic = $rMethod->isStatic();
     $isConstructor = $rMethod->isConstructor();
 
-    if($isConstructor) continue;
+    if ($isConstructor) continue;
 
     $initParamStr = '';
     $callParamStr = '';
-    foreach ($params as $param) {
+    foreach ($params as $param) :
         $default = '';
 
         $rp = new ReflectionParameter(array($className, $fun), $param->name);
@@ -109,21 +95,22 @@ foreach ($methods as $method) {
         $initParamStr .= "
         \$" . $param->name . " = $default;";
         $callParamStr .= '$' . $param->name . ', ';
-    }
-    $callParamStr = empty($callParamStr) ? $callParamStr : substr($callParamStr, 0, -2);
+    endforeach;
+    $callParamStr = empty($callParamStr) ? $callParamStr
+        : substr($callParamStr, 0, -2);
 
     /** ------------------- 根据@return对结果类型的简单断言 ------------------ **/
     $returnAssert = '';
 
     $docComment = $rMethod->getDocComment();
     $docCommentArr = explode("\n", $docComment);
-    foreach ($docCommentArr as $comment) {
-        if (strpos($comment, '@return') == false) {
+    foreach ($docCommentArr as $comment) :
+        if (strpos($comment, '@return') == false) :
             continue;
-        }
+        endif;
         $returnCommentArr = explode(' ', strrchr($comment, '@return'));
-        if (count($returnCommentArr) >= 2) {
-            switch (strtolower($returnCommentArr[1])) {
+        if (count($returnCommentArr) >= 2) :
+            switch (strtolower($returnCommentArr[1])) :
                 case 'bool':
                 case 'boolean':
                     $returnAssert = '$this->assertTrue(is_bool($rs));';
@@ -146,61 +133,51 @@ foreach ($methods as $method) {
                 case 'float':
                     $returnAssert = '$this->assertTrue(is_float($rs));';
                     break;
-            }
+            endswitch;
 
             break;
-        }
-    }
-
+        endif;
+    endforeach;
+?>
     /** ------------------- 基本的单元测试代码生成 ------------------ **/
-    $code .= "
     /**
-     * @group test$Fun
+     * @group test<?=$fun?>
      */ 
-    public function test$Fun()
-    {"
-        . (empty($initParamStr) ? '' : "$initParamStr\n")
-        . "\n        "
-        . ($isStatic ? "\$rs = $className::$fun($callParamStr);" : "\$rs = \$this->$objName->$fun($callParamStr);")
-        . (empty($returnAssert) ? '' : "\n\n        " . $returnAssert . "\n")
-        . "
+    public function test<?=$fun?>() {
+        <?= empty($initParamStr) ? '' : $initParamStr ?>
+
+        <?= $isStatic ? "\$rs = $className::$fun($callParamStr);" : "\$rs = \$this->$objName->$fun($callParamStr);"?>
+        <?= empty($returnAssert) ? '' : $returnAssert?>
     }
-";
 
     /** ------------------- 根据@testcase 生成测试代码 ------------------ **/
-    $caseNum = 0;
-    foreach ($docCommentArr as $comment) {
+    <?php $caseNum = 0;
+    foreach ($docCommentArr as $comment) :
         if (strpos($comment, '@testcase') == false) {
             continue;
         }
 
         $returnCommentArr = explode(' ', strrchr($comment, '@testcase'));
-        if (count($returnCommentArr) > 1) {
+        if (count($returnCommentArr) > 1) :
             $expRs = $returnCommentArr[1];
             $callParamStrInCase = isset($returnCommentArr[2]) ? $returnCommentArr[2] : '';
 
-            $code .= "
+           ?>
     /**
      * @group test$Fun
      */ 
-    public function test{$Fun}Case{$caseNum}()
-    {"
-                . "\n        "
-                . ($isStatic ? "\$rs = $className::$fun($callParamStrInCase);" : "\$rs = \$this->$objName->$fun($callParamStrInCase);")
-                . "\n\n        \$this->assertEquals({$expRs}, \$rs);"
-                . "
+    public function test<?=$Fun?>Case<?=$caseNum?>() {"
+
+                <?= $isStatic ? "\$rs = $className::$fun($callParamStrInCase);" : "\$rs = \$this->$objName->$fun($callParamStrInCase);"?>
+        $this->assertEquals(<?=$expRs?>, $rs);"
     }
-";
+<?php
             $caseNum ++;
 
-        }
+        endif;
 
-    }
+    endforeach;
 
+endforeach;
+?>
 }
-
-$code .= "
-}";
-
-echo $code;
-echo "\n";
