@@ -291,6 +291,14 @@ class Table extends BaseSchema {
     }
 
     /**
+     * 获取列名
+     * @return array
+     */
+    public function getColumnKeys() {
+        return array_column($this->getAllColumn(), 'Field');
+    }
+
+    /**
      * 系统生成的创建表的语句
      * @return string
      */

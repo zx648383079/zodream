@@ -209,4 +209,62 @@ class Record extends BaseQuery  {
     public function getSql() {
         return '';
     }
+
+    /**
+     * @param array|Query $data
+     * @param array $relations
+     * @return bool
+     */
+    public static function moveTo($data, array $relations) {
+        if ($data instanceof Query) {
+            $data = $data->all();
+        }
+        if (empty($data)) {
+            return false;
+        }
+        foreach ($data as $item) {
+            foreach ($relations as $table => $relation) {
+                if (is_integer($table) && is_callable($relation)) {
+                    call_user_func($relation, $item);
+                    return;
+                }
+                $key = $table.'_id';
+                $record = (new static)->setTable($table);
+                if (is_callable($relation)) {
+                    call_user_func($relation, $record, $item);
+                    // 防止有些表没有自增字段
+                    $id = $record->insert();
+                    if ($id > 0) {
+                        $item[$key] = $id;
+                    }
+                    continue;
+                }
+                foreach ($relation as $column => $oldColumn) {
+                    if (is_numeric($oldColumn) || empty($oldColumn)) {
+                        $record->set($column, $oldColumn);
+                        continue;
+                    }
+                    if (is_callable($oldColumn)) {
+                        // 返回自定义字段
+                        $record->set($column, $item[$table.'_'.$column] = call_user_func($oldColumn, $item));
+                        continue;
+                    }
+                    if (strpos($oldColumn, '!') === 0) {
+                        $record->set($column, substr($oldColumn, 1));
+                        continue;
+                    }
+                    if (!array_key_exists($oldColumn, $item)) {
+                        throw new \InvalidArgumentException($oldColumn);
+                    }
+                    $record->set($column, $item[$oldColumn]);
+                }
+                // 防止有些表没有自增字段
+                $id = $record->insert();
+                if ($id > 0) {
+                    $item[$key] = $id;
+                }
+            }
+        }
+        return true;
+    }
 }

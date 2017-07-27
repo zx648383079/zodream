@@ -253,4 +253,12 @@ class File extends FileObject {
     public function md5() {
         return md5_file($this->fullName);
     }
+
+    /**
+     * 转化为 stream 方式读写
+     * @return Stream
+     */
+    public function asStream() {
+        return new Stream($this);
+    }
 }

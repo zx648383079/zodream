@@ -25,6 +25,11 @@ class Stream {
         return $this;
     }
 
+    /**
+     *
+     * @param string $mode  默认写入   r 为读取
+     * @return $this
+     */
     public function open($mode = 'a') {
         if (is_resource($this->stream)) {
             return $this;
@@ -33,16 +38,36 @@ class Stream {
         return $this;
     }
 
+    /**
+     * 判断是否已经结束
+     * @return bool
+     */
+    public function isEnd() {
+        return feof($this->stream);
+    }
+
+    /**
+     * 读取一行
+     * @return bool|string
+     */
+    public function readLine() {
+        return fgets($this->stream);
+    }
+
     public function write($content) {
         $this->open('a');
         if ($this->useLocking) {
             flock($this->stream, LOCK_EX);
         }
-        fwrite($this->stream, (string) $content);
+        fwrite($this->stream, (string)$content);
         if ($this->useLocking) {
             flock($this->stream, LOCK_UN);
         }
         return $this;
+    }
+
+    public function writeLine($line) {
+        return $this->write(PHP_EOL. $line);
     }
 
     public function read($length) {

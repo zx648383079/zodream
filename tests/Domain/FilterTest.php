@@ -1,5 +1,9 @@
 <?php
+namespace Zodream\Domain;
+
 use Zodream\Domain\Filter\DataFilter;
+use PHPUnit_Framework_TestCase;
+
 class FilterTest extends PHPUnit_Framework_TestCase {
     public function testValidate() {
         $this->assertEquals(true, DataFilter::validate(1, 'int'));
