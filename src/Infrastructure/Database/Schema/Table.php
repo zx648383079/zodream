@@ -199,6 +199,44 @@ class Table extends BaseSchema {
     }
 
     /**
+     * Add nullable creation and update timestamps to the table.
+     *
+     * @return void
+     */
+    public function timestamps() {
+        $this->set('created_at')->int(10)->unsigned()->defaultVal(0)->null();
+        $this->set('updated_at')->int(10)->unsigned()->defaultVal(0)->null();
+    }
+
+    /**
+     * Add a "deleted at" timestamp for the table.
+     *
+     * @param  string  $column
+     * @return Column
+     */
+    public function softDeletes($column = 'deleted_at') {
+        return $this->set($column)->int(10)->unsigned()->defaultVal(0)->null();
+    }
+
+    /**
+     * Indicate that the timestamp columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropTimestamps() {
+        $this->dropColumn('created_at', 'updated_at');
+    }
+
+    /**
+     * Indicate that the soft delete column should be dropped.
+     *
+     * @return void
+     */
+    public function dropSoftDeletes() {
+        $this->dropColumn('deleted_at');
+    }
+
+    /**
      * DROP TABLE
      * @return mixed
      */
@@ -244,6 +282,10 @@ class Table extends BaseSchema {
      * @return mixed
      */
     public function dropColumn() {
+        $columns = func_get_args();
+        foreach ($columns as $column) {
+            $this->set($column);
+        }
         return $this->command()->execute($this->getDropColumnSql());
     }
 
@@ -423,5 +465,9 @@ class Table extends BaseSchema {
      */
     public function record() {
         return (new Record())->setTable($this->getTable());
+    }
+
+    public function __call($name, $arguments) {
+        $this->set($name, ...$arguments);
     }
 }

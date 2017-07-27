@@ -85,6 +85,14 @@ abstract class Model extends MagicObject {
 		
 	}
 
+    /**
+     * 判断是否是新增
+     * @return bool
+     */
+	public function getIsNewRecord() {
+	    return $this->isNewRecord;
+    }
+
 	/**
 	 * @param string $key
 	 * @return string

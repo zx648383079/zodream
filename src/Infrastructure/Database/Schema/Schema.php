@@ -138,4 +138,25 @@ class Schema {
     public function mergeTable($table, $sql) {
         return $this->command()->execute('CREATE TABLE '.$this->addPrefix($table).' AS '.$sql);
     }
+
+    /**
+     * 新建表
+     * @param string $table
+     * @param callable $callback
+     * @return mixed
+     */
+    public static function createTable($table, callable $callback) {
+        $table = new Table($table);
+        call_user_func($callback, $table);
+        return $table->create();
+    }
+
+    /**
+     * 删除表
+     * @param string $table
+     * @return mixed
+     */
+    public static function dropTable($table) {
+        return (new Table($table))->drop();
+    }
 }

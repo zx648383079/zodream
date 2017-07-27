@@ -10,13 +10,15 @@ class Column {
 
     const KIND = 0;
 
-    const NULL = 1;
+    const SIGN = 1; // 判断整有无符号
 
-    const AI = 2;
+    const NULL = 2;
 
-    const _DEFAULT_ = 3;
+    const AI = 3;
 
-    const COMMENT = 4;
+    const _DEFAULT_ = 4;
+
+    const COMMENT = 5;
 
     protected $data = [];
 
@@ -121,6 +123,22 @@ class Column {
 
     public function bool() {
         return $this->tinyint(1);
+    }
+
+    /**
+     * 有符号整型
+     * @return Column
+     */
+    public function signed() {
+        return $this->addData(self::SIGN, 'SIGNED');
+    }
+
+    /**
+     * 无符号整型
+     * @return Column
+     */
+    public function unsigned() {
+        return $this->addData(self::SIGN, 'UNSIGNED');
     }
 
     public function char($arg) {
