@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Http\Requests;
+namespace Zodream\Infrastructure\Http\Input;
 /**
  * Created by PhpStorm.
  * User: zx648
@@ -7,7 +7,8 @@ namespace Zodream\Infrastructure\Http\Requests;
  * Time: 9:23
  */
 use Zodream\Infrastructure\Base\MagicObject;
-abstract class BaseRequest extends MagicObject {
+
+abstract class BaseInput extends MagicObject {
     /**
      * 格式化
      * @param array|string $data

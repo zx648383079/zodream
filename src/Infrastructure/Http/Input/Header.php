@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Http\Requests;
+namespace Zodream\Infrastructure\Http\Input;
 
 /**
  * Created by PhpStorm.
@@ -10,7 +10,7 @@ namespace Zodream\Infrastructure\Http\Requests;
 use Zodream\Infrastructure\Http\Request;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-class Header extends BaseRequest {
+class Header extends BaseInput {
     public function __construct() {
         $server = Request::server();
         foreach ($server as $key => $value) {

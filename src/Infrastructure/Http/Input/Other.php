@@ -1,5 +1,5 @@
 <?php
-namespace Zodream\Infrastructure\Http\Requests;
+namespace Zodream\Infrastructure\Http\Input;
 
 /**
  * Created by PhpStorm.
@@ -9,7 +9,7 @@ namespace Zodream\Infrastructure\Http\Requests;
  */
 use Zodream\Infrastructure\Http\Request;
 
-class Other extends BaseRequest {
+class Other extends BaseInput {
 
     public function get($name = null, $default = null) {
         if ($this->has($name)) {

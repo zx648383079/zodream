@@ -5,13 +5,14 @@ namespace Zodream\Infrastructure\Http;
 * 
 * @author Jason
 */
-use Zodream\Infrastructure\Http\Requests\BaseRequest;
-use Zodream\Infrastructure\Http\Requests\Cookie;
-use Zodream\Infrastructure\Http\Requests\Files;
-use Zodream\Infrastructure\Http\Requests\Get;
-use Zodream\Infrastructure\Http\Requests\Header;
-use Zodream\Infrastructure\Http\Requests\Post;
-use Zodream\Infrastructure\Http\Requests\Server;
+use Zodream\Infrastructure\Http\Input\BaseInput;
+use Zodream\Infrastructure\Http\Input\Cookie;
+use Zodream\Infrastructure\Http\Input\Files;
+use Zodream\Infrastructure\Http\Input\Get;
+use Zodream\Infrastructure\Http\Input\Header;
+use Zodream\Infrastructure\Http\Input\Post;
+use Zodream\Infrastructure\Http\Input\Server;
+use Zodream\Infrastructure\Http\Input\Argv;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 use Zodream\Service\Config;
 
@@ -27,22 +28,23 @@ final class Request {
 		'header' => null,
 		'request' => null,
 		'server' => null,
-		'other' => null
+		'other' => null,
+        'argv' => null,
 	);
 
 	/**
 	 * @param $name
-	 * @return BaseRequest
+	 * @return BaseInput
 	 */
 	private static function _getInstance($name) {
 		$name = strtolower($name);
 		if (!array_key_exists($name, self::$_instances)) {
 			return null;
 		}
-		if (self::$_instances[$name] instanceof BaseRequest) {
+		if (self::$_instances[$name] instanceof BaseInput) {
 			return self::$_instances[$name];
 		}
-		$class = 'Zodream\\Infrastructure\\Http\\Requests\\'.ucfirst($name);
+		$class = 'Zodream\\Infrastructure\\Http\\Input\\'.ucfirst($name);
 		return self::$_instances[$name] = new $class;
 	}
 
@@ -50,7 +52,7 @@ final class Request {
 	 * @param $key
 	 * @param string $name
 	 * @param mixed $default
-	 * @return array|string|BaseRequest
+	 * @return array|string|BaseInput
 	 */
 	private static function getValue($key, $name = null, $default = null) {
 		$instance = self::_getInstance($key);
@@ -69,6 +71,16 @@ final class Request {
 	public static function get($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
 	}
+
+    /**
+     * CLI ARGV
+     * @param null $name
+     * @param null $default
+     * @return array|string|Argv
+     */
+	public static function argv($name = null, $default = null) {
+        return self::getValue(__FUNCTION__, $name, $default);
+    }
 
 	/**
 	 * $_POST
@@ -94,7 +106,7 @@ final class Request {
 	 * $_REQUEST
 	 * @param string $name
 	 * @param string $default
-	 * @return array|string|\Zodream\Infrastructure\Http\Requests\Request
+	 * @return array|string|\Zodream\Infrastructure\Http\Input\Request
 	 */
 	public static function request($name = null, $default = null) {
 		return self::getValue(__FUNCTION__, $name, $default);
