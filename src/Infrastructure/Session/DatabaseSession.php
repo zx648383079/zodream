@@ -10,7 +10,7 @@ use Zodream\Infrastructure\Database\Command;
 use Zodream\Infrastructure\Error\Error;
 use Zodream\Infrastructure\ObjectExpand\StringExpand;
 
-class DatabaseCache extends Session {
+class DatabaseSession extends Session {
 
     protected $configs = [
         'table' => 'session'

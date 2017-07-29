@@ -32,8 +32,12 @@ class Session extends ConfigObject implements \ArrayAccess {
         return false;
     }
 
+    /**
+     * 判断session 是否启动
+     * @return bool
+     */
     public function isActive() {
-        return session_status() === PHP_SESSION_ACTIVE;
+        return isset($_SESSION) || session_status() === PHP_SESSION_ACTIVE;
     }
 
     public function open() {
