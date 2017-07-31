@@ -85,7 +85,8 @@ class Directory extends FileObject {
                 continue;
             }
             $file = $this->fullName.'/'.$name;
-            $result = call_user_func($callback, is_dir($file) ? new static($file) : new File($file));
+            $result = call_user_func($callback,
+                is_dir($file) ? new static($file) : new File($file));
             if ($result === false) {
                 break;
             }
@@ -270,9 +271,20 @@ class Directory extends FileObject {
      * @return bool
      */
     public function delete() {
-        $this->map(function (FileObject $item) {
-            $item->delete();
-        });
-        return rmdir($this->fullName);
+        $this->clear();
+        @rmdir($this->fullName);
+        return $this;
+    }
+
+    /**
+     * 清空文件夹
+     * @return $this
+     */
+    public function clear() {
+        $children = $this->children();
+        foreach ($children as $file) {
+            $file->delete();
+        }
+        return $this;
     }
 }

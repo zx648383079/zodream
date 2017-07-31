@@ -50,11 +50,14 @@ abstract class FileObject {
     /**
      * RENAME FILE
      * @param string $file
-     * @param resource $context
+     * @param resource|null $context
      * @return bool
      */
     public function rename($file, $context = null) {
-        return rename($this->fullName, $file, $context);
+        if (is_resource($context)) {
+            return rename($this->fullName, (string)$file, $context);
+        }
+        return rename($this->fullName, (string)$file);
     }
 
     /**
@@ -100,5 +103,14 @@ abstract class FileObject {
             return substr($this->fullName, strlen($root));
         }
         return false;
+    }
+
+    /**
+     * 清除静态缓存
+     * @return $this
+     */
+    public function clearStatCache() {
+        clearstatcache();
+        return $this;
     }
 }

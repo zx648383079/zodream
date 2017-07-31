@@ -29,7 +29,7 @@ class File extends FileObject {
             $this->fullName = $this->getSafePath($file);
             $args = pathinfo($this->fullName);
             $this->name = $args['basename'];
-            $this->extension = $args['extension'];
+            $this->extension = isset($args['extension']) ? $args['extension'] : '';
             $this->directory = $args['dirname'];
         }
     }

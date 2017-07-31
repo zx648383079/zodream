@@ -365,23 +365,25 @@ abstract class BaseQuery extends BaseSchema  {
             return $this->getValueWithParser($value);
         }
         // 连接查询 排除邮箱 排除网址
-        if (strpos($value, '.') !== false
-            && substr_count($value, '.') === 1
-            && strpos($value, '@') === false) {
-            return $value;
-        }
-        // 表内字段关联
-        if (strpos($value, '@') === 0) {
-            return substr($value, 1);
-        }
+//        if (strpos($value, '.') !== false
+//            && substr_count($value, '.') === 1
+//            && strpos($value, '@') === false) {
+//            return $value;
+//        }
+//        // 表内字段关联
+//        if (strpos($value, '@') === 0
+//            && preg_match('/^[\w\.]+$/', $value, $match)) {
+//            return substr($value, 1);
+//        }
 
         if (is_numeric($value) ||
             $value === '?' ||
             (strpos($value, ':') === 0
                 && $this->hasParam($value))) {
+
             return $value;
         }
-        return "'{$value}'";
+        return sprintf("'%s'", addslashes($value));
     }
 
     /**
