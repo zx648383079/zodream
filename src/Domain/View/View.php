@@ -106,7 +106,6 @@ class View {
         } catch (\Throwable $e) {
             $this->handleViewException(new \Exception($e), $obLevel);
         }
-
         return ltrim(ob_get_clean());
     }
 

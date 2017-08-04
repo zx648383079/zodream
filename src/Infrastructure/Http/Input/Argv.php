@@ -40,7 +40,7 @@ class Argv extends BaseInput {
             }
 
             // Is it a command? (prefixed with --)
-            if ( substr( $arg, 0, 2 ) === '--' ) {
+            if ( substr($arg, 0, 2 ) === '--' ) {
 
                 // is it the end of options flag?
                 if (!isset($arg[3])) {
@@ -59,7 +59,7 @@ class Argv extends BaseInput {
 
                 // is the option not followed by another option but by arguments
                 elseif (strpos($args[0],'-') !== 0) {
-                    while (strpos($args[0],'-') !== 0) {
+                    while (!empty($args) && strpos($args[0],'-') !== 0) {
                         $value .= array_shift($args).' ';
                     }
                     $value = rtrim($value,' ');
