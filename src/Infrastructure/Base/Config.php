@@ -75,9 +75,15 @@ class Config extends MagicObject implements JsonAble, JsonSerializable {
         if (!is_array($args)) {
             $args = func_get_args();
         }
-        $data = [$this->get()];
+        $data = [];
+        if ($this->has()) {
+            $data[] = $this->get();
+        }
         foreach ($args as $arg) {
-            $data[] = $this->getDataByFile($arg);
+            $arg = $this->getDataByFile($arg);
+            if (!empty($arg)) {
+                $data[] = $arg;
+            }
         }
         $this->_data = call_user_func_array('Zodream\Infrastructure\ObjectExpand\ArrayExpand::merge2D', $data);
         return $this;
@@ -100,7 +106,7 @@ class Config extends MagicObject implements JsonAble, JsonSerializable {
      * @return string
      */
     protected function getRealFile($name) {
-        if (is_file($name)) {
+        if (!preg_match('/^\w+$/', $name, $m) && is_file($name)) {
             return $name;
         }
         return $this->getDirectory().$name.'.php';
