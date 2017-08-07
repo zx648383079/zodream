@@ -146,6 +146,15 @@ class Directory extends FileObject {
     }
 
     /**
+     *
+     * @param $name
+     * @return File
+     */
+    public function file($name) {
+        return $this->childFile($name);
+    }
+
+    /**
      * GET FILE OR CHILD FILE
      * @param string $file
      * @return File
