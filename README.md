@@ -5,9 +5,7 @@
 
 ## 进度
 
-    进行全面优化，进行理想化编程优化
-
-    理想化编程， 即先出使用文档，再进行编程，尽可能达到最舒服使用
+做程序分离，转移至 [https://github.com/zodream/zodream](https://github.com/zodream/zodream)
 
 ## ZoDream 主程序
 
